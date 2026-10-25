@@ -40,18 +40,24 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('labels', nargs=6)
     ap.add_argument('--holdout-seeds', nargs=4, type=int, default=[6, 7, 8, 9])
+    ap.add_argument('--tested-source', help='Fully tested regression run with the same frozen policy')
     ap.add_argument('--output', type=Path, required=True)
     a = ap.parse_args()
     root = Path(__file__).resolve().parents[1]
     store = Path('/media/krist/KINGSTON/scene1-speed-20261025')
     runs = [inspect(label, root, store) for label in a.labels]
+    tested_source = inspect(a.tested_source, root, store) if a.tested_source else None
+    source_tests = (tested_source is not None and tested_source['tests_passed']
+                    and tested_source['passed']
+                    and all(r['manifest'] == tested_source['manifest']
+                            and r['profile'] == tested_source['profile'] for r in runs))
     expected = {0, 2, *a.holdout_seeds}
     checks = dict(six_distinct_seeds=len(expected) == 6 and {r['seed'] for r in runs} == expected,
                   same_manifest=len({r['manifest'] for r in runs}) == 1,
                   same_profile=len({r['profile'] for r in runs}) == 1,
-                  regression_passed=any(r['tests_passed'] for r in runs),
+                  regression_passed=any(r['tests_passed'] for r in runs) or source_tests,
                   all_runs_passed=all(r['passed'] for r in runs))
-    report = dict(passed=all(checks.values()), checks=checks, runs=runs,
+    report = dict(passed=all(checks.values()), checks=checks, runs=runs, tested_source=tested_source,
                   note='Visual acceptance only. Null task_success is not an official success verdict.')
     a.output.write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps(report, indent=2))

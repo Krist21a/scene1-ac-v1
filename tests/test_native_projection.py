@@ -3,6 +3,7 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 import numpy as np
+import test_approach_edges as approach_tests
 from scene1.fast_components import project_grid
 from scene1.approach_edges import roof_edges
 
@@ -56,3 +57,24 @@ class NativeProjectionTests(unittest.TestCase):
                 expected = camera @ m[:3, :3].T+m[:3, 3]
             actual = project_grid(depth, k, m, stride)
             np.testing.assert_allclose(actual, expected, rtol=0, atol=2e-15)
+
+    def test_fused_mask_preserves_all_recorded_roof_support(self):
+        for snapshot, target in self.frames():
+            for shift in (0., .014):
+                snapshot['camera_to_base'] = snapshot['camera_to_base'].copy()
+                snapshot['camera_to_base'][0, 3] += shift
+                with patch('scene1.approach_edges.FAST_ROOF_MASK', False), patch('scene1.approach_edges.FAST_PROJECTION', False):
+                    expected = roof_edges(snapshot, target)
+                with patch('scene1.approach_edges.FAST_ROOF_MASK', True):
+                    actual = roof_edges(snapshot, target)
+                self.compare(actual, expected)
+
+
+@unittest.skipUnless((Path(__file__).resolve().parents[1]/'scene1/_components.so').exists(),
+                     'Optional native kernel is not built')
+class NativeRoofRegressionTests(approach_tests.ApproachEdgeTests):
+    """Run the original occlusion, motion and real-boundary tests on fused masks."""
+    def setUp(self):
+        toggle = patch('scene1.approach_edges.FAST_ROOF_MASK', True)
+        toggle.start()
+        self.addCleanup(toggle.stop)

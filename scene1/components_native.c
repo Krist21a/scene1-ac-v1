@@ -75,3 +75,28 @@ void scene1_project_grid(const double *depth, int64_t height, int64_t width,
         }
     }
 }
+
+void scene1_roof_mask(const double *depth, const uint8_t *hsv, int64_t height, int64_t width,
+                     const double *k, const double *m, const double *center,
+                     const double *axes, const double *size, double top,
+                     double *local, uint8_t *roof, uint8_t *lower) {
+    for (int64_t v = 0; v < height; ++v) {
+        for (int64_t u = 0; u < width; ++u) {
+            int64_t i = v*width+u;
+            double z = depth[i];
+            double x = ((double)u-k[2])*z/k[0];
+            double y = ((double)v-k[5])*z/k[4];
+            double px = (x*m[0]+y*m[1]+z*m[2])+m[3];
+            double py = (x*m[4]+y*m[5]+z*m[6])+m[7];
+            double pz = (x*m[8]+y*m[9]+z*m[10])+m[11];
+            double a = (px-center[0])*axes[0]+(py-center[1])*axes[2];
+            double b = (px-center[0])*axes[1]+(py-center[1])*axes[3];
+            local[2*i] = a; local[2*i+1] = b;
+            int valid = z > .1 && isfinite(px) && isfinite(py) && isfinite(pz);
+            int green = hsv[3*i] >= 40 && hsv[3*i] <= 85 && hsv[3*i+1] >= 100;
+            roof[i] = valid && fabs(a) < size[0]/2.+.025 && fabs(b) < size[1]/2.+.025
+                      && fabs(pz-top) < .010 && hsv[3*i+2] >= 90 && !green;
+            lower[i] = valid && pz < top-.015;
+        }
+    }
+}

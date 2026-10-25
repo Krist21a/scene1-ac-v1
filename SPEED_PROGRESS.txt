@@ -103,3 +103,28 @@ Balanced trial: all stages0; formal PD0 clips/12097 samples; target clips0.
 Cadence20 single-parcel trial running;559 tests passed.
 Prepared parallel_rgbd for same-cycle overlapping read/detection, no frame reuse;
 2 concurrency/error tests passed; NOT dynamically validated yet.
+
+- speed-cadence20-p1-s0-1025:2312 steps,241.902 s; all stages0.
+- speed-parallel-p4-s0-1025: FAILED first parcel at verify_bin timeout;
+  2420 command steps (2421 timing rows including final failed iteration),226.550 s.
+  Parcel observed in bin but outside assigned slot0 region: observed lateral
+  median -0.0497 m vs planned -0.105 m; slot0 retained only14 points, cluster9.
+  No checks relaxed. All evidence archived; controller restored. Formal PD0 clips.
+- speed-loaded15-p4-s0-1025 running full four parcels: loaded transport,
+  left clearance and bin transport1.5x at10 Hz; empty movement keeps20 Hz;
+  parallel RGB-D retained. Isolates sensitivity to rapid loaded motion.
+- Old successful container source copies pruned only after both external and
+  container manifest SHA checks; originals/evidence retained externally.
+  Per-trial *-policy-prune.json records removed bytes and restoration source.
+
+- speed-loaded15-p4-s0-1025: FOUR PARCELS complete,9697 steps,986.522 s.
+  All pipeline stages0; target clips0; formal PD0 clips/46404 samples.
+  This is16m26.5s, still86.5s above900. First two244.917s and489.574s cumulative.
+- Fused roof masks:14 native projection/edge regression tests pass; identical
+  real support counts/decisions. Same offline benchmark: original34.693ms,
+  projection-only25.501ms, fused4.220ms. No sampling/threshold change.
+- speed-roof20-p4-s0-1025 running: fused roof masks and loaded2x at10Hz.
+  574 tests passed. First parcel completed232.388s; second in progress.
+- Prepared speed_adaptive: auxiliary held/settled point projection (13 tests),
+  lift15Hz, empty receiver approach20Hz only farther than80mm;10Hz restored
+  before wrist confirmation40mm region.7 cadence tests pass. Not dynamically tested.

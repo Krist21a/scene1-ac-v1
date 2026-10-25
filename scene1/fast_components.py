@@ -93,3 +93,40 @@ def project_grid(depth, intrinsic, matrix, stride=1):
     points = np.empty(((h+stride-1)//stride, (w+stride-1)//stride, 3), dtype=np.float64)
     native_grid()(depth, h, w, stride, k, m, points)
     return points
+
+
+def sampled_geometry(snapshot, stride=2):
+    import cv2
+    depth = snapshot['depth_m']
+    points = project_grid(depth, snapshot['intrinsic'], snapshot['camera_to_base'], stride)
+    hsv = cv2.cvtColor(snapshot['rgb'], cv2.COLOR_RGB2HSV)
+    return (depth[::stride, ::stride].reshape(-1), points.reshape(-1, 3),
+            hsv[::stride, ::stride].reshape(-1, 3))
+
+
+@lru_cache(maxsize=1)
+def native_roof():
+    library = ctypes.CDLL(str(Path(__file__).with_name('_components.so')))
+    function = library.scene1_roof_mask
+    doubles = np.ctypeslib.ndpointer(dtype=np.float64, flags='C_CONTIGUOUS')
+    bytes_ = np.ctypeslib.ndpointer(dtype=np.uint8, flags='C_CONTIGUOUS')
+    function.argtypes = [doubles, bytes_, ctypes.c_int64, ctypes.c_int64,
+                         doubles, doubles, doubles, doubles, doubles, ctypes.c_double,
+                         doubles, bytes_, bytes_]
+    function.restype = None
+    return function
+
+
+def roof_masks(depth, hsv, intrinsic, matrix, center, axes, size, top):
+    depth, k, m, center, axes, size = [np.ascontiguousarray(a, dtype=np.float64)
+                                     for a in (depth, intrinsic, matrix, center, axes, size)]
+    hsv = np.ascontiguousarray(hsv, dtype=np.uint8)
+    if (depth.ndim != 2 or hsv.shape != (*depth.shape, 3) or k.shape != (3, 3)
+            or m.shape != (4, 4) or center.shape != (2,) or axes.shape != (2, 2) or size.shape != (2,)):
+        raise ValueError('Invalid roof-mask dimensions')
+    h, w = depth.shape
+    local = np.empty((h, w, 2), dtype=np.float64)
+    roof = np.empty((h, w), dtype=np.uint8)
+    lower = np.empty_like(roof)
+    native_roof()(depth, hsv, h, w, k, m, center, axes, size, float(top), local, roof, lower)
+    return local, roof.astype(bool), lower.astype(bool)

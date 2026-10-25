@@ -453,7 +453,9 @@ def run(args, config, base, images):
         period = 1.0 / env.ros_rate
         if config.get('performance', {}).get('motion_hz') is not None:
             from scene1.cadence import MotionCadence
-            motion_cadence = MotionCadence(env, rospy.Rate, config['performance']['motion_hz'])
+            motion_cadence = MotionCadence(env, rospy.Rate, config['performance']['motion_hz'],
+                                          config['performance'].get('fast_cycle_stages'),
+                                          config['performance'].get('cycle_stage_hz'))
         if config.get('performance', {}).get('parallel_rgbd', False):
             from scene1.parallel_read import CycleRead
             rgbd_worker = CycleRead()
@@ -509,7 +511,8 @@ def run(args, config, base, images):
                 break
             started = time.monotonic()
             if motion_cadence is not None:
-                period = motion_cadence.select(visual_cycle, visual_pickup)
+                period = motion_cadence.select(visual_cycle, visual_pickup,
+                    observation['observation.state'].detach().cpu().numpy().reshape(-1))
             cycle_timer.begin(steps+1, rospy.get_time())
             cycle_timer.mark('clock_sample', control_period_s=period, sensor_sim_start_s=
                 watchdog.snapshot().get('/sensors_data_raw', {}).get('sensor_time_s'))
@@ -1077,6 +1080,17 @@ def main():
         parser.error('--stop-after-regrasp requires --regrasp-from')
     config, base, images = load_config(args.config, args.speed_profile)
     performance = config.get('performance', {})
+    if performance.get('native_aux_projection', False):
+        import scene1.residual as residual_module
+        import scene1.settlement as settlement_module
+        from scene1.fast_components import native_grid
+        native_grid()
+        residual_module.FAST_PROJECTION = settlement_module.FAST_PROJECTION = True
+    if performance.get('native_roof_mask', False):
+        import scene1.approach_edges as edges_module
+        from scene1.fast_components import native_roof
+        native_roof()
+        edges_module.FAST_ROOF_MASK = True
     if performance.get('native_projection', False):
         import scene1.approach_edges as edges_module
         from scene1.fast_components import native_grid

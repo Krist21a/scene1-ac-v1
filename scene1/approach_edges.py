@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 
 FAST_PROJECTION = False
+FAST_ROOF_MASK = False
 
 
 def supported_edge(samples, axis, tangent_extent):
@@ -52,22 +53,27 @@ def roof_edges(snapshot, target):
     axes = np.column_stack((major, [-major[1], major[0]]))
     depth, intrinsic = snapshot['depth_m'], snapshot['intrinsic']
     matrix = snapshot['camera_to_base']
-    if FAST_PROJECTION:
-        from .fast_components import project_grid
-        points = project_grid(depth, intrinsic, matrix)
-    else:
-        v, u = np.indices(depth.shape)
-        camera = np.stack(((u-intrinsic[0, 2])*depth/intrinsic[0, 0],
-                           (v-intrinsic[1, 2])*depth/intrinsic[1, 1], depth), axis=-1)
-        points = camera @ matrix[:3, :3].T+matrix[:3, 3]
-    local = (points[:, :, :2]-np.asarray(target['position_base_m'])[:2]) @ axes
     hsv = cv2.cvtColor(snapshot['rgb'], cv2.COLOR_RGB2HSV)
-    valid = (depth > .1) & np.isfinite(points).all(axis=2)
     top = target['top_z_base_m']
-    roof = (valid & np.all(abs(local) < size/2+.025, axis=2)
-            & (abs(points[:, :, 2]-top) < .010) & (hsv[:, :, 2] >= 90)
-            & ~((hsv[:, :, 0] >= 40) & (hsv[:, :, 0] <= 85) & (hsv[:, :, 1] >= 100)))
-    lower = valid & (points[:, :, 2] < top-.015)
+    if FAST_ROOF_MASK:
+        from .fast_components import roof_masks
+        local, roof, lower = roof_masks(depth, hsv, intrinsic, matrix,
+                                       np.asarray(target['position_base_m'])[:2], axes, size, top)
+    else:
+        if FAST_PROJECTION:
+            from .fast_components import project_grid
+            points = project_grid(depth, intrinsic, matrix)
+        else:
+            v, u = np.indices(depth.shape)
+            camera = np.stack(((u-intrinsic[0, 2])*depth/intrinsic[0, 0],
+                               (v-intrinsic[1, 2])*depth/intrinsic[1, 1], depth), axis=-1)
+            points = camera @ matrix[:3, :3].T+matrix[:3, 3]
+        local = (points[:, :, :2]-np.asarray(target['position_base_m'])[:2]) @ axes
+        valid = (depth > .1) & np.isfinite(points).all(axis=2)
+        roof = (valid & np.all(abs(local) < size/2+.025, axis=2)
+                & (abs(points[:, :, 2]-top) < .010) & (hsv[:, :, 2] >= 90)
+                & ~((hsv[:, :, 0] >= 40) & (hsv[:, :, 0] <= 85) & (hsv[:, :, 1] >= 100)))
+        lower = valid & (points[:, :, 2] < top-.015)
     boundary = np.zeros(depth.shape, bool)
     for axis in (0, 1):
         for shift in (-2, 2):

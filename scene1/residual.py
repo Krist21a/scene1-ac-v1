@@ -16,6 +16,8 @@ from .retreat_certificate import certify_retreat_execution
 from .command_sweep import sampled_sweep
 from .retreat_projection import project_retreat_reference
 
+FAST_PROJECTION = False
+
 
 class ResidualAssist:
     def __init__(self, config, kinematics, low, high):
@@ -466,15 +468,19 @@ class ResidualAssist:
             return None
         import cv2
         center, rotation, extent = self._world_geometry(1, poses)
-        depth = snapshot['depth_m']; intrinsic = snapshot['intrinsic']
-        v, u = np.mgrid[0:depth.shape[0]:2, 0:depth.shape[1]:2]
-        v, u = v.ravel(), u.ravel(); z = depth[v, u]
-        camera = np.column_stack(((u-intrinsic[0,2])*z/intrinsic[0,0],
-                                  (v-intrinsic[1,2])*z/intrinsic[1,1], z))
-        matrix = snapshot['camera_to_base']
-        points = camera @ matrix[:3,:3].T + matrix[:3,3]
+        if FAST_PROJECTION:
+            from .fast_components import sampled_geometry
+            z, points, hsv = sampled_geometry(snapshot, 2)
+        else:
+            depth = snapshot['depth_m']; intrinsic = snapshot['intrinsic']
+            v, u = np.mgrid[0:depth.shape[0]:2, 0:depth.shape[1]:2]
+            v, u = v.ravel(), u.ravel(); z = depth[v, u]
+            camera = np.column_stack(((u-intrinsic[0,2])*z/intrinsic[0,0],
+                                      (v-intrinsic[1,2])*z/intrinsic[1,1], z))
+            matrix = snapshot['camera_to_base']
+            points = camera @ matrix[:3,:3].T + matrix[:3,3]
+            hsv = cv2.cvtColor(snapshot['rgb'], cv2.COLOR_RGB2HSV)[v,u]
         local = rotation.inv().apply(points-center)
-        hsv = cv2.cvtColor(snapshot['rgb'], cv2.COLOR_RGB2HSV)[v,u]
         green = (hsv[:,0] >= 40) & (hsv[:,0] <= 85) & (hsv[:,1] >= 100)
         selected = (z > .1) & np.isfinite(points).all(axis=1) & ~green & (hsv[:,2] >= 65)
         selected &= np.all(np.abs(local) <= extent/2 + .025, axis=1)

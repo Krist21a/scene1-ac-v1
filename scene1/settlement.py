@@ -3,6 +3,21 @@ from collections import deque
 import numpy as np
 import cv2
 
+FAST_PROJECTION = False
+
+
+def sampled_geometry(snapshot):
+    if FAST_PROJECTION:
+        from .fast_components import sampled_geometry as native_sample
+        return native_sample(snapshot, 2)
+    depth, k = snapshot['depth_m'], snapshot['intrinsic']
+    v, u = np.mgrid[0:depth.shape[0]:2, 0:depth.shape[1]:2]
+    v, u = v.ravel(), u.ravel(); z = depth[v, u]
+    camera = np.column_stack(((u-k[0,2])*z/k[0,0], (v-k[1,2])*z/k[1,1], z))
+    matrix = snapshot['camera_to_base']
+    points = camera @ matrix[:3,:3].T + matrix[:3,3]
+    return z, points, cv2.cvtColor(snapshot['rgb'], cv2.COLOR_RGB2HSV)[v,u]
+
 
 def track_resting_roof(snapshot, target, center_hint):
     """Track the known support-height roof without merging a nearby gripper.
@@ -16,14 +31,8 @@ def track_resting_roof(snapshot, target, center_hint):
     axes = np.column_stack((major,[-major[1],major[0]]))
     size = np.asarray(target.get('oriented_extent_m',target['extent_xy_m']))
     top = target['top_z_base_m'] + snapshot['table_z_base_m']-target['support_z_base_m']
-    depth = snapshot['depth_m']; k = snapshot['intrinsic']
-    v,u = np.mgrid[0:depth.shape[0]:2,0:depth.shape[1]:2]
-    v,u = v.ravel(),u.ravel(); z=depth[v,u]
-    camera = np.column_stack(((u-k[0,2])*z/k[0,0],(v-k[1,2])*z/k[1,1],z))
-    matrix = snapshot['camera_to_base']
-    points = camera@matrix[:3,:3].T+matrix[:3,3]
+    z, points, hsv = sampled_geometry(snapshot)
     local = (points[:,:2]-center_hint)@axes
-    hsv = cv2.cvtColor(snapshot['rgb'],cv2.COLOR_RGB2HSV)[v,u]
     selected = ((z > .1) & np.isfinite(points).all(axis=1)
                 & np.all(abs(local) <= size/2+.03,axis=1)
                 & (abs(points[:,2]-top) <= .010) & (hsv[:,2] >= 90)
@@ -64,14 +73,8 @@ def resting_observation(snapshot, surface, extent, roof_normal):
     corners = [center[:2]+a*size[0]/2*major+b*size[1]/2*minor
                for a,b in ((-1,-1),(1,-1),(1,1),(-1,1))]
     margin = min(cv2.pointPolygonTest(np.asarray(footprint,np.float32),tuple(p),True) for p in corners)
-    depth = snapshot['depth_m']; k = snapshot['intrinsic']
-    v,u = np.mgrid[0:depth.shape[0]:2,0:depth.shape[1]:2]
-    v,u = v.ravel(),u.ravel(); z = depth[v,u]
-    camera = np.column_stack(((u-k[0,2])*z/k[0,0],(v-k[1,2])*z/k[1,1],z))
-    matrix = snapshot['camera_to_base']
-    points = camera@matrix[:3,:3].T+matrix[:3,3]
+    z, points, hsv = sampled_geometry(snapshot)
     delta = points[:,:2]-center[:2]
-    hsv = cv2.cvtColor(snapshot['rgb'],cv2.COLOR_RGB2HSV)[v,u]
     selected = ((z > .1) & np.isfinite(points).all(axis=1)
                 & (abs(delta@major) <= size[0]/2+.008)
                 & (abs(delta@minor) <= size[1]/2+.008)

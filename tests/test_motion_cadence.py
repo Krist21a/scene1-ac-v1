@@ -35,6 +35,33 @@ class MotionCadenceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             MotionCadence(SimpleNamespace(ros_rate=10, direct_to_wbc=True), None, 20)
 
+    def test_stage_override_only_narrows_permitted_movements(self):
+        env = SimpleNamespace(ros_rate=10, direct_to_wbc=False, rate=None)
+        with self.assertRaises(ValueError):
+            MotionCadence(env, lambda hz: hz, 20, ['release_left'])
+        cadence = MotionCadence(env, lambda hz: hz, 20, ['return_home'])
+        cycle = SimpleNamespace(active=True, stage='bin_transport')
+        self.assertEqual(cadence.select(cycle, None), .1)
+        cycle.stage = 'return_home'
+        self.assertEqual(cadence.select(cycle, None), .05)
+
+    def test_receiver_approach_restores_original_cadence_before_visual_contact_region(self):
+        env = SimpleNamespace(ros_rate=10, direct_to_wbc=False, rate=None)
+        cadence = MotionCadence(env, lambda hz: hz, 20, ['lift', 'left_approach'], {'lift':15})
+        cycle = profiles.SpeedProfileTests().cycle({})
+        cycle.active = True
+        cycle._stage('lift')
+        self.assertAlmostEqual(cadence.select(cycle, None), 1./15)
+        cycle._stage('left_approach');cycle.goal = [np.eye(4), None]
+        self.assertEqual(cadence.select(cycle, None), .1)
+        measured = np.zeros(16);measured[0] = .10
+        self.assertEqual(cadence.select(cycle, None, measured), .05)
+        measured[0] = .079
+        self.assertEqual(cadence.select(cycle, None, measured), .1)
+        for rates in ({'lift': 21}, {'lift': 9}, {'release_left': 15}):
+            with self.assertRaises(ValueError):
+                MotionCadence(env, lambda hz: hz, 20, ['lift'], rates)
+
     def cycle(self):
         cycle = profiles.SpeedProfileTests().cycle({})
         cycle._stage('transport')

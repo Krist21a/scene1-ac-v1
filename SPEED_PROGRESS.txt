@@ -128,3 +128,19 @@ Prepared parallel_rgbd for same-cycle overlapping read/detection, no frame reuse
 - Prepared speed_adaptive: auxiliary held/settled point projection (13 tests),
   lift15Hz, empty receiver approach20Hz only farther than80mm;10Hz restored
   before wrist confirmation40mm region.7 cadence tests pass. Not dynamically tested.
+
+- speed-roof20-p4-s0-1025: four parcels9135 steps,918.415 s; all stages0.
+  Acceptance failed ONLY the two <900s timing checks.
+- speed-adaptive-p4-s0-1025: FIRST UNDER900 four-parcel run:9235 steps,895.173 s.
+  588 tests passed; all stages0; target clips0; formal PD0 clips/42110 samples.
+  Completed cycle times232.545,449.993,672.859,895.173 s. Official task_success=null.
+  Only4.8s headroom: freeze this snapshot for multi-seed validation before claiming success.
+- Frozen matrix speed-adaptive-reg-1025 running seeds2,1,3,4,5 in order,
+  then speed-adaptive-holdout-1025 seeds6,7,8,9 ONLY if regressions all pass.
+  Source snapshot speed-adaptive-p4-s0-1025; tools/speed_trial.py --frozen-from
+  verifies every source SHA and copies the exact manifest. Tests reused unchanged.
+  tools/speed_matrix.py stops on first failed run or quota cutoff; all trial wrappers restore.
+- Conditional launcher session69757 performs matrix/holdout/acceptance sequence;
+  inspect matrix status before starting any manual trial.
+- speed_adaptive25 prepared fallback only (loaded2.5x at10Hz; profiling disabled),
+  NOT dynamically tested. Do not use unless frozen validation needs more speed.

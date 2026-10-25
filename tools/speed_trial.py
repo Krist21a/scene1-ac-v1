@@ -20,10 +20,13 @@ def main():
     ap.add_argument('--parcels', type=int, choices=[1,2,4], default=4)
     ap.add_argument('--speed-profile', default='configs/speed_baseline.yaml')
     ap.add_argument('--skip-tests', action='store_true')
+    ap.add_argument('--frozen-from', help='Reuse an existing byte-verified policy snapshot for regression/holdouts')
     a = ap.parse_args()
     import re
     if not re.fullmatch(r'[a-z0-9][a-z0-9_-]*', a.label):
         ap.error('Invalid label')
+    if a.frozen_from and not re.fullmatch(r'[a-z0-9][a-z0-9_-]*', a.frozen_from):
+        ap.error('Invalid frozen source label')
     sys.path.insert(0, str(DRIVER))
     import usage_guard
     import environment
@@ -34,24 +37,41 @@ def main():
         raise RuntimeError(('10% quota stop', quota))
     policy = STORE/'policies'/a.label
     policy.mkdir(parents=True, exist_ok=False)
-    files = [ROOT/'run_scene1.py', ROOT/'run.sh', ROOT/'config.yaml', ROOT/'calibrate_servo.py']
-    for directory in ['scene1', 'configs', 'tests']:
-        files += [p for p in (ROOT/directory).rglob('*') if p.is_file()
-                  and '__pycache__' not in p.parts and p.suffix != '.pyc']
+    source = ROOT
+    expected = None
+    if a.frozen_from:
+        source = STORE/'policies'/a.frozen_from
+        expected = json.loads((source.parent/(a.frozen_from+'-manifest.json')).read_text())
+        files = []
+        for name, digest in expected.items():
+            relative = Path(name)
+            if relative.is_absolute() or '..' in relative.parts:
+                raise ValueError('Unsafe frozen manifest path')
+            path = source/relative
+            if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+                raise RuntimeError(('Frozen policy changed', name))
+            files.append(path)
+    else:
+        files = [ROOT/'run_scene1.py', ROOT/'run.sh', ROOT/'config.yaml', ROOT/'calibrate_servo.py']
+        for directory in ['scene1', 'configs', 'tests']:
+            files += [p for p in (ROOT/directory).rglob('*') if p.is_file()
+                      and '__pycache__' not in p.parts and p.suffix != '.pyc']
     manifest = {}
     for p in files:
-        relative = p.relative_to(ROOT)
+        relative = p.relative_to(source)
         dst = policy/relative
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(p, dst)
         manifest[str(relative)] = hashlib.sha256(dst.read_bytes()).hexdigest()
+    if expected is not None and manifest != expected:
+        raise RuntimeError('Frozen snapshot copy failed verification')
     manifest_path = policy.parent/(a.label+'-manifest.json')
     manifest_path.write_text(json.dumps(manifest, indent=2)+'\n')
     project = '/root/scene1_speed/'+a.label
     subprocess.run(['docker','exec',ALGO,'mkdir','-p',project],check=True)
     subprocess.run(['docker','cp',str(policy)+'/.',ALGO+':'+project],check=True)
     receipt = dict(label=a.label, seed=a.seed, parcels=a.parcels, quota=quota,
-                   speed_profile=a.speed_profile, stages={})
+                   speed_profile=a.speed_profile, frozen_from=a.frozen_from, stages={})
     output = STORE/(a.label+'-pipeline.json')
     def run(stage, command):
         receipt['current_stage'] = stage

@@ -303,6 +303,8 @@ def run(args, config, base, images):
     watchdog = SensorWatchdog(rospy, topic_map, config["sensor_timeout_s"])
     arm = None
     sdk_limit_cache = None
+    motion_cadence = None
+    rgbd_worker = None
     rgbd_scene = None
     output = ROOT / "outputs" / time.strftime("%Y%m%d-%H%M%S")
     output.mkdir(parents=True, exist_ok=False)
@@ -449,6 +451,12 @@ def run(args, config, base, images):
                     weighing_pad = np.asarray(saved['weighing_pad'], float)
                 motion.reset(visual_cycle.command)
         period = 1.0 / env.ros_rate
+        if config.get('performance', {}).get('motion_hz') is not None:
+            from scene1.cadence import MotionCadence
+            motion_cadence = MotionCadence(env, rospy.Rate, config['performance']['motion_hz'])
+        if config.get('performance', {}).get('parallel_rgbd', False):
+            from scene1.parallel_read import CycleRead
+            rgbd_worker = CycleRead()
         last_send = time.monotonic()
         previous_sent = initial.copy()
         if visual_cycle is not None and visual_cycle.active:
@@ -500,8 +508,10 @@ def run(args, config, base, images):
                 reason = "user_stop"
                 break
             started = time.monotonic()
+            if motion_cadence is not None:
+                period = motion_cadence.select(visual_cycle, visual_pickup)
             cycle_timer.begin(steps+1, rospy.get_time())
-            cycle_timer.mark('clock_sample', sensor_sim_start_s=
+            cycle_timer.mark('clock_sample', control_period_s=period, sensor_sim_start_s=
                 watchdog.snapshot().get('/sensors_data_raw', {}).get('sensor_time_s'))
             ages = watchdog.check()
             trace_payload = None
@@ -524,6 +534,11 @@ def run(args, config, base, images):
                     rgbd_scene.close()
                     rgbd_scene = None
                 print(f'ACT_DIRECT_AFTER_FIRST_GRASP step={steps+1}',flush=True)
+            if rgbd_worker is not None and aligner is not None:
+                # observe_wrist below updates only wrist observations. Pending
+                # phase/geometry stays unchanged until this read is consumed.
+                rgbd_worker.begin(read_manipulation_rgbd,
+                                  rgbd_scene, aligner, visual_cycle, visual_pickup, config)
             for key, shape in images.items():
                 if list(observation[key].shape) != [1] + shape:
                     raise ValueError(f"Runtime image shape mismatch: {key}: {observation[key].shape}")
@@ -544,11 +559,12 @@ def run(args, config, base, images):
             rgbd_error = None
             if aligner is not None:
                 try:
-                    rgbd_snapshot = read_manipulation_rgbd(
-                        rgbd_scene, aligner, visual_cycle, visual_pickup, config)
+                    rgbd_snapshot = (rgbd_worker.result() if rgbd_worker is not None else
+                        read_manipulation_rgbd(rgbd_scene, aligner, visual_cycle, visual_pickup, config))
                 except Exception as exc:
                     rgbd_error = str(exc)
-            cycle_timer.mark('rgbd', rgbd_stamp=rgbd_snapshot.get('stamp') if rgbd_snapshot else None)
+            cycle_timer.mark('rgbd', rgbd_stamp=rgbd_snapshot.get('stamp') if rgbd_snapshot else None,
+                             rgbd_parallel=rgbd_worker is not None)
             measured = observation['observation.state'].detach().cpu().numpy().reshape(-1)
             if (pickup_template is None and isinstance(aligner, ResidualAssist)
                     and aligner.first_grasp_complete and not aligner.regrasp_complete
@@ -969,6 +985,10 @@ def run(args, config, base, images):
         raise
     finally:
         cycle_timer.close()
+        if rgbd_worker is not None:
+            rgbd_worker.close()
+        if motion_cadence is not None:
+            motion_cadence.close()
         if sdk_limit_cache is not None:
             sdk_limit_cache.close()
         if policy_trace is not None:
@@ -1057,6 +1077,11 @@ def main():
         parser.error('--stop-after-regrasp requires --regrasp-from')
     config, base, images = load_config(args.config, args.speed_profile)
     performance = config.get('performance', {})
+    if performance.get('native_projection', False):
+        import scene1.approach_edges as edges_module
+        from scene1.fast_components import native_grid
+        native_grid()
+        edges_module.FAST_PROJECTION = True
     if performance.get('native_cloud', False):
         import scene1.visual_cycle as cycle_module
         from scene1.fast_components import native_cloud

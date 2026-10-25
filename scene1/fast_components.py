@@ -69,3 +69,27 @@ def project_cloud(depth, hsv, intrinsic, matrix, stride):
     colors = np.empty((size, 3), dtype=np.uint8)
     count = native_cloud()(depth, hsv, h, w, stride, k, m, points, colors)
     return points[:count], colors[:count]
+
+
+@lru_cache(maxsize=1)
+def native_grid():
+    library = ctypes.CDLL(str(Path(__file__).with_name('_components.so')))
+    function = library.scene1_project_grid
+    doubles = np.ctypeslib.ndpointer(dtype=np.float64, flags='C_CONTIGUOUS')
+    function.argtypes = [doubles, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64,
+                         doubles, doubles, doubles]
+    function.restype = None
+    return function
+
+
+def project_grid(depth, intrinsic, matrix, stride=1):
+    depth = np.ascontiguousarray(depth, dtype=np.float64)
+    k = np.ascontiguousarray(intrinsic, dtype=np.float64)
+    m = np.ascontiguousarray(matrix, dtype=np.float64)
+    if (depth.ndim != 2 or k.shape != (3, 3) or m.shape != (4, 4)
+            or type(stride) is not int or stride < 1):
+        raise ValueError('Invalid organized projection dimensions or stride')
+    h, w = depth.shape
+    points = np.empty(((h+stride-1)//stride, (w+stride-1)//stride, 3), dtype=np.float64)
+    native_grid()(depth, h, w, stride, k, m, points)
+    return points

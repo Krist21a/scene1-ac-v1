@@ -54,3 +54,33 @@ class SpeedProfileTests(unittest.TestCase):
             cycle._stage('transport')
             with self.assertRaises(ValueError):
                 cycle._servo(np.zeros(16), 1, np.eye(4))
+
+    def home_cycle(self, gain):
+        cycle = self.cycle({'return_home': {'gain_scale': gain}})
+        cycle.command[:] = .1
+        cycle.side, cycle.total_steps = 1, 0
+        cycle.active = True
+        cycle.goal = [None, None]
+        cycle.rim = dict(center=np.zeros(2), rim_z=0.)
+        cycle.geometry = dict(center=np.zeros(3), rotation=Rotation.identity(), extent=np.ones(3))
+        cycle._stage('return_home')
+        return cycle
+
+    def test_home_gain_keeps_step_limit_and_actual_feedback_completion(self):
+        measured = np.full(16, .1)
+        base, fast = self.home_cycle(1.), self.home_cycle(3.)
+        a, _ = base.update(measured, {'stamp': 1.}, None)
+        b, _ = fast.update(measured, {'stamp': 1.}, None)
+        self.assertAlmostEqual(a[0], .094)
+        self.assertAlmostEqual(b[0], .088)
+        self.assertFalse(fast.done)
+        self.assertEqual(b[7], 0.)
+        self.assertEqual(b[15], 0.)
+        for i in range(5):
+            fast.update(np.zeros(16), {'stamp': 2.+i}, None)
+            self.assertEqual(fast.done, i == 4)
+
+    def test_home_profile_rejects_invalid_gain(self):
+        for gain in (0., -1., float('nan'), float('inf'), 3.01):
+            with self.assertRaises(ValueError):
+                self.home_cycle(gain).update(np.full(16, .1), {'stamp': 1.}, None)

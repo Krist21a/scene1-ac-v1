@@ -2,6 +2,8 @@
 import cv2
 import numpy as np
 
+FAST_PROJECTION = False
+
 
 def supported_edge(samples, axis, tangent_extent):
     """Keep one supported straight boundary, separating adjacent corner edges."""
@@ -49,11 +51,15 @@ def roof_edges(snapshot, target):
     major = major/np.linalg.norm(major)
     axes = np.column_stack((major, [-major[1], major[0]]))
     depth, intrinsic = snapshot['depth_m'], snapshot['intrinsic']
-    v, u = np.indices(depth.shape)
-    camera = np.stack(((u-intrinsic[0, 2])*depth/intrinsic[0, 0],
-                       (v-intrinsic[1, 2])*depth/intrinsic[1, 1], depth), axis=-1)
     matrix = snapshot['camera_to_base']
-    points = camera @ matrix[:3, :3].T+matrix[:3, 3]
+    if FAST_PROJECTION:
+        from .fast_components import project_grid
+        points = project_grid(depth, intrinsic, matrix)
+    else:
+        v, u = np.indices(depth.shape)
+        camera = np.stack(((u-intrinsic[0, 2])*depth/intrinsic[0, 0],
+                           (v-intrinsic[1, 2])*depth/intrinsic[1, 1], depth), axis=-1)
+        points = camera @ matrix[:3, :3].T+matrix[:3, 3]
     local = (points[:, :, :2]-np.asarray(target['position_base_m'])[:2]) @ axes
     hsv = cv2.cvtColor(snapshot['rgb'], cv2.COLOR_RGB2HSV)
     valid = (depth > .1) & np.isfinite(points).all(axis=2)

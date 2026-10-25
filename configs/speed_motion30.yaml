@@ -1,0 +1,41 @@
+performance:
+  enabled: true
+  compute_threads: 1
+  cache_fk: true
+  native_components: true
+  compact_detector: true
+  cache_sdk_limits: true
+  native_rgb: true
+  native_cloud: true
+  profile_every_steps: 100
+visual_cycle:
+  analytic_jacobian: true
+  servo_profiles:
+    pickup_clear:
+      gain_scale: 3.0
+    pickup_hover:
+      gain_scale: 3.0
+    pickup_lift:
+      gain_scale: 3.0
+    pickup_carry:
+      gain_scale: 3.0
+    lift:
+      gain_scale: 3.0
+    transport:
+      gain_scale: 3.0
+    left_approach:
+      gain_scale: 3.0
+    right_retreat:
+      gain_scale: 3.0
+    left_clear:
+      gain_scale: 3.0
+    bin_transport:
+      gain_scale: 3.0
+    left_retreat:
+      gain_scale: 3.0
+    pickup_first_clear:
+      gain_scale: 2.0
+    pickup_first_back:
+      gain_scale: 2.0
+    return_home:
+      gain_scale: 2.0

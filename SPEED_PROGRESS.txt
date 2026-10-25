@@ -67,5 +67,39 @@ this thread's token_count rate_limits entries; 90% used triggers stop.
 - New fused RGB/cloud kernels and SDK arm limit cache: 8 focused tests passed.
   Cache checks ROS epoch/URDF updates each call, requires exact physical limits.
   Native cloud preserves point selection/order and exact fixture hull decisions.
-- speed-sdk-p1-s0-1025: independent one-parcel validation in progress.
+- speed-sdk-p1-s0-1025: 550 tests passed; one parcel3184 steps,352.543 s.
+  All pipeline stages0; formal PD0 clips/16606 samples; target clips0.
+  Initialization had one raw PD cap sample (.502447 Nm), total clips0.
+  Performance baseline preserved, no motion gains changed in this trial.
 - speed_motion15 profile updated with these compute options; motion not yet tested.
+
+- speed-motion15-p1-s0-1025: first 1.5x motion-gain validation in progress.
+
+- speed-motion15-p1-s0-1025: one parcel2735 steps,304.292 s; all stages0.
+  Formal PD0 clips/14337 samples; target clips0. 449 fewer steps than compute-only.
+- speed-motion20-p1-s0-1025: same stages at2x gain; independent trial running.
+- Prepared return_home optional gain with unchanged step/arrival requirements;
+  5 speed-profile unit tests passed, including actual-feedback completion.
+- speed_motion30 prepared, NOT dynamically tested:3x existing non-contact
+  stages and2x initial empty-hand clearance/backout and final empty-hand return.
+
+- speed-motion20-p1-s0-1025:2552 steps,285.250 s; all stages0, formal PD0 clips.
+- speed-motion30-p1-s0-1025: completed in approximately282 s; all stages0.
+  Faster carry increased subsequent release preparation145->253 steps, negating
+  much of the speedup. Mixed stage gains required rather than uniform escalation.
+- Native organized projection preserves roof support counts/decisions on all
+  recorded approach fixtures and14 mm translated scenes;2 focused tests passed.
+  Offline median roof_edges49.455->33.337 ms on a real frame.
+- speed-balanced-p1-s0-1025 running:3x useful movements, carry2x,cycle lift1.5x,
+  left approach2x, descent and left insertion1.5x, native roof projection.
+- Prepared noncontact20 Hz cadence (not dynamically validated). All contact,
+  ACT and evidence stages retain10 Hz; measured-motion threshold scales with
+  elapsed time and arrival requires original0.2s/0.4s dwell spans.5 tests passed.
+
+Latest confirmed timings:
+speed-motion30-p1-s0-1025: 2487 steps, 281.904 s
+speed-balanced-p1-s0-1025: 2287 steps, 256.801 s
+Balanced trial: all stages0; formal PD0 clips/12097 samples; target clips0.
+Cadence20 single-parcel trial running;559 tests passed.
+Prepared parallel_rgbd for same-cycle overlapping read/detection, no frame reuse;
+2 concurrency/error tests passed; NOT dynamically validated yet.

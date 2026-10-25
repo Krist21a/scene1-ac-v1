@@ -4,6 +4,7 @@ The grasp transform comes from ResidualAssist's observed parcel. Both arms use
 measured FK and bounded Cartesian feedback. Bin geometry comes from RGB-D.
 """
 import copy
+import time
 import cv2
 import numpy as np
 from scipy.optimize import lsq_linear
@@ -241,12 +242,16 @@ class VisualCycle:
             return None
         return self.world_box(measured)[0]
 
-    def _servo(self, measured, side, goal, posture_target=None, posture_gain=.04, descent_alignment=False,
-               coupled_pose_request=False, reserve_joint_bound=False, servo_profile=None):
-        profile = self.config.get('servo_profiles', {}).get(servo_profile or self.stage, {})
+    def _profile_gain(self, stage):
+        profile = self.config.get('servo_profiles', {}).get(stage, {})
         gain_scale = float(profile.get('gain_scale', 1.))
         if not np.isfinite(gain_scale) or not 0. < gain_scale <= 3.:
             raise ValueError('Servo gain scale must be finite and in (0, 3]')
+        return gain_scale
+
+    def _servo(self, measured, side, goal, posture_target=None, posture_gain=.04, descent_alignment=False,
+               coupled_pose_request=False, reserve_joint_bound=False, servo_profile=None):
+        gain_scale = self._profile_gain(servo_profile or self.stage)
         if ((self.stage == 'right_retreat' and side == 0) or
                 (self.stage in ('left_approach', 'left_insert') and side == 1)):
             gain_scale = 1.  # Keep the stationary loaded hand's hold unchanged.
@@ -349,7 +354,12 @@ class VisualCycle:
                   reserve_joint_bound=reserve_joint_bound and side == 1,
                   servo_profile=servo_profile) for side in sides]
         positions = np.concatenate([e[2] for e in errors])
-        moving = self.last_positions is None or np.max(abs(positions-self.last_positions)) > .004
+        now = time.monotonic()
+        fast = getattr(self, 'control_period_s', .1) < .1
+        interval = now-getattr(self, 'arrival_sample_at', now)
+        movement_limit = .004*min(1., max(0., interval)/.1) if fast else .004
+        moving = self.last_positions is None or np.max(abs(positions-self.last_positions)) > movement_limit
+        self.arrival_sample_at = now
         self.last_positions = positions
         if angle_limit is None:
             angle_limit = .25 if self.stage in ('left_clear', 'bin_transport') else .14
@@ -361,8 +371,11 @@ class VisualCycle:
         empty = lambda side: self.stage == 'left_retreat' or (self.stage == 'right_retreat' and side == 1)
         ok = all(e[0] < position_limit and (empty(side) or e[1] < angle_limit)
                  for side, e in zip(sides, errors)) and not moving
+        if self.stable == 0 or not ok:
+            self.arrival_since = now
         self.stable = self.stable+1 if ok else 0
-        return self.stable >= 3, [dict(position_m=e[0], angle_rad=e[1]) for e in errors]
+        arrived = self.stable >= 3 and (not fast or now-self.arrival_since >= .2)
+        return arrived, [dict(position_m=e[0], angle_rad=e[1]) for e in errors]
 
     def _head_support(self, snapshot, measured):
         if snapshot is None:
@@ -658,14 +671,18 @@ class VisualCycle:
             previous = getattr(self, 'home_previous', None)
             velocity = np.zeros(len(JOINTS)) if previous is None else measured[JOINTS]-previous
             self.home_previous = measured[JOINTS].copy()
-            change = .06*delta-.24*velocity
+            change = self._profile_gain('return_home')*(.06*delta-.24*velocity)
             scale = min(1., .012/max(max(abs(change)), 1e-9))
             self.command[JOINTS] += scale*change
             self.command = np.clip(self.command, self.low, self.high)
             self.command[[7, 15]] = 0.
             ready = max(abs(delta)) < .06
+            now = time.monotonic()
+            if self.stable == 0 or not ready:
+                self.home_arrival_since = now
             self.stable = self.stable+1 if ready else 0
-            if self.stable >= 5:
+            fast = getattr(self, 'control_period_s', .1) < .1
+            if self.stable >= 5 and (not fast or now-self.home_arrival_since >= .4):
                 self.done, self.active = True, False
                 info['state'] = 'visual_cycle_complete'
                 info['completed_parcels'] = self.completed

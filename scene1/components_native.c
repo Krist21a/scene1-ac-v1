@@ -58,3 +58,20 @@ int64_t scene1_cloud(const double *depth, const uint8_t *hsv,
     }
     return count;
 }
+
+/* Organized projection: preserve every sample, including invalid depths. */
+void scene1_project_grid(const double *depth, int64_t height, int64_t width,
+                         int64_t stride, const double *k, const double *m,
+                         double *points) {
+    int64_t i = 0;
+    for (int64_t v = 0; v < height; v += stride) {
+        for (int64_t u = 0; u < width; u += stride) {
+            double z = depth[v*width+u];
+            double x = ((double)u-k[2])*z/k[0];
+            double y = ((double)v-k[5])*z/k[4];
+            for (int r = 0; r < 3; ++r)
+                points[3*i+r] = (x*m[4*r]+y*m[4*r+1]+z*m[4*r+2])+m[4*r+3];
+            ++i;
+        }
+    }
+}

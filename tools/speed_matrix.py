@@ -54,6 +54,10 @@ def main():
                               frozen_match=result['frozen_match'])), flush=True)
         if not result['passed'] or not result['frozen_match']:
             receipt['status'] = 'acceptance_failed'; save(); return 1
+        # The next run reads the external frozen snapshot. Reclaim only its
+        # independently verified container source copy after full archival.
+        from prune_policy_copies import prune
+        prune(label)
     receipt['status'] = 'passed'; save(); return 0
 
 

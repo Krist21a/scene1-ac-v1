@@ -35,9 +35,12 @@ def prune(label):
     if receipt_path.exists():
         return json.loads(receipt_path.read_text())
     pipeline = json.loads((STORE/(label+'-pipeline.json')).read_text())
-    required = ('tests', 'driver', 'analysis', 'audit', 'archive', 'restore')
+    # A failed experiment's sources are also reproducible from the verified
+    # external snapshot. Preserve all generated evidence and require completed
+    # analysis/archive/restoration regardless of the policy's outcome.
+    required = ('analysis', 'audit', 'archive', 'restore')
     if pipeline.get('current_stage') != 'done' or any(pipeline['stages'].get(s) != 0 for s in required):
-        raise RuntimeError('Only fully archived, restored successful trials can be pruned')
+        raise RuntimeError('Only fully analyzed, archived and restored trials can be pruned')
     manifest_path = STORE/'policies'/(label+'-manifest.json')
     manifest = json.loads(manifest_path.read_text())
     frozen = STORE/'policies'/label

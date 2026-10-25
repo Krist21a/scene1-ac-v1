@@ -35,6 +35,8 @@ def main():
     quota = usage_guard.latest()
     if quota['reached']:
         raise RuntimeError(('10% quota stop', quota))
+    from archive_idle_ros_logs import archive_if_needed
+    archive_if_needed(a.label, environment)
     policy = STORE/'policies'/a.label
     policy.mkdir(parents=True, exist_ok=False)
     source = ROOT

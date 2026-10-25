@@ -96,6 +96,20 @@ class VisualCycleTests(unittest.TestCase):
             with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'tighten'):
                 self.cycle._arrived(self.measured)
 
+    def test_bin_arrival_precision_can_follow_each_slot_without_relaxing_any(self):
+        self.cycle.config.update(max_parcels=4, bin_arrival_position_m=[.025,.025,.025,.010])
+        self.cycle.goal = [np.eye(4), None]
+        for index, expected in enumerate([True, True, True, False]):
+            self.cycle.completed = index
+            self.cycle._stage('bin_transport')
+            with patch.object(self.cycle, '_servo', return_value=(.020, .03, np.zeros(3))):
+                for _ in range(4):arrived, _ = self.cycle._arrived(self.measured)
+            self.assertEqual(arrived, expected)
+        for value in ([.025], [.025,.025,.025,float('nan')], [.025,.025,.025,.03]):
+            self.cycle.config['bin_arrival_position_m'] = value
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                self.cycle._arrived(self.measured)
+
     def test_visible_surface_evidence_rejects_scattered_colored_noise(self):
         x,y=np.mgrid[0:10,0:10]
         patch_points=np.column_stack((x.ravel()*.002,y.ravel()*.002,np.zeros(100)))

@@ -67,6 +67,35 @@ class VisualCycleTests(unittest.TestCase):
                         action, _ = self.cycle.update(self.measured, dict(stamp=stamp), self.assist)
                 self.assertEqual(action[7] == 0., opened)
 
+    def test_precise_bin_gate_keeps_payload_closed_at_recorded_release_error(self):
+        fixture = json.loads((Path(__file__).parent/'fixtures/bin_release_error_s4_20261026.json').read_text())
+        error = fixture['alignment']['pose_errors'][0]['position_m']
+        self.assertGreater(error, .010)
+        self.assertLess(error, .025)
+        self.cycle.config['bin_arrival_position_m'] = .010
+        self.cycle._stage('bin_transport'); self.cycle.side = 0
+        self.measured[:3] = [.6, .2, .4]; self.measured[7] = .5
+        self.cycle.command[7] = .98
+        self.cycle.goal = [self.cycle.k.matrix(self.measured[:7], 0), None]
+        self.cycle.goal[0][0, 3] += error
+        with patch.object(self.cycle, '_bin_points', return_value=np.empty((0, 3))):
+            for stamp in [.1, .2, .3, .4]:
+                action, _ = self.cycle.update(self.measured, dict(stamp=stamp), self.assist)
+                self.assertEqual(action[7], .98)
+                self.assertEqual(self.cycle.stage, 'bin_transport')
+            self.measured[0] += error-.008
+            for stamp in [.5, .6, .7, .8]:
+                action, _ = self.cycle.update(self.measured, dict(stamp=stamp), self.assist)
+            self.assertEqual(action[7], 0.)
+            self.assertEqual(self.cycle.stage, 'release_left')
+
+    def test_bin_arrival_tolerance_cannot_relax_original_gate(self):
+        self.cycle._stage('bin_transport')
+        for value in (0., -.01, .026, float('nan'), float('inf')):
+            self.cycle.config['bin_arrival_position_m'] = value
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'tighten'):
+                self.cycle._arrived(self.measured)
+
     def test_visible_surface_evidence_rejects_scattered_colored_noise(self):
         x,y=np.mgrid[0:10,0:10]
         patch_points=np.column_stack((x.ravel()*.002,y.ravel()*.002,np.zeros(100)))

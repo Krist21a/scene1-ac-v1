@@ -368,6 +368,10 @@ class VisualCycle:
         # the fresh rim, including 25 mm edge and vertical clearance.
         if position_limit is None:
             position_limit = .025 if self.stage == 'bin_transport' else .012
+            if self.stage == 'bin_transport':
+                position_limit = float(self.config.get('bin_arrival_position_m', position_limit))
+                if not np.isfinite(position_limit) or not 0. < position_limit <= .025:
+                    raise ValueError('Bin arrival tolerance must tighten the original 25 mm gate')
         empty = lambda side: self.stage == 'left_retreat' or (self.stage == 'right_retreat' and side == 1)
         ok = all(e[0] < position_limit and (empty(side) or e[1] < angle_limit)
                  for side, e in zip(sides, errors)) and not moving

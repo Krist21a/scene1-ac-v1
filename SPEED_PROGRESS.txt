@@ -144,3 +144,5 @@ Prepared parallel_rgbd for same-cycle overlapping read/detection, no frame reuse
   inspect matrix status before starting any manual trial.
 - speed_adaptive25 prepared fallback only (loaded2.5x at10Hz; profiling disabled),
   NOT dynamically tested. Do not use unless frozen validation needs more speed.
+
+Seed 2 regression speed-adaptive-reg-1025-s2 failed at second release, step 3171. Preflight rejected measured pose; offline original URDF FK shows initial signed finger gaps -2.551mm and +19.776mm against unchanged 3mm inflated parcel. Last opening hold position error20.460mm/angular4.162deg. No retreat sent, guard retained, baseline restored. Testing gripper opening step0.04 (was0.08), unchanged40step open budget, to reduce unloading transient; adaptive25 moves loaded stages2.5x at10Hz, no profiling. Holdouts6-9 remainunused.

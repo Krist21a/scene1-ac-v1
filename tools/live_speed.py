@@ -30,10 +30,21 @@ print(json.dumps(dict(steps=n,formal_elapsed_s=last['started_monotonic_s']+last[
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('label')
-    label = parser.parse_args().label
+    parser.add_argument('--matrix', action='store_true', help='Follow the active run in a matrix receipt')
+    args = parser.parse_args()
+    label = args.label
     if not re.fullmatch(r'[a-z0-9][a-z0-9_-]*', label):
         parser.error('Invalid label')
     store = Path('/media/krist/KINGSTON/scene1-speed-20261025')
+    if args.matrix:
+        matrix = json.loads((store/(label+'-matrix.json')).read_text())
+        print(json.dumps(dict(matrix=label, status=matrix['status'],
+                              completed=[dict(seed=r['seed'],wall_s=r.get('formal_wall_s'),
+                                              passed=r.get('passed')) for r in matrix['runs']])), flush=True)
+        label = matrix.get('current_label')
+        if not label:
+            raise SystemExit(0)
+        print(json.dumps(dict(current_label=label)), flush=True)
     pipeline = store/(label+'-pipeline.json')
     if pipeline.exists():
         state = json.loads(pipeline.read_text())

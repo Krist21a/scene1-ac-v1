@@ -64,7 +64,10 @@ def read_manipulation_rgbd(scene, aligner, visual_cycle, visual_pickup, config):
     # select no geometry based on whether a subsequent sweep passes.
     split = split or (settling and pending['kind'] == 'short_retreat' and split_enabled
                       and config.get('wrist_assist', {}).get('release_spatial_components', False))
-    snapshot = scene.read(candidate_stride=2 if settling else 4, spatial_components=split)
+    dense_pickup = (config.get('performance', {}).get('dense_pickup_candidates', False)
+        and visual_pickup is not None and getattr(visual_pickup, 'active', False)
+        and visual_pickup.stage in ('select', 'clear', 'hover', 'descend'))
+    snapshot = scene.read(candidate_stride=2 if settling or dense_pickup else 4, spatial_components=split)
     if (snapshot is not None and visual_pickup is not None
             and getattr(visual_pickup, 'active', False)
             and getattr(visual_pickup, 'stage', None) == 'observe_pad'):

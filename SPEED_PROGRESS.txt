@@ -30,7 +30,7 @@ Runs:
 - speed-threads-p1-s0-1025: two new gain-test fixtures lacked initial command;
   preflight failed before simulation. Fixed fixtures; no policy algorithm change.
 - speed-threads-p1-s0-r2-1025: all540 tests passed (529 original +11 new),
-  thread-only one-parcel independent trial running.
+  thread-only one-parcel completed: 3189 steps,459.674 s. All stages passed.
 
 Prepared, NOT dynamically validated:
 - Optional one-thread OpenCV/Torch/BLAS compute profile.
@@ -58,3 +58,14 @@ Driver snapshots candidate files and manifests; it restores baseline controller
 in finally. Do not run multiple simulation trials concurrently.
 Quota: diagnostics/path-tracking-continuation-20261023/usage_guard.py reads only
 this thread's token_count rate_limits entries; 90% used triggers stop.
+
+2026-10-25 further compute trials:
+- speed-compute-p2-s0-1025: 542 tests; 6344 steps; formal836.272 s for two
+  parcels, compared to baseline first two1003.567 s. All visual checks passed;
+  target clips0; formal PD39364 samples with0 clipping. Analysis/audit/archive0.
+- Optional compact detector ROI computes exact same contour color supports.
+- New fused RGB/cloud kernels and SDK arm limit cache: 8 focused tests passed.
+  Cache checks ROS epoch/URDF updates each call, requires exact physical limits.
+  Native cloud preserves point selection/order and exact fixture hull decisions.
+- speed-sdk-p1-s0-1025: independent one-parcel validation in progress.
+- speed_motion15 profile updated with these compute options; motion not yet tested.

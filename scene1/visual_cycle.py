@@ -15,9 +15,14 @@ from .rgbd import spatial_groups
 from .receiver import receiver_section
 from .bin_layout import plan_bin_drop, validate_layout, slot_points
 
+FAST_CLOUD = False
+
 
 def cloud(snapshot, stride=3):
     d, k, m = snapshot['depth_m'], snapshot['intrinsic'], snapshot['camera_to_base']
+    if FAST_CLOUD:
+        from .fast_components import project_cloud
+        return project_cloud(d, cv2.cvtColor(snapshot['rgb'], cv2.COLOR_RGB2HSV), k, m, stride)
     v, u = np.mgrid[0:d.shape[0]:stride, 0:d.shape[1]:stride]
     z = d[v, u].ravel(); u, v = u.ravel(), v.ravel()
     p = np.column_stack(((u-k[0, 2])*z/k[0, 0], (v-k[1, 2])*z/k[1, 1], z))

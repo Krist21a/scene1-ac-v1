@@ -2,6 +2,8 @@
 import cv2
 import numpy as np
 
+FAST_IMAGE_CONVERSION = False
+
 
 def rgb_image(value):
     if hasattr(value, "detach"):
@@ -9,6 +11,11 @@ def rgb_image(value):
     image = np.asarray(value)
     if image.ndim == 4 and image.shape[0] == 1:
         image = image[0]
+    if FAST_IMAGE_CONVERSION:
+        from .fast_components import convert_rgb_chw
+        converted = convert_rgb_chw(image)
+        if converted is not None:
+            return converted
     if image.ndim == 3 and image.shape[0] == 3:
         image = np.moveaxis(image, 0, -1)
     if image.ndim != 3 or image.shape[2] != 3 or not np.isfinite(image).all():
@@ -34,7 +41,9 @@ class ParcelDetector:
             raise ValueError("Tracking thresholds must be positive")
 
     def detect(self, rgb):
-        image = rgb_image(rgb)
+        compact = self.config.get('compact_regions', False)
+        image = (rgb if compact and isinstance(rgb, np.ndarray) and rgb.dtype == np.uint8
+                 and rgb.ndim == 3 and rgb.shape[2] == 3 else rgb_image(rgb))
         height, width = image.shape[:2]
         x0, y0, x1, y1 = self.config["roi"]
         if not 0 <= x0 < x1 <= 1 or not 0 <= y0 < y1 <= 1:
@@ -95,10 +104,18 @@ class ParcelDetector:
                     continue
                 moments = cv2.moments(contour)
                 uv = np.array([moments["m10"] / moments["m00"], moments["m01"] / moments["m00"]])
-                region = np.zeros((height, width), np.uint8)
-                cv2.drawContours(region, [contour], -1, 255, cv2.FILLED)
-                support = {label: cv2.countNonZero(cv2.bitwise_and(region, cmask))
-                           for label, cmask in exclusive.items()}
+                if compact:
+                    # The filled contour is zero outside its integer bounding box.
+                    # Count exactly the same pixels without full-frame temporaries.
+                    region = np.zeros((h, w), np.uint8)
+                    cv2.drawContours(region, [contour], -1, 255, cv2.FILLED, offset=(-x, -y))
+                    support = {label: cv2.countNonZero(cv2.bitwise_and(region, cmask[y:y+h, x:x+w]))
+                               for label, cmask in exclusive.items()}
+                else:
+                    region = np.zeros((height, width), np.uint8)
+                    cv2.drawContours(region, [contour], -1, 255, cv2.FILLED)
+                    support = {label: cv2.countNonZero(cv2.bitwise_and(region, cmask))
+                               for label, cmask in exclusive.items()}
                 label = max(support, key=support.get)
                 color_fraction = support[label] / max(1, cv2.countNonZero(region))
                 if color_fraction < self.config.get("min_color_fraction", 0.08):

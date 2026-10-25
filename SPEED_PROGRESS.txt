@@ -182,3 +182,6 @@ Frozenmatrix r2 seed2 completed4 parcels9136steps890.057391s(14m50.1s), cumulati
 - NativeFK matchesbotharms+customtooloffsets acrosslimits/randomposes atol3e-15; fusedgaps match500random+blockedposes atol2e-12.17specializedtests passedinclhistoricalretreatprojection/certificatefixtures. Representativecold-cacheprojection99.25ms->32.82ms, bothclearandmaxstep.006. InitialFK-onlyprototype99.13->91.21ms rejectedasinsufficient, fusedgeometryadded.
 - C source99f265bea0d58867b8687aeb4440a40550a22f58e6a94129a6be848ed0c6df84;binary16ffe10e893763bb40652d62133c29c385b49159f7ed818b04d9b06040461f33. Offlinevalidationdir/root/scene1_speed/fk-check-1026.
 - speed-retreat-p4-s0-1026 startedwithconfigs/speed_retreat.yaml (marginmotionunchanged+nativeconstraints),634tests expected. Holds6-9stillunused.
+
+- speed-retreat-p4-s0-1026:634tests passed;fourparcels9222steps886.753572s(14m46.8s), cumulative219.218/432.389/648.920/886.754,15.588s fasterthanmarginseed0. Postprocessingpending. Source0still13.25smargin, notfinalgoal.
+- Auto-launchersession25148 waitsfordone+strictacceptance thenrunsmatrixspeed-retreat-validation-1026 seeds2,1,3,4,5,6,7,8,9 fromexactsource speed-retreat-p4-s0-1026; anyfailure/time>=900stops. Currenttrialsession36370. Allholdouts6-9unusedtodate.

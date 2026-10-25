@@ -365,6 +365,50 @@ class VisualPickupTests(unittest.TestCase):
                 break
         self.assertEqual(action[15], .98); self.assertEqual(pickup.stage, 'carry')
 
+    def test_occluded_pad_recovery_preserves_boundary_and_requires_reconfirmation(self):
+        fixture = json.loads((Path(__file__).parent/'fixtures/pad_occluded_s3_20261026.json').read_text())
+        reference = update_pad_reference(None, fixture['reference_candidates'], fixture['pad'])
+        self.assertIsNotNone(reference)
+        self.assertFalse(visible_pad(reference, fixture))
+        measured = np.zeros(16); measured[15] = .5
+        cycle = VisualCycle(dict(pickup_pad_clear_recovery=True), Arm(),
+                            np.full(16,-3.), np.full(16,3.), measured)
+        pickup = VisualPickup(cycle, self.template, fixture['pad'], np.zeros(16), np.zeros(16))
+        pickup._stage('observe_pad'); pickup.motion.command[15] = .98
+        pickup.surface_reference = reference
+        pickup.plane = -.084
+        assist = self.transport_assist(confirmed=True)
+        assist._observe_box = lambda *args: dict(orientation_confirmed=True, bottom_base_m=.066)
+        self.snapshot['surfaces'] = fixture['surfaces']
+        head = dict(state='look_at_target', desired_degrees=[-53.,20.],
+                    command_degrees=[-53.,20.], measured_degrees=[-53.,21.])
+        for _ in range(24):
+            self.snapshot['stamp'] += 1
+            command, info = pickup.update(measured, self.snapshot, assist, head)
+            self.assertEqual(command[15], .98)
+            if pickup.stage == 'pad_clear': break
+        self.assertEqual(pickup.stage, 'pad_clear')
+        self.assertIs(pickup.surface_reference, reference)
+        center = pickup.motion.world_box(measured)[0]
+        self.assertAlmostEqual(np.linalg.norm(pickup.box_destination[:2]-center[:2]), .08)
+        self.assertEqual(pickup.box_destination[2], center[2])
+        with patch.object(pickup.motion, '_arrived', return_value=(True, [])), \
+                patch.object(pickup.motion, '_head_support', return_value=dict(bottom_m=.066)):
+            self.snapshot['stamp'] += 1
+            pickup.update(measured, self.snapshot, assist, head)
+        self.assertEqual(pickup.stage, 'observe_pad')
+        for _ in range(25):
+            self.snapshot['stamp'] += 1
+            command, _ = pickup.update(measured, self.snapshot, assist, head)
+        self.assertEqual(pickup.stage, 'observe_pad')  # no repeat or blind carry
+        self.assertEqual(command[15], .98)
+        self.assertIs(pickup.surface_reference, reference)
+        self.snapshot['surfaces'] = [reference]
+        for _ in range(3):
+            self.snapshot['stamp'] += 1
+            pickup.update(measured, self.snapshot, assist, head)
+        self.assertEqual(pickup.stage, 'carry')
+
     def stable_pad_reference_replay(self):
         fixture = json.loads((Path(__file__).parent/'fixtures/pad_reference_head_motion_v51.json').read_text())
         measured = np.zeros(16)

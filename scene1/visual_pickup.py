@@ -208,6 +208,8 @@ class VisualPickup:
         self.feedback = None
         self.surface_reference = None
         self.pad_frames = 0
+        self.pad_occluded_frames = 0
+        self.pad_clear_attempted = False
         self.placement_height = PlacementHeight()
         self._stage('select')
         if resume_lift is not None:
@@ -248,7 +250,7 @@ class VisualPickup:
             return assist.camera_target(measured)
         if self.stage == 'observe_pad':
             return self.pad
-        if self.stage in ('lift', 'carry', 'prepare_weighing'):
+        if self.stage in ('lift', 'pad_clear', 'carry', 'prepare_weighing'):
             return self.motion.world_box(measured)[0]
         if self.target is not None:
             return np.asarray(self.target['position_base_m'])
@@ -412,7 +414,7 @@ class VisualPickup:
                 if self.stage=='hover':motion.goal[1][2,3]=self.target['top_z_base_m']+.10
                 else:motion.goal[1][2,3]+=.005
             info['table_reference_motion']={k:v for k,v in relative.items() if k!='transform'}
-        if self.stage in ('lift', 'observe_pad', 'carry', 'prepare_weighing'):
+        if self.stage in ('lift', 'pad_clear', 'observe_pad', 'carry', 'prepare_weighing'):
             self.lost = self.lost+1 if not .2 < measured[15] < .85 else 0
             if self.lost >= 4:
                 raise RuntimeError('Visual pickup lost held parcel contact')
@@ -426,7 +428,7 @@ class VisualPickup:
                 if self.unverified_pose >= 30:
                     raise RuntimeError('Held parcel pose could not be verified during visual transport')
                 motion.geometry = copy.deepcopy(assist.geometry[1])
-                if self.pose_frames >= 3 and self.stage in ('lift', 'carry', 'prepare_weighing') and seen is not None and seen['orientation_confirmed']:
+                if self.pose_frames >= 3 and self.stage in ('lift', 'pad_clear', 'carry', 'prepare_weighing') and seen is not None and seen['orientation_confirmed']:
                     # Use the observed attachment transform while keeping a
                     # fixed upright box goal; a slipping parcel is not rigidly
                     # attached to the transform captured before liftoff.
@@ -495,6 +497,8 @@ class VisualPickup:
             observed = visible_pad(self.surface_reference, snapshot)
             if fresh:
                 self.pad_frames = self.pad_frames+1 if observed else 0
+                self.pad_occluded_frames = (self.pad_occluded_frames+1
+                    if reference_view_ready and not observed else 0)
             info.update(pad_boundary_observed=observed, pad_stable_frames=self.pad_frames,
                         pad_surface_stride=snapshot.get('surface_sampling_stride', 4))
             if self.pad_frames >= 3:
@@ -506,6 +510,26 @@ class VisualPickup:
                 motion.goal[1] = motion.k.matrix(measured[8:15], 1)
                 motion.goal[1][:3, 3] += destination-center
                 self._stage('carry')
+            elif (motion.config.get('pickup_pad_clear_recovery', False)
+                    and self.pad_occluded_frames >= 20 and not self.pad_clear_attempted
+                    and self.surface_reference is not None):
+                # Move the held parcel away from the observed support, once.
+                # The reference and its confirmation criteria remain unchanged.
+                # This is an elevated waypoint, never a placement or release.
+                seen = info.get('transport_visual_box') or {}
+                if seen.get('bottom_base_m', -np.inf) >= self.plane+.06:
+                    center, rotation, extent = motion.world_box(measured)
+                    away = center[:2]-np.asarray(self.surface_reference['position_base_m'])[:2]
+                    distance = np.linalg.norm(away)
+                    if distance >= .12:
+                        self.box_destination = center.copy()
+                        self.box_destination[:2] += .08*away/distance
+                        axis = rotation.as_matrix()[:, 0]
+                        self.box_rotation = Rotation.from_euler('z', np.arctan2(axis[1], axis[0]))
+                        motion.goal[1] = motion.k.matrix(measured[8:15], 1)
+                        motion.goal[1][:2, 3] += .08*away/distance
+                        self.pad_clear_attempted = True
+                        self._stage('pad_clear')
         elif self.stage in ('local_grasp', 'local_weighing'):
             if self.stage == 'local_weighing' and motion.config.get('weighing_live_support_height', False):
                 height = self.placement_height.update(assist, snapshot,
@@ -749,7 +773,7 @@ class VisualPickup:
                                   plane=self.plane, grasp_z=float(self.grasp_goal[2, 3]), wrist_verified=False,
                                   **orientation)
                     self._stage('local_grasp')
-                elif self.stage == 'lift':
+                elif self.stage in ('lift', 'pad_clear'):
                     support = motion._head_support(snapshot, measured)
                     info['lift_evidence'] = support
                     if (support is not None and support['bottom_m'] >= self.plane+.06

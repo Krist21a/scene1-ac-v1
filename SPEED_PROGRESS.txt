@@ -189,3 +189,8 @@ Frozenmatrix r2 seed2 completed4 parcels9136steps890.057391s(14m50.1s), cumulati
 - speed-retreat-validation-1026-s2 completed4/9173steps888.136710s(14m48.1s), cumulative222.768/432.633/661.819/888.137;postprocessingpending. Same634-testsource0=886.753572s. Matrixcontinues1/3/4/5thenholdouts6-9 onlyifstrictacceptancepasses.
 
 - speed-retreat-validation-1026-s2 strictacceptancepassed888.136710s. Samefrozenmatrixseed1 nowcomplete4/9006steps870.123957s(14m30.1s), cumulative219.341/436.787/654.844/870.124;postprocessingpending. Source0=886.753572s,617+17=634tests. Continue3/4/5thenheldouts6-9, allofwhichremainunusedwithspeedcandidates.
+
+- Frozen retreat matrix seed1 passed870.123957s. Seed3 failed atstep3238: Visual pickup timed out at observe_pad; completed1. Allanalysis/audit/archive/restore0, matrixstopped, seeds4/5/6-9notstarted.
+- Seed3 replay: correct completepad referenceobserved at2371/2377; aftersecondpickup rightarmoccludesmostpad. Lastpartialfootprint~.175x.070m failsoriginal40%area/twoedgecheck. Headstableandheldposeconfirmed, no contactloss. Keptvalidationthresholds.
+- Added opt-in pickup_pad_clear_recovery: after20freshstableheadunconfirmedpadframes, ifpriorcompleteboundary+heldbottom>=plane+.06 anddistance>=.12, one8cmXYwaypoint awayfromsupport. Sameheight,uprightheldpose,10Hz boundedservo, originalcontact/pose/deadlinechecks. Reobservespadwithoriginalcriteria beforecarry; no repeatedrecovery. Defaultoff, enabledinspeed_retreat. Seed3fixture+integrationtestverifyocclusion,unchangedreference,8cmfixedheight,closedgrip,noautomaticcarryorretry,threevalidframesrequired.42pickuptests passed.
+- New frozen speed-padclear-p4-s3-1026 startedfull4seed3 withfulltestgate(635expected). Noheldoutshavebeenused.

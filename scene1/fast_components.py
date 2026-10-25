@@ -16,10 +16,15 @@ def native_boxes():
 
 
 def boxes_overlap_native(center_a, rotation_a, half_a, center_b, rotation_b, half_b):
-    arrays = [np.ascontiguousarray(x, dtype=np.float64) for x in
+    arrays = [np.asarray(x) for x in
               (center_a, rotation_a, half_a, center_b, rotation_b, half_b)]
     if [a.shape for a in arrays] != [(3,), (3, 3), (3,), (3,), (3, 3), (3,)]:
         return None
+    # Runtime FK and parcel envelopes are float64. Preserve the original
+    # arithmetic for callers using float32 or other numeric representations.
+    if any(a.dtype != np.float64 for a in arrays):
+        return None
+    arrays = [np.ascontiguousarray(a) for a in arrays]
     result = native_boxes()(*arrays)
     return None if result < 0 else bool(result)
 

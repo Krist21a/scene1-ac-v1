@@ -13,6 +13,10 @@ import test_fresh_command_sweep
 
 
 class NativeFallbackTests(unittest.TestCase):
+    def test_float32_retains_reference_precision(self):
+        self.assertIsNone(boxes_overlap_native(np.zeros(3, dtype=np.float32),
+            np.eye(3), np.ones(3), np.zeros(3), np.eye(3), np.ones(3)))
+
     def test_speed_seed_two_blocked_release_is_still_rejected(self):
         from scene1.kinematics import UrdfArmKinematics
         from scene1.command_sweep import sampled_sweep

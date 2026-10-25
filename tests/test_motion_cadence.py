@@ -7,6 +7,25 @@ import test_speed_profiles as profiles
 
 
 class MotionCadenceTests(unittest.TestCase):
+    def test_pickup_lift_override_keeps_contact_and_observation_at_ten_hz(self):
+        env = SimpleNamespace(ros_rate=10, direct_to_wbc=False, rate=None)
+        cadence = MotionCadence(env, lambda hz: hz, 20,
+            pickup_stages=['hover', 'lift'], pickup_rates={'lift': 15})
+        pickup = SimpleNamespace(active=True, stage='lift', motion=SimpleNamespace())
+        self.assertAlmostEqual(cadence.select(None, pickup), 1./15)
+        self.assertAlmostEqual(pickup.motion.control_period_s, 1./15)
+        self.assertEqual(env.ros_rate, 10)
+        for stage in ('descend', 'local_grasp', 'local_weighing', 'carry', 'observe_pad'):
+            pickup.stage = stage
+            self.assertEqual(cadence.select(None, pickup), .1)
+
+    def test_pickup_override_rejects_contact_stages_and_excess_rates(self):
+        env = SimpleNamespace(ros_rate=10, direct_to_wbc=False, rate=None)
+        for stages, rates in ((['descend'], {}), (['lift'], {'lift': 21}),
+                              (['lift'], {'lift': 9}), (['lift'], {'carry': 15})):
+            with self.assertRaises(ValueError):
+                MotionCadence(env, lambda hz: hz, 20, pickup_stages=stages, pickup_rates=rates)
+
     def test_contact_and_policy_stages_keep_original_rate_and_observation_window(self):
         original = object()
         env = SimpleNamespace(ros_rate=10, direct_to_wbc=False, rate=original)

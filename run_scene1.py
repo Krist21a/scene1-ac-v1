@@ -460,7 +460,9 @@ def run(args, config, base, images):
             from scene1.cadence import MotionCadence
             motion_cadence = MotionCadence(env, rospy.Rate, config['performance']['motion_hz'],
                                           config['performance'].get('fast_cycle_stages'),
-                                          config['performance'].get('cycle_stage_hz'))
+                                          config['performance'].get('cycle_stage_hz'),
+                                          config['performance'].get('fast_pickup_stages'),
+                                          config['performance'].get('pickup_stage_hz'))
         if config.get('performance', {}).get('parallel_rgbd', False):
             from scene1.parallel_read import CycleRead
             rgbd_worker = CycleRead()

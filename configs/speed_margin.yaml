@@ -1,0 +1,67 @@
+performance:
+  enabled: true
+  compute_threads: 1
+  cache_fk: true
+  native_components: true
+  compact_detector: true
+  cache_sdk_limits: true
+  native_rgb: true
+  native_cloud: true
+  native_projection: true
+  motion_hz: 20.0
+  parallel_rgbd: true
+  fast_cycle_stages:
+  - right_retreat
+  - left_retreat
+  - return_home
+  - lift
+  - left_approach
+  native_roof_mask: true
+  native_aux_projection: true
+  native_clearance: true
+  sdk_numeric_copies: true
+  cycle_stage_hz:
+    lift: 15.0
+  fast_pickup_stages:
+  - clear
+  - first_clear
+  - first_back
+  - hover
+  - lift
+  pickup_stage_hz:
+    lift: 15.0
+visual_cycle:
+  analytic_jacobian: true
+  servo_profiles:
+    pickup_clear:
+      gain_scale: 3.0
+    pickup_hover:
+      gain_scale: 3.0
+    pickup_lift:
+      gain_scale: 3.0
+    pickup_carry:
+      gain_scale: 2.0
+    lift:
+      gain_scale: 1.5
+    transport:
+      gain_scale: 2.5
+    left_approach:
+      gain_scale: 2.0
+    right_retreat:
+      gain_scale: 3.0
+    left_clear:
+      gain_scale: 2.5
+    bin_transport:
+      gain_scale: 2.5
+    left_retreat:
+      gain_scale: 3.0
+    pickup_first_clear:
+      gain_scale: 2.0
+    pickup_first_back:
+      gain_scale: 2.0
+    return_home:
+      gain_scale: 2.0
+    pickup_descend:
+      gain_scale: 1.5
+    left_insert:
+      gain_scale: 2.0

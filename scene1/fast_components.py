@@ -6,6 +6,25 @@ import numpy as np
 
 
 @lru_cache(maxsize=1)
+def native_boxes():
+    library = ctypes.CDLL(str(Path(__file__).with_name('_components.so')))
+    function = library.scene1_boxes_overlap
+    doubles = np.ctypeslib.ndpointer(dtype=np.float64, flags='C_CONTIGUOUS')
+    function.argtypes = [doubles] * 6
+    function.restype = ctypes.c_int
+    return function
+
+
+def boxes_overlap_native(center_a, rotation_a, half_a, center_b, rotation_b, half_b):
+    arrays = [np.ascontiguousarray(x, dtype=np.float64) for x in
+              (center_a, rotation_a, half_a, center_b, rotation_b, half_b)]
+    if [a.shape for a in arrays] != [(3,), (3, 3), (3,), (3,), (3, 3), (3,)]:
+        return None
+    result = native_boxes()(*arrays)
+    return None if result < 0 else bool(result)
+
+
+@lru_cache(maxsize=1)
 def native_union():
     library = ctypes.CDLL(str(Path(__file__).with_name('_components.so')))
     function = library.scene1_union_pairs

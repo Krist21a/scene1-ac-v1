@@ -1,8 +1,15 @@
 """Conservative open-finger/parcel overlap checks from public robot geometry."""
 import numpy as np
 
+FAST_CLEARANCE = False
+
 
 def boxes_overlap(center_a, rotation_a, half_a, center_b, rotation_b, half_b):
+    if FAST_CLEARANCE:
+        from .fast_components import boxes_overlap_native
+        result = boxes_overlap_native(center_a, rotation_a, half_a, center_b, rotation_b, half_b)
+        if result is not None:
+            return result
     axes = np.vstack((rotation_a.T, rotation_b.T,
         np.cross(rotation_a.T[:,None,:],rotation_b.T[None,:,:]).reshape(-1,3)))
     axes = axes[np.linalg.norm(axes,axis=1) >= 1e-8]

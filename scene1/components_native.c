@@ -1,6 +1,46 @@
 #include <stdint.h>
 #include <math.h>
 
+/* Same 15 separating axes as clearance.py. Boundary/invalid inputs request
+   the original NumPy path, including its exact-contact scalar fallback. */
+int scene1_boxes_overlap(const double *a, const double *ra, const double *ha,
+                         const double *b, const double *rb, const double *hb) {
+    double axes[15][3], delta[3];
+    int separated = 0, ambiguous = 0;
+    for (int i=0; i<3; ++i) {
+        if (!isfinite(a[i]) || !isfinite(b[i]) || !isfinite(ha[i]) || !isfinite(hb[i])) return -1;
+        delta[i] = b[i]-a[i];
+        for (int j=0; j<3; ++j) {
+            if (!isfinite(ra[3*i+j]) || !isfinite(rb[3*i+j])) return -1;
+            axes[j][i] = ra[3*i+j]; axes[3+j][i] = rb[3*i+j];
+        }
+    }
+    for (int i=0; i<3; ++i) for (int j=0; j<3; ++j) {
+        int n=6+3*i+j;
+        for (int k=0; k<3; ++k)
+            axes[n][k]=axes[i][(k+1)%3]*axes[3+j][(k+2)%3]-axes[i][(k+2)%3]*axes[3+j][(k+1)%3];
+    }
+    for (int n=0; n<15; ++n) {
+        double norm=0., distance=0., radius_a=0., radius_b=0.;
+        for (int k=0; k<3; ++k) norm+=axes[n][k]*axes[n][k];
+        double length=sqrt(norm);
+        if (fabs(length-1e-8)<=1e-20) return -1;
+        if (length<1e-8) continue;
+        for (int j=0; j<3; ++j) {
+            double pa=0., pb=0.;
+            distance+=axes[n][j]*delta[j];
+            for (int k=0; k<3; ++k) {
+                pa+=axes[n][k]*ra[3*k+j]; pb+=axes[n][k]*rb[3*k+j];
+            }
+            radius_a+=fabs(pa)*ha[j]; radius_b+=fabs(pb)*hb[j];
+        }
+        double gap=fabs(distance)-(radius_a+radius_b);
+        if (!isfinite(gap) || fabs(gap)<=1e-12) ambiguous=1;
+        if (gap>0.) separated=1;
+    }
+    return ambiguous ? -1 : !separated;
+}
+
 static int64_t root(int64_t *parent, int64_t i) {
     while (parent[i] != i) {
         parent[i] = parent[parent[i]];

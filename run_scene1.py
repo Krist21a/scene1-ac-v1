@@ -303,6 +303,7 @@ def run(args, config, base, images):
     watchdog = SensorWatchdog(rospy, topic_map, config["sensor_timeout_s"])
     arm = None
     sdk_limit_cache = None
+    sdk_numeric_copies = None
     motion_cadence = None
     rgbd_worker = None
     rgbd_scene = None
@@ -351,6 +352,10 @@ def run(args, config, base, images):
                 or trace_window.enabled):
             policy_trace = ACTChunkTrace(policy)
         watchdog.check()
+        if config.get('performance', {}).get('sdk_numeric_copies', False):
+            from scene1.sdk_copy import SensorNumericCopies
+            from kuavo_humanoid_sdk.kuavo.core.ros.state import KuavoRobotStateCore
+            sdk_numeric_copies = SensorNumericCopies(KuavoRobotStateCore)
         arm = ArmMove(base)
         env = arm.env
         if args.mode == "optimized" and config["cartesian_alignment"].get("strategy") == "act_residual":
@@ -1003,6 +1008,8 @@ def run(args, config, base, images):
             rgbd_scene.close()
         if arm is not None:
             arm.env.close()
+        if sdk_numeric_copies is not None:
+            sdk_numeric_copies.close()
         trace_manifest_error = None
         try:
             trace_window.close()
@@ -1080,6 +1087,11 @@ def main():
         parser.error('--stop-after-regrasp requires --regrasp-from')
     config, base, images = load_config(args.config, args.speed_profile)
     performance = config.get('performance', {})
+    if performance.get('native_clearance', False):
+        import scene1.clearance as clearance_module
+        from scene1.fast_components import native_boxes
+        native_boxes()
+        clearance_module.FAST_CLEARANCE = True
     if performance.get('native_aux_projection', False):
         import scene1.residual as residual_module
         import scene1.settlement as settlement_module

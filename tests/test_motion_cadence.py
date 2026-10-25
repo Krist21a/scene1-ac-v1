@@ -7,6 +7,21 @@ import test_speed_profiles as profiles
 
 
 class MotionCadenceTests(unittest.TestCase):
+    def test_home_settling_latches_original_rate_and_resets_next_cycle(self):
+        env = SimpleNamespace(ros_rate=10, direct_to_wbc=False, rate=None)
+        cadence = MotionCadence(env, lambda hz: hz, 20)
+        cycle = profiles.SpeedProfileTests().cycle({})
+        cycle.config['return_home_settle'] = True
+        cycle.active = True; cycle._stage('return_home')
+        measured = cycle.home.copy(); measured[0] += .3
+        self.assertEqual(cadence.select(cycle, None, measured), .05)
+        measured[0] -= .15
+        self.assertEqual(cadence.select(cycle, None, measured), .1)
+        measured[0] += .15
+        self.assertEqual(cadence.select(cycle, None, measured), .1)
+        cycle._stage('return_home')
+        self.assertEqual(cadence.select(cycle, None, measured), .05)
+
     def test_pickup_lift_override_keeps_contact_and_observation_at_ten_hz(self):
         env = SimpleNamespace(ros_rate=10, direct_to_wbc=False, rate=None)
         cadence = MotionCadence(env, lambda hz: hz, 20,

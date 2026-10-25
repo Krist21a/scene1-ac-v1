@@ -42,6 +42,9 @@ class MotionCadence:
         hz = float(self.pickup_rates.get(pickup.stage, self.hz)) if moving else self.base_hz
         if cycle is not None and cycle.active and cycle.stage in self.cycle_stages:
             allowed = True
+            if (cycle.stage == 'return_home'
+                    and getattr(cycle, 'config', {}).get('return_home_settle', False)):
+                allowed = measured is not None and not cycle.settle_home(measured)
             if cycle.stage == 'left_approach':
                 # Wrist edge confirmation begins within 40 mm. Restore 10 Hz
                 # at 80 mm, before that region, retaining its original dwell.

@@ -226,6 +226,7 @@ class VisualCycle:
         self.servo_previous = [None, None]
         self.servo_precision = [False, False]
         self.home_previous = None
+        self.home_settling = False
         self.receiver_center_frames = 0
 
     def world_box(self, measured):
@@ -241,6 +242,14 @@ class VisualCycle:
         if self.stage == 'return_home':
             return None
         return self.world_box(measured)[0]
+
+    def settle_home(self, measured):
+        """Latch the original home controller near its destination."""
+        if self.config.get('return_home_settle', False):
+            self.home_settling = (getattr(self, 'home_settling', False)
+                or np.max(abs(self.home[JOINTS]-np.asarray(measured)[JOINTS])) <= .2)
+            return self.home_settling
+        return False
 
     def _profile_gain(self, stage):
         profile = self.config.get('servo_profiles', {}).get(stage, {})
@@ -678,7 +687,8 @@ class VisualCycle:
             previous = getattr(self, 'home_previous', None)
             velocity = np.zeros(len(JOINTS)) if previous is None else measured[JOINTS]-previous
             self.home_previous = measured[JOINTS].copy()
-            change = self._profile_gain('return_home')*(.06*delta-.24*velocity)
+            gain = 1. if self.settle_home(measured) else self._profile_gain('return_home')
+            change = gain*(.06*delta-.24*velocity)
             scale = min(1., .012/max(max(abs(change)), 1e-9))
             self.command[JOINTS] += scale*change
             self.command = np.clip(self.command, self.low, self.high)

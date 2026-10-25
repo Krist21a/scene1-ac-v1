@@ -110,6 +110,17 @@ class VisualCycleTests(unittest.TestCase):
             with self.subTest(value=value), self.assertRaises(ValueError):
                 self.cycle._arrived(self.measured)
 
+    def test_near_home_uses_original_gain_and_retains_arrival_gate(self):
+        self.cycle.config.update(return_home_settle=True,
+                                servo_profiles={'return_home': {'gain_scale': 2.}})
+        self.cycle._stage('return_home')
+        self.measured[0] = self.cycle.home[0]+.10
+        before = self.cycle.command.copy()
+        action, _ = self.cycle.update(self.measured, dict(stamp=.1), self.assist)
+        self.assertAlmostEqual(action[0]-before[0], -.006)
+        self.assertTrue(self.cycle.home_settling)
+        self.assertEqual(self.cycle.stage, 'return_home')
+
     def test_visible_surface_evidence_rejects_scattered_colored_noise(self):
         x,y=np.mgrid[0:10,0:10]
         patch_points=np.column_stack((x.ravel()*.002,y.ravel()*.002,np.zeros(100)))

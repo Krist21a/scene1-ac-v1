@@ -6,13 +6,14 @@ The official arm-only service currently uses a different upper-arm length.
 from types import SimpleNamespace
 import xml.etree.ElementTree as ET
 import numpy as np
+from functools import lru_cache
 from scipy.optimize import least_squares
 from scipy.spatial.transform import Rotation
 from .motion import action_vector
 
 
 class UrdfArmKinematics:
-    def __init__(self, rospy=None, description=None, tool_xyz=(0, 0, -0.1488)):
+    def __init__(self, rospy=None, description=None, tool_xyz=(0, 0, -0.1488), fast=False):
         if description is None:
             description = rospy.get_param('/humanoid_description')
         root = ET.fromstring(description)
@@ -52,8 +53,17 @@ class UrdfArmKinematics:
                 raise ValueError('Expected seven arm joints')
             self.chains.append(parsed)
             self.limits.append(np.asarray(limits))
+        self.fast = fast
+        self._cached_matrix = lru_cache(maxsize=256)(self._matrix_reference)
 
     def matrix(self, q, side):
+        if self.fast:
+            # Exact state keys: never reuse a transform from a nearby/stale state.
+            # Callers may modify waypoints, so cached arrays cannot escape.
+            return self._cached_matrix(tuple(q), side).copy()
+        return self._matrix_reference(q, side)
+
+    def _matrix_reference(self, q, side):
         mat = np.eye(4)
         for origin, index, axis in self.chains[side]:
             mat = mat @ origin
@@ -63,6 +73,23 @@ class UrdfArmKinematics:
                 mat = mat @ rot
         mat[:3, 3] += mat[:3, :3] @ self.tool_xyz
         return mat
+
+    def matrix_and_jacobian(self, q, side):
+        """TCP geometric Jacobian in base coordinates, including fixed origins."""
+        mat = np.eye(4)
+        origins = np.empty((7, 3))
+        axes = np.empty((7, 3))
+        for origin, index, axis in self.chains[side]:
+            mat = mat @ origin
+            if index is not None:
+                origins[index] = mat[:3, 3]
+                axes[index] = mat[:3, :3] @ axis
+                rot = np.eye(4)
+                rot[:3, :3] = Rotation.from_rotvec(axis*q[index]).as_matrix()
+                mat = mat @ rot
+        mat[:3, 3] += mat[:3, :3] @ self.tool_xyz
+        jac = np.vstack((np.cross(axes, mat[:3, 3]-origins).T, axes.T))
+        return mat, jac
 
     def fk(self, action):
         action = action_vector(action)

@@ -1,0 +1,60 @@
+Scene1 A+C speed work — 2026-10-25
+
+Goal: same-workstation four-parcel formal execution wall time <900 s in every
+acceptance run, preserving the existing visual checks. No official success claim
+while task_success=null. Stop when the current session quota has <=10% remaining;
+stop experiment, retain evidence, restore original controller.
+
+Base: ac-v1-20261025 / 0b92d80. Isolated branch speed/under-15m.
+Original repo /home/krist/scene1-ac-v1 and production policy remain unchanged.
+Baseline archive: seeds0/2/4/5 mean wall2070.609 s, sim608.437 s, 12667.75 steps.
+Existing 10Hz wall pacing alone implies approximately1266.8 s with that step count.
+
+Evidence root: /media/krist/KINGSTON/scene1-speed-20261025
+Experiment raw data remains under the existing external evidence root with new
+speed-* labels. Local diagnostics symlinks reference those authoritative files.
+
+Runs:
+- speed-baseline-s0-1025: packaging preflight failed (calibrate_servo.py omitted);
+  no simulation launched. Failure retained; packager fixed.
+- speed-baseline-s0-r2-1025: 529 original tests passed; A+C hash verified;
+  independent official reset; four parcels completed,12663 steps. Full-cycle formal
+  wall2030.285 s (33m50.3s); all analysis/audit/archive/restore stages passed.
+  Sensor simulation602.264 s; sampled RTF0.296842; formal PD clipping0/90454.
+  Image detection550.759 s; RGB-D443.006 s; servo517.793 s; env236.803 s;
+  phase/head129.757 s; diagnostics52.686 s; checkpoints39.973 s; ACT3.568 s.
+  Changes limited to added full-cycle timing. Note initial timer fields named
+  sim_start_s/sim_end_s are rospy.get_time and represent ROS/wall time in this
+  environment; use original chain analysis for physical simulation duration.
+
+- speed-threads-p1-s0-1025: two new gain-test fixtures lacked initial command;
+  preflight failed before simulation. Fixed fixtures; no policy algorithm change.
+- speed-threads-p1-s0-r2-1025: all540 tests passed (529 original +11 new),
+  thread-only one-parcel independent trial running.
+
+Prepared, NOT dynamically validated:
+- Optional one-thread OpenCV/Torch/BLAS compute profile.
+- Exact-key bounded FK cache (returns independent arrays).
+- Analytic geometric Jacobian with synthetic central-difference tests.
+- Native ordered union-find kernel; same pairs/root algorithm as Python.
+- Stage-selective 1.5x servo gain for non-contact transport phases; original
+  command-step/velocity/arrival/geometry bounds. Loaded receiving-hand hold unchanged.
+- Separate profile files retain the original defaults without speed overrides.
+
+Next: inspect thread-only one-parcel timing and tracking;
+validate compute-only and then motion changes in independent one-parcel resets;
+expand successful candidates to four parcels and multi-seed frozen acceptance.
+All changes require dynamic validation before any claim of <900s success.
+
+Workstation storage: moved ~/.ccache to external disk with byte verification and
+left a symlink at the original path. Archived obsolete container pip temp build
+/tmp/pip-install-1wlzicaj with per-file verification; this lower-layer cleanup did
+not reclaim host disk. No historical task evidence removed.
+
+Rebuild optional native kernel: python3 tools/build_components.py
+Run isolated candidate: python3 tools/speed_trial.py UNIQUE-LABEL --seed 0 --parcels 1
+  --speed-profile configs/speed_threads.yaml
+Driver snapshots candidate files and manifests; it restores baseline controller
+in finally. Do not run multiple simulation trials concurrently.
+Quota: diagnostics/path-tracking-continuation-20261023/usage_guard.py reads only
+this thread's token_count rate_limits entries; 90% used triggers stop.

@@ -237,7 +237,14 @@ class VisualCycle:
         return self.world_box(measured)[0]
 
     def _servo(self, measured, side, goal, posture_target=None, posture_gain=.04, descent_alignment=False,
-               coupled_pose_request=False, reserve_joint_bound=False):
+               coupled_pose_request=False, reserve_joint_bound=False, servo_profile=None):
+        profile = self.config.get('servo_profiles', {}).get(servo_profile or self.stage, {})
+        gain_scale = float(profile.get('gain_scale', 1.))
+        if not np.isfinite(gain_scale) or not 0. < gain_scale <= 3.:
+            raise ValueError('Servo gain scale must be finite and in (0, 3]')
+        if ((self.stage == 'right_retreat' and side == 0) or
+                (self.stage in ('left_approach', 'left_insert') and side == 1)):
+            gain_scale = 1.  # Keep the stationary loaded hand's hold unchanged.
         start = (0, 8)[side]
         q = measured[start:start+7]
         current = self.k.matrix(q, side)
@@ -270,12 +277,16 @@ class VisualCycle:
         # keep its goal, derivative damping, request/step caps and all gates.
         angular_weight = (.24 if side == 0 and self.stage == 'right_retreat'
             and self.config.get('holding_pose_priority', False) else .12)
-        jac = np.empty((6, 7))
-        for j in range(7):
-            shifted = q.copy(); shifted[j] += 1e-4
-            m = self.k.matrix(shifted, side)
-            jac[:3, j] = (m[:3, 3]-current[:3, 3])/1e-4
-            jac[3:, j] = angular_weight*(Rotation.from_matrix(m[:3, :3])*r.inv()).as_rotvec()/1e-4
+        if self.config.get('analytic_jacobian', False):
+            _, jac = self.k.matrix_and_jacobian(q, side)
+            jac[3:] *= angular_weight
+        else:
+            jac = np.empty((6, 7))
+            for j in range(7):
+                shifted = q.copy(); shifted[j] += 1e-4
+                m = self.k.matrix(shifted, side)
+                jac[:3, j] = (m[:3, 3]-current[:3, 3])/1e-4
+                jac[3:, j] = angular_weight*(Rotation.from_matrix(m[:3, :3])*r.inv()).as_rotvec()/1e-4
         xyz_scale = min(1., .012/max(np.linalg.norm(xyz), 1e-9))
         angle_scale = min(1., .045/max(np.linalg.norm(angle), 1e-9))
         if coupled_pose_request:
@@ -284,7 +295,7 @@ class VisualCycle:
             xyz_scale = angle_scale = min(xyz_scale, angle_scale)
         requested = np.r_[xyz*xyz_scale, angular_weight*angle*angle_scale]
         step = self.config.get('max_joint_step_rad', .012)
-        gain = self.config.get('servo_gain', .18)
+        gain = self.config.get('servo_gain', .18)*gain_scale
         if precision:
             step *= .5
             gain /= 3.
@@ -324,13 +335,14 @@ class VisualCycle:
         return position_error, angle_error, current[:3, 3]
 
     def _arrived(self, measured, *, position_limit=None, angle_limit=None, posture_targets=None, posture_gain=.04,
-                 descent_alignment=False, coupled_pose_request=False, reserve_joint_bound=False):
+                 descent_alignment=False, coupled_pose_request=False, reserve_joint_bound=False, servo_profile=None):
         sides = [side for side, goal in enumerate(self.goal) if goal is not None]
         errors = [self._servo(measured, side, self.goal[side],
                   None if posture_targets is None else posture_targets[side], posture_gain,
                   descent_alignment=descent_alignment and side == 1,
                   coupled_pose_request=coupled_pose_request and side == 1,
-                  reserve_joint_bound=reserve_joint_bound and side == 1) for side in sides]
+                  reserve_joint_bound=reserve_joint_bound and side == 1,
+                  servo_profile=servo_profile) for side in sides]
         positions = np.concatenate([e[2] for e in errors])
         moving = self.last_positions is None or np.max(abs(positions-self.last_positions)) > .004
         self.last_positions = positions

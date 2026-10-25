@@ -13,6 +13,8 @@ import cv2
 import numpy as np
 from scipy.spatial import cKDTree
 
+FAST_COMPONENTS = False
+
 
 def decode_depth(message):
     if "16UC1" not in message.format:
@@ -29,13 +31,18 @@ def decode_depth(message):
 
 def spatial_groups(points, max_gap=.02):
     """Split an XY component only at actual gaps between its observed 3D points."""
+    pairs = cKDTree(points).query_pairs(max_gap, output_type='ndarray')
+    if FAST_COMPONENTS:
+        from .fast_components import component_labels
+        labels = component_labels(pairs, len(points))
+        return [np.flatnonzero(labels == label) for label in np.unique(labels)]
     parent = np.arange(len(points))
     def root(i):
         while parent[i] != i:
             parent[i] = parent[parent[i]]
             i = parent[i]
         return i
-    for a, b in cKDTree(points).query_pairs(max_gap, output_type='ndarray'):
+    for a, b in pairs:
         a, b = root(a), root(b)
         if a != b:
             parent[b] = a

@@ -21,7 +21,7 @@ def variant(name):
         source = e.OLD / 'candidate-wrist-pd/libhumanoid_controllers.so'
         expected, factor = e.PD_SHA, 'C: bounded post-WBC wrist torque PD'
     elif name in ['wrist_damping','pd_scale','pd_scale15','origin_mpc_q']:
-        d=e.HERE/('candidate-wrist-damping' if name=='wrist_damping' else 'candidate-pd-scale15' if name=='pd_scale15' else 'candidate-pd-scale')
+        d=e.ASSETS/('candidate-wrist-damping' if name=='wrist_damping' else 'candidate-pd-scale15' if name=='pd_scale15' else 'candidate-pd-scale')
         registration=json.loads((d/'registration.json').read_text())
         build=json.loads((d/'build-manifest.json').read_text())
         assert sha(d/'humanoidController.cpp')==registration['source_sha256']==build['source_sha256']
@@ -29,7 +29,7 @@ def variant(name):
         expected=build['library_sha256']
         factor='G: C post-WBC wrist damping0.05to0.20; all bounds unchanged'
     elif name in ['velocity', 'velocity_pd']:
-        d = e.HERE / ('candidate-velocity' if name == 'velocity' else 'candidate-velocity-pd')
+        d = e.ASSETS / ('candidate-velocity' if name == 'velocity' else 'candidate-velocity-pd')
         registration = json.loads((d / 'registration.json').read_text())
         build = json.loads((d / 'build-manifest.json').read_text())
         assert sha(d / 'humanoidController.cpp') == registration['source_sha256'] == build['source_sha256']
@@ -40,22 +40,22 @@ def variant(name):
     else:
         raise ValueError(name)
     assert sha(source) == expected, ('Candidate artifact hash mismatch', name)
-    qr_source=e.HERE/'baseline-config/dynamic_qr.info'
-    qr_expected=json.loads((e.HERE/'baseline-config/manifest.json').read_text())['sha256']
+    qr_source=e.ASSETS/'baseline-config/dynamic_qr.info'
+    qr_expected=json.loads((e.ASSETS/'baseline-config/manifest.json').read_text())['sha256']
     if name in ['mpc_q','origin_mpc_q']:
-        qr_source=e.HERE/'candidate-mpc-arm-q/dynamic_qr.info'
-        qr_expected=json.loads((e.HERE/'candidate-mpc-arm-q/registration.json').read_text())['candidate_sha256']
+        qr_source=e.ASSETS/'candidate-mpc-arm-q/dynamic_qr.info'
+        qr_expected=json.loads((e.ASSETS/'candidate-mpc-arm-q/registration.json').read_text())['candidate_sha256']
         factor='E: C plus active stance MPC proximal arm Q x2'
     assert sha(qr_source)==qr_expected
-    task_source=e.HERE/'baseline-task/task.info'
-    task_expected=json.loads((e.HERE/'baseline-task/manifest.json').read_text())['sha256']
+    task_source=e.ASSETS/'baseline-task/task.info'
+    task_expected=json.loads((e.ASSETS/'baseline-task/manifest.json').read_text())['sha256']
     if name=='proximal_kp':
-        task_source=e.HERE/'candidate-proximal-kp/task.info'
-        task_expected=json.loads((e.HERE/'candidate-proximal-kp/registration.json').read_text())['candidate_sha256']
+        task_source=e.ASSETS/'candidate-proximal-kp/task.info'
+        task_expected=json.loads((e.ASSETS/'candidate-proximal-kp/registration.json').read_text())['candidate_sha256']
         factor='F: unchanged C plus WBC proximal arm task Kp80to100; wrist gains, damping and MPC unchanged'
     if name=='arm_weight':
-        task_source=e.HERE/'candidate-arm-weight/task.info'
-        task_expected=json.loads((e.HERE/'candidate-arm-weight/registration.json').read_text())['candidate_sha256']
+        task_source=e.ASSETS/'candidate-arm-weight/task.info'
+        task_expected=json.loads((e.ASSETS/'candidate-arm-weight/registration.json').read_text())['candidate_sha256']
     assert sha(task_source)==task_expected
     vr_source=e.OLD/'baseline/vr-reference/humanoid_VR_hand_control'
     vr_expected='155191dc393e6c92552e57a2c4af6d52833283bc22660e7d8788ba65424ce293'
@@ -86,5 +86,5 @@ def variant(name):
 
 def available():
     return {name: variant(name) for name in CHOICES if name in ['baseline', 'candidate','mpc_q','proximal_kp','origin_pd','wrist_damping','arm_weight','pd_scale','pd_scale15','origin_mpc_q'] or
-            (e.HERE / ('candidate-velocity' if name == 'velocity' else 'candidate-velocity-pd') /
+            (e.ASSETS / ('candidate-velocity' if name == 'velocity' else 'candidate-velocity-pd') /
              'libhumanoid_controllers.so').exists()}

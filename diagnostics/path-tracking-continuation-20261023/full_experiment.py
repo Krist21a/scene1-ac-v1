@@ -46,10 +46,14 @@ def main():
     ap.add_argument('--max-steps', type=int, default=5000)
     ap.add_argument('--parcels', type=int, choices=[1,2,4], default=1)
     ap.add_argument('--policy', choices=['axis','axis_sweep','axis_feasible','executor','executor_geometry','executor_spatial','executor_release','executor_physical','executor_context','executor_hold','executor_open','executor_project','executor_obb','executor_fresh','executor_fast','executor_mpc_hold','executor_numerics','executor_prepare','executor_prepare_adapt','executor_grasp_frame','executor_grasp_gain','executor_grasp_settle','executor_support_heading','executor_support_gain','executor_pending_hold','executor_first_gain','executor_arm_prepare','executor_soft_open','executor_support_prepare','executor_insert_pitch','executor_support_recover','executor_placement_physical','executor_release_quiet','executor_first_transport','executor_first_pitch','executor_first_pickup','executor_first_select','executor_pickup_sweep','executor_first_clear','executor_first_reobserve','executor_pickup_hold_sweep','executor_first_bin','executor_bin_components','executor_bin_dense','executor_table_dense','executor_pad_dense'], default='axis_sweep')
+    ap.add_argument('--speed-profile')
+    ap.add_argument('--policy-root', type=Path, required=True)
+    ap.add_argument('--manifest', type=Path, required=True)
+    ap.add_argument('--container-project', required=True)
     a = ap.parse_args()
-    e.HOST_PROJECT = e.HERE / ('candidate-policy-' + a.policy.replace('_', '-'))
-    e.PROJECT = '/root/scene1_path_tracking_continuation_20261023/' + e.HOST_PROJECT.name
-    manifest_path = e.HERE / (a.policy.replace('_', '-') + '-manifest.json')
+    e.HOST_PROJECT = a.policy_root.resolve()
+    e.PROJECT = a.container_project
+    manifest_path = a.manifest.resolve()
     registration_path = e.HERE / 'registration.json'
     if not re.fullmatch(r'[a-z0-9][a-z0-9_-]*',a.label):
         ap.error('label must contain only lowercase letters, digits, underscore and hyphen')
@@ -70,6 +74,7 @@ def main():
     state = dict(version=a.version, label=a.label, seed=a.seed, status='preflight',
                  started_at=now(), task_success=None, independent_full_success=None,
                  expected_controller_sha256=expected, max_steps=a.max_steps, parcels=a.parcels, policy_root=e.PROJECT, policy_variant=a.policy,
+                 speed_profile=a.speed_profile,
                  orchestrator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                  registration_sha256=hashlib.sha256(registration_path.read_bytes()).hexdigest())
     state['registration_amendments'] = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
@@ -107,7 +112,7 @@ def main():
     try:
         state['usage_at_start'] = usage_guard.latest()
         if state['usage_at_start']['reached']:
-            raise RuntimeError('User20percent usage limit reached; no new experiment')
+            raise RuntimeError('User quota stop: <=10% remaining; no new experiment')
         e.wait_idle(e.ALGO)
         e.wait_idle(e.SIM)
         if shutil.disk_usage('/').free < 4_000_000_000:
@@ -226,7 +231,8 @@ print(json.dumps(bad));sys.exit(bool(bad))
         save()
         policy = launch('controller',['docker','exec',e.ALGO,'bash',e.PROJECT+'/run.sh',
                                       '--config','configs/visual_cycle_four_parcels.yaml','--task','go_run',
-                                      '--mode','optimized','--stop-after-parcels',str(a.parcels),'--max-steps',str(a.max_steps)])
+                                      '--mode','optimized','--stop-after-parcels',str(a.parcels),'--max-steps',str(a.max_steps)] +
+                                      (['--speed-profile',a.speed_profile] if a.speed_profile else []))
         print(json.dumps(dict(label=a.label,status='running',run_id=state['ros_run_id'],sha256=mapped[0])),flush=True)
         cursors = dict(robot_guard=0,target_guard=0)
         last = {name:time.monotonic() for name in cursors}

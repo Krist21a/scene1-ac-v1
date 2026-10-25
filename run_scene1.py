@@ -38,6 +38,7 @@ from scene1.placement_target import PlacementTarget
 from scene1.bin_layout import validate_layout
 from scene1.recovery import load_run_history, load_last_arm_command, validate_act_handover_resume
 from scene1.snapshots import write_sensor_snapshot
+from scene1.performance import CycleTimer
 
 ROOT = Path(__file__).resolve().parent
 
@@ -104,8 +105,14 @@ def read_manipulation_rgbd(scene, aligner, visual_cycle, visual_pickup, config):
     return snapshot
 
 
-def load_config(path):
+def load_config(path, speed_profile=None):
     config = yaml.safe_load(Path(path).read_text())
+    if speed_profile is not None:
+        overrides = yaml.safe_load(Path(speed_profile).read_text())
+        for section, values in overrides.items():
+            if section not in ('performance', 'visual_cycle') or not isinstance(values, dict):
+                raise ValueError('Speed profiles may override performance/visual_cycle mappings only')
+            config.setdefault(section, {}).update(values)
     compression = config.get('sensor_snapshot_compression_level', 6)
     if type(compression) is not int or not 0 <= compression <= 9:
         raise ValueError('sensor_snapshot_compression_level must be an integer from 0 to 9')
@@ -233,9 +240,11 @@ class SensorWatchdog:
             self.received[topic] = time.monotonic()
             header = getattr(message, 'header', None)
             stamp = getattr(header, 'stamp', None)
+            sensor_time = getattr(message, 'sensor_time', None)
             self.message_metadata[topic] = dict(
                 receipt_monotonic_s=self.received[topic],
                 source_stamp_s=stamp.to_sec() if stamp is not None else None,
+                sensor_time_s=sensor_time.to_sec() if sensor_time is not None else None,
                 receipts=self.message_metadata.get(topic, {}).get('receipts', 0) + 1)
 
     def snapshot(self):
@@ -295,6 +304,8 @@ def run(args, config, base, images):
     output = ROOT / "outputs" / time.strftime("%Y%m%d-%H%M%S")
     output.mkdir(parents=True, exist_ok=False)
     log = None
+    cycle_timer = CycleTimer(output/'performance.jsonl', config.get('performance', {}).get('enabled', False),
+                            profile_every=config.get('performance', {}).get('profile_every_steps', 0))
     steps = 0
     reason = "not_started"
     error = None
@@ -376,7 +387,7 @@ def run(args, config, base, images):
         head_tracker = None
         if args.mode == "optimized" and config["cartesian_alignment"]["enabled"]:
             rgbd_scene = RgbdScene(rospy, config["cartesian_alignment"])
-            kinematics = UrdfArmKinematics(rospy)
+            kinematics = UrdfArmKinematics(rospy, fast=config.get('performance', {}).get('cache_fk', False))
             for side,start in enumerate((0,8)):
                 motion.low[start:start+7] = np.maximum(motion.low[start:start+7],kinematics.limits[side][:,0])
                 motion.high[start:start+7] = np.minimum(motion.high[start:start+7],kinematics.limits[side][:,1])
@@ -482,6 +493,9 @@ def run(args, config, base, images):
                 reason = "user_stop"
                 break
             started = time.monotonic()
+            cycle_timer.begin(steps+1, rospy.get_time())
+            cycle_timer.mark('clock_sample', sensor_sim_start_s=
+                watchdog.snapshot().get('/sensors_data_raw', {}).get('sensor_time_s'))
             ages = watchdog.check()
             trace_payload = None
             selected_normalized = None
@@ -518,6 +532,7 @@ def run(args, config, base, images):
                 aligner.observe_wrist(wrist_detections,
                     {side: [image.shape[1], image.shape[0]] for side, image in wrist_images.items()},
                     wrist_images)
+            cycle_timer.mark('image_detection')
             rgbd_snapshot = None
             rgbd_error = None
             if aligner is not None:
@@ -526,6 +541,7 @@ def run(args, config, base, images):
                         rgbd_scene, aligner, visual_cycle, visual_pickup, config)
                 except Exception as exc:
                     rgbd_error = str(exc)
+            cycle_timer.mark('rgbd', rgbd_stamp=rgbd_snapshot.get('stamp') if rgbd_snapshot else None)
             measured = observation['observation.state'].detach().cpu().numpy().reshape(-1)
             if (pickup_template is None and isinstance(aligner, ResidualAssist)
                     and aligner.first_grasp_complete and not aligner.regrasp_complete
@@ -582,6 +598,7 @@ def run(args, config, base, images):
             cycle_active = visual_cycle is not None and visual_cycle.active
             pickup_active = visual_pickup is not None and visual_pickup.active
             frozen = pickup_active or cycle_active or (aligner is not None and ((aligner.pending is not None and not act_handover) or head_returning))
+            cycle_timer.mark('phase_and_head')
             prediction_info = None
             if trace_window.wants_payload():
                 # Copy BEFORE preprocessing: a processor may replace or modify
@@ -625,6 +642,7 @@ def run(args, config, base, images):
                     trace_payload['normalized_chunk'] = policy_trace.chunk.cpu().numpy().copy()
                 trace_payload['selected_normalized'] = selected_normalized.cpu().numpy().copy()
             inferred = time.monotonic()
+            cycle_timer.mark('policy')
             if config["servo"]["enabled"]:
                 servo_image = rgb_image(observation[config["servo"]["image_key"]])
                 servo_detections = servo_detector.detect(servo_image)
@@ -669,6 +687,7 @@ def run(args, config, base, images):
                                                  cartesian_info['grasp_target_base_m'])
                 cartesian_info["sensor_error"] = rgbd_error
                 cartesian_info["candidate_count"] = len(rgbd_snapshot["candidates"]) if rgbd_snapshot else 0
+            cycle_timer.mark('servo', phase=cartesian_info.get('state'))
             dt = min(period, max(1e-4, time.monotonic() - last_send))
             contract_info = None
             if contract is not None and contract.active and not frozen:
@@ -755,9 +774,11 @@ def run(args, config, base, images):
                 observation = env.get_obs()
                 observation_received = watchdog.snapshot()
                 continue
+            cycle_timer.mark('filter_and_sweep')
             last_send = time.monotonic()
             next_observation, reward, terminated, truncated, info = env.step(sent)
             next_observation_received = watchdog.snapshot()
+            cycle_timer.mark('env_step')
             previous_sent = sent.copy()
             if cycle_active:
                 visual_cycle.command = sent.copy()
@@ -771,6 +792,7 @@ def run(args, config, base, images):
                 {side: [image.shape[1], image.shape[0]] for side, image in wrist_images.items()})
             steps += 1
             ended = time.monotonic()
+            cycle_timer.mark('feedback')
             if visual_cycle is not None and (visual_cycle.active or visual_cycle.done):
                 checkpoint_state = dict(schema=1, ros_run_id=rospy.get_param('/run_id', None),
                     step=steps, controller=visual_cycle.state_dict(),
@@ -784,6 +806,7 @@ def run(args, config, base, images):
                 write_pickup_checkpoint(output, steps, rospy.get_param('/run_id', None),
                     visual_pickup, visual_cycle, aligner,
                     next_observation['observation.state'].detach().cpu().numpy().reshape(-1))
+            cycle_timer.mark('checkpoint')
             record = {
                 "step": steps, "mode": args.mode,
                 "inference_s": inferred - started, "step_s": ended - started,
@@ -900,12 +923,17 @@ def run(args, config, base, images):
             if terminated or truncated:
                 reason = "environment_terminated" if terminated else "environment_truncated"
                 break
+            cycle_timer.mark('diagnostics')
             # The original environment already sleeps; only fill remaining time.
             remaining = period - (time.monotonic() - started)
             if remaining > 0:
                 time.sleep(remaining)
+            cycle_timer.finish(ros_end_s=rospy.get_time(), sensor_sim_end_s=
+                watchdog.snapshot().get('/sensors_data_raw', {}).get('sensor_time_s'))
         else:
             reason = "max_steps_reached"
+        cycle_timer.finish(ros_end_s=rospy.get_time(), sensor_sim_end_s=
+            watchdog.snapshot().get('/sensors_data_raw', {}).get('sensor_time_s'))
         print(f"Stopped: {reason}; steps={steps}; task success requires scene/rule evaluation. Logs: {output}")
     except KeyboardInterrupt:
         reason = "keyboard_interrupt"
@@ -933,6 +961,7 @@ def run(args, config, base, images):
                     camera_to_base=rgbd_snapshot['camera_to_base'], observation_state=measured)
         raise
     finally:
+        cycle_timer.close()
         if policy_trace is not None:
             policy_trace.close()
         if log is not None:
@@ -962,6 +991,7 @@ def run(args, config, base, images):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", default=str(ROOT / "config.yaml"))
+    parser.add_argument('--speed-profile', help='Optional isolated performance/visual-cycle overrides')
     parser.add_argument("--task", choices=("run", "go_run"), default="go_run")
     parser.add_argument("--mode", choices=("baseline", "observe", "optimized"), default="optimized")
     parser.add_argument("--preflight", action="store_true", help="Read configuration/model metadata only; send no commands")
@@ -1016,7 +1046,23 @@ def main():
             parser.error('--regrasp-from source must have completed weighing release')
     if args.stop_after_regrasp and args.regrasp_from is None:
         parser.error('--stop-after-regrasp requires --regrasp-from')
-    config, base, images = load_config(args.config)
+    config, base, images = load_config(args.config, args.speed_profile)
+    performance = config.get('performance', {})
+    if performance.get('native_components', False):
+        import scene1.rgbd as rgbd_module
+        from scene1.fast_components import native_union
+        native_union()  # Validate the frozen binary before any robot initialization.
+        rgbd_module.FAST_COMPONENTS = True
+    thread_limits = None
+    if 'compute_threads' in performance:
+        threads = performance['compute_threads']
+        if type(threads) is not int or threads < 1:
+            raise ValueError('compute_threads must be a positive integer')
+        import torch
+        from threadpoolctl import threadpool_limits
+        cv2.setNumThreads(threads)
+        torch.set_num_threads(threads)
+        thread_limits = threadpool_limits(limits=threads)
     if config.get('handover_contract', {}).get('enabled', False) and args.mode != 'optimized':
         parser.error('Handover contract experiments require --mode optimized')
     if config.get('visual_cycle', {}).get('enabled', False) and args.mode != 'optimized':

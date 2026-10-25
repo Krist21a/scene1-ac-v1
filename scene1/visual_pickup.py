@@ -623,7 +623,7 @@ class VisualPickup:
                 position_limit=.008 if self.stage == 'prepare_weighing' else None,
                 posture_targets=posture, posture_gain=posture_gain,
                 descent_alignment=descent_alignment, coupled_pose_request=coupled_pose_request,
-                reserve_joint_bound=reserve_joint_bound)
+                reserve_joint_bound=reserve_joint_bound, servo_profile='pickup_'+self.stage)
             info['pose_errors'] = errors
             if self.stage == 'prepare_weighing':
                 info['weighing_coupled_pose_request'] = bool(coupled_pose_request)

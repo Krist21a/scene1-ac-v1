@@ -58,14 +58,14 @@ if p.exists():
     receipt['removed_redundant_copies'].append(dict(container=e.SIM,path=removed.strip()))
 if len(state.get('output_runs',[]))==1:
     project=state['policy_root'];run=state['output_runs'][0]
-    assert project.startswith('/root/scene1_path_tracking_continuation_20261023/') and re.fullmatch(r'\d{8}-\d{6}',run)
+    assert project.startswith('/root/scene1_speed/') and re.fullmatch(r'\d{8}-\d{6}',run)
     expected_output={k[len('output/'):]:v for k,v in expected.items() if k.startswith('output/')}
     # A guard may stop SDK initialization before the first policy record.
     # Empty output is valid failure evidence; verify remote emptiness below.
     receipt['empty_policy_output'] = not bool(expected_output)
     code='''import pathlib,hashlib,json,shutil,sys
 p=pathlib.Path(sys.argv[1]);expected=json.load(sys.stdin)
-assert str(p).startswith('/root/scene1_path_tracking_continuation_20261023/') and p.parent.name=='outputs'
+assert str(p).startswith('/root/scene1_speed/') and p.parent.name=='outputs'
 if p.exists():
  found={}
  for x in p.rglob('*'):

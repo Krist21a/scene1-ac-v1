@@ -3,8 +3,9 @@ from pathlib import Path
 import importlib.util
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parents[1]
+ROOT = Path('/home/krist/kuavo_course/scene1_act_optimization')
 OLD = ROOT / 'diagnostics/mpc-wbc-tracking-20261022'
+ASSETS = ROOT / 'diagnostics/path-tracking-continuation-20261023'
 _spec = importlib.util.spec_from_file_location('tracking_previous_experiment', OLD / 'experiment.py')
 _module = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_module)

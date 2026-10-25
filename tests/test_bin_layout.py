@@ -80,6 +80,29 @@ class BinLayoutTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'does not fit'):
             plan_bin_drop(rim, state['geometry'], dict(changed, bin_depth_offsets_m=[0., 0., 0., -.3]), 3)
 
+    def test_accessible_layout_preserves_spacing_footprint_and_unique_slot_evidence(self):
+        import yaml
+        root = Path(__file__).parent
+        data = self.decode(json.loads((root/'fixtures/bin_occluded_s3_20261026.json').read_text()))
+        config = yaml.safe_load((root.parent/'configs/speed_accessible.yaml').read_text())['visual_cycle']
+        config = dict(config, max_parcels=4, bin_tool_rpy_degrees=[80.,5.,-90.])
+        offsets, _ = validate_layout(config)
+        self.assertGreaterEqual(np.min(np.diff(offsets)), .06)
+        centers = []
+        for index in range(4):
+            goal, info = plan_bin_drop(data['rim'], data['geometry'], config, index)
+            self.assertGreaterEqual(info['planned_margin_m'], .025)
+            centers.append(info['target_center_base_m'])
+        for index in range(4):
+            np.testing.assert_array_equal(slot_points(np.asarray(centers), data['rim'], config, index),
+                                          np.asarray(centers[index:index+1]))
+        original = dict(config, bin_lateral_offsets_m=[-.105,-.035,.035,.105],
+                        bin_depth_offsets_m=[0.,0.,0.,-.025])
+        _, old = plan_bin_drop(data['rim'], data['geometry'], original, 3)
+        shift = np.asarray(centers[3])-old['target_center_base_m']
+        self.assertGreater(shift[0], .014)
+        self.assertLess(shift[1], -.033)
+
     def test_depth_change_preserves_lateral_slot_ownership_for_rotated_bins(self):
         config = dict(max_parcels=4, bin_tool_rpy_degrees=[80., 5., -90.],
                       bin_lateral_offsets_m=[-.105, -.035, .035, .105])

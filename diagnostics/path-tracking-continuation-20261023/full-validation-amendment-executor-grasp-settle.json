@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-24T09:40:29.710055+08:00",
+  "semantic_parent": "executor-grasp-frame",
+  "delivery_patch_parent": "executor-grasp-gain",
+  "candidate": "executor-grasp-settle",
+  "factor": "Initial grasp motion damping and settle-before-close; local pickup gain restored1.0",
+  "evidence": "Initial close requested while TCP movement2.808mm/step; settled contact drift changed grasp frame. Mesh convex hull confirms inflated parcel intersection after release; shallower grasp10mm replay did not fix gap.",
+  "unchanged": [
+    "Original45step grasp budget",
+    "Original physical/torque/sweep bounds and3mm parcel margin",
+    "Original success checks",
+    "C library, original VR/task/QR"
+  ],
+  "new_motion_gate_m_per_observation": 0.0015,
+  "velocity_brake_multiplier": 2.0,
+  "tests_passed": 456,
+  "next_trial": "executor-grasp-settle-c-p2-s0-1024",
+  "heldout_seeds_used": []
+}

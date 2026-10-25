@@ -1,0 +1,238 @@
+{
+  "label": "frozen-first-transport-base-p4-s0-1024",
+  "steps": 134,
+  "step_sequence_contiguous": true,
+  "summary": {
+    "steps": 134,
+    "reason": "error",
+    "task_success": null,
+    "error": "Filtered command or pending reference intersects observed parcel; no action sent",
+    "handover_contract_stop": null,
+    "last_sensor_receipts": {
+      "/gripper/state": {
+        "receipt_monotonic_s": 32507.167036071,
+        "source_stamp_s": 1792834637.424651,
+        "receipts": 45718
+      },
+      "/sensors_data_raw": {
+        "receipt_monotonic_s": 32507.166889122,
+        "source_stamp_s": 1792834637.4246333,
+        "receipts": 29124
+      },
+      "/cam_l/color/image_raw/compressed": {
+        "receipt_monotonic_s": 32507.134918799,
+        "source_stamp_s": 1792834637.371405,
+        "receipts": 1452
+      },
+      "/cam_r/color/image_raw/compressed": {
+        "receipt_monotonic_s": 32507.142060058,
+        "source_stamp_s": 1792834637.3766224,
+        "receipts": 1438
+      },
+      "/cam_h/color/image_raw/compressed": {
+        "receipt_monotonic_s": 32507.149902369,
+        "source_stamp_s": 1792834637.3674233,
+        "receipts": 1455
+      }
+    },
+    "trace_manifest_error": null,
+    "visual_confirmed_parcels": 0,
+    "note": "Original KuavoSimEnv returns reward=0 and does not judge scene1 success."
+  },
+  "ros_run_id": "5be83800-cf8e-11f1-8204-c85ea94bd8c7",
+  "controller_sha": "e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4",
+  "policy_sha": "07702217378795656edd747032ad5b9831aae22d30b3870fcf1829216ae37f18",
+  "requested_parcels": 4,
+  "bin_confirmations": [],
+  "complete_events": [],
+  "gripper_events": [],
+  "gripper_event_count": 0,
+  "unpaused_ACT_steps_after_first_complete": 0,
+  "target_clips": 0,
+  "velocity_limited_steps": 2,
+  "regrasp_sweep_block_steps": 0,
+  "regrasp_forward_gate_hold_steps": 0,
+  "pd_limits_50hz": {
+    "initialization": {
+      "samples": 0,
+      "raw_clipped_samples": null,
+      "total_clipped_samples": null,
+      "raw_peak_nm": null,
+      "added_peak_nm": null,
+      "wrist_command_peak_nm": null,
+      "longest_observed_clip_s": null,
+      "available": false
+    },
+    "formal_policy": {
+      "samples": 0,
+      "raw_clipped_samples": null,
+      "total_clipped_samples": null,
+      "raw_peak_nm": null,
+      "added_peak_nm": null,
+      "wrist_command_peak_nm": null,
+      "longest_observed_clip_s": null,
+      "available": false
+    },
+    "after_policy": {
+      "samples": 0,
+      "raw_clipped_samples": null,
+      "total_clipped_samples": null,
+      "raw_peak_nm": null,
+      "added_peak_nm": null,
+      "wrist_command_peak_nm": null,
+      "longest_observed_clip_s": null,
+      "available": false
+    }
+  },
+  "task_success": null,
+  "limitations": "Gripper events are upper command threshold crossings (0.25/0.6 hysteresis), not proof of contact. Original visual checks and raw feedback evidence retained. 50Hz clipping can miss shorter events; online guard is separate. null is not an official verdict.",
+  "release_reference_transfers": [],
+  "release_preparation": [],
+  "release_reference_transfer_interpretation": "Physical bounds and MotionFilter checked separately. measured_physical intentionally replaces obsolete ACT anchoring with a new visual-phase reference; this is not measured tracking evidence.",
+  "post_level_geometry_refreshes": [],
+  "retreat_goal_certificates": [],
+  "retreat_projections": [],
+  "fresh_sweep_feedback": {
+    "samples": 27,
+    "max_captured_to_send_s": 0.06033268700048211,
+    "max_joint_change_from_planning_rad": 0.034609317779541016,
+    "records": [
+      {
+        "step": 61,
+        "captured_to_send_s": 0.06033268700048211,
+        "max_joint_change_from_planning_rad": 0.034609317779541016
+      },
+      {
+        "step": 62,
+        "captured_to_send_s": 0.032970898999337805,
+        "max_joint_change_from_planning_rad": 0.019092321395874023
+      },
+      {
+        "step": 63,
+        "captured_to_send_s": 0.057255889998486964,
+        "max_joint_change_from_planning_rad": 0.009611845016479492
+      },
+      {
+        "step": 64,
+        "captured_to_send_s": 0.039814445000956766,
+        "max_joint_change_from_planning_rad": 0.005482912063598633
+      },
+      {
+        "step": 65,
+        "captured_to_send_s": 0.03499952600031975,
+        "max_joint_change_from_planning_rad": 0.0018134117126464844
+      },
+      {
+        "step": 66,
+        "captured_to_send_s": 0.02276036699913675,
+        "max_joint_change_from_planning_rad": 0.0024889111518859863
+      },
+      {
+        "step": 67,
+        "captured_to_send_s": 0.02479437600050005,
+        "max_joint_change_from_planning_rad": 0.0029439926147460938
+      },
+      {
+        "step": 68,
+        "captured_to_send_s": 0.0419476509996457,
+        "max_joint_change_from_planning_rad": 0.005290985107421875
+      },
+      {
+        "step": 69,
+        "captured_to_send_s": 0.05186107899862691,
+        "max_joint_change_from_planning_rad": 0.005303144454956055
+      },
+      {
+        "step": 70,
+        "captured_to_send_s": 0.042210231000353815,
+        "max_joint_change_from_planning_rad": 0.004709959030151367
+      },
+      {
+        "step": 71,
+        "captured_to_send_s": 0.04891494500043336,
+        "max_joint_change_from_planning_rad": 0.004218339920043945
+      },
+      {
+        "step": 72,
+        "captured_to_send_s": 0.038380780002626125,
+        "max_joint_change_from_planning_rad": 0.0046634674072265625
+      },
+      {
+        "step": 73,
+        "captured_to_send_s": 0.035422328001004644,
+        "max_joint_change_from_planning_rad": 0.0038557052612304688
+      },
+      {
+        "step": 74,
+        "captured_to_send_s": 0.030546927999239415,
+        "max_joint_change_from_planning_rad": 0.0034651607275009155
+      },
+      {
+        "step": 75,
+        "captured_to_send_s": 0.02108228399811196,
+        "max_joint_change_from_planning_rad": 0.002957269549369812
+      },
+      {
+        "step": 76,
+        "captured_to_send_s": 0.035093366997898556,
+        "max_joint_change_from_planning_rad": 0.003010004758834839
+      },
+      {
+        "step": 77,
+        "captured_to_send_s": 0.03156725900043966,
+        "max_joint_change_from_planning_rad": 0.0029972344636917114
+      },
+      {
+        "step": 78,
+        "captured_to_send_s": 0.0233582100008789,
+        "max_joint_change_from_planning_rad": 0.0032496079802513123
+      },
+      {
+        "step": 79,
+        "captured_to_send_s": 0.02179461900232127,
+        "max_joint_change_from_planning_rad": 0.003257647156715393
+      },
+      {
+        "step": 80,
+        "captured_to_send_s": 0.025639118000981398,
+        "max_joint_change_from_planning_rad": 0.003861449658870697
+      },
+      {
+        "step": 81,
+        "captured_to_send_s": 0.022999814002105268,
+        "max_joint_change_from_planning_rad": 0.005282700061798096
+      },
+      {
+        "step": 82,
+        "captured_to_send_s": 0.03801226599898655,
+        "max_joint_change_from_planning_rad": 0.002293713390827179
+      },
+      {
+        "step": 83,
+        "captured_to_send_s": 0.046002691000467166,
+        "max_joint_change_from_planning_rad": 0.003299333155155182
+      },
+      {
+        "step": 84,
+        "captured_to_send_s": 0.03000078500190284,
+        "max_joint_change_from_planning_rad": 0.0038590580224990845
+      },
+      {
+        "step": 85,
+        "captured_to_send_s": 0.01830611100012902,
+        "max_joint_change_from_planning_rad": 0.0037881433963775635
+      },
+      {
+        "step": 86,
+        "captured_to_send_s": 0.03976867999881506,
+        "max_joint_change_from_planning_rad": 0.002590365707874298
+      },
+      {
+        "step": 87,
+        "captured_to_send_s": 0.02574994200040237,
+        "max_joint_change_from_planning_rad": 0.003328390419483185
+      }
+    ]
+  },
+  "rejected_retreat_certificate": null
+}

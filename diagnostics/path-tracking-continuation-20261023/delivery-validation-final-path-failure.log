@@ -1,0 +1,19 @@
+{"status": "passed", "errors": [], "candidates": 41}
+{"status": "failed", "errors": ["AssertionError(\"can't find file to patch at input line 3\\nPerhaps you used the wrong -p or --strip option?\\nThe text leading up to this was:\\n--------------------------\\n|--- a/humanoidController.cpp\\n|+++ b/humanoidController.cpp\\n--------------------------\\nNo file to patch.  Skipping patch.\\n1 out of 1 hunk ignored\\n\")"]}
+Traceback (most recent call last):
+  File "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/validate_delivery.py", line 207, in <module>
+    main()
+  File "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/validate_delivery.py", line 102, in main
+    row = apply(controller, HERE/'candidate-wrist-damping/wrist-damping.patch')
+  File "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/validate_delivery.py", line 43, in apply
+    assert result.returncode == 0, result.stdout + result.stderr
+AssertionError: can't find file to patch at input line 3
+Perhaps you used the wrong -p or --strip option?
+The text leading up to this was:
+--------------------------
+|--- a/humanoidController.cpp
+|+++ b/humanoidController.cpp
+--------------------------
+No file to patch.  Skipping patch.
+1 out of 1 hunk ignored
+

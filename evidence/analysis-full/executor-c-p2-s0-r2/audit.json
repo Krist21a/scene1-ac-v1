@@ -1,0 +1,126 @@
+{
+  "label": "executor-c-p2-s0-r2",
+  "steps": 392,
+  "step_sequence_contiguous": true,
+  "summary": {
+    "steps": 392,
+    "reason": "error",
+    "task_success": null,
+    "error": "Release retreat rejected: expected one currently observed parcel on pad",
+    "handover_contract_stop": null,
+    "last_sensor_receipts": {
+      "/sensors_data_raw": {
+        "receipt_monotonic_s": 11078.73555951,
+        "source_stamp_s": 1792751287.1057515,
+        "receipts": 42225
+      },
+      "/gripper/state": {
+        "receipt_monotonic_s": 11078.73542768,
+        "source_stamp_s": 1792751287.1057677,
+        "receipts": 77650
+      },
+      "/cam_h/color/image_raw/compressed": {
+        "receipt_monotonic_s": 11078.721446404,
+        "source_stamp_s": 1792751287.0733228,
+        "receipts": 2562
+      },
+      "/cam_r/color/image_raw/compressed": {
+        "receipt_monotonic_s": 11078.725171995,
+        "source_stamp_s": 1792751287.0790327,
+        "receipts": 2419
+      },
+      "/cam_l/color/image_raw/compressed": {
+        "receipt_monotonic_s": 11078.734193811,
+        "source_stamp_s": 1792751287.0761662,
+        "receipts": 2473
+      }
+    },
+    "trace_manifest_error": null,
+    "visual_confirmed_parcels": 0,
+    "note": "Original KuavoSimEnv returns reward=0 and does not judge scene1 success."
+  },
+  "ros_run_id": "34369a26-cecc-11f1-8b05-c85ea94bd8c7",
+  "controller_sha": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+  "policy_sha": "850073e6656ad1e8482024ade1f4d622c17d7a794d899e3cf0b9bd5d4b95e161",
+  "requested_parcels": 2,
+  "bin_confirmations": [],
+  "complete_events": [],
+  "gripper_events": [
+    {
+      "step": 151,
+      "side": "right",
+      "action": "close",
+      "phase": "small_grasp"
+    },
+    {
+      "step": 380,
+      "side": "right",
+      "action": "open",
+      "phase": "weighing_release"
+    }
+  ],
+  "gripper_event_count": 2,
+  "unpaused_ACT_steps_after_first_complete": 0,
+  "target_clips": 0,
+  "velocity_limited_steps": 3,
+  "regrasp_sweep_block_steps": 0,
+  "regrasp_forward_gate_hold_steps": 0,
+  "pd_limits_50hz": {
+    "initialization": {
+      "samples": 1694,
+      "raw_clipped_samples": 6,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.6755820417817854,
+      "added_peak_nm": 0.5,
+      "wrist_command_peak_nm": 1.1504550181253093,
+      "longest_observed_clip_s": 0.10817746199973044,
+      "available": true
+    },
+    "formal_policy": {
+      "samples": 2576,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.37138609833558467,
+      "added_peak_nm": 0.37138609833558456,
+      "wrist_command_peak_nm": 1.512912498600468,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    },
+    "after_policy": {
+      "samples": 125,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.05728570608770654,
+      "added_peak_nm": 0.057285706087706556,
+      "wrist_command_peak_nm": 0.9810158231967255,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    }
+  },
+  "task_success": null,
+  "limitations": "Gripper events are upper command threshold crossings (0.25/0.6 hysteresis), not proof of contact. Original visual checks and raw feedback evidence retained. 50Hz clipping can miss shorter events; online guard is separate. null is not an official verdict.",
+  "release_reference_transfers": [
+    {
+      "step": 380,
+      "bound_active_count": 1,
+      "original_cap_rad": 0.5235987756,
+      "max_offset_rad": 0.5235987756,
+      "remaining_reference_error_rad": [
+        0.0,
+        0.0,
+        0.0,
+        -0.0516052391781372,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_requested_change_rad": 0.14627785978216318,
+      "motion_filter_velocity_limited": true,
+      "motion_filter_bounds_clipped": false
+    }
+  ],
+  "release_reference_transfer_interpretation": "Single-event bounded target construction, separately reported from MotionFilter clipping. Does not establish measured tracking or reset correction budgets.",
+  "post_level_geometry_refreshes": [],
+  "retreat_goal_certificates": [],
+  "rejected_retreat_certificate": null
+}

@@ -1,0 +1,13 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -212,7 +212,9 @@
+   handover_contact_frames: 3
+   trace_act_handover: false
+   refresh_stale_handover_ensemble: false
+-  max_regrasp_joint_offset_rad: 0.5235987756
++  # Visual regrasp uses physical joint limits; this offset budget is nonbinding.
++  # Per-step increments, velocity, swept fingers and phase timeouts remain active.
++  max_regrasp_joint_offset_rad: 6.283185307179586
+   regrasp_pitch_degrees: 12.5
+   regrasp_finger_tilt_degrees: 5.0
+   regrasp_descent_request_m: 0.012

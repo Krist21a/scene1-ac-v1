@@ -1,0 +1,14 @@
+..........................................................................................................................................................................................................................................................................................................................................................................................................................................................................E................................................................
+======================================================================
+ERROR: test_recorded_thin_rim_requires_dense_observation_with_unchanged_four_edge_gate (test_visual_cycle.VisualCycleTests.test_recorded_thin_rim_requires_dense_observation_with_unchanged_four_edge_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-bin-dense/tests/test_visual_cycle.py", line 282, in test_recorded_thin_rim_requires_dense_observation_with_unchanged_four_edge_gate
+    p=Path(__file__).parent/'fixtures';snapshot=dict(np.load(p/'bin_observation_20261024.npz'))
+      ^^^^
+NameError: name 'Path' is not defined. Did you mean: 'patch'?
+
+----------------------------------------------------------------------
+Ran 523 tests in 20.172s
+
+FAILED (errors=1)

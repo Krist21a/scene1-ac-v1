@@ -1,0 +1,619 @@
+{
+  "all": {
+    "samples": 40026,
+    "upper_to_timed_arm_proximal_rmse_rad": 0.001992608268834304,
+    "upper_to_timed_arm_wrist_rmse_rad": 0.0022223604644928323,
+    "timed_arm_to_mpc_proximal_rmse_rad": 0.03414054652370731,
+    "mpc_to_wbc_proximal_rmse_rad": 0.0020447683790321505,
+    "wbc_to_measured_proximal_rmse_rad": 0.0049676024136918835,
+    "wbc_to_measured_wrist_rmse_rad": 0.06631411143255253
+  },
+  "per_parcel": {
+    "1": {
+      "all": {
+        "samples": 18139,
+        "upper_to_timed_arm_proximal_rmse_rad": 0.0023160896390336406,
+        "upper_to_timed_arm_wrist_rmse_rad": 0.002771432210419132,
+        "timed_arm_to_mpc_proximal_rmse_rad": 0.037104293142955054,
+        "mpc_to_wbc_proximal_rmse_rad": 0.0022743302010776252,
+        "wbc_to_measured_proximal_rmse_rad": 0.005444609201841625,
+        "wbc_to_measured_wrist_rmse_rad": 0.07344176084771875
+      },
+      "phases": {
+        "returning_policy_view": {
+          "samples": 32,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.004352307855164363,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0203197326559028,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.007207229485647967,
+          "mpc_to_wbc_proximal_rmse_rad": 0.001297415736575408,
+          "wbc_to_measured_proximal_rmse_rad": 0.0028342603593468855,
+          "wbc_to_measured_wrist_rmse_rad": 0.03662912273450706
+        },
+        "act": {
+          "samples": 814,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.006341796552626493,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.008408532159307421,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.03708876498372165,
+          "mpc_to_wbc_proximal_rmse_rad": 0.004652217274010264,
+          "wbc_to_measured_proximal_rmse_rad": 0.005034791908701863,
+          "wbc_to_measured_wrist_rmse_rad": 0.07574346087049666
+        },
+        "small_pregrasp": {
+          "samples": 2002,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0014309201092661994,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0015525692732672803,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.02186624702063667,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0013391293830297716,
+          "wbc_to_measured_proximal_rmse_rad": 0.003288479692189435,
+          "wbc_to_measured_wrist_rmse_rad": 0.026131938544482567
+        },
+        "pregrasp_aligned": {
+          "samples": 8,
+          "upper_to_timed_arm_proximal_rmse_rad": 2.506552176032578e-08,
+          "upper_to_timed_arm_wrist_rmse_rad": 4.199551677988553e-09,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.01509704587182936,
+          "mpc_to_wbc_proximal_rmse_rad": 0.000664619245664619,
+          "wbc_to_measured_proximal_rmse_rad": 0.002269375603290741,
+          "wbc_to_measured_wrist_rmse_rad": 0.023786535975644098
+        },
+        "open_hand_visual_tracking": {
+          "samples": 312,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.003518810050817421,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.004569432297899317,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.0190584021125933,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0024032551317295456,
+          "wbc_to_measured_proximal_rmse_rad": 0.003774189324496516,
+          "wbc_to_measured_wrist_rmse_rad": 0.039552641498650336
+        },
+        "small_grasp": {
+          "samples": 150,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0008215383641300369,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0006491684187557799,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.015607893631430978,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0009875824081021494,
+          "wbc_to_measured_proximal_rmse_rad": 0.0026341564620940678,
+          "wbc_to_measured_wrist_rmse_rad": 0.024511780556945764
+        },
+        "grasp_contact_confirmed": {
+          "samples": 18,
+          "upper_to_timed_arm_proximal_rmse_rad": 4.837340117142227e-09,
+          "upper_to_timed_arm_wrist_rmse_rad": 2.586220639441973e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.017426130222125972,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0007402831116709447,
+          "wbc_to_measured_proximal_rmse_rad": 0.0027408940723387936,
+          "wbc_to_measured_wrist_rmse_rad": 0.024992305850541824
+        },
+        "act_transport_leveling": {
+          "samples": 328,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.003443496674628574,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.006304587710565407,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.0393796280657319,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0029852279980175107,
+          "wbc_to_measured_proximal_rmse_rad": 0.007403533974057534,
+          "wbc_to_measured_wrist_rmse_rad": 0.09952366156485605
+        },
+        "small_weighing": {
+          "samples": 1166,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0013236066717069322,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0014059268601061695,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.0515738945035775,
+          "mpc_to_wbc_proximal_rmse_rad": 0.002164434484558502,
+          "wbc_to_measured_proximal_rmse_rad": 0.008149131084189095,
+          "wbc_to_measured_wrist_rmse_rad": 0.08461131164721046
+        },
+        "preparing_release_reference": {
+          "samples": 808,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0010461348635052363,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.001145525063283438,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.044220266776332215,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0016179748304225236,
+          "wbc_to_measured_proximal_rmse_rad": 0.007088984216693802,
+          "wbc_to_measured_wrist_rmse_rad": 0.06004453757926441
+        },
+        "weighing_release": {
+          "samples": 12,
+          "upper_to_timed_arm_proximal_rmse_rad": 1.962615573354719e-17,
+          "upper_to_timed_arm_wrist_rmse_rad": 1.801178136332043e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.012869651125656141,
+          "mpc_to_wbc_proximal_rmse_rad": 0.00043191803077738535,
+          "wbc_to_measured_proximal_rmse_rad": 0.001856901759830769,
+          "wbc_to_measured_wrist_rmse_rad": 0.00966909674481724
+        },
+        "small_short_retreat": {
+          "samples": 1397,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0010309910407600518,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0009136617280362738,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.03267675429691764,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0011997384345443522,
+          "wbc_to_measured_proximal_rmse_rad": 0.00436718226323462,
+          "wbc_to_measured_wrist_rmse_rad": 0.026173498351331807
+        },
+        "short_retreat_complete": {
+          "samples": 12,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0009589748444073223,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0005963107490205668,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.033024446550723646,
+          "mpc_to_wbc_proximal_rmse_rad": 0.001386934786270563,
+          "wbc_to_measured_proximal_rmse_rad": 0.003536826008775937,
+          "wbc_to_measured_wrist_rmse_rad": 0.02453000286541271
+        },
+        "small_settle": {
+          "samples": 55,
+          "upper_to_timed_arm_proximal_rmse_rad": 9.69159344549694e-09,
+          "upper_to_timed_arm_wrist_rmse_rad": 2.2185979445611058e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.028026680773497268,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0013087921953010243,
+          "wbc_to_measured_proximal_rmse_rad": 0.0030891092044176764,
+          "wbc_to_measured_wrist_rmse_rad": 0.02236688975455715
+        },
+        "placement_stable": {
+          "samples": 11,
+          "upper_to_timed_arm_proximal_rmse_rad": 9.691593445496938e-09,
+          "upper_to_timed_arm_wrist_rmse_rad": 2.2185979445611058e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.024374786252587013,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0005841304423714351,
+          "wbc_to_measured_proximal_rmse_rad": 0.0029461562887979848,
+          "wbc_to_measured_wrist_rmse_rad": 0.02057705170684132
+        },
+        "regrasp_pose_verified": {
+          "samples": 7,
+          "upper_to_timed_arm_proximal_rmse_rad": 5.688590974596082e-09,
+          "upper_to_timed_arm_wrist_rmse_rad": 2.7061487666696347e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.020459988379780778,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0009739604533002601,
+          "wbc_to_measured_proximal_rmse_rad": 0.003963862854836491,
+          "wbc_to_measured_wrist_rmse_rad": 0.01809219817593941
+        },
+        "visual_cycle_lift": {
+          "samples": 1031,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0025964590638975944,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0022773465527898638,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.049162314848948535,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0023785355585716145,
+          "wbc_to_measured_proximal_rmse_rad": 0.005121031752263592,
+          "wbc_to_measured_wrist_rmse_rad": 0.07556555646471808
+        },
+        "visual_cycle_transport": {
+          "samples": 1775,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0018636972851709091,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0014193074385969752,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.031223021268351664,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0020194941653239786,
+          "wbc_to_measured_proximal_rmse_rad": 0.005063525029641752,
+          "wbc_to_measured_wrist_rmse_rad": 0.08660848952494701
+        },
+        "visual_cycle_left_approach": {
+          "samples": 1522,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0016688542664907281,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0020002002617157738,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.03754392062634182,
+          "mpc_to_wbc_proximal_rmse_rad": 0.002009711244145883,
+          "wbc_to_measured_proximal_rmse_rad": 0.005653100973100396,
+          "wbc_to_measured_wrist_rmse_rad": 0.08977738203628259
+        },
+        "visual_cycle_left_insert": {
+          "samples": 1939,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0004858841033779195,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0004722738172789891,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.0361203728847843,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0014334996782087092,
+          "wbc_to_measured_proximal_rmse_rad": 0.0057546752876052945,
+          "wbc_to_measured_wrist_rmse_rad": 0.09463730016943649
+        },
+        "visual_cycle_close_left": {
+          "samples": 50,
+          "upper_to_timed_arm_proximal_rmse_rad": 3.0676139311473904e-08,
+          "upper_to_timed_arm_wrist_rmse_rad": 1.2724257630501985e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.033585118678516504,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0013313095672463182,
+          "wbc_to_measured_proximal_rmse_rad": 0.005120915564354106,
+          "wbc_to_measured_wrist_rmse_rad": 0.09570629067511666
+        },
+        "visual_cycle_release_right": {
+          "samples": 38,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.00042288727914216467,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0004886811840709765,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.030821638509932477,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0020870274698058643,
+          "wbc_to_measured_proximal_rmse_rad": 0.00621328902535992,
+          "wbc_to_measured_wrist_rmse_rad": 0.08016744984977918
+        },
+        "visual_cycle_right_retreat": {
+          "samples": 725,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0015243471300386087,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0020583761196848564,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.03814512490127502,
+          "mpc_to_wbc_proximal_rmse_rad": 0.001924771176073835,
+          "wbc_to_measured_proximal_rmse_rad": 0.005807391043443905,
+          "wbc_to_measured_wrist_rmse_rad": 0.09350117107550804
+        },
+        "visual_cycle_left_clear": {
+          "samples": 808,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0011684023523046547,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0022042441825317655,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.037475422178574636,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0017562466646947016,
+          "wbc_to_measured_proximal_rmse_rad": 0.005500966888840594,
+          "wbc_to_measured_wrist_rmse_rad": 0.08614994606270766
+        },
+        "visual_cycle_bin_transport": {
+          "samples": 1427,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.001782077562135943,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.001428856250058276,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.03523441990381375,
+          "mpc_to_wbc_proximal_rmse_rad": 0.002220057423754067,
+          "wbc_to_measured_proximal_rmse_rad": 0.006232944211827194,
+          "wbc_to_measured_wrist_rmse_rad": 0.08724976578147435
+        },
+        "visual_cycle_release_left": {
+          "samples": 37,
+          "upper_to_timed_arm_proximal_rmse_rad": 3.5435319442508235e-08,
+          "upper_to_timed_arm_wrist_rmse_rad": 2.2311187539857257e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.04191854793974639,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0018639696213481676,
+          "wbc_to_measured_proximal_rmse_rad": 0.0072641039719781465,
+          "wbc_to_measured_wrist_rmse_rad": 0.06484946122401512
+        },
+        "visual_cycle_left_retreat": {
+          "samples": 704,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0021889833756182334,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.002667501863273692,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.04116831039933665,
+          "mpc_to_wbc_proximal_rmse_rad": 0.00241863724060475,
+          "wbc_to_measured_proximal_rmse_rad": 0.0050197699448486805,
+          "wbc_to_measured_wrist_rmse_rad": 0.040329266833625366
+        },
+        "visual_cycle_verify_bin": {
+          "samples": 61,
+          "upper_to_timed_arm_proximal_rmse_rad": 3.4424637343969187e-08,
+          "upper_to_timed_arm_wrist_rmse_rad": 1.5568517269445578e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.027745437444356758,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0010802278602402434,
+          "wbc_to_measured_proximal_rmse_rad": 0.0036656502715408986,
+          "wbc_to_measured_wrist_rmse_rad": 0.03085627045482558
+        },
+        "visual_cycle_return_home": {
+          "samples": 886,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.004638639756178121,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0032233173981790803,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.04418509852200796,
+          "mpc_to_wbc_proximal_rmse_rad": 0.00450355060739192,
+          "wbc_to_measured_proximal_rmse_rad": 0.0038120601294909136,
+          "wbc_to_measured_wrist_rmse_rad": 0.04190882724339623
+        },
+        "visual_cycle_complete": {
+          "samples": 4,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0012755075032939943,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0007421829739690547,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.01774297764210705,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0009840178136866194,
+          "wbc_to_measured_proximal_rmse_rad": 0.002227701543330535,
+          "wbc_to_measured_wrist_rmse_rad": 0.026472197938383395
+        }
+      }
+    },
+    "2": {
+      "all": {
+        "samples": 21887,
+        "upper_to_timed_arm_proximal_rmse_rad": 0.0016779094619120774,
+        "upper_to_timed_arm_wrist_rmse_rad": 0.0016329347669298583,
+        "timed_arm_to_mpc_proximal_rmse_rad": 0.03147353729274043,
+        "mpc_to_wbc_proximal_rmse_rad": 0.001832857126089043,
+        "wbc_to_measured_proximal_rmse_rad": 0.004534411868171316,
+        "wbc_to_measured_wrist_rmse_rad": 0.05976630450170276
+      },
+      "phases": {
+        "visual_pickup_select": {
+          "samples": 114,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.00013794309710737324,
+          "upper_to_timed_arm_wrist_rmse_rad": 8.026532127707246e-05,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.016098048855090318,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0007227689075409257,
+          "wbc_to_measured_proximal_rmse_rad": 0.0023598207456352743,
+          "wbc_to_measured_wrist_rmse_rad": 0.026974531619741362
+        },
+        "visual_pickup_clear": {
+          "samples": 31,
+          "upper_to_timed_arm_proximal_rmse_rad": 1.9695465155375714e-06,
+          "upper_to_timed_arm_wrist_rmse_rad": 1.5431338075432122e-06,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.015522999251013348,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0003385565974581116,
+          "wbc_to_measured_proximal_rmse_rad": 0.0021139847006660124,
+          "wbc_to_measured_wrist_rmse_rad": 0.026961533553690947
+        },
+        "visual_pickup_hover": {
+          "samples": 1516,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0010759138308869087,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0016153277691173158,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.0161219966958624,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0009789001123043178,
+          "wbc_to_measured_proximal_rmse_rad": 0.002199254807958949,
+          "wbc_to_measured_wrist_rmse_rad": 0.027665144250475785
+        },
+        "visual_pickup_descend": {
+          "samples": 1495,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0007038557099875439,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.000902142110570569,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.014197845082183535,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0008049974371565099,
+          "wbc_to_measured_proximal_rmse_rad": 0.002467691526470753,
+          "wbc_to_measured_wrist_rmse_rad": 0.038122766957714445
+        },
+        "small_grasp": {
+          "samples": 167,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0009205038962231153,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0004815623201253705,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.015598268327640826,
+          "mpc_to_wbc_proximal_rmse_rad": 0.001199707546682801,
+          "wbc_to_measured_proximal_rmse_rad": 0.0028706739946685288,
+          "wbc_to_measured_wrist_rmse_rad": 0.03757186031824543
+        },
+        "grasp_contact_confirmed": {
+          "samples": 18,
+          "upper_to_timed_arm_proximal_rmse_rad": 2.6171730036400944e-08,
+          "upper_to_timed_arm_wrist_rmse_rad": 1.5324940583151652e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.01620638376764608,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0005312482612319904,
+          "wbc_to_measured_proximal_rmse_rad": 0.002667842996312477,
+          "wbc_to_measured_wrist_rmse_rad": 0.039913691884693576
+        },
+        "visual_pickup_lift": {
+          "samples": 1154,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0013219355256278728,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0015380563806695977,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.02867785871734532,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0012918333802580109,
+          "wbc_to_measured_proximal_rmse_rad": 0.0029014138213341667,
+          "wbc_to_measured_wrist_rmse_rad": 0.05195207296811391
+        },
+        "visual_pickup_observe_pad": {
+          "samples": 27,
+          "upper_to_timed_arm_proximal_rmse_rad": 3.2667909958294304e-08,
+          "upper_to_timed_arm_wrist_rmse_rad": 2.29277277237122e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.022667847713854113,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0007617967547936482,
+          "wbc_to_measured_proximal_rmse_rad": 0.003083333635236762,
+          "wbc_to_measured_wrist_rmse_rad": 0.0535141303162321
+        },
+        "visual_pickup_carry": {
+          "samples": 2204,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0013995455264573843,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0017363476796056834,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.024540280006169066,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0014291531362882485,
+          "wbc_to_measured_proximal_rmse_rad": 0.00405165449546717,
+          "wbc_to_measured_wrist_rmse_rad": 0.07221748245335123
+        },
+        "visual_pickup_prepare_weighing": {
+          "samples": 465,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.001293327952975482,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.000932165198791212,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.03490308447956666,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0017785221708194925,
+          "wbc_to_measured_proximal_rmse_rad": 0.006317429876503868,
+          "wbc_to_measured_wrist_rmse_rad": 0.07652303907238284
+        },
+        "small_weighing": {
+          "samples": 258,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0017289523922429733,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0016393071327550092,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.05058132715093482,
+          "mpc_to_wbc_proximal_rmse_rad": 0.002212965798623419,
+          "wbc_to_measured_proximal_rmse_rad": 0.0078422244762099,
+          "wbc_to_measured_wrist_rmse_rad": 0.06701376449758627
+        },
+        "preparing_release_reference": {
+          "samples": 936,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0009035661843297293,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0009957419368213953,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.025752507527687655,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0010587701585917705,
+          "wbc_to_measured_proximal_rmse_rad": 0.004201067557858796,
+          "wbc_to_measured_wrist_rmse_rad": 0.03278093564612473
+        },
+        "weighing_release": {
+          "samples": 9,
+          "upper_to_timed_arm_proximal_rmse_rad": 2.2933800815159112e-08,
+          "upper_to_timed_arm_wrist_rmse_rad": 8.307898482068613e-09,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.011616142969458657,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0003178165333556984,
+          "wbc_to_measured_proximal_rmse_rad": 0.0015774040475064965,
+          "wbc_to_measured_wrist_rmse_rad": 0.0175293712097338
+        },
+        "small_short_retreat": {
+          "samples": 672,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0012313819242140368,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0014223088941216213,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.03317686335997365,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0014219988469739281,
+          "wbc_to_measured_proximal_rmse_rad": 0.004232752145247639,
+          "wbc_to_measured_wrist_rmse_rad": 0.032591828211617
+        },
+        "short_retreat_complete": {
+          "samples": 14,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0007187332977250068,
+          "upper_to_timed_arm_wrist_rmse_rad": 7.456598336614788e-05,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.035642605441583375,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0018416431755337694,
+          "wbc_to_measured_proximal_rmse_rad": 0.004316907335078978,
+          "wbc_to_measured_wrist_rmse_rad": 0.025756037512996054
+        },
+        "small_settle": {
+          "samples": 45,
+          "upper_to_timed_arm_proximal_rmse_rad": 2.591759222770123e-08,
+          "upper_to_timed_arm_wrist_rmse_rad": 1.6029675199591023e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.03259377963900851,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0015280074336717438,
+          "wbc_to_measured_proximal_rmse_rad": 0.004123723548753239,
+          "wbc_to_measured_wrist_rmse_rad": 0.025764740795742296
+        },
+        "placement_stable": {
+          "samples": 11,
+          "upper_to_timed_arm_proximal_rmse_rad": 2.591759222770123e-08,
+          "upper_to_timed_arm_wrist_rmse_rad": 1.6029675199591023e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.029448752497403162,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0017740532988220347,
+          "wbc_to_measured_proximal_rmse_rad": 0.005319760909537214,
+          "wbc_to_measured_wrist_rmse_rad": 0.025763394045568325
+        },
+        "small_pregrasp": {
+          "samples": 1637,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.001212020538522112,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0013678959134915145,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.026302111375320222,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0011744844956435262,
+          "wbc_to_measured_proximal_rmse_rad": 0.003893728960164393,
+          "wbc_to_measured_wrist_rmse_rad": 0.026341669488686402
+        },
+        "regrasp_pose_verified": {
+          "samples": 7,
+          "upper_to_timed_arm_proximal_rmse_rad": 2.346845009574394e-08,
+          "upper_to_timed_arm_wrist_rmse_rad": 1.5958889208013757e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.019754848739274834,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0012769622341547847,
+          "wbc_to_measured_proximal_rmse_rad": 0.00411471716790909,
+          "wbc_to_measured_wrist_rmse_rad": 0.027173534560379235
+        },
+        "visual_cycle_lift": {
+          "samples": 1011,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.002452031420553782,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0022573608051833856,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.05082241363993093,
+          "mpc_to_wbc_proximal_rmse_rad": 0.002551869111875375,
+          "wbc_to_measured_proximal_rmse_rad": 0.00559167955552654,
+          "wbc_to_measured_wrist_rmse_rad": 0.062192076462911874
+        },
+        "visual_cycle_transport": {
+          "samples": 1742,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.002025831960012654,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0010139492673874317,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.03083635916648744,
+          "mpc_to_wbc_proximal_rmse_rad": 0.00224845776700771,
+          "wbc_to_measured_proximal_rmse_rad": 0.005074106062685741,
+          "wbc_to_measured_wrist_rmse_rad": 0.0701056769916853
+        },
+        "visual_cycle_left_approach": {
+          "samples": 1436,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0016127459854845196,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0018272195556028445,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.033328283524554025,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0018561281754227803,
+          "wbc_to_measured_proximal_rmse_rad": 0.005047411240995165,
+          "wbc_to_measured_wrist_rmse_rad": 0.07430968316863669
+        },
+        "visual_cycle_left_insert": {
+          "samples": 2035,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.00055618836262856,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0004210843173961642,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.034034171609968786,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0013866661639594625,
+          "wbc_to_measured_proximal_rmse_rad": 0.005394170678341889,
+          "wbc_to_measured_wrist_rmse_rad": 0.07683846420073191
+        },
+        "visual_cycle_close_left": {
+          "samples": 46,
+          "upper_to_timed_arm_proximal_rmse_rad": 3.193117892999723e-08,
+          "upper_to_timed_arm_wrist_rmse_rad": 1.6826433180482178e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.03224235814841706,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0012945970107768902,
+          "wbc_to_measured_proximal_rmse_rad": 0.004705589130693029,
+          "wbc_to_measured_wrist_rmse_rad": 0.08061353993759209
+        },
+        "visual_cycle_release_right": {
+          "samples": 44,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.00039110881449403383,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0004975535799775114,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.030414345773183454,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0018454373705953828,
+          "wbc_to_measured_proximal_rmse_rad": 0.005183520790358689,
+          "wbc_to_measured_wrist_rmse_rad": 0.07128830138628776
+        },
+        "visual_cycle_right_retreat": {
+          "samples": 709,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0014291589758775732,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0020086913159710635,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.03583718297197077,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0017172905570298602,
+          "wbc_to_measured_proximal_rmse_rad": 0.0050224533966355045,
+          "wbc_to_measured_wrist_rmse_rad": 0.08236549116243376
+        },
+        "visual_cycle_left_clear": {
+          "samples": 802,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.001141061469996048,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.002087925348965906,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.03467642365462576,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0016509796431163567,
+          "wbc_to_measured_proximal_rmse_rad": 0.005015086593901923,
+          "wbc_to_measured_wrist_rmse_rad": 0.07282774115311831
+        },
+        "visual_cycle_bin_transport": {
+          "samples": 1579,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0016570505632301584,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0015176039071074297,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.03267142291506421,
+          "mpc_to_wbc_proximal_rmse_rad": 0.00197354604414661,
+          "wbc_to_measured_proximal_rmse_rad": 0.00562253778053019,
+          "wbc_to_measured_wrist_rmse_rad": 0.07181981825549955
+        },
+        "visual_cycle_release_left": {
+          "samples": 43,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0010640013183745316,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0014541084242079786,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.03872443131735185,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0017236352238438094,
+          "wbc_to_measured_proximal_rmse_rad": 0.006002048719251049,
+          "wbc_to_measured_wrist_rmse_rad": 0.05636388951857232
+        },
+        "visual_cycle_left_retreat": {
+          "samples": 685,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0023329321442207207,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0027594303248704337,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.04100965268377911,
+          "mpc_to_wbc_proximal_rmse_rad": 0.002426746391345896,
+          "wbc_to_measured_proximal_rmse_rad": 0.005145117492046288,
+          "wbc_to_measured_wrist_rmse_rad": 0.03988923427191283
+        },
+        "visual_cycle_verify_bin": {
+          "samples": 68,
+          "upper_to_timed_arm_proximal_rmse_rad": 3.4608286348061965e-08,
+          "upper_to_timed_arm_wrist_rmse_rad": 1.0880002149575974e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.0273361306432716,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0010860050438588926,
+          "wbc_to_measured_proximal_rmse_rad": 0.004228724622064431,
+          "wbc_to_measured_wrist_rmse_rad": 0.030630944427139185
+        },
+        "visual_cycle_return_home": {
+          "samples": 901,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.00455491555593535,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.003317289182094675,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.04312745440840456,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0044197117068985785,
+          "wbc_to_measured_proximal_rmse_rad": 0.0037256338380446162,
+          "wbc_to_measured_wrist_rmse_rad": 0.04157682499430158
+        },
+        "visual_cycle_complete": {
+          "samples": 6,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0010089734258637646,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0006244739370472906,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.019299564017932008,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0010472600885681675,
+          "wbc_to_measured_proximal_rmse_rad": 0.0023411428973385846,
+          "wbc_to_measured_wrist_rmse_rad": 0.027307946308454754
+        }
+      }
+    }
+  },
+  "clock_note": "Absolute sensor epoch is mapped through observed MPC relative time before evaluating trajectory knot times",
+  "sensor_epoch_minus_mpc_time_spread_ms": 0.8107155489396753,
+  "alignment_age_p95_ms": {
+    "upper": 176.59872750118666,
+    "arm": 177.1946274984657,
+    "mpc": 10.900229750404833,
+    "wbc": 10.920025750237983
+  },
+  "limitations": [
+    "Reference vectors lack controller-cycle timestamps; arrival alignment is approximate",
+    "Advertised arm trajectory is evaluated at its knot times, not mistaken for its future endpoint",
+    "This observes solver output, not internal active constraints or cost matrices"
+  ]
+}

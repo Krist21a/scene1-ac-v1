@@ -1,0 +1,1637 @@
+{
+  "label": "executor-fast-ac-p2-s0",
+  "steps": 436,
+  "step_sequence_contiguous": true,
+  "summary": {
+    "steps": 436,
+    "reason": "error",
+    "task_success": null,
+    "error": "Filtered command or pending reference intersects observed parcel; no action sent",
+    "handover_contract_stop": null,
+    "last_sensor_receipts": {
+      "/cam_l/color/image_raw/compressed": {
+        "receipt_monotonic_s": 18423.186888371,
+        "source_stamp_s": 1792758631.5407524,
+        "receipts": 2679
+      },
+      "/cam_h/color/image_raw/compressed": {
+        "receipt_monotonic_s": 18423.206655548,
+        "source_stamp_s": 1792758631.5376751,
+        "receipts": 2777
+      },
+      "/sensors_data_raw": {
+        "receipt_monotonic_s": 18423.203938129,
+        "source_stamp_s": 1792758631.5744076,
+        "receipts": 44933
+      },
+      "/gripper/state": {
+        "receipt_monotonic_s": 18423.20898314,
+        "source_stamp_s": 1792758631.5794384,
+        "receipts": 84219
+      },
+      "/cam_r/color/image_raw/compressed": {
+        "receipt_monotonic_s": 18423.194374651,
+        "source_stamp_s": 1792758631.5449343,
+        "receipts": 2659
+      }
+    },
+    "trace_manifest_error": null,
+    "visual_confirmed_parcels": 0,
+    "note": "Original KuavoSimEnv returns reward=0 and does not judge scene1 success."
+  },
+  "ros_run_id": "491c1c16-cedd-11f1-8703-c85ea94bd8c7",
+  "controller_sha": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+  "policy_sha": "b1b544157dd800718d160ba42199857706906340653603cffc56be05fcc58e07",
+  "requested_parcels": 2,
+  "bin_confirmations": [],
+  "complete_events": [],
+  "gripper_events": [
+    {
+      "step": 151,
+      "side": "right",
+      "action": "close",
+      "phase": "small_grasp"
+    },
+    {
+      "step": 431,
+      "side": "right",
+      "action": "open",
+      "phase": "weighing_release"
+    }
+  ],
+  "gripper_event_count": 2,
+  "unpaused_ACT_steps_after_first_complete": 0,
+  "target_clips": 0,
+  "velocity_limited_steps": 4,
+  "regrasp_sweep_block_steps": 0,
+  "regrasp_forward_gate_hold_steps": 0,
+  "pd_limits_50hz": {
+    "initialization": {
+      "samples": 1675,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.4375080235769766,
+      "added_peak_nm": 0.4375080235769766,
+      "wrist_command_peak_nm": 1.1771557643348274,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    },
+    "formal_policy": {
+      "samples": 2972,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.3662719750647849,
+      "added_peak_nm": 0.3662719750647849,
+      "wrist_command_peak_nm": 1.5062750158662277,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    },
+    "after_policy": {
+      "samples": 111,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.054428794327372715,
+      "added_peak_nm": 0.05442879432737269,
+      "wrist_command_peak_nm": 0.961653175016653,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    }
+  },
+  "task_success": null,
+  "limitations": "Gripper events are upper command threshold crossings (0.25/0.6 hysteresis), not proof of contact. Original visual checks and raw feedback evidence retained. 50Hz clipping can miss shorter events; online guard is separate. null is not an official verdict.",
+  "release_reference_transfers": [
+    {
+      "step": 431,
+      "bound_active_count": 0,
+      "original_cap_rad": null,
+      "reference_mode": "measured_physical",
+      "max_offset_rad": 0.5837191939353943,
+      "remaining_reference_error_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_requested_change_rad": 0.18545806835095602,
+      "motion_filter_velocity_limited": true,
+      "motion_filter_bounds_clipped": false
+    }
+  ],
+  "release_reference_transfer_interpretation": "Physical bounds and MotionFilter checked separately. measured_physical intentionally replaces obsolete ACT anchoring with a new visual-phase reference; this is not measured tracking evidence.",
+  "post_level_geometry_refreshes": [],
+  "retreat_goal_certificates": [
+    {
+      "step": 436,
+      "direction_source": "measured_tool_positive_z_horizontal_projection",
+      "projection_norm": 0.9935994147273933,
+      "direction_xy": [
+        -0.8932395154415771,
+        0.4495811028654301
+      ],
+      "origin_base_m": [
+        0.37393906544856914,
+        -0.5677609790919449,
+        -0.01897842989735971
+      ],
+      "goal_base_m": [
+        0.32034469452207454,
+        -0.5407861129200191,
+        0.0510215701026403
+      ],
+      "observed_parcel": {
+        "position_base_m": [
+          0.4173487069800428,
+          -0.5635090845717576,
+          -0.010454167829057254
+        ],
+        "oriented_center_base_m": [
+          0.41969696130853174,
+          -0.5665053389244081,
+          -0.010454167829057254
+        ],
+        "extent_xy_m": [
+          0.11208300216436956,
+          0.0588996977229751
+        ],
+        "points": 196,
+        "minor_extent_m": 0.04347544009468024,
+        "major_axis_xy": [
+          -0.9637040614996046,
+          0.2669728110672819
+        ],
+        "oriented_extent_m": [
+          0.1140379912641174,
+          0.04347544009468024
+        ],
+        "top_z_base_m": 0.02149880323281167,
+        "uv": [
+          424.0,
+          228.0
+        ],
+        "bbox": [
+          410,
+          208,
+          31,
+          37
+        ]
+      },
+      "observation_stamp": 1792758630.4207304,
+      "away_dot_m": 0.04030824863425582,
+      "horizontal_distance_m": 0.06,
+      "rise_m": 0.07,
+      "lower_joint_rad": [
+        -3.14,
+        -3.14,
+        -1.48352986419518,
+        -2.61799387799149,
+        -1.5707963267949,
+        -0.698131700797732,
+        -0.698131700797732
+      ],
+      "upper_joint_rad": [
+        1.5707963267949,
+        0.349065850398866,
+        1.48352986419518,
+        0.0,
+        1.5707963267949,
+        1.30899693899575,
+        0.698131700797732
+      ],
+      "original_reference_rad": [
+        -0.28284937143325806,
+        -0.4729301631450653,
+        -0.0997735932469368,
+        -0.4655523896217346,
+        1.0785064697265625,
+        -0.5495832562446594,
+        -0.2167755365371704
+      ],
+      "correction_cap_rad": 6.283185307179586,
+      "position_tolerance_m": 0.014,
+      "certified": true,
+      "reason": "nominal bounded executor reached original position and dwell criteria",
+      "feasibility_joint_rad": [
+        -0.012257420107829431,
+        -0.43995973436785046,
+        -0.39743207876605324,
+        -0.8201457045449126,
+        1.0199683796994246,
+        -0.698131700797732,
+        -0.5743295754568766
+      ],
+      "position_residual_m": 0.00927427484056699,
+      "orientation_residual_degrees": 25.600696295590048,
+      "orientation_tolerance_degrees": null,
+      "orientation_criterion": "unchanged per-step executor plus full sampled finger sweeps; no added cumulative angle gate",
+      "solver_method": "nominal_incremental_executor_sweep",
+      "remaining_steps": 136,
+      "nominal_steps": 60,
+      "max_cumulative_rotation_degrees": 25.39735366574355,
+      "nominal_filter": {
+        "alpha": 1.0,
+        "max_velocity": 0.6,
+        "period": 0.1
+      },
+      "nominal_records": [
+        {
+          "index": 0,
+          "error_m": 0.09219544457292886,
+          "cumulative_rotation_degrees": 0.0,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 9
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 9
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 1,
+          "error_m": 0.09615358478014494,
+          "cumulative_rotation_degrees": 9.15417190017886,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 2,
+          "error_m": 0.09387388386317902,
+          "cumulative_rotation_degrees": 9.23526431788643,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 3,
+          "error_m": 0.09201664489654585,
+          "cumulative_rotation_degrees": 9.37286971370457,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 4,
+          "error_m": 0.09013386271826217,
+          "cumulative_rotation_degrees": 9.534784036933411,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 5,
+          "error_m": 0.08825429232065278,
+          "cumulative_rotation_degrees": 9.720438233035924,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 6,
+          "error_m": 0.08637620672343123,
+          "cumulative_rotation_degrees": 9.92857461141012,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 7,
+          "error_m": 0.0844996008829676,
+          "cumulative_rotation_degrees": 10.157915825583965,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 8,
+          "error_m": 0.08262436493251506,
+          "cumulative_rotation_degrees": 10.40716162448018,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 9,
+          "error_m": 0.08075039057655314,
+          "cumulative_rotation_degrees": 10.675018267403159,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 10,
+          "error_m": 0.07887756452027558,
+          "cumulative_rotation_degrees": 10.960220444000877,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 11,
+          "error_m": 0.07700576869203633,
+          "cumulative_rotation_degrees": 11.261548158468559,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 12,
+          "error_m": 0.07513488004730347,
+          "cumulative_rotation_degrees": 11.577838847812892,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 13,
+          "error_m": 0.07326477040233317,
+          "cumulative_rotation_degrees": 11.907995360244055,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 14,
+          "error_m": 0.07139530626986865,
+          "cumulative_rotation_degrees": 12.250990491245465,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 15,
+          "error_m": 0.0695263486998614,
+          "cumulative_rotation_degrees": 12.60586877472296,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 16,
+          "error_m": 0.06765775312559447,
+          "cumulative_rotation_degrees": 12.971746173057653,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 17,
+          "error_m": 0.06578936921625028,
+          "cumulative_rotation_degrees": 13.34780822788587,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 18,
+          "error_m": 0.06392104073633609,
+          "cumulative_rotation_degrees": 13.733307140716184,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 19,
+          "error_m": 0.06205260541257021,
+          "cumulative_rotation_degrees": 14.127558161033647,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 20,
+          "error_m": 0.06018389480849441,
+          "cumulative_rotation_degrees": 14.529935576062329,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 21,
+          "error_m": 0.058314734207101315,
+          "cumulative_rotation_degrees": 14.939868524508315,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 22,
+          "error_m": 0.056444942501417905,
+          "cumulative_rotation_degrees": 15.356836796697824,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 23,
+          "error_m": 0.0545743320928648,
+          "cumulative_rotation_degrees": 15.780366735682652,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 24,
+          "error_m": 0.05323819602214114,
+          "cumulative_rotation_degrees": 16.05513673044374,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 25,
+          "error_m": 0.051987140425197614,
+          "cumulative_rotation_degrees": 16.311487665727533,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 26,
+          "error_m": 0.05074602085791858,
+          "cumulative_rotation_degrees": 16.569022653079923,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 27,
+          "error_m": 0.049513633914102836,
+          "cumulative_rotation_degrees": 16.827702213574344,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 28,
+          "error_m": 0.04828900514868598,
+          "cumulative_rotation_degrees": 17.087461384330062,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 29,
+          "error_m": 0.04707115867283768,
+          "cumulative_rotation_degrees": 17.348241916416402,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 30,
+          "error_m": 0.0458591465928554,
+          "cumulative_rotation_degrees": 17.609988206321425,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 31,
+          "error_m": 0.044652049138724774,
+          "cumulative_rotation_degrees": 17.87264753233464,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 32,
+          "error_m": 0.0434489777100542,
+          "cumulative_rotation_degrees": 18.136169786571607,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 33,
+          "error_m": 0.04224907713309258,
+          "cumulative_rotation_degrees": 18.400507288159407,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 34,
+          "error_m": 0.04105152757625786,
+          "cumulative_rotation_degrees": 18.665614604188328,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 35,
+          "error_m": 0.03985554608246367,
+          "cumulative_rotation_degrees": 18.931448387703288,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 36,
+          "error_m": 0.038660387741710406,
+          "cumulative_rotation_degrees": 19.197967231201503,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 37,
+          "error_m": 0.03746534652289384,
+          "cumulative_rotation_degrees": 19.465131535524453,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 38,
+          "error_m": 0.03626975578756895,
+          "cumulative_rotation_degrees": 19.732903393803788,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 39,
+          "error_m": 0.03507298850992627,
+          "cumulative_rotation_degrees": 20.001246490030404,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 40,
+          "error_m": 0.03387445722839045,
+          "cumulative_rotation_degrees": 20.270126011901986,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 41,
+          "error_m": 0.03267361375477062,
+          "cumulative_rotation_degrees": 20.539508577522476,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 42,
+          "error_m": 0.03146994866670715,
+          "cumulative_rotation_degrees": 20.80936217551236,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 43,
+          "error_m": 0.03026299060866972,
+          "cumulative_rotation_degrees": 21.07965611818432,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 44,
+          "error_m": 0.029052305425804725,
+          "cumulative_rotation_degrees": 21.350361007322217,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 45,
+          "error_m": 0.027837495153638234,
+          "cumulative_rotation_degrees": 21.62144871229544,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 46,
+          "error_m": 0.02661819688522194,
+          "cumulative_rotation_degrees": 21.8928923601603,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 47,
+          "error_m": 0.025394081535532048,
+          "cumulative_rotation_degrees": 22.164666337540144,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 48,
+          "error_m": 0.02416485252125634,
+          "cumulative_rotation_degrees": 22.436746304059188,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 49,
+          "error_m": 0.022930244372153984,
+          "cumulative_rotation_degrees": 22.70910921736921,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 50,
+          "error_m": 0.02169002128831605,
+          "cumulative_rotation_degrees": 22.981733369729024,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 51,
+          "error_m": 0.020444185857504883,
+          "cumulative_rotation_degrees": 23.254502476381678,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 52,
+          "error_m": 0.019193762363630327,
+          "cumulative_rotation_degrees": 23.5268832493603,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 53,
+          "error_m": 0.01793801813167945,
+          "cumulative_rotation_degrees": 23.799409061678237,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 54,
+          "error_m": 0.01667691246618832,
+          "cumulative_rotation_degrees": 24.072076930734315,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 55,
+          "error_m": 0.015410327076332511,
+          "cumulative_rotation_degrees": 24.345038087888867,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 56,
+          "error_m": 0.01413829626977655,
+          "cumulative_rotation_degrees": 24.618376490062623,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 0,
+          "projection": null
+        },
+        {
+          "index": 57,
+          "error_m": 0.012860929211675177,
+          "cumulative_rotation_degrees": 24.89218252241999,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 1,
+          "projection": null
+        },
+        {
+          "index": 58,
+          "error_m": 0.011593579773908048,
+          "cumulative_rotation_degrees": 25.15973086910164,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 2,
+          "projection": null
+        },
+        {
+          "index": 59,
+          "error_m": 0.010389186939246144,
+          "cumulative_rotation_degrees": 25.39735366574355,
+          "proposed_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "filtered_sweep": {
+            "clear": true,
+            "first_blocked_fraction": null,
+            "samples": 3
+          },
+          "motion": {
+            "velocity_limited": false,
+            "velocity_scale": 1.0,
+            "bounds_clipped": false,
+            "max_joint_change_rad": 0.006000000000000005
+          },
+          "stable_steps": 3,
+          "projection": null
+        }
+      ],
+      "limitation": "Perfect-tracking kinematic preflight only; live sweep and original timeout remain active"
+    }
+  ],
+  "retreat_projections": [],
+  "fresh_sweep_feedback": {
+    "samples": 1,
+    "max_captured_to_send_s": 0.01685623799858149,
+    "max_joint_change_from_planning_rad": 0.08984708786010742,
+    "records": [
+      {
+        "step": 436,
+        "captured_to_send_s": 0.01685623799858149,
+        "max_joint_change_from_planning_rad": 0.08984708786010742
+      }
+    ]
+  },
+  "rejected_retreat_certificate": null
+}

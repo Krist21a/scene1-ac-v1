@@ -1,0 +1,101 @@
+--- a/scene1/visual_cycle.py
++++ b/scene1/visual_cycle.py
+@@ -11,6 +11,7 @@
+ from scipy.spatial.transform import Rotation
+ 
+ from .motion import action_vector, JOINTS
++from .rgbd import spatial_groups
+ from .receiver import receiver_section
+ from .bin_layout import plan_bin_drop, validate_layout, slot_points
+ 
+@@ -47,17 +48,24 @@
+     rim = p[abs(p[:, 2]-top) < .009]
+     if len(rim) < 80:
+         return None
+-    # The seed changes placement, not the bin's rectangular shape. Fit its
+-    # orientation as well as center rather than assuming fixed coordinates.
+-    rect = cv2.minAreaRect(rim[:, :2].astype(np.float32))
+-    corners = cv2.boxPoints(rect)
+-    extent = np.sort(rect[1])
+-    if not (.22 < extent[0] < .55 and .28 < extent[1] < .65):
+-        return None
+-    if not rim_edges_supported(rim, corners):
+-        return None
+-    return dict(center=np.mean(corners, axis=0), corners=corners, rim_z=top,
+-                plane_z=plane, stamp=snapshot['stamp'])
++    # Associate connected sensor points before fitting a rectangle. Isolated
++    # elevated green returns must not stretch a physically separate rim.
++    candidates = []
++    for indices in spatial_groups(rim):
++        group = rim[indices]
++        if len(group) < 80:
++            continue
++        rect = cv2.minAreaRect(group[:, :2].astype(np.float32))
++        corners = cv2.boxPoints(rect)
++        extent = np.sort(rect[1])
++        if not (.22 < extent[0] < .55 and .28 < extent[1] < .65):
++            continue
++        if not rim_edges_supported(group, corners):
++            continue
++        candidates.append(dict(center=np.mean(corners, axis=0), corners=corners,
++            rim_z=top, plane_z=plane, stamp=snapshot['stamp']))
++    # Ambiguous full boundaries are rejected instead of choosing by a goal.
++    return candidates[0] if len(candidates) == 1 else None
+ 
+ 
+ def rim_edges_supported(points, corners):
+--- a/tests/test_bin_rim_initialization.py
++++ b/tests/test_bin_rim_initialization.py
+@@ -47,16 +47,18 @@
+         self.assertFalse(rim_edges_supported(self.rim_points(self.snapshot(80)),tracked['corners']))
+         self.assertGreater(max(np.linalg.norm(np.roll(tracked['corners'],-1,axis=0)-tracked['corners'],axis=1)),.63)
+ 
+-    def test_plausible_size_outlier_cannot_initialize_bin(self):
++    def test_disconnected_outlier_cannot_stretch_initialized_bin(self):
+         snap=self.snapshot(80);points=self.rim_points(snap)
+         # Synthetic counterexample: one disconnected point in the original
+         # admissible size range. The remaining points are actual raw evidence.
+         outlier=np.array([points[:,0].min()-.15,points[:,1].mean(),np.median(points[:,2])])
+         cloud_points=np.vstack((points,outlier));hsv=np.tile([60,200,200],(len(cloud_points),1)).astype(np.uint8)
+         with patch('scene1.visual_cycle.cloud',return_value=(cloud_points,hsv)):
+-            with patch('scene1.visual_cycle.rim_edges_supported',return_value=True):
+-                self.assertIsNotNone(bin_rim(snap))
+-            self.assertIsNone(bin_rim(snap))
++            result=bin_rim(snap)
++            self.assertIsNotNone(result)
++            self.assertTrue(rim_edges_supported(points,result['corners']))
++            self.assertLess(max(np.linalg.norm(np.roll(result['corners'],-1,axis=0)-result['corners'],axis=1)),.46)
++            self.assertGreater(result['corners'][:,0].min()-outlier[0],.14)
+ 
+     def test_missing_or_short_side_is_not_filled_from_a_rectangle(self):
+         corners=np.array([[0.,0.],[.4,0.],[.4,.3],[0.,.3]])
+@@ -65,3 +67,10 @@
+         self.assertFalse(rim_edges_supported(np.vstack(edges[:3]),corners))
+         short=edges[3][15:25]
+         self.assertFalse(rim_edges_supported(np.vstack(edges[:3]+[short]),corners))
++
++    def test_two_disconnected_full_rims_are_ambiguous_and_rejected(self):
++        t=np.linspace(0.,1.,100)
++        points=np.concatenate([np.column_stack((.45+.4*t,np.full(100,y),np.full(100,.22))) for y in (.05,.45)] + [np.column_stack((np.full(100,x),.05+.4*t,np.full(100,.22))) for x in (.45,.85)])
++        both=np.vstack([points,points+[-.25,-.6,0.]])
++        with patch('scene1.visual_cycle.cloud',return_value=(both,np.tile([60,150,150],(len(both),1)))):
++            self.assertIsNone(bin_rim(dict(table_z_base_m=-.08,stamp=1.)))
+--- a/tests/test_visual_cycle.py
++++ b/tests/test_visual_cycle.py
+@@ -267,5 +267,16 @@
+         self.assertEqual(self.cycle.command[14],.3)
+ 
+ 
++    def test_rim_component_ignores_disconnected_green_points_but_keeps_four_edges(self):
++        t=np.linspace(0.,1.,100)
++        points=np.concatenate([np.column_stack((.45+.4*t,np.full(100,y),np.full(100,.22))) for y in (.05,.45)] + [np.column_stack((np.full(100,x),.05+.4*t,np.full(100,.22))) for x in (.45,.85)])
++        dirty=np.vstack([points,[.18,.3,.22],[.22,.35,.22]])
++        with patch('scene1.visual_cycle.cloud',return_value=(dirty,np.tile([60,150,150],(len(dirty),1)))):
++            rim=bin_rim(dict(table_z_base_m=-.08,stamp=1.))
++        np.testing.assert_allclose(np.sort(np.ptp(rim['corners'],axis=0)),[.4,.4],atol=1e-6)
++        # One connected but incomplete shape must still fail original support.
++        with patch('scene1.visual_cycle.cloud',return_value=(points[:300],np.tile([60,150,150],(300,1)))):
++            self.assertIsNone(bin_rim(dict(table_z_base_m=-.08,stamp=1.)))
++
+ if __name__ == '__main__':
+     unittest.main()

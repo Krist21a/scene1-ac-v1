@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-24T09:34:12.318482+08:00",
+  "parent": "executor-grasp-frame",
+  "candidate": "executor-grasp-gain",
+  "factor": "Visual pickup local grasp correction gain scale1.0 to0.35",
+  "evidence": "Grasp-frame completed1parcel; second yaw aligned but position overshot repeatedly until45step original budget. No target/PD torque clipping in formal policy.",
+  "unchanged": [
+    "Original45step grasp budget",
+    "Yaw2degrees transverse2mm height5mm gates",
+    "Physical and torque limits and3mm sweep margin",
+    "C output compensation and original MPC/WBC configuration"
+  ],
+  "next_trial": "executor-grasp-gain-c-p2-s0-1024",
+  "heldout_seeds_used": []
+}

@@ -1,0 +1,2557 @@
+{
+  "label": "executor-placement-physical-ac-p4-s0-1024",
+  "steps": 461,
+  "step_sequence_contiguous": true,
+  "summary": {
+    "steps": 461,
+    "reason": "error",
+    "task_success": null,
+    "error": "Retreat projection cannot repair an already blocked measured pose",
+    "handover_contract_stop": null,
+    "last_sensor_receipts": {
+      "/sensors_data_raw": {
+        "receipt_monotonic_s": 25457.477011073,
+        "source_stamp_s": 1792827587.7338448,
+        "receipts": 46806
+      },
+      "/gripper/state": {
+        "receipt_monotonic_s": 25457.493553061,
+        "source_stamp_s": 1792827587.750885,
+        "receipts": 87344
+      },
+      "/cam_r/color/image_raw/compressed": {
+        "receipt_monotonic_s": 25457.4790143,
+        "source_stamp_s": 1792827587.7201009,
+        "receipts": 2687
+      },
+      "/cam_h/color/image_raw/compressed": {
+        "receipt_monotonic_s": 25457.486458003,
+        "source_stamp_s": 1792827587.7132125,
+        "receipts": 2897
+      },
+      "/cam_l/color/image_raw/compressed": {
+        "receipt_monotonic_s": 25457.480568313,
+        "source_stamp_s": 1792827587.7163532,
+        "receipts": 2734
+      }
+    },
+    "trace_manifest_error": null,
+    "visual_confirmed_parcels": 0,
+    "note": "Original KuavoSimEnv returns reward=0 and does not judge scene1 success."
+  },
+  "ros_run_id": "d3bc981e-cf7d-11f1-92de-c85ea94bd8c7",
+  "controller_sha": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+  "policy_sha": "0c4fdba89fd804c974a1d309f706b8681d8192dab169ba2d8dbd64b86a17f69a",
+  "requested_parcels": 4,
+  "bin_confirmations": [],
+  "complete_events": [],
+  "gripper_events": [
+    {
+      "step": 176,
+      "side": "right",
+      "action": "close",
+      "phase": "small_grasp"
+    },
+    {
+      "step": 457,
+      "side": "right",
+      "action": "open",
+      "phase": "small_short_retreat"
+    }
+  ],
+  "gripper_event_count": 2,
+  "unpaused_ACT_steps_after_first_complete": 0,
+  "target_clips": 0,
+  "velocity_limited_steps": 1,
+  "regrasp_sweep_block_steps": 0,
+  "regrasp_forward_gate_hold_steps": 0,
+  "pd_limits_50hz": {
+    "initialization": {
+      "samples": 1688,
+      "raw_clipped_samples": 1,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.502064498953152,
+      "added_peak_nm": 0.5,
+      "wrist_command_peak_nm": 1.140581389573702,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    },
+    "formal_policy": {
+      "samples": 3126,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.32383860428567696,
+      "added_peak_nm": 0.3238386042856769,
+      "wrist_command_peak_nm": 1.5636770868083778,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    },
+    "after_policy": {
+      "samples": 126,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.08848791733278963,
+      "added_peak_nm": 0.0884879173327896,
+      "wrist_command_peak_nm": 1.0429952851747437,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    }
+  },
+  "task_success": null,
+  "limitations": "Gripper events are upper command threshold crossings (0.25/0.6 hysteresis), not proof of contact. Original visual checks and raw feedback evidence retained. 50Hz clipping can miss shorter events; online guard is separate. null is not an official verdict.",
+  "release_reference_transfers": [
+    {
+      "step": 448,
+      "bound_active_count": 0,
+      "original_cap_rad": null,
+      "reference_mode": "mpc_continuous",
+      "max_offset_rad": 0.5388189848559232,
+      "remaining_reference_error_rad": [
+        0.00037366151809692383,
+        -0.00039270520210266113,
+        -0.0037537122292610747,
+        -0.015245587001529226,
+        -0.00027501583099365234,
+        0.007399022579193115,
+        0.003514327607559431
+      ],
+      "max_requested_change_rad": 0.0,
+      "motion_filter_velocity_limited": false,
+      "motion_filter_bounds_clipped": false
+    }
+  ],
+  "release_preparation": [
+    {
+      "step": 383,
+      "target_rad": [
+        -0.271370937513863,
+        -0.3990562438736503,
+        -0.350718317065617,
+        -0.6414346322933228,
+        1.2518012613504808,
+        -0.698131700797732,
+        -0.03630471211308384
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.13337179069107308,
+      "settled_movement_rad": Infinity,
+      "wrist_error_rad": 0.13337179069107308,
+      "wrist_movement_rad": Infinity,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "center_and_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 384,
+      "target_rad": [
+        -0.271370937513863,
+        -0.3990562438736503,
+        -0.350718317065617,
+        -0.6414346322933228,
+        1.2518012613504808,
+        -0.698131700797732,
+        -0.03630471211308384
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.1329406106907679,
+      "settled_movement_rad": 0.0015403032302856445,
+      "wrist_error_rad": 0.1329406106907679,
+      "wrist_movement_rad": 0.0015403032302856445,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 385,
+      "target_rad": [
+        -0.271370937513863,
+        -0.3990562438736503,
+        -0.350718317065617,
+        -0.6414346322933228,
+        1.2518012613504808,
+        -0.698131700797732,
+        -0.03630471211308384
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.1328706348378016,
+      "settled_movement_rad": 0.0014876127243041992,
+      "wrist_error_rad": 0.1328706348378016,
+      "wrist_movement_rad": 0.0014876127243041992,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 386,
+      "target_rad": [
+        -0.27310696244239807,
+        -0.4066457102580544,
+        -0.3431288506812129,
+        -0.6338451659089186,
+        1.2593907277348848,
+        -0.6905422344133278,
+        -0.043894178497487946
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.1252821817323586,
+      "settled_movement_rad": 0.0012354850769042969,
+      "wrist_error_rad": 0.1252821817323586,
+      "wrist_movement_rad": 0.0012354850769042969,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -0.0017360249285350848,
+        -0.007589466384404109,
+        0.007589466384404109,
+        0.007589466384404164,
+        0.007589466384404053,
+        0.007589466384404164,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 387,
+      "target_rad": [
+        -0.27310696244239807,
+        -0.4066457102580544,
+        -0.3431288506812129,
+        -0.6338451659089186,
+        1.2593907277348848,
+        -0.6905422344133278,
+        -0.043894178497487946
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.12527753257006613,
+      "settled_movement_rad": 0.0010280609130859375,
+      "wrist_error_rad": 0.12527753257006613,
+      "wrist_movement_rad": 0.0010280609130859375,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 388,
+      "target_rad": [
+        -0.27310696244239807,
+        -0.4066457102580544,
+        -0.3431288506812129,
+        -0.6338451659089186,
+        1.2593907277348848,
+        -0.6905422344133278,
+        -0.043894178497487946
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.12527502917498556,
+      "settled_movement_rad": 0.0011855363845825195,
+      "wrist_error_rad": 0.12527502917498556,
+      "wrist_movement_rad": 0.0011855363845825195,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 389,
+      "target_rad": [
+        -0.27325254678726196,
+        -0.4142351766424585,
+        -0.3355393842968088,
+        -0.6262556995245144,
+        1.2669801941192889,
+        -0.6829527680289237,
+        -0.051483644881892054
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.11801452082509678,
+      "settled_movement_rad": 0.0010395199060440063,
+      "wrist_error_rad": 0.11801452082509678,
+      "wrist_movement_rad": 0.0010395199060440063,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -0.0001455843448638916,
+        -0.007589466384404109,
+        0.007589466384404109,
+        0.007589466384404164,
+        0.007589466384404053,
+        0.007589466384404164,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 390,
+      "target_rad": [
+        -0.27325254678726196,
+        -0.4142351766424585,
+        -0.3355393842968088,
+        -0.6262556995245144,
+        1.2669801941192889,
+        -0.6829527680289237,
+        -0.051483644881892054
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.11837858599538487,
+      "settled_movement_rad": 0.00036406517028808594,
+      "wrist_error_rad": 0.11837858599538487,
+      "wrist_movement_rad": 0.00036406517028808594,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 391,
+      "target_rad": [
+        -0.27325254678726196,
+        -0.4142351766424585,
+        -0.3355393842968088,
+        -0.6262556995245144,
+        1.2669801941192889,
+        -0.6829527680289237,
+        -0.051483644881892054
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.11868841093892735,
+      "settled_movement_rad": 0.00030982494354248047,
+      "wrist_error_rad": 0.11868841093892735,
+      "wrist_movement_rad": 0.00030982494354248047,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 392,
+      "target_rad": [
+        -0.27325254678726196,
+        -0.4142351766424585,
+        -0.3355393842968088,
+        -0.6262556995245144,
+        1.2669801941192889,
+        -0.6829527680289237,
+        -0.051483644881892054
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.11925578755254429,
+      "settled_movement_rad": 0.0005673766136169434,
+      "wrist_error_rad": 0.11925578755254429,
+      "wrist_movement_rad": 0.0005673766136169434,
+      "original_support_checks_passed": false,
+      "support_checks_passed": false,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 393,
+      "target_rad": [
+        -0.27325254678726196,
+        -0.4142351766424585,
+        -0.3355393842968088,
+        -0.6262556995245144,
+        1.2669801941192889,
+        -0.6829527680289237,
+        -0.051483644881892054
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.11996216219777744,
+      "settled_movement_rad": 0.0007063746452331543,
+      "wrist_error_rad": 0.11996216219777744,
+      "wrist_movement_rad": 0.0007063746452331543,
+      "original_support_checks_passed": false,
+      "support_checks_passed": false,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 394,
+      "target_rad": [
+        -0.27325254678726196,
+        -0.4142351766424585,
+        -0.3355393842968088,
+        -0.6262556995245144,
+        1.2669801941192889,
+        -0.6829527680289237,
+        -0.051483644881892054
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.12074280423040074,
+      "settled_movement_rad": 0.000780642032623291,
+      "wrist_error_rad": 0.12074280423040074,
+      "wrist_movement_rad": 0.000780642032623291,
+      "original_support_checks_passed": false,
+      "support_checks_passed": false,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 395,
+      "target_rad": [
+        -0.27325254678726196,
+        -0.4142351766424585,
+        -0.3355393842968088,
+        -0.6262556995245144,
+        1.2669801941192889,
+        -0.6829527680289237,
+        -0.051483644881892054
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.12149054449910801,
+      "settled_movement_rad": 0.0007477402687072754,
+      "wrist_error_rad": 0.12149054449910801,
+      "wrist_movement_rad": 0.0007477402687072754,
+      "original_support_checks_passed": false,
+      "support_checks_passed": false,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 396,
+      "target_rad": [
+        -0.27325254678726196,
+        -0.4142351766424585,
+        -0.3355393842968088,
+        -0.6262556995245144,
+        1.2669801941192889,
+        -0.6829527680289237,
+        -0.051483644881892054
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.12211621445531529,
+      "settled_movement_rad": 0.0006256699562072754,
+      "wrist_error_rad": 0.12211621445531529,
+      "wrist_movement_rad": 0.0006256699562072754,
+      "original_support_checks_passed": false,
+      "support_checks_passed": false,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 397,
+      "target_rad": [
+        -0.27325254678726196,
+        -0.4142351766424585,
+        -0.3355393842968088,
+        -0.6262556995245144,
+        1.2669801941192889,
+        -0.6829527680289237,
+        -0.051483644881892054
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.1226872865569083,
+      "settled_movement_rad": 0.0005710721015930176,
+      "wrist_error_rad": 0.1226872865569083,
+      "wrist_movement_rad": 0.0005710721015930176,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 398,
+      "target_rad": [
+        -0.27325254678726196,
+        -0.4142351766424585,
+        -0.3355393842968088,
+        -0.6262556995245144,
+        1.2669801941192889,
+        -0.6829527680289237,
+        -0.051483644881892054
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.12314940136785191,
+      "settled_movement_rad": 0.0004621148109436035,
+      "wrist_error_rad": 0.12314940136785191,
+      "wrist_movement_rad": 0.0004621148109436035,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 399,
+      "target_rad": [
+        -0.2743825316429138,
+        -0.4218246430268626,
+        -0.3279499179124047,
+        -0.6186662331401103,
+        1.274569660503693,
+        -0.6753633016445195,
+        -0.05907311126629616
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.11619573772926683,
+      "settled_movement_rad": 0.0006358027458190918,
+      "wrist_error_rad": 0.11619573772926683,
+      "wrist_movement_rad": 0.0006358027458190918,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -0.0011299848556518555,
+        -0.007589466384404109,
+        0.007589466384404109,
+        0.007589466384404164,
+        0.007589466384404053,
+        0.007589466384404164,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 400,
+      "target_rad": [
+        -0.2743825316429138,
+        -0.4218246430268626,
+        -0.3279499179124047,
+        -0.6186662331401103,
+        1.274569660503693,
+        -0.6753633016445195,
+        -0.05907311126629616
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.11679631413002367,
+      "settled_movement_rad": 0.0006005764007568359,
+      "wrist_error_rad": 0.11679631413002367,
+      "wrist_movement_rad": 0.0006005764007568359,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 401,
+      "target_rad": [
+        -0.2743825316429138,
+        -0.4218246430268626,
+        -0.3279499179124047,
+        -0.6186662331401103,
+        1.274569660503693,
+        -0.6753633016445195,
+        -0.05907311126629616
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.11733609379310961,
+      "settled_movement_rad": 0.0005397796630859375,
+      "wrist_error_rad": 0.11733609379310961,
+      "wrist_movement_rad": 0.0005397796630859375,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 402,
+      "target_rad": [
+        -0.2748062312602997,
+        -0.42883753776550293,
+        -0.3203604515280006,
+        -0.6110767667557061,
+        1.282159126888097,
+        -0.6677738352601154,
+        -0.06666257765070027
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.11088984449549744,
+      "settled_movement_rad": 0.0011432170867919922,
+      "wrist_error_rad": 0.11088984449549744,
+      "wrist_movement_rad": 0.0011432170867919922,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -0.00042369961738586426,
+        -0.007012894738640307,
+        0.007589466384404109,
+        0.007589466384404164,
+        0.007589466384404053,
+        0.007589466384404164,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 403,
+      "target_rad": [
+        -0.2748062312602997,
+        -0.42883753776550293,
+        -0.3203604515280006,
+        -0.6110767667557061,
+        1.282159126888097,
+        -0.6677738352601154,
+        -0.06666257765070027
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.11180745800181457,
+      "settled_movement_rad": 0.0009176135063171387,
+      "wrist_error_rad": 0.11180745800181457,
+      "wrist_movement_rad": 0.0009176135063171387,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 404,
+      "target_rad": [
+        -0.2748062312602997,
+        -0.42883753776550293,
+        -0.3203604515280006,
+        -0.6110767667557061,
+        1.282159126888097,
+        -0.6677738352601154,
+        -0.06666257765070027
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.11262803514643738,
+      "settled_movement_rad": 0.0008205771446228027,
+      "wrist_error_rad": 0.11262803514643738,
+      "wrist_movement_rad": 0.0008205771446228027,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 405,
+      "target_rad": [
+        -0.27531325817108154,
+        -0.430024653673172,
+        -0.31277098514359647,
+        -0.6034873003713019,
+        1.289748593272501,
+        -0.6601843688757112,
+        -0.07425204403510438
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.10608683564969801,
+      "settled_movement_rad": 0.001048266887664795,
+      "wrist_error_rad": 0.10608683564969801,
+      "wrist_movement_rad": 0.001048266887664795,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -0.0005070269107818604,
+        -0.0011871159076690674,
+        0.007589466384404109,
+        0.007589466384404164,
+        0.007589466384404053,
+        0.007589466384404164,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 406,
+      "target_rad": [
+        -0.27531325817108154,
+        -0.430024653673172,
+        -0.31277098514359647,
+        -0.6034873003713019,
+        1.289748593272501,
+        -0.6601843688757112,
+        -0.07425204403510438
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.10717414357969068,
+      "settled_movement_rad": 0.0010873079299926758,
+      "wrist_error_rad": 0.10717414357969068,
+      "wrist_movement_rad": 0.0010873079299926758,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 407,
+      "target_rad": [
+        -0.27531325817108154,
+        -0.430024653673172,
+        -0.31277098514359647,
+        -0.6034873003713019,
+        1.289748593272501,
+        -0.6601843688757112,
+        -0.07425204403510438
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.10871128776380323,
+      "settled_movement_rad": 0.0015371441841125488,
+      "wrist_error_rad": 0.10871128776380323,
+      "wrist_movement_rad": 0.0015371441841125488,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 408,
+      "target_rad": [
+        -0.27577003836631775,
+        -0.43202048540115356,
+        -0.30518151875919236,
+        -0.5958978339868978,
+        1.297338059656905,
+        -0.652594902491307,
+        -0.08184151041950849
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.10183773276779629,
+      "settled_movement_rad": 0.0007159113883972168,
+      "wrist_error_rad": 0.10183773276779629,
+      "wrist_movement_rad": 0.0007159113883972168,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -0.00045678019523620605,
+        -0.0019958317279815674,
+        0.007589466384404109,
+        0.007589466384404164,
+        0.007589466384404053,
+        0.007589466384404164,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 409,
+      "target_rad": [
+        -0.27577003836631775,
+        -0.43202048540115356,
+        -0.30518151875919236,
+        -0.5958978339868978,
+        1.297338059656905,
+        -0.652594902491307,
+        -0.08184151041950849
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.10231397387955166,
+      "settled_movement_rad": 0.0006162077188491821,
+      "wrist_error_rad": 0.10231397387955166,
+      "wrist_movement_rad": 0.0006162077188491821,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 410,
+      "target_rad": [
+        -0.27577003836631775,
+        -0.43202048540115356,
+        -0.30518151875919236,
+        -0.5958978339868978,
+        1.297338059656905,
+        -0.652594902491307,
+        -0.08184151041950849
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.10250572202179409,
+      "settled_movement_rad": 0.0005387961864471436,
+      "wrist_error_rad": 0.10250572202179409,
+      "wrist_movement_rad": 0.0005387961864471436,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 411,
+      "target_rad": [
+        -0.27633392810821533,
+        -0.43346038460731506,
+        -0.29759205237478825,
+        -0.5883083676024936,
+        1.3049275260413091,
+        -0.6450054361069029,
+        -0.0894309768039126
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.09493312375186136,
+      "settled_movement_rad": 0.00039827823638916016,
+      "wrist_error_rad": 0.09493312375186136,
+      "wrist_movement_rad": 0.00039827823638916016,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -0.000563889741897583,
+        -0.001439899206161499,
+        0.007589466384404109,
+        0.007589466384404164,
+        0.007589466384404053,
+        0.007589466384404164,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 412,
+      "target_rad": [
+        -0.27633392810821533,
+        -0.43346038460731506,
+        -0.29759205237478825,
+        -0.5883083676024936,
+        1.3049275260413091,
+        -0.6450054361069029,
+        -0.0894309768039126
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.09493479268191507,
+      "settled_movement_rad": 0.0006495118141174316,
+      "wrist_error_rad": 0.09493479268191507,
+      "wrist_movement_rad": 0.0006495118141174316,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 413,
+      "target_rad": [
+        -0.27633392810821533,
+        -0.43346038460731506,
+        -0.29759205237478825,
+        -0.5883083676024936,
+        1.3049275260413091,
+        -0.6450054361069029,
+        -0.0894309768039126
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.09492966668246439,
+      "settled_movement_rad": 0.0005031824111938477,
+      "wrist_error_rad": 0.09492966668246439,
+      "wrist_movement_rad": 0.0005031824111938477,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 414,
+      "target_rad": [
+        -0.2770598232746124,
+        -0.4347136914730072,
+        -0.29000258599038414,
+        -0.5807189012180894,
+        1.3125169924257132,
+        -0.6374159697224987,
+        -0.09702044318831671
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.08732059036992912,
+      "settled_movement_rad": 0.0007731318473815918,
+      "wrist_error_rad": 0.08732059036992912,
+      "wrist_movement_rad": 0.0007731318473815918,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -0.0007258951663970947,
+        -0.0012533068656921387,
+        0.007589466384404109,
+        0.007589466384404164,
+        0.007589466384404053,
+        0.007589466384404164,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 415,
+      "target_rad": [
+        -0.2770598232746124,
+        -0.4347136914730072,
+        -0.29000258599038414,
+        -0.5807189012180894,
+        1.3125169924257132,
+        -0.6374159697224987,
+        -0.09702044318831671
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.08729102646612052,
+      "settled_movement_rad": 0.00037288665771484375,
+      "wrist_error_rad": 0.08729102646612052,
+      "wrist_movement_rad": 0.00037288665771484375,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 416,
+      "target_rad": [
+        -0.2770598232746124,
+        -0.4347136914730072,
+        -0.29000258599038414,
+        -0.5807189012180894,
+        1.3125169924257132,
+        -0.6374159697224987,
+        -0.09702044318831671
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.08727284704946403,
+      "settled_movement_rad": 0.0004734992980957031,
+      "wrist_error_rad": 0.08727284704946403,
+      "wrist_movement_rad": 0.0004734992980957031,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 417,
+      "target_rad": [
+        -0.27745938301086426,
+        -0.4357356131076813,
+        -0.28241311960598003,
+        -0.5731294348336853,
+        1.3133823871612549,
+        -0.6298265033380945,
+        -0.10460990957272082
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.07945855194496709,
+      "settled_movement_rad": 0.000581204891204834,
+      "wrist_error_rad": 0.07945855194496709,
+      "wrist_movement_rad": 0.000581204891204834,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -0.00039955973625183105,
+        -0.0010219216346740723,
+        0.007589466384404109,
+        0.007589466384404164,
+        0.0008653947355417024,
+        0.007589466384404164,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 418,
+      "target_rad": [
+        -0.27745938301086426,
+        -0.4357356131076813,
+        -0.28241311960598003,
+        -0.5731294348336853,
+        1.3133823871612549,
+        -0.6298265033380945,
+        -0.10460990957272082
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.0791514092104395,
+      "settled_movement_rad": 0.000456392765045166,
+      "wrist_error_rad": 0.0791514092104395,
+      "wrist_movement_rad": 0.000456392765045166,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 419,
+      "target_rad": [
+        -0.27745938301086426,
+        -0.4357356131076813,
+        -0.28241311960598003,
+        -0.5731294348336853,
+        1.3133823871612549,
+        -0.6298265033380945,
+        -0.10460990957272082
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.07871987158226568,
+      "settled_movement_rad": 0.0006090998649597168,
+      "wrist_error_rad": 0.07871987158226568,
+      "wrist_movement_rad": 0.0006090998649597168,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 420,
+      "target_rad": [
+        -0.2778353989124298,
+        -0.43655869364738464,
+        -0.2748236532215759,
+        -0.5655399684492811,
+        1.3134185075759888,
+        -0.6222370369536904,
+        -0.11219937595712492
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.0703778965575722,
+      "settled_movement_rad": 0.0007709264755249023,
+      "wrist_error_rad": 0.0703778965575722,
+      "wrist_movement_rad": 0.0007709264755249023,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -0.00037601590156555176,
+        -0.0008230805397033691,
+        0.007589466384404109,
+        0.007589466384404164,
+        3.612041473388672e-05,
+        0.007589466384404164,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 421,
+      "target_rad": [
+        -0.2778353989124298,
+        -0.43655869364738464,
+        -0.2748236532215759,
+        -0.5655399684492811,
+        1.3134185075759888,
+        -0.6222370369536904,
+        -0.11219937595712492
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.06960732770991596,
+      "settled_movement_rad": 0.00077056884765625,
+      "wrist_error_rad": 0.06960732770991596,
+      "wrist_movement_rad": 0.00077056884765625,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 422,
+      "target_rad": [
+        -0.2778353989124298,
+        -0.43655869364738464,
+        -0.2748236532215759,
+        -0.5655399684492811,
+        1.3134185075759888,
+        -0.6222370369536904,
+        -0.11219937595712492
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.06822891069484027,
+      "settled_movement_rad": 0.0013784170150756836,
+      "wrist_error_rad": 0.06822891069484027,
+      "wrist_movement_rad": 0.0013784170150756836,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 423,
+      "target_rad": [
+        -0.2784050405025482,
+        -0.437176913022995,
+        -0.2672341868371718,
+        -0.557950502064877,
+        1.3134651184082031,
+        -0.6146475705692862,
+        -0.11978884234152903
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.05881482692457185,
+      "settled_movement_rad": 0.0018246173858642578,
+      "wrist_error_rad": 0.05881482692457185,
+      "wrist_movement_rad": 0.0018246173858642578,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -0.0005696415901184082,
+        -0.0006182193756103516,
+        0.007589466384404109,
+        0.007589466384404164,
+        4.661083221435547e-05,
+        0.007589466384404164,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 424,
+      "target_rad": [
+        -0.2784050405025482,
+        -0.437176913022995,
+        -0.2672341868371718,
+        -0.557950502064877,
+        1.3134651184082031,
+        -0.6146475705692862,
+        -0.11978884234152903
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.056589845139751294,
+      "settled_movement_rad": 0.0022249817848205566,
+      "wrist_error_rad": 0.056589845139751294,
+      "wrist_movement_rad": 0.0022249817848205566,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 425,
+      "target_rad": [
+        -0.2784050405025482,
+        -0.437176913022995,
+        -0.2672341868371718,
+        -0.557950502064877,
+        1.3134651184082031,
+        -0.6146475705692862,
+        -0.11978884234152903
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.05353617997861848,
+      "settled_movement_rad": 0.0030536651611328125,
+      "wrist_error_rad": 0.05353617997861848,
+      "wrist_movement_rad": 0.0030536651611328125,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 426,
+      "target_rad": [
+        -0.2784050405025482,
+        -0.437176913022995,
+        -0.2672341868371718,
+        -0.557950502064877,
+        1.3134651184082031,
+        -0.6146475705692862,
+        -0.11978884234152903
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.051265004594097,
+      "settled_movement_rad": 0.0022711753845214844,
+      "wrist_error_rad": 0.051265004594097,
+      "wrist_movement_rad": 0.0022711753845214844,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 427,
+      "target_rad": [
+        -0.2784050405025482,
+        -0.437176913022995,
+        -0.2672341868371718,
+        -0.557950502064877,
+        1.3134651184082031,
+        -0.6146475705692862,
+        -0.11978884234152903
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.04851758809782014,
+      "settled_movement_rad": 0.0027474164962768555,
+      "wrist_error_rad": 0.04851758809782014,
+      "wrist_movement_rad": 0.0027474164962768555,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 428,
+      "target_rad": [
+        -0.28029966354370117,
+        -0.43762028217315674,
+        -0.2596447204527677,
+        -0.5503610356804728,
+        1.3136351108551025,
+        -0.607058104184882,
+        -0.12737830872593314
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.03829758992554366,
+      "settled_movement_rad": 0.0026305317878723145,
+      "wrist_error_rad": 0.03829758992554366,
+      "wrist_movement_rad": 0.0026305317878723145,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -0.001894623041152954,
+        -0.00044336915016174316,
+        0.007589466384404109,
+        0.007589466384404164,
+        0.00016999244689941406,
+        0.007589466384404164,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 429,
+      "target_rad": [
+        -0.28029966354370117,
+        -0.43762028217315674,
+        -0.2596447204527677,
+        -0.5503610356804728,
+        1.3136351108551025,
+        -0.607058104184882,
+        -0.12737830872593314
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.035967107919470664,
+      "settled_movement_rad": 0.002330482006072998,
+      "wrist_error_rad": 0.035967107919470664,
+      "wrist_movement_rad": 0.002330482006072998,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 430,
+      "target_rad": [
+        -0.28029966354370117,
+        -0.43762028217315674,
+        -0.2596447204527677,
+        -0.5503610356804728,
+        1.3136351108551025,
+        -0.607058104184882,
+        -0.12737830872593314
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.034063926386257104,
+      "settled_movement_rad": 0.002104043960571289,
+      "wrist_error_rad": 0.034063926386257104,
+      "wrist_movement_rad": 0.002104043960571289,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 431,
+      "target_rad": [
+        -0.28029966354370117,
+        -0.43762028217315674,
+        -0.2596447204527677,
+        -0.5503610356804728,
+        1.3136351108551025,
+        -0.607058104184882,
+        -0.12737830872593314
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.03406201903762429,
+      "settled_movement_rad": 0.002094089984893799,
+      "wrist_error_rad": 0.03406201903762429,
+      "wrist_movement_rad": 0.002094089984893799,
+      "original_support_checks_passed": false,
+      "support_checks_passed": false,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 432,
+      "target_rad": [
+        -0.28029966354370117,
+        -0.43762028217315674,
+        -0.2596447204527677,
+        -0.5503610356804728,
+        1.3136351108551025,
+        -0.607058104184882,
+        -0.12737830872593314
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.03405772750320046,
+      "settled_movement_rad": 0.001760721206665039,
+      "wrist_error_rad": 0.03405772750320046,
+      "wrist_movement_rad": 0.001760721206665039,
+      "original_support_checks_passed": false,
+      "support_checks_passed": false,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 433,
+      "target_rad": [
+        -0.28029966354370117,
+        -0.43762028217315674,
+        -0.2596447204527677,
+        -0.5503610356804728,
+        1.3136351108551025,
+        -0.607058104184882,
+        -0.12737830872593314
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.034873662805259165,
+      "settled_movement_rad": 0.0018874406814575195,
+      "wrist_error_rad": 0.03405276541652291,
+      "wrist_movement_rad": 0.0018874406814575195,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 434,
+      "target_rad": [
+        -0.28029966354370117,
+        -0.43762028217315674,
+        -0.2596447204527677,
+        -0.5503610356804728,
+        1.3136351108551025,
+        -0.607058104184882,
+        -0.12737830872593314
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.03632688364952796,
+      "settled_movement_rad": 0.001884162425994873,
+      "wrist_error_rad": 0.03404594068469613,
+      "wrist_movement_rad": 0.001884162425994873,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 435,
+      "target_rad": [
+        -0.2826070189476013,
+        -0.4375899136066437,
+        -0.2520552540683636,
+        -0.5427715692960686,
+        1.313748836517334,
+        -0.5994686378004779,
+        -0.13496777511033725
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.02981161217326589,
+      "settled_movement_rad": 0.0013657212257385254,
+      "wrist_error_rad": 0.02645078205671597,
+      "wrist_movement_rad": 0.0013657212257385254,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -0.0023073554039001465,
+        3.0368566513061523e-05,
+        0.007589466384404109,
+        0.007589466384404164,
+        0.00011372566223144531,
+        0.007589466384404164,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 436,
+      "target_rad": [
+        -0.2826070189476013,
+        -0.4375899136066437,
+        -0.2520552540683636,
+        -0.5427715692960686,
+        1.313748836517334,
+        -0.5994686378004779,
+        -0.13496777511033725
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.03055798153514333,
+      "settled_movement_rad": 0.000915229320526123,
+      "wrist_error_rad": 0.02644519412126828,
+      "wrist_movement_rad": 0.000915229320526123,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 437,
+      "target_rad": [
+        -0.2826070189476013,
+        -0.4375899136066437,
+        -0.2520552540683636,
+        -0.5427715692960686,
+        1.313748836517334,
+        -0.5994686378004779,
+        -0.13496777511033725
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.030974796816057637,
+      "settled_movement_rad": 0.0005409717559814453,
+      "wrist_error_rad": 0.026441304918196684,
+      "wrist_movement_rad": 0.0005409717559814453,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 438,
+      "target_rad": [
+        -0.2827063202857971,
+        -0.4375787079334259,
+        -0.2444657876839595,
+        -0.5351821029116645,
+        1.313789963722229,
+        -0.5918791714160737,
+        -0.14255724149474136
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.023794456713391754,
+      "settled_movement_rad": 0.0005974769592285156,
+      "wrist_error_rad": 0.018846757237825473,
+      "wrist_movement_rad": 0.0005974769592285156,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -9.930133819580078e-05,
+        1.1205673217773438e-05,
+        0.007589466384404109,
+        0.007589466384404164,
+        4.112720489501953e-05,
+        0.007589466384404164,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 439,
+      "target_rad": [
+        -0.2827063202857971,
+        -0.4375787079334259,
+        -0.2444657876839595,
+        -0.5351821029116645,
+        1.313789963722229,
+        -0.5918791714160737,
+        -0.14255724149474136
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.024121626608563873,
+      "settled_movement_rad": 0.0005540251731872559,
+      "wrist_error_rad": 0.018840558354768833,
+      "wrist_movement_rad": 0.0005540251731872559,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 440,
+      "target_rad": [
+        -0.2827063202857971,
+        -0.4375787079334259,
+        -0.2444657876839595,
+        -0.5351821029116645,
+        1.313789963722229,
+        -0.5918791714160737,
+        -0.14255724149474136
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.02433375953931949,
+      "settled_movement_rad": 0.0003625154495239258,
+      "wrist_error_rad": 0.018836266820345005,
+      "wrist_movement_rad": 0.0003625154495239258,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 441,
+      "target_rad": [
+        -0.2827197313308716,
+        -0.43752121925354004,
+        -0.23687632129955538,
+        -0.5275926365272603,
+        1.3138301372528076,
+        -0.5854572653770447,
+        -0.15014670787914547
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.016895927371223918,
+      "settled_movement_rad": 0.00029987096786499023,
+      "wrist_error_rad": 0.01124352218047825,
+      "wrist_movement_rad": 0.00029987096786499023,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -1.341104507446289e-05,
+        5.748867988586426e-05,
+        0.007589466384404109,
+        0.007589466384404164,
+        4.017353057861328e-05,
+        0.006421906039029035,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 442,
+      "target_rad": [
+        -0.2827197313308716,
+        -0.43752121925354004,
+        -0.23687632129955538,
+        -0.5275926365272603,
+        1.3138301372528076,
+        -0.5854572653770447,
+        -0.15014670787914547
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.017389036597450724,
+      "settled_movement_rad": 0.0009437799453735352,
+      "wrist_error_rad": 0.011229768408696328,
+      "wrist_movement_rad": 0.0009437799453735352,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 443,
+      "target_rad": [
+        -0.2827197313308716,
+        -0.43752121925354004,
+        -0.23687632129955538,
+        -0.5275926365272603,
+        1.3138301372528076,
+        -0.5854572653770447,
+        -0.15014670787914547
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.017839707316597453,
+      "settled_movement_rad": 0.000797271728515625,
+      "wrist_error_rad": 0.011222258223454629,
+      "wrist_movement_rad": 0.000797271728515625,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 444,
+      "target_rad": [
+        -0.2827844023704529,
+        -0.4373621642589569,
+        -0.22928685491515127,
+        -0.5200031701428561,
+        1.3138864040374756,
+        -0.5882315039634705,
+        -0.15773617426354958
+      ],
+      "sent_error_rad": 0.007589466384404164,
+      "whole_arm": true,
+      "tracking_error_rad": 0.010796457896914968,
+      "settled_movement_rad": 0.001033186912536621,
+      "wrist_error_rad": 0.003622122607635725,
+      "wrist_movement_rad": 0.001033186912536621,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 0,
+      "settled_target_adjustment_rad": [
+        -6.467103958129883e-05,
+        0.00015905499458312988,
+        0.007589466384404109,
+        0.007589466384404164,
+        5.626678466796875e-05,
+        -0.0027742385864257812,
+        -0.007589466384404109
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 445,
+      "target_rad": [
+        -0.2827844023704529,
+        -0.4373621642589569,
+        -0.22928685491515127,
+        -0.5200031701428561,
+        1.3138864040374756,
+        -0.5882315039634705,
+        -0.15773617426354958
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.01137200034686614,
+      "settled_movement_rad": 0.00097733736038208,
+      "wrist_error_rad": 0.0036137630562059764,
+      "wrist_movement_rad": 0.00097733736038208,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 1,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 446,
+      "target_rad": [
+        -0.2827844023704529,
+        -0.4373621642589569,
+        -0.22928685491515127,
+        -0.5200031701428561,
+        1.3138864040374756,
+        -0.5882315039634705,
+        -0.15773617426354958
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.012328416476932058,
+      "settled_movement_rad": 0.001547694206237793,
+      "wrist_error_rad": 0.003601588807510603,
+      "wrist_movement_rad": 0.001547694206237793,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 2,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    },
+    {
+      "step": 447,
+      "target_rad": [
+        -0.2827844023704529,
+        -0.4373621642589569,
+        -0.22928685491515127,
+        -0.5200031701428561,
+        1.3138864040374756,
+        -0.5882315039634705,
+        -0.15773617426354958
+      ],
+      "sent_error_rad": 0.0,
+      "whole_arm": true,
+      "tracking_error_rad": 0.013792485366549978,
+      "settled_movement_rad": 0.0024722814559936523,
+      "wrist_error_rad": 0.004997313022613525,
+      "wrist_movement_rad": 0.0024722814559936523,
+      "original_support_checks_passed": true,
+      "support_checks_passed": true,
+      "support_position_rule": "prepared_footprint",
+      "stable_steps": 3,
+      "settled_target_adjustment_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gripper_kept_closed": true,
+      "shared_weighing_step_budget": 450
+    }
+  ],
+  "release_reference_transfer_interpretation": "Physical bounds and MotionFilter checked separately. measured_physical intentionally replaces obsolete ACT anchoring with a new visual-phase reference; this is not measured tracking evidence.",
+  "post_level_geometry_refreshes": [],
+  "retreat_goal_certificates": [],
+  "retreat_projections": [],
+  "fresh_sweep_feedback": {
+    "samples": 55,
+    "max_captured_to_send_s": 0.030107542999758152,
+    "max_joint_change_from_planning_rad": 0.02219080924987793,
+    "records": [
+      {
+        "step": 73,
+        "captured_to_send_s": 0.026582129998132586,
+        "max_joint_change_from_planning_rad": 0.02219080924987793
+      },
+      {
+        "step": 74,
+        "captured_to_send_s": 0.022512947998620803,
+        "max_joint_change_from_planning_rad": 0.011807441711425781
+      },
+      {
+        "step": 75,
+        "captured_to_send_s": 0.027588400000240654,
+        "max_joint_change_from_planning_rad": 0.010521888732910156
+      },
+      {
+        "step": 76,
+        "captured_to_send_s": 0.018569564999779686,
+        "max_joint_change_from_planning_rad": 0.012784719467163086
+      },
+      {
+        "step": 77,
+        "captured_to_send_s": 0.020885681002255296,
+        "max_joint_change_from_planning_rad": 0.011041462421417236
+      },
+      {
+        "step": 78,
+        "captured_to_send_s": 0.017499420999229187,
+        "max_joint_change_from_planning_rad": 0.008424043655395508
+      },
+      {
+        "step": 79,
+        "captured_to_send_s": 0.01083092200133251,
+        "max_joint_change_from_planning_rad": 0.0054254233837127686
+      },
+      {
+        "step": 80,
+        "captured_to_send_s": 0.015796241001226008,
+        "max_joint_change_from_planning_rad": 0.007753938436508179
+      },
+      {
+        "step": 81,
+        "captured_to_send_s": 0.0143680779983697,
+        "max_joint_change_from_planning_rad": 0.007206767797470093
+      },
+      {
+        "step": 82,
+        "captured_to_send_s": 0.012871887000073912,
+        "max_joint_change_from_planning_rad": 0.005825996398925781
+      },
+      {
+        "step": 83,
+        "captured_to_send_s": 0.011989609000011114,
+        "max_joint_change_from_planning_rad": 0.0054128170013427734
+      },
+      {
+        "step": 84,
+        "captured_to_send_s": 0.020483880998654058,
+        "max_joint_change_from_planning_rad": 0.0067768096923828125
+      },
+      {
+        "step": 85,
+        "captured_to_send_s": 0.014397095001186244,
+        "max_joint_change_from_planning_rad": 0.004271745681762695
+      },
+      {
+        "step": 86,
+        "captured_to_send_s": 0.022431760000472423,
+        "max_joint_change_from_planning_rad": 0.006945133209228516
+      },
+      {
+        "step": 87,
+        "captured_to_send_s": 0.0068536299986590166,
+        "max_joint_change_from_planning_rad": 0.00573420524597168
+      },
+      {
+        "step": 88,
+        "captured_to_send_s": 0.017206143998919288,
+        "max_joint_change_from_planning_rad": 0.006043195724487305
+      },
+      {
+        "step": 89,
+        "captured_to_send_s": 0.009704134998173686,
+        "max_joint_change_from_planning_rad": 0.005319548305124044
+      },
+      {
+        "step": 90,
+        "captured_to_send_s": 0.008138917000906076,
+        "max_joint_change_from_planning_rad": 0.004443376092240214
+      },
+      {
+        "step": 91,
+        "captured_to_send_s": 0.020224096999299945,
+        "max_joint_change_from_planning_rad": 0.0047957440838217735
+      },
+      {
+        "step": 92,
+        "captured_to_send_s": 0.008597750998887932,
+        "max_joint_change_from_planning_rad": 0.0036691343411803246
+      },
+      {
+        "step": 93,
+        "captured_to_send_s": 0.006153274000098463,
+        "max_joint_change_from_planning_rad": 0.005625015124678612
+      },
+      {
+        "step": 94,
+        "captured_to_send_s": 0.015445827000803547,
+        "max_joint_change_from_planning_rad": 0.0065230876207351685
+      },
+      {
+        "step": 95,
+        "captured_to_send_s": 0.008495693000440951,
+        "max_joint_change_from_planning_rad": 0.0059289224445819855
+      },
+      {
+        "step": 96,
+        "captured_to_send_s": 0.004835011000977829,
+        "max_joint_change_from_planning_rad": 0.00585242360830307
+      },
+      {
+        "step": 97,
+        "captured_to_send_s": 0.013933088001067517,
+        "max_joint_change_from_planning_rad": 0.005488336086273193
+      },
+      {
+        "step": 98,
+        "captured_to_send_s": 0.011421395996876527,
+        "max_joint_change_from_planning_rad": 0.004630789160728455
+      },
+      {
+        "step": 99,
+        "captured_to_send_s": 0.012215014001412783,
+        "max_joint_change_from_planning_rad": 0.004792265594005585
+      },
+      {
+        "step": 100,
+        "captured_to_send_s": 0.007731629000772955,
+        "max_joint_change_from_planning_rad": 0.005372524261474609
+      },
+      {
+        "step": 101,
+        "captured_to_send_s": 0.016910480000660755,
+        "max_joint_change_from_planning_rad": 0.005668520927429199
+      },
+      {
+        "step": 102,
+        "captured_to_send_s": 0.009111590003158199,
+        "max_joint_change_from_planning_rad": 0.0021839141845703125
+      },
+      {
+        "step": 103,
+        "captured_to_send_s": 0.011500938999233767,
+        "max_joint_change_from_planning_rad": 0.0036568641662597656
+      },
+      {
+        "step": 104,
+        "captured_to_send_s": 0.008851498001604341,
+        "max_joint_change_from_planning_rad": 0.0038046836853027344
+      },
+      {
+        "step": 105,
+        "captured_to_send_s": 0.006050836000213167,
+        "max_joint_change_from_planning_rad": 0.0029048919677734375
+      },
+      {
+        "step": 155,
+        "captured_to_send_s": 0.01517092499852879,
+        "max_joint_change_from_planning_rad": 0.0055162906646728516
+      },
+      {
+        "step": 156,
+        "captured_to_send_s": 0.01950228799978504,
+        "max_joint_change_from_planning_rad": 0.002211451530456543
+      },
+      {
+        "step": 157,
+        "captured_to_send_s": 0.013667487997736316,
+        "max_joint_change_from_planning_rad": 0.004282832145690918
+      },
+      {
+        "step": 158,
+        "captured_to_send_s": 0.006431125002563931,
+        "max_joint_change_from_planning_rad": 0.004427909851074219
+      },
+      {
+        "step": 159,
+        "captured_to_send_s": 0.01055977400028496,
+        "max_joint_change_from_planning_rad": 0.002707839012145996
+      },
+      {
+        "step": 160,
+        "captured_to_send_s": 0.005788949998532189,
+        "max_joint_change_from_planning_rad": 0.002526223659515381
+      },
+      {
+        "step": 161,
+        "captured_to_send_s": 0.012144685999373905,
+        "max_joint_change_from_planning_rad": 0.004315197467803955
+      },
+      {
+        "step": 162,
+        "captured_to_send_s": 0.008191029002773575,
+        "max_joint_change_from_planning_rad": 0.0017873644828796387
+      },
+      {
+        "step": 163,
+        "captured_to_send_s": 0.013839934999850811,
+        "max_joint_change_from_planning_rad": 0.0034710168838500977
+      },
+      {
+        "step": 164,
+        "captured_to_send_s": 0.01974601200345205,
+        "max_joint_change_from_planning_rad": 0.00400090217590332
+      },
+      {
+        "step": 165,
+        "captured_to_send_s": 0.008466085000691237,
+        "max_joint_change_from_planning_rad": 0.004216432571411133
+      },
+      {
+        "step": 166,
+        "captured_to_send_s": 0.030107542999758152,
+        "max_joint_change_from_planning_rad": 0.004233241081237793
+      },
+      {
+        "step": 167,
+        "captured_to_send_s": 0.010558407000644365,
+        "max_joint_change_from_planning_rad": 0.0068242549896240234
+      },
+      {
+        "step": 168,
+        "captured_to_send_s": 0.02727036799842608,
+        "max_joint_change_from_planning_rad": 0.005023479461669922
+      },
+      {
+        "step": 169,
+        "captured_to_send_s": 0.022051427000405965,
+        "max_joint_change_from_planning_rad": 0.00495457649230957
+      },
+      {
+        "step": 170,
+        "captured_to_send_s": 0.016877797002962325,
+        "max_joint_change_from_planning_rad": 0.004403233528137207
+      },
+      {
+        "step": 171,
+        "captured_to_send_s": 0.01564188599877525,
+        "max_joint_change_from_planning_rad": 0.004282474517822266
+      },
+      {
+        "step": 172,
+        "captured_to_send_s": 0.011764017999666976,
+        "max_joint_change_from_planning_rad": 0.0026979446411132812
+      },
+      {
+        "step": 173,
+        "captured_to_send_s": 0.016327825000189478,
+        "max_joint_change_from_planning_rad": 0.002457171678543091
+      },
+      {
+        "step": 174,
+        "captured_to_send_s": 0.01745727700108546,
+        "max_joint_change_from_planning_rad": 0.002703368663787842
+      },
+      {
+        "step": 175,
+        "captured_to_send_s": 0.01720208500046283,
+        "max_joint_change_from_planning_rad": 0.002306133508682251
+      },
+      {
+        "step": 176,
+        "captured_to_send_s": 0.019023550001293188,
+        "max_joint_change_from_planning_rad": 0.0014423131942749023
+      }
+    ]
+  },
+  "rejected_retreat_certificate": null
+}

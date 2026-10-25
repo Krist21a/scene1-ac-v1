@@ -1,0 +1,31 @@
+{
+  "at": "2026-10-23T19:39:55.384585+08:00",
+  "candidate": "executor-project",
+  "parent": "executor-open",
+  "manifest_sha256": "e404c553f694fa8203c4978164f8001610d88e37c816b60c3eb39e99c8f6ba6c",
+  "factor": "Project only blocked retreat corrections within original per-step and physical limits; optimize signed separation of unchanged two finger boxes and parcel, then independently validate complete proposed and filtered sweeps",
+  "evidence": "executor-open-c-p2-s0 step384: measured and previous sweeps clear, proposed/filtered endpoint blocked. Alternative max adjustment0.000373rad, same0.006rad step, both sweeps clear, goal error63.302to61.633mm.",
+  "tests": {
+    "count": 423,
+    "passed": true,
+    "log": "tests-executor-project.log",
+    "sign_equivalence_random_states": 200,
+    "physical_failure_fixture": true
+  },
+  "preflight_replay": {
+    "seconds": 0.342098805,
+    "nominal_steps": 55,
+    "certified": true
+  },
+  "unchanged": [
+    "original collision geometry and3mm margin",
+    "60mm axis horizontal/70mm rise",
+    "phase budgets and success checks",
+    "MPC/WBC C and original task/QR",
+    "physical joint/torque limits",
+    "4step minimum open gate from parent"
+  ],
+  "rejection": "Already blocked measured pose or absence of feasible safe step still raises; unsent residual is rolled back. Actual MotionFilter output gets final guard before sending.",
+  "next_trial": "executor-project-c-p2-s0",
+  "production_promoted": false
+}

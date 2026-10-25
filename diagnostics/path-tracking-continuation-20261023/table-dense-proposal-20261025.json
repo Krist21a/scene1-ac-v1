@@ -1,0 +1,42 @@
+{
+  "at": "2026-10-25T13:12:46.718941+08:00",
+  "parent": "executor-bin-dense",
+  "candidate": "executor-table-dense",
+  "factor": "Dense RGB-D hull only for table reference anchoring and tracking; original geometry thresholds unchanged",
+  "evidence": [
+    "heldout-seed2-table-diagnostic.json",
+    "heldout-seed2-table-dense-replay.json"
+  ],
+  "used_research_seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "fresh_reserved_seeds": [
+    4,
+    5
+  ],
+  "tests": 525,
+  "unchanged": [
+    "table_motion limits 8mm/30mm/15mm/2deg",
+    "four visible exterior edges",
+    "collision envelope and 3mm margin",
+    "A+C",
+    "phase budgets",
+    "production and v63"
+  ],
+  "validation_order": [
+    "seed2 two-parcel regression",
+    "seed0 full4 development",
+    "seed2 full4 regression",
+    "freeze then fresh4/5 baseline and A+C"
+  ],
+  "source_hashes": {
+    "scene1/visual_pickup.py": "7590d8c47e004551ba4f537b6bd8cb503453f16ebd02ee4a1e93ff32103bb592",
+    "tests/fixtures/table_dense_seed2.json": "998e3b13d4a2988ccf64fcecb19111548af16d7dfb2fe06add1521fac4778bbf",
+    "tests/fixtures/table_dense_seed2_failure.npz": "980fa61c57663edba466e61fd95321c2c0a0bc9b02424ba7b43f6a6dd310b004",
+    "tests/fixtures/table_dense_seed2_reference.npz": "9211051f37808e0501f2687b7ebd676d4253e7e2646711ab16956ad0f0395ac1",
+    "tests/test_table_reference.py": "365c98225f3958622f9a06a35bb6ce693f1f17c68c267db5c9acf6121165bebd"
+  }
+}

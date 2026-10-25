@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-23T19:05:19.522464+08:00",
+  "candidate": "executor-context",
+  "parent": "executor-physical",
+  "manifest_sha256": "84d4379568699e1906e06556de8fb0b3f1531ffecf03b4a1ec2edbcbe35c6d9b",
+  "factor": "Centralize ResidualAssist creation so every parcel receives same actual MotionFilter alpha, approachvelocity and10Hz period",
+  "evidence": "executor-physical-c-p2-s0 completed1parcel and second release, but second controller had no retreat_motion_config; no retreat action sent at3373",
+  "tests": {
+    "count": 409,
+    "passed": true,
+    "log": "tests-executor-context.log",
+    "real_second_parcel_regression": true
+  },
+  "parameters_changed": false,
+  "path_changed": false,
+  "next_trial": "executor-context-c-p2-s0",
+  "controller": "C unchanged",
+  "production_promoted": false
+}

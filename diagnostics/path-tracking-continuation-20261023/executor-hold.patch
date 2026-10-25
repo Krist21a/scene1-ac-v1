@@ -1,0 +1,131 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -247,6 +247,8 @@
+   release_clearance_rise_m: 0.07
+   release_measured_reference_hold: true
+   release_reference_mode: measured_physical
++  release_cartesian_open_hold: true
++  release_open_hold_position_gain: 2.0
+   release_retreat_ready_m: 0.014
+   max_short_retreat_steps: 140
+   max_open_joint_delta_rad: 0.025
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -690,6 +690,29 @@
+             if p['steps'] <= self.wrist_config.get('release_open_dwell_steps', 12) or measured[15] > .1:
+                 if p['steps'] >= 40:
+                     raise RuntimeError('Right gripper did not open before retreat')
++                if self.wrist_config.get('release_cartesian_open_hold', False):
++                    position=np.asarray(pose.pos_xyz)
++                    rotation=Rotation.from_quat(pose.quat_xyzw)
++                    error=p['release_hold_position']-position
++                    angular=(p['release_hold_rotation']*rotation.inv()).as_rotvec()
++                    velocity=position-p.get('hold_last_position',position)
++                    angular_velocity=(rotation*p.get('hold_last_rotation',rotation).inv()).as_rotvec()
++                    position_gain=self.wrist_config.get('release_open_hold_position_gain',1.)
++                    if not np.isfinite(position_gain) or position_gain<=0:
++                        raise ValueError('Opening hold position gain must be positive and finite')
++                    # Compensate measured unload drift while fingers open.
++                    # Same incremental corrector, step limit and downstream
++                    # MotionFilter; the original open dwell/budget is retained.
++                    result=self._correct(p['base'],measured,side,position_gain*error-1.5*velocity,
++                                         angular-4.*angular_velocity)
++                    result[15]=0.
++                    p['hold_last_position']=position.copy()
++                    p['hold_last_rotation']=rotation
++                    info['release_pose_hold']=dict(position_error_m=float(np.linalg.norm(error)),
++                        angular_error_degrees=float(np.rad2deg(np.linalg.norm(angular))),
++                        position_gain=float(position_gain),
++                        position_goal_m=p['release_hold_position'].tolist(),
++                        measured_gripper=float(measured[15]))
+                 return result, info
+             if p.get('goal') is None:
+                 if self.wrist_config.get('release_geometry_reobserve', False):
+@@ -1094,7 +1117,9 @@
+                     active_reference_source='measured_physical_release' if visual_reference else 'original_act')
+                 self.offset[8:15] = result[8:15]-reference[8:15]
+                 self.unwinding_placement = bool(np.max(np.abs(self.offset[8:15])) > self.config['max_joint_offset_rad'])
+-                self._begin('short_retreat', 1, reference, surface=copy.deepcopy(p['surface']), extent=extent)
++                self._begin('short_retreat', 1, reference, surface=copy.deepcopy(p['surface']), extent=extent,
++                            release_hold_position=np.asarray(pose.pos_xyz).copy(),
++                            release_hold_rotation=Rotation.from_quat(pose.quat_xyzw))
+                 info['state'] = 'weighing_release'
+                 return result, info
+             seen = self._observe_box(snapshot, poses)
+--- a/tests/test_release_open_hold.py
++++ b/tests/test_release_open_hold.py
+@@ -0,0 +1,74 @@
++import unittest
++import numpy as np
++from scipy.spatial.transform import Rotation
++import test_residual as original
++
++
++class ReleaseOpenHoldTests(unittest.TestCase):
++    setUp = original.ResidualTests.setUp
++
++    def fixture(self):
++        self.a.wrist_config = dict(release_cartesian_open_hold=True,
++            release_open_hold_position_gain=2., release_open_dwell_steps=12)
++        self.a._begin('short_retreat', 1, self.raw.copy(),
++            release_hold_position=self.measured[8:11].copy(),
++            release_hold_rotation=Rotation.identity())
++
++    def test_stationary_feedback_keeps_pose_and_original_twelve_step_dwell(self):
++        self.fixture()
++        for index in range(12):
++            result, info = self.a._pending_action(self.measured, None)
++            np.testing.assert_array_equal(result, self.raw)
++            self.assertEqual(info['phase_steps'], index + 1)
++            self.assertEqual(info['release_pose_hold']['position_error_m'], 0.)
++            self.assertIsNone(self.a.pending.get('goal'))
++
++    def test_downward_drift_requests_upward_correction_without_moving_other_arm(self):
++        self.fixture()
++        self.measured[10] -= .02
++        before = self.a.offset.copy()
++        result, info = self.a._pending_action(self.measured, None)
++        self.assertGreater(result[10], self.raw[10])
++        self.assertLessEqual(np.max(abs(self.a.offset-before)),
++                             self.a.config['max_joint_step_rad'] + 1e-12)
++        np.testing.assert_array_equal(result[:8], self.raw[:8])
++        self.assertEqual(result[15], 0.)
++        self.assertAlmostEqual(info['release_pose_hold']['position_error_m'], .02)
++
++    def test_recovering_velocity_reduces_correction(self):
++        self.fixture()
++        self.measured[10] -= .01
++        slow, _ = self.a._pending_action(self.measured, None)
++        self.a.offset[:] = 0.
++        self.a.pending['hold_last_position'] = self.measured[8:11] - [0., 0., .005]
++        moving, _ = self.a._pending_action(self.measured, None)
++        self.assertGreater(moving[10], self.raw[10])
++        self.assertLess(moving[10], slow[10])
++
++    def test_joint_limit_is_enforced_during_hold(self):
++        self.fixture()
++        self.a.high[10] = self.raw[10]
++        self.measured[10] -= .02
++        for _ in range(12):
++            result, _ = self.a._pending_action(self.measured, None)
++            self.assertLessEqual(result[10], self.a.high[10])
++            self.assertTrue(np.all(result >= self.a.low))
++            self.assertTrue(np.all(result <= self.a.high))
++
++    def test_gripper_open_timeout_is_unchanged(self):
++        self.fixture()
++        self.a.pending['steps'] = 39
++        self.measured[15] = .2
++        with self.assertRaisesRegex(RuntimeError, 'gripper did not open'):
++            self.a._pending_action(self.measured, None)
++
++    def test_invalid_hold_gain_rejected_before_command(self):
++        for value in [0., -1., float('nan'), float('inf')]:
++            self.fixture()
++            self.a.wrist_config['release_open_hold_position_gain'] = value
++            with self.assertRaisesRegex(ValueError, 'positive and finite'):
++                self.a._pending_action(self.measured, None)
++
++
++if __name__ == '__main__':
++    unittest.main()

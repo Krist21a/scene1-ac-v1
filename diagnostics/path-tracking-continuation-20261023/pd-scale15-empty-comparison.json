@@ -1,0 +1,1230 @@
+{
+  "extended-ac-empty-s0": {
+    "tracking": {
+      "proximal": {
+        "rmse_rad": 0.002834344217106564,
+        "per_joint_rmse_rad": [
+          0.0022368528572285643,
+          0.0008103670696454655,
+          0.0016391484498142097,
+          0.005219997977361321,
+          0.002067314039907347,
+          0.0008032995122922458,
+          0.0016324157119058913,
+          0.004592255067959223
+        ],
+        "static_samples": 906,
+        "static_bias_rad": [
+          -0.002041788211692313,
+          7.837443449116882e-05,
+          4.735114524004123e-06,
+          0.004950187819787144,
+          -0.001887793963480176,
+          5.116492767662422e-05,
+          4.3201273385169905e-05,
+          0.004377999806676204
+        ],
+        "static_position_std_rad": [
+          0.0003655734797772621,
+          0.0001412889528692045,
+          0.0007062708600777162,
+          0.0009070668986782331,
+          0.0003550631240737263,
+          0.00014491044827607917,
+          0.0006724673369187652,
+          0.0008359153418298187
+        ],
+        "approximate_dynamic_lag_per_joint": [
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.9767771931006239,
+            "at_search_boundary": true
+          },
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.994095599469959,
+            "at_search_boundary": true
+          },
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.953141654865853,
+            "at_search_boundary": true
+          },
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.8025961424358672,
+            "at_search_boundary": true
+          },
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.9802799743847738,
+            "at_search_boundary": true
+          },
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.9941088471499143,
+            "at_search_boundary": true
+          },
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.9542077878381897,
+            "at_search_boundary": true
+          },
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.839120236263668,
+            "at_search_boundary": true
+          }
+        ]
+      },
+      "wrist": {
+        "rmse_rad": 0.013854784745015312,
+        "per_joint_rmse_rad": [
+          0.014767036866255672,
+          0.008826012659479727,
+          0.019418065260071105,
+          0.014845978007349367,
+          0.008993566818790067,
+          0.013319831798730813
+        ],
+        "static_samples": 906,
+        "static_bias_rad": [
+          -0.0019153107908098936,
+          -0.002587897693836384,
+          -0.017151302154964715,
+          0.0023630690881962335,
+          -0.002211217870393274,
+          -0.00911289963750991
+        ],
+        "static_position_std_rad": [
+          0.009924576292537107,
+          0.004499722736659474,
+          0.0050818492466415685,
+          0.009461951609242939,
+          0.0042004376438447445,
+          0.004575099614927792
+        ],
+        "approximate_dynamic_lag_per_joint": [
+          {
+            "sim_lag_s": 0.24,
+            "velocity_correlation": 0.9212397825194105,
+            "at_search_boundary": false
+          },
+          {
+            "sim_lag_s": 0.23,
+            "velocity_correlation": 0.9258805777000512,
+            "at_search_boundary": false
+          },
+          {
+            "sim_lag_s": 0.22,
+            "velocity_correlation": 0.8289545577915831,
+            "at_search_boundary": false
+          },
+          {
+            "sim_lag_s": 0.24,
+            "velocity_correlation": 0.9170407707240957,
+            "at_search_boundary": false
+          },
+          {
+            "sim_lag_s": 0.23,
+            "velocity_correlation": 0.9238996928045823,
+            "at_search_boundary": false
+          },
+          {
+            "sim_lag_s": 0.25,
+            "velocity_correlation": 0.8747409788328029,
+            "at_search_boundary": false
+          }
+        ]
+      }
+    },
+    "metrics": {
+      "metadata": {
+        "kind": "metadata",
+        "run_id": "7544fb66-cedb-11f1-9082-c85ea94bd8c7",
+        "timestamp_semantics": "callback arrival, not controller application; unstamped vectors cannot be exactly synchronized",
+        "max_hz": 50,
+        "topics": {
+          "/sensors_data_raw": {
+            "type": "kuavo_msgs/sensorsData",
+            "md5": "35fff741b8e115992c1ac46e99c1084f"
+          },
+          "/joint_cmd": {
+            "type": "kuavo_msgs/jointCmd",
+            "md5": "9ed16f87b9f90b25cdeeb417f3c21f9e"
+          },
+          "/kuavo_arm_traj": {
+            "type": "sensor_msgs/JointState",
+            "md5": "3066dcd76a6cfaef579bd0f34173e9fd"
+          },
+          "/humanoid_mpc_arm_commanded": {
+            "type": "ocs2_msgs/mpc_target_trajectories",
+            "md5": "2d8da69ddfcd018a998edad053f8c7b6"
+          },
+          "/humanoid_mpc_target_arm": {
+            "type": "ocs2_msgs/mpc_target_trajectories",
+            "md5": "2d8da69ddfcd018a998edad053f8c7b6"
+          },
+          "/humanoid_mpc_observation": {
+            "type": "ocs2_msgs/mpc_observation",
+            "md5": "c4075a25799f2a89c6d62b26e93cb66f"
+          },
+          "/humanoid/mpc/arm_control_mode": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/optimizedState_mrt_origin": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/optimizedInput_mrt_origin": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/optimizedState_wbc_mrt_origin": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/optimizedInput_wbc_mrt_origin": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/wbc_planned_joint_acc": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/torque": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/measuredRbdState_/joint_pos": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/measuredRbdState_/joint_vel": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/resetting_mpc_state_": {
+            "type": "std_msgs/Float64",
+            "md5": "fdb28210bfa9d7c91146260178d9a584"
+          },
+          "/monitor/time_cost/controller_loop_time": {
+            "type": "std_msgs/Float64",
+            "md5": "fdb28210bfa9d7c91146260178d9a584"
+          },
+          "/monitor/time_cost/wbc": {
+            "type": "std_msgs/Float64",
+            "md5": "fdb28210bfa9d7c91146260178d9a584"
+          },
+          "/monitor/time_cost/mpc": {
+            "type": "std_msgs/Float64",
+            "md5": "fdb28210bfa9d7c91146260178d9a584"
+          },
+          "/gripper/state": {
+            "type": "sensor_msgs/JointState",
+            "md5": "3066dcd76a6cfaef579bd0f34173e9fd"
+          },
+          "/scene1_tracking/wrist_pd": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/scene1_tracking/wrist_velocity_reference": {
+            "missing": true
+          }
+        },
+        "params": {
+          "/robot_version": 52,
+          "/taskFile": "/root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/mpc/task.info",
+          "/referenceFile": "/root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/command/reference.info",
+          "/is_rl_start": false,
+          "/use_external_mpc": true,
+          "/wbc_frequency": 1000
+        }
+      },
+      "counts": {
+        "kind": "counts",
+        "counts": {
+          "received:/sensors_data_raw": 52764,
+          "received:/joint_cmd": 28408,
+          "received:/humanoid_mpc_observation": 28353,
+          "received:/humanoid/mpc/arm_control_mode": 2633,
+          "received:/humanoid_controller/optimizedState_mrt_origin": 28381,
+          "received:/humanoid_controller/optimizedInput_mrt_origin": 28376,
+          "received:/humanoid_controller/optimizedState_wbc_mrt_origin": 28370,
+          "received:/humanoid_controller/optimizedInput_wbc_mrt_origin": 28365,
+          "received:/humanoid_controller/wbc_planned_joint_acc": 28358,
+          "received:/humanoid_controller/torque": 28354,
+          "received:/humanoid_controller/resetting_mpc_state_": 28342,
+          "received:/monitor/time_cost/controller_loop_time": 28340,
+          "received:/monitor/time_cost/wbc": 28337,
+          "received:/monitor/time_cost/mpc": 2628,
+          "received:/gripper/state": 52600,
+          "received:/scene1_tracking/wrist_pd": 28322,
+          "received:/kuavo_arm_traj": 984,
+          "received:/humanoid_mpc_target_arm": 984,
+          "received:/humanoid_mpc_arm_commanded": 984
+        }
+      },
+      "alignment": "nearest callback arrival; unstamped WBC vectors; <=25ms included; not exact controller-cycle alignment",
+      "timestamp_pair_error_ms_p95": 10.018737000791589,
+      "topics": {
+        "/sensors_data_raw": 2561,
+        "/joint_cmd": 2510,
+        "/humanoid_mpc_observation": 2509,
+        "/humanoid/mpc/arm_control_mode": 1777,
+        "/humanoid_controller/optimizedState_mrt_origin": 2507,
+        "/humanoid_controller/optimizedInput_mrt_origin": 2504,
+        "/humanoid_controller/optimizedState_wbc_mrt_origin": 2506,
+        "/humanoid_controller/optimizedInput_wbc_mrt_origin": 2507,
+        "/humanoid_controller/wbc_planned_joint_acc": 2507,
+        "/humanoid_controller/torque": 2508,
+        "/humanoid_controller/resetting_mpc_state_": 2505,
+        "/monitor/time_cost/controller_loop_time": 2504,
+        "/monitor/time_cost/wbc": 2506,
+        "/monitor/time_cost/mpc": 1765,
+        "/gripper/state": 2548,
+        "/scene1_tracking/wrist_pd": 2502,
+        "/kuavo_arm_traj": 984,
+        "/humanoid_mpc_target_arm": 984,
+        "/humanoid_mpc_arm_commanded": 984
+      },
+      "segments": [
+        {
+          "name": "proximal_out",
+          "joints": [
+            0,
+            7
+          ],
+          "samples": 338,
+          "ramp_command_rmse_rad": 0.042675223559361306,
+          "ramp_command_rmse_bias_removed_rad": 0.02859472502059354,
+          "ramp_wbc_rmse_rad": 0.001545448633070601,
+          "static_bias_rad": [
+            -0.015084429120215901,
+            -0.01313449363502846
+          ],
+          "static_abs_bias_mean_rad": 0.01410946137762218,
+          "static_speed_p95_rad_s": 3.817532544847881e-05,
+          "static_position_std_rad": 6.684194278313864e-06,
+          "settle_within_1deg_s": 0.3991342359986447,
+          "overshoot_rad": 0.0,
+          "wbc_reference_speed_abs_mean_rad_s": [
+            0.2908956007064134,
+            0.2812982263128179
+          ],
+          "observed_speed_abs_mean_rad_s": [
+            0.1290489001399646,
+            0.12960982453303824
+          ],
+          "actuator_force_abs_peak_nm": [
+            2.7339318282597467,
+            2.743541245348712
+          ]
+        },
+        {
+          "name": "proximal_return",
+          "joints": [
+            0,
+            7
+          ],
+          "samples": 339,
+          "ramp_command_rmse_rad": 0.01364715531361441,
+          "ramp_command_rmse_bias_removed_rad": 0.02498822643144282,
+          "ramp_wbc_rmse_rad": 0.003919532671368688,
+          "static_bias_rad": [
+            -0.012374850141312172,
+            -0.010740050909421138
+          ],
+          "static_abs_bias_mean_rad": 0.011557450525366655,
+          "static_speed_p95_rad_s": 5.503877144434098e-05,
+          "static_position_std_rad": 8.417360225715997e-06,
+          "settle_within_1deg_s": 0.008763855999859516,
+          "overshoot_rad": 0.016436616320628067,
+          "wbc_reference_speed_abs_mean_rad_s": [
+            0.07901533646251853,
+            0.0917049570052734
+          ],
+          "observed_speed_abs_mean_rad_s": [
+            0.12876186731430792,
+            0.12911081903223373
+          ],
+          "actuator_force_abs_peak_nm": [
+            2.66161535479242,
+            2.674372282188163
+          ]
+        },
+        {
+          "name": "distal_out",
+          "joints": [
+            4,
+            5,
+            6,
+            11,
+            12,
+            13
+          ],
+          "samples": 339,
+          "ramp_command_rmse_rad": 0.047168686569368234,
+          "ramp_command_rmse_bias_removed_rad": 0.04840639239049348,
+          "ramp_wbc_rmse_rad": 0.03894921903037023,
+          "static_bias_rad": [
+            0.014876406864277176,
+            -0.011680672748171363,
+            -0.015868678191844104,
+            -0.013017800967373766,
+            -0.010589665611726872,
+            -0.0046752347826365705
+          ],
+          "static_abs_bias_mean_rad": 0.011784743194338308,
+          "static_speed_p95_rad_s": 0.0003711477638740596,
+          "static_position_std_rad": 5.289455471446724e-05,
+          "settle_within_1deg_s": 0.43901231799827656,
+          "overshoot_rad": 0.015520764897743844,
+          "wbc_reference_speed_abs_mean_rad_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "observed_speed_abs_mean_rad_s": [
+            0.1547758098642656,
+            0.11832470889153451,
+            0.13643103039754426,
+            0.15230540363071207,
+            0.11730336060616028,
+            0.11351487425317824
+          ],
+          "actuator_force_abs_peak_nm": [
+            0.06706327375463556,
+            0.18514154399773974,
+            0.18978596110614435,
+            0.0387880114544894,
+            0.09487499547582313,
+            0.2822219138488446
+          ]
+        },
+        {
+          "name": "distal_return",
+          "joints": [
+            4,
+            5,
+            6,
+            11,
+            12,
+            13
+          ],
+          "samples": 340,
+          "ramp_command_rmse_rad": 0.03979474824153838,
+          "ramp_command_rmse_bias_removed_rad": 0.04627290075980486,
+          "ramp_wbc_rmse_rad": 0.031833429860996014,
+          "static_bias_rad": [
+            -0.013039487108944594,
+            -0.0008421032122698928,
+            -0.011438155305585743,
+            0.013458315628872656,
+            -0.001510076190566757,
+            -0.005092756693475876
+          ],
+          "static_abs_bias_mean_rad": 0.007563482356619252,
+          "static_speed_p95_rad_s": 0.00024950219540802724,
+          "static_position_std_rad": 4.201131419193715e-05,
+          "settle_within_1deg_s": 0.2606170299986843,
+          "overshoot_rad": 0.013895951429387913,
+          "wbc_reference_speed_abs_mean_rad_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "observed_speed_abs_mean_rad_s": [
+            0.17699182691463894,
+            0.11726347081312491,
+            0.11941616144187808,
+            0.17536697502674337,
+            0.1187320969231312,
+            0.12528946312135375
+          ],
+          "actuator_force_abs_peak_nm": [
+            0.10371236406798265,
+            0.1801495783440146,
+            0.1979785480365433,
+            0.0534575324030395,
+            0.09716282974560787,
+            0.2811769978792486
+          ]
+        },
+        {
+          "name": "proximal_elbow_out",
+          "joints": [
+            1,
+            2,
+            3,
+            8,
+            9,
+            10
+          ],
+          "samples": 339,
+          "ramp_command_rmse_rad": 0.05070668715618972,
+          "ramp_command_rmse_bias_removed_rad": 0.028459407215911475,
+          "ramp_wbc_rmse_rad": 0.004949753039129008,
+          "static_bias_rad": [
+            0.0025624322135712274,
+            -0.0194851026495137,
+            0.045185055618180994,
+            -0.002898401907167173,
+            0.01938168199416892,
+            0.0392701658305626
+          ],
+          "static_abs_bias_mean_rad": 0.0214638067021941,
+          "static_speed_p95_rad_s": 6.410508107111728e-05,
+          "static_position_std_rad": 1.076705204868873e-05,
+          "settle_within_1deg_s": null,
+          "overshoot_rad": 0.009295170066979594,
+          "wbc_reference_speed_abs_mean_rad_s": [
+            0.06520297519932933,
+            0.3950531549784739,
+            0.4798168305667328,
+            0.06648297454761827,
+            0.39844224735768013,
+            0.4485602045494966
+          ],
+          "observed_speed_abs_mean_rad_s": [
+            0.09358283451130338,
+            0.04700547293707396,
+            0.08116070311384406,
+            0.09351130787821284,
+            0.046845264914089066,
+            0.08698186017458887
+          ],
+          "actuator_force_abs_peak_nm": [
+            2.2374240711694853,
+            0.361459831186276,
+            1.5360780497023268,
+            2.2830740603381567,
+            0.37387697622769245,
+            1.5541358994840873
+          ]
+        },
+        {
+          "name": "proximal_elbow_return",
+          "joints": [
+            1,
+            2,
+            3,
+            8,
+            9,
+            10
+          ],
+          "samples": 339,
+          "ramp_command_rmse_rad": 0.024421370353244317,
+          "ramp_command_rmse_bias_removed_rad": 0.02385599584766408,
+          "ramp_wbc_rmse_rad": 0.003777279081168278,
+          "static_bias_rad": [
+            -0.0008777617543278839,
+            0.008018556434482592,
+            0.0345919136090327,
+            0.000632914571253161,
+            -0.006875502500381457,
+            0.030008753915829932
+          ],
+          "static_abs_bias_mean_rad": 0.013500900464217954,
+          "static_speed_p95_rad_s": 0.00012975236863696466,
+          "static_position_std_rad": 1.8694021749667755e-05,
+          "settle_within_1deg_s": null,
+          "overshoot_rad": 0.03470451484467896,
+          "wbc_reference_speed_abs_mean_rad_s": [
+            0.09219714848372752,
+            0.23704704340134816,
+            0.13881888079896482,
+            0.09085148040741828,
+            0.23230220967265391,
+            0.09536579862452169
+          ],
+          "observed_speed_abs_mean_rad_s": [
+            0.0943586778347633,
+            0.05082996488924553,
+            0.08776327725127438,
+            0.0943765099611499,
+            0.05247332434925089,
+            0.08865180355504816
+          ],
+          "actuator_force_abs_peak_nm": [
+            2.178832658886493,
+            0.3523449319057079,
+            1.4979818889169718,
+            2.2309885417000084,
+            0.36525011191624124,
+            1.51760156523377
+          ]
+        }
+      ],
+      "task_success": null,
+      "independent_full_success": false,
+      "missing": [
+        "QP active constraint flags",
+        "actuator application timestamp"
+      ],
+      "/monitor/time_cost/controller_loop_time": {
+        "p50": 1.9298791885375977,
+        "p95": 2.960813045501709,
+        "max": 5.866527557373047
+      },
+      "/monitor/time_cost/wbc": {
+        "p50": 1.2604185,
+        "p95": 1.871372,
+        "max": 3.076231
+      },
+      "/monitor/time_cost/mpc": {
+        "p50": 18.970211,
+        "p95": 22.6946908,
+        "max": 38.545467
+      }
+    },
+    "pd": {
+      "samples": 2502,
+      "enabled_samples": 2415,
+      "raw_added_torque_clip_samples": 0,
+      "total_torque_clip_samples": 0,
+      "longest_observed_continuous_clip_s": 0.0,
+      "wrist_added_peak_nm": [
+        0.05407870948704324,
+        0.03798931938239787,
+        0.04975821343736048,
+        0.05599319271622383,
+        0.039664044198671575,
+        0.04110352075754098
+      ],
+      "wrist_command_peak_nm": [
+        0.10452951774477776,
+        0.20864684133694966,
+        0.28020762709996866,
+        0.05347503500885656,
+        0.20714917877573866,
+        0.2834986812488568
+      ],
+      "proximal_added_peak_nm": 0.0,
+      "exact_cycle_addition_identity_max_error_nm": 0.0,
+      "exact_cycle_pd_clip_formula_max_error_nm": 0.0,
+      "limitation": "50Hz recorded output; transient events between samples not excluded. Raw and total command are controller diagnostics, actuator force is in sensors_data_raw."
+    }
+  },
+  "pd-scale-j-empty-s0-1024": {
+    "tracking": {
+      "proximal": {
+        "rmse_rad": 0.002776474126943966,
+        "per_joint_rmse_rad": [
+          0.0022026651733666504,
+          0.0008339145687003282,
+          0.0016292052608028146,
+          0.005064453588997786,
+          0.002042494142323802,
+          0.0008263545420697967,
+          0.0016150470577610955,
+          0.004511906488449394
+        ],
+        "static_samples": 1000,
+        "static_bias_rad": [
+          -0.00205487458486146,
+          0.00012271557086926396,
+          -0.0002930433978159411,
+          0.004955024543620505,
+          -0.0018952558587814851,
+          -7.179394467858913e-06,
+          0.0003388300352480694,
+          0.0044220247482373845
+        ],
+        "static_position_std_rad": [
+          0.0003571199148131642,
+          0.00019721748366172012,
+          0.001125982417864432,
+          0.0009386176641202053,
+          0.0003422706339044393,
+          0.00020528734977913674,
+          0.0010903851468012774,
+          0.0008569926250068266
+        ],
+        "approximate_dynamic_lag_per_joint": [
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.9761258964741016,
+            "at_search_boundary": true
+          },
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.9919469833192109,
+            "at_search_boundary": true
+          },
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.9531424876734954,
+            "at_search_boundary": true
+          },
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.8154662090842515,
+            "at_search_boundary": true
+          },
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.9796888573527495,
+            "at_search_boundary": true
+          },
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.992020326210699,
+            "at_search_boundary": true
+          },
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.9545151945492218,
+            "at_search_boundary": true
+          },
+          {
+            "sim_lag_s": 0.0,
+            "velocity_correlation": 0.8466262675928151,
+            "at_search_boundary": true
+          }
+        ]
+      },
+      "wrist": {
+        "rmse_rad": 0.010256727980340219,
+        "per_joint_rmse_rad": [
+          0.009712524585405311,
+          0.007063686067558102,
+          0.014575351821140961,
+          0.009527263467699389,
+          0.007127584503362217,
+          0.011530911835040661
+        ],
+        "static_samples": 1000,
+        "static_bias_rad": [
+          -0.0016956159298488313,
+          -0.0017882340769373357,
+          -0.01168259273457944,
+          0.0018279030198621862,
+          -0.0014999548971500536,
+          -0.007395904047560296
+        ],
+        "static_position_std_rad": [
+          0.004807109707708795,
+          0.0028308781496433465,
+          0.003893144832165647,
+          0.004075836885334401,
+          0.0030024104595273043,
+          0.004906550775561163
+        ],
+        "approximate_dynamic_lag_per_joint": [
+          {
+            "sim_lag_s": 0.19,
+            "velocity_correlation": 0.9307002387188543,
+            "at_search_boundary": false
+          },
+          {
+            "sim_lag_s": 0.2,
+            "velocity_correlation": 0.9427157771292064,
+            "at_search_boundary": false
+          },
+          {
+            "sim_lag_s": 0.19,
+            "velocity_correlation": 0.8492615472044864,
+            "at_search_boundary": false
+          },
+          {
+            "sim_lag_s": 0.19,
+            "velocity_correlation": 0.9255448514075895,
+            "at_search_boundary": false
+          },
+          {
+            "sim_lag_s": 0.2,
+            "velocity_correlation": 0.9391138574413314,
+            "at_search_boundary": false
+          },
+          {
+            "sim_lag_s": 0.21,
+            "velocity_correlation": 0.889129413124703,
+            "at_search_boundary": false
+          }
+        ]
+      }
+    },
+    "metrics": {
+      "metadata": {
+        "kind": "metadata",
+        "run_id": "33d0b350-cf85-11f1-9ef1-c85ea94bd8c7",
+        "timestamp_semantics": "callback arrival, not controller application; unstamped vectors cannot be exactly synchronized",
+        "max_hz": 50,
+        "topics": {
+          "/sensors_data_raw": {
+            "type": "kuavo_msgs/sensorsData",
+            "md5": "35fff741b8e115992c1ac46e99c1084f"
+          },
+          "/joint_cmd": {
+            "type": "kuavo_msgs/jointCmd",
+            "md5": "9ed16f87b9f90b25cdeeb417f3c21f9e"
+          },
+          "/kuavo_arm_traj": {
+            "type": "sensor_msgs/JointState",
+            "md5": "3066dcd76a6cfaef579bd0f34173e9fd"
+          },
+          "/humanoid_mpc_arm_commanded": {
+            "type": "ocs2_msgs/mpc_target_trajectories",
+            "md5": "2d8da69ddfcd018a998edad053f8c7b6"
+          },
+          "/humanoid_mpc_target_arm": {
+            "type": "ocs2_msgs/mpc_target_trajectories",
+            "md5": "2d8da69ddfcd018a998edad053f8c7b6"
+          },
+          "/humanoid_mpc_observation": {
+            "type": "ocs2_msgs/mpc_observation",
+            "md5": "c4075a25799f2a89c6d62b26e93cb66f"
+          },
+          "/humanoid/mpc/arm_control_mode": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/optimizedState_mrt_origin": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/optimizedInput_mrt_origin": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/optimizedState_wbc_mrt_origin": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/optimizedInput_wbc_mrt_origin": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/wbc_planned_joint_acc": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/torque": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/measuredRbdState_/joint_pos": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/measuredRbdState_/joint_vel": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/humanoid_controller/resetting_mpc_state_": {
+            "type": "std_msgs/Float64",
+            "md5": "fdb28210bfa9d7c91146260178d9a584"
+          },
+          "/monitor/time_cost/controller_loop_time": {
+            "type": "std_msgs/Float64",
+            "md5": "fdb28210bfa9d7c91146260178d9a584"
+          },
+          "/monitor/time_cost/wbc": {
+            "type": "std_msgs/Float64",
+            "md5": "fdb28210bfa9d7c91146260178d9a584"
+          },
+          "/monitor/time_cost/mpc": {
+            "type": "std_msgs/Float64",
+            "md5": "fdb28210bfa9d7c91146260178d9a584"
+          },
+          "/gripper/state": {
+            "type": "sensor_msgs/JointState",
+            "md5": "3066dcd76a6cfaef579bd0f34173e9fd"
+          },
+          "/scene1_tracking/wrist_pd": {
+            "type": "std_msgs/Float64MultiArray",
+            "md5": "4b7d974086d4060e7db4613a7e6c3ba4"
+          },
+          "/scene1_tracking/wrist_velocity_reference": {
+            "missing": true
+          }
+        },
+        "params": {
+          "/robot_version": 52,
+          "/taskFile": "/root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/mpc/task.info",
+          "/referenceFile": "/root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/command/reference.info",
+          "/is_rl_start": false,
+          "/use_external_mpc": true,
+          "/wbc_frequency": 1000
+        }
+      },
+      "counts": {
+        "kind": "counts",
+        "counts": {
+          "received:/sensors_data_raw": 52800,
+          "received:/joint_cmd": 28564,
+          "received:/humanoid_mpc_observation": 28506,
+          "received:/humanoid/mpc/arm_control_mode": 2633,
+          "received:/humanoid_controller/optimizedState_mrt_origin": 28541,
+          "received:/humanoid_controller/optimizedInput_mrt_origin": 28538,
+          "received:/humanoid_controller/optimizedState_wbc_mrt_origin": 28533,
+          "received:/humanoid_controller/optimizedInput_wbc_mrt_origin": 28528,
+          "received:/humanoid_controller/wbc_planned_joint_acc": 28523,
+          "received:/humanoid_controller/torque": 28520,
+          "received:/humanoid_controller/resetting_mpc_state_": 28506,
+          "received:/monitor/time_cost/controller_loop_time": 28501,
+          "received:/monitor/time_cost/wbc": 28498,
+          "received:/monitor/time_cost/mpc": 2629,
+          "received:/gripper/state": 52636,
+          "received:/scene1_tracking/wrist_pd": 28480,
+          "received:/kuavo_arm_traj": 983,
+          "received:/humanoid_mpc_target_arm": 983,
+          "received:/humanoid_mpc_arm_commanded": 983
+        }
+      },
+      "alignment": "nearest callback arrival; unstamped WBC vectors; <=25ms included; not exact controller-cycle alignment",
+      "timestamp_pair_error_ms_p95": 10.02660879967152,
+      "topics": {
+        "/sensors_data_raw": 2569,
+        "/joint_cmd": 2517,
+        "/humanoid_mpc_observation": 2514,
+        "/humanoid/mpc/arm_control_mode": 1769,
+        "/humanoid_controller/optimizedState_mrt_origin": 2513,
+        "/humanoid_controller/optimizedInput_mrt_origin": 2512,
+        "/humanoid_controller/optimizedState_wbc_mrt_origin": 2512,
+        "/humanoid_controller/optimizedInput_wbc_mrt_origin": 2509,
+        "/humanoid_controller/wbc_planned_joint_acc": 2515,
+        "/humanoid_controller/torque": 2513,
+        "/humanoid_controller/resetting_mpc_state_": 2513,
+        "/monitor/time_cost/controller_loop_time": 2508,
+        "/monitor/time_cost/wbc": 2514,
+        "/monitor/time_cost/mpc": 1740,
+        "/gripper/state": 2555,
+        "/scene1_tracking/wrist_pd": 2510,
+        "/kuavo_arm_traj": 983,
+        "/humanoid_mpc_target_arm": 983,
+        "/humanoid_mpc_arm_commanded": 983
+      },
+      "segments": [
+        {
+          "name": "proximal_out",
+          "joints": [
+            0,
+            7
+          ],
+          "samples": 339,
+          "ramp_command_rmse_rad": 0.04205779599955208,
+          "ramp_command_rmse_bias_removed_rad": 0.027982306683438655,
+          "ramp_wbc_rmse_rad": 0.0014850893069724978,
+          "static_bias_rad": [
+            -0.015046708767536277,
+            -0.013203487804958662
+          ],
+          "static_abs_bias_mean_rad": 0.01412509828624747,
+          "static_speed_p95_rad_s": 4.275754103947039e-05,
+          "static_position_std_rad": 7.041009048954771e-06,
+          "settle_within_1deg_s": 0.3864294879967929,
+          "overshoot_rad": 0.0,
+          "wbc_reference_speed_abs_mean_rad_s": [
+            0.2874651525690471,
+            0.27900916296095507
+          ],
+          "observed_speed_abs_mean_rad_s": [
+            0.12887581090762706,
+            0.12941123627013223
+          ],
+          "actuator_force_abs_peak_nm": [
+            2.7333599272814224,
+            2.7444992591456128
+          ]
+        },
+        {
+          "name": "proximal_return",
+          "joints": [
+            0,
+            7
+          ],
+          "samples": 339,
+          "ramp_command_rmse_rad": 0.012544350596744108,
+          "ramp_command_rmse_bias_removed_rad": 0.023717092659066605,
+          "ramp_wbc_rmse_rad": 0.003653829166532379,
+          "static_bias_rad": [
+            -0.012151986943735605,
+            -0.010692185223187722
+          ],
+          "static_abs_bias_mean_rad": 0.011422086083461663,
+          "static_speed_p95_rad_s": 8.033739682608344e-05,
+          "static_position_std_rad": 1.418704617941322e-05,
+          "settle_within_1deg_s": 0.009654223998950329,
+          "overshoot_rad": 0.016433910714379246,
+          "wbc_reference_speed_abs_mean_rad_s": [
+            0.0683014015755467,
+            0.07983600811923694
+          ],
+          "observed_speed_abs_mean_rad_s": [
+            0.119757408026234,
+            0.12013898048792614
+          ],
+          "actuator_force_abs_peak_nm": [
+            2.6562511174711694,
+            2.6695015530090083
+          ]
+        },
+        {
+          "name": "distal_out",
+          "joints": [
+            4,
+            5,
+            6,
+            11,
+            12,
+            13
+          ],
+          "samples": 338,
+          "ramp_command_rmse_rad": 0.03856341856372019,
+          "ramp_command_rmse_bias_removed_rad": 0.03766028768071577,
+          "ramp_wbc_rmse_rad": 0.03026046490877816,
+          "static_bias_rad": [
+            0.007155689223171024,
+            -0.007948464917128278,
+            -0.009743592615919922,
+            -0.005252828920732435,
+            -0.00799603102480612,
+            -0.0029101167867337076
+          ],
+          "static_abs_bias_mean_rad": 0.006834453914748582,
+          "static_speed_p95_rad_s": 0.00024430577223225053,
+          "static_position_std_rad": 4.2007211706618395e-05,
+          "settle_within_1deg_s": 0.32413340200218954,
+          "overshoot_rad": 0.007610614717759284,
+          "wbc_reference_speed_abs_mean_rad_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "observed_speed_abs_mean_rad_s": [
+            0.17032148833933125,
+            0.1275371250124085,
+            0.14046731394643244,
+            0.16960541490278516,
+            0.12764857252419684,
+            0.12489392336044701
+          ],
+          "actuator_force_abs_peak_nm": [
+            0.06314449048870073,
+            0.19112652863760454,
+            0.18412182954946726,
+            0.04255500935424897,
+            0.09541860509109436,
+            0.2846992222885416
+          ]
+        },
+        {
+          "name": "distal_return",
+          "joints": [
+            4,
+            5,
+            6,
+            11,
+            12,
+            13
+          ],
+          "samples": 339,
+          "ramp_command_rmse_rad": 0.0324709648741613,
+          "ramp_command_rmse_bias_removed_rad": 0.03578675050106967,
+          "ramp_wbc_rmse_rad": 0.024604222144899816,
+          "static_bias_rad": [
+            -0.0065091250436047484,
+            -0.001095640993704341,
+            -0.008342505971601865,
+            0.006175889693846957,
+            -0.0009954358502484253,
+            -0.0034850031360705576
+          ],
+          "static_abs_bias_mean_rad": 0.004433933448179482,
+          "static_speed_p95_rad_s": 0.00015648983856582873,
+          "static_position_std_rad": 3.442906504422522e-05,
+          "settle_within_1deg_s": 0.19685128400305985,
+          "overshoot_rad": 0.008506517895239141,
+          "wbc_reference_speed_abs_mean_rad_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "observed_speed_abs_mean_rad_s": [
+            0.17583928580791594,
+            0.12628475277804227,
+            0.13125155221325363,
+            0.174841850766721,
+            0.12696948235169908,
+            0.13279234212047564
+          ],
+          "actuator_force_abs_peak_nm": [
+            0.11056799646145929,
+            0.18304127675007045,
+            0.20054401906278685,
+            0.058247242890616946,
+            0.09840025018516324,
+            0.2817508732991625
+          ]
+        },
+        {
+          "name": "proximal_elbow_out",
+          "joints": [
+            1,
+            2,
+            3,
+            8,
+            9,
+            10
+          ],
+          "samples": 340,
+          "ramp_command_rmse_rad": 0.05152157338840996,
+          "ramp_command_rmse_bias_removed_rad": 0.029680504802272068,
+          "ramp_wbc_rmse_rad": 0.005018213944453916,
+          "static_bias_rad": [
+            0.0026444647177856326,
+            -0.01998259135935369,
+            0.04357158210239286,
+            -0.002996268093714432,
+            0.01985438675504426,
+            0.037973202905772656
+          ],
+          "static_abs_bias_mean_rad": 0.02117041598901059,
+          "static_speed_p95_rad_s": 5.9893887510009e-05,
+          "static_position_std_rad": 1.1608515094965589e-05,
+          "settle_within_1deg_s": null,
+          "overshoot_rad": 0.010461217607856205,
+          "wbc_reference_speed_abs_mean_rad_s": [
+            0.0664694818034149,
+            0.4083558581816943,
+            0.48093356355257333,
+            0.06799653274111367,
+            0.4105742561146318,
+            0.44831549163673734
+          ],
+          "observed_speed_abs_mean_rad_s": [
+            0.09616381599312916,
+            0.04538092625915793,
+            0.08530277499843192,
+            0.09631544523143636,
+            0.044945442827226775,
+            0.0880876072991084
+          ],
+          "actuator_force_abs_peak_nm": [
+            2.2390825549041393,
+            0.3632977742542061,
+            1.5298276515991924,
+            2.2927078486865073,
+            0.37670345223021084,
+            1.5475331837315078
+          ]
+        },
+        {
+          "name": "proximal_elbow_return",
+          "joints": [
+            1,
+            2,
+            3,
+            8,
+            9,
+            10
+          ],
+          "samples": 339,
+          "ramp_command_rmse_rad": 0.023365685367603094,
+          "ramp_command_rmse_bias_removed_rad": 0.023156459554124872,
+          "ramp_wbc_rmse_rad": 0.003843955026993206,
+          "static_bias_rad": [
+            -0.0008728314684306159,
+            0.008054287767595097,
+            0.03371242388701112,
+            0.0005927557901480417,
+            -0.0065042589803871115,
+            0.02939849457319493
+          ],
+          "static_abs_bias_mean_rad": 0.013189175411127818,
+          "static_speed_p95_rad_s": 0.00014354583762823245,
+          "static_position_std_rad": 2.0657842808804137e-05,
+          "settle_within_1deg_s": null,
+          "overshoot_rad": 0.03382271007372445,
+          "wbc_reference_speed_abs_mean_rad_s": [
+            0.09628685886875483,
+            0.22491069512750345,
+            0.13492117506565898,
+            0.09512825751985353,
+            0.22005940477731803,
+            0.09407814950835337
+          ],
+          "observed_speed_abs_mean_rad_s": [
+            0.09184092321671065,
+            0.05176259521317357,
+            0.08572645161472557,
+            0.09189930587468884,
+            0.05354172573067137,
+            0.08673860697725976
+          ],
+          "actuator_force_abs_peak_nm": [
+            2.1818290753225575,
+            0.35292631196605284,
+            1.5085767303175854,
+            2.231395326234312,
+            0.36577933313709604,
+            1.527595314253261
+          ]
+        }
+      ],
+      "task_success": null,
+      "independent_full_success": false,
+      "missing": [
+        "QP active constraint flags",
+        "actuator application timestamp"
+      ],
+      "/monitor/time_cost/controller_loop_time": {
+        "p50": 1.8984079360961914,
+        "p95": 2.931511402130127,
+        "max": 9.392976760864258
+      },
+      "/monitor/time_cost/wbc": {
+        "p50": 1.227119,
+        "p95": 1.8793980999999995,
+        "max": 5.747385
+      },
+      "/monitor/time_cost/mpc": {
+        "p50": 19.1123575,
+        "p95": 23.011339399999997,
+        "max": 51.144467
+      }
+    },
+    "pd": {
+      "samples": 2510,
+      "enabled_samples": 2415,
+      "raw_added_torque_clip_samples": 0,
+      "total_torque_clip_samples": 0,
+      "longest_observed_continuous_clip_s": 0.0,
+      "wrist_added_peak_nm": [
+        0.06027222370554742,
+        0.04493346539492911,
+        0.05674364580738436,
+        0.061828870386344374,
+        0.04596738891336975,
+        0.04782952463566653
+      ],
+      "wrist_command_peak_nm": [
+        0.11026436193972897,
+        0.2086836842202479,
+        0.2773184868795156,
+        0.0582721414868227,
+        0.20520335154812896,
+        0.28488668062911815
+      ],
+      "proximal_added_peak_nm": 0.0,
+      "exact_cycle_addition_identity_max_error_nm": 0.0,
+      "exact_cycle_pd_clip_formula_max_error_nm": 0.0,
+      "limitation": "50Hz recorded output; transient events between samples not excluded. Raw and total command are controller diagnostics, actuator force is in sensors_data_raw."
+    }
+  }
+}

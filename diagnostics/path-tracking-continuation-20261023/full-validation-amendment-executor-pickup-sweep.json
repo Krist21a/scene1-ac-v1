@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-24T18:13:54.374687+08:00",
+  "parent": "executor-first-select",
+  "candidate": "executor-pickup-sweep",
+  "factor": "Fresh full pending and filtered reference sweep in visual clear/hover/descend; same sampled geometry/margins",
+  "evidence": "Existing visual descent only checks measured+a*(command-before_servo); omits accumulated command-measured difference. Shared final send guard now required.",
+  "development_seed": 0,
+  "unchanged": [
+    "all collision geometry/margins",
+    "paths",
+    "budgets",
+    "A+C"
+  ]
+}

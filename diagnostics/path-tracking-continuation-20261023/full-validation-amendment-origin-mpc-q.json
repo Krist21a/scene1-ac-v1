@@ -1,0 +1,21 @@
+{
+  "at": "2026-10-24T18:09:47.329660+08:00",
+  "candidate": "origin_mpc_q",
+  "factor": "A+C with stance proximal MPC Q200to400",
+  "path": "executor_first_select unchanged",
+  "reason": "Final right elbow published -.8750; MPC -1.0802; WBC -1.0775; measured -1.1129. Earlier E used erroneous first-knot indexing; this test isolates Q with A corrected.",
+  "unchanged": [
+    "WBC C1,.05 bounded.5Nm",
+    "all collision envelopes",
+    "table thresholds",
+    "budgets",
+    "task gains",
+    "normal MPC route"
+  ],
+  "validation": [
+    "empty probe",
+    "independent seed0 two parcels",
+    "full4 development then freeze and fresh2,3"
+  ],
+  "acceptance": false
+}

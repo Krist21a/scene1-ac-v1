@@ -1,0 +1,104 @@
+{
+  "at": "2026-10-23T15:49:24.461665+08:00",
+  "production_host": {
+    "files": 124,
+    "missing": [],
+    "mismatch": []
+  },
+  "production_snapshot": {
+    "files": 124,
+    "missing": [],
+    "mismatch": []
+  },
+  "baseline_official": {
+    "files": 4,
+    "missing": [],
+    "mismatch": []
+  },
+  "root_free_bytes": 4872486912,
+  "errors": [
+    "active processes: kuavo_challenge_container_GPU_046e4301"
+  ],
+  "production_container": {
+    "files": 124,
+    "missing": [],
+    "mismatch": []
+  },
+  "v63_backup": {
+    "files": 115,
+    "missing": [],
+    "mismatch": []
+  },
+  "restored_reference": {
+    "files": 2,
+    "missing": [],
+    "mismatch": []
+  },
+  "restored_executable_sha256": "155191dc393e6c92552e57a2c4af6d52833283bc22660e7d8788ba65424ce293",
+  "restored_controller_library": {
+    "files": 1,
+    "missing": [],
+    "mismatch": []
+  },
+  "restored_controller_library_sha256": "e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4",
+  "official_commit": "51b3defaf8c032957647c7aa193d1fa20daef1f3",
+  "official_git_status": "",
+  "containers": {
+    "kuavo-ros-noetic-s12-ready": {
+      "status": "running",
+      "image_id": "sha256:a0403e3ab7d651f5b87dfe9b2cccc23a2cb8f73dd030611190da2a0a0cecd97b",
+      "started_at": "2026-10-23T07:49:23.318059571Z",
+      "processes": [
+        "      1 /bin/bash",
+        "     30 ps -eo pid,args"
+      ],
+      "active_work_processes": [],
+      "mounts": []
+    },
+    "kuavo_challenge_container_GPU_046e4301": {
+      "status": "running",
+      "image_id": "sha256:8eafa6a83f9edeb93e28da7cabe6b930fcccd88f02b4c3b57668549b6bae7e50",
+      "started_at": "2026-10-23T07:49:24.400857256Z",
+      "processes": [
+        "      1 zsh",
+        "     74 curl --connect-timeout 2 -fsSL -H Accept: application/vnd.github.v3.sha https://api.github.com/repos/ohmyzsh/ohmyzsh/commits/master",
+        "     76 ps -eo pid,args"
+      ],
+      "active_work_processes": [
+        "     74 curl --connect-timeout 2 -fsSL -H Accept: application/vnd.github.v3.sha https://api.github.com/repos/ohmyzsh/ohmyzsh/commits/master"
+      ],
+      "mounts": [
+        {
+          "source": "/dev",
+          "destination": "/dev",
+          "type": "bind"
+        },
+        {
+          "source": "/home/krist/.ccache",
+          "destination": "/root/.ccache",
+          "type": "bind"
+        },
+        {
+          "source": "/home/krist/.config/lejuconfig",
+          "destination": "/root/.config/lejuconfig",
+          "type": "bind"
+        },
+        {
+          "source": "/home/krist/.ros",
+          "destination": "/root/.ros",
+          "type": "bind"
+        },
+        {
+          "source": "/home/krist/kuavo_course/workspace/leju-kuavo-challenge-cup-2026",
+          "destination": "/root/kuavo_ws",
+          "type": "bind"
+        },
+        {
+          "source": "/tmp/.X11-unix",
+          "destination": "/tmp/.X11-unix",
+          "type": "bind"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "at": "2026-10-22T16:53:18.059720+08:00",
+  "candidate": "reference-origin-v1",
+  "changed_factor": "joint indexing of the first knot in ROS arm -> MPC target trajectory",
+  "evidence": [
+    "runtime WBC state dimension 39: 12 centroidal + 12 legs + 1 waist + 14 arms",
+    "baseline commanded first knot starts with waist 0.0011476597; left shoulder is 0.1338365674; last right wrist absent",
+    "distal steady errors remain after 5s; this change is not claimed to remove them",
+    "distal WBC velocity zero is a separate verified finding, unchanged in this candidate"
+  ],
+  "hypothesis": "Repeated 10ms references incorrectly jump toward adjacent joints before reaching each target, creating avoidable transient reference motion and outer corrections",
+  "expected": "smaller start-knot jumps and dynamic tracking disturbances; static offsets may remain",
+  "risks": [
+    "different transient trajectory can change grasp/contact timing with fixed outer policy",
+    "no promise of lower total task duration; repeatable matched-seed simulation required"
+  ],
+  "fixed": [
+    "WBC gains 80/10.2",
+    "task weights accArm9",
+    "MPC costs",
+    "filters10Hz",
+    "direct_to_wbc=false",
+    "upper v69 config",
+    "all scene physics and limits"
+  ],
+  "validation_order": [
+    "empty probe matched v2",
+    "one parcel from official full reset covers loaded weighing handover and bin checks",
+    "full four parcels only on clear phase benefit"
+  ],
+  "backup": {
+    "baseline/vr-reference/HumanoidVRHandCommandNode.cpp": "8b09518831bc09f589312de98ee3bd7ddfda5b57838f5c7c5d7e6e8d88cb65c6",
+    "baseline/vr-reference/humanoid_VR_hand_control": "155191dc393e6c92552e57a2c4af6d52833283bc22660e7d8788ba65424ce293"
+  },
+  "candidate_source_sha256": "3dd05dbcbdcdb611cb1d0ac12408280ba9fe8e83af3c41d3cff441cfe6f201d2"
+}

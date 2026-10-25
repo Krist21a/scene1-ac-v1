@@ -1,0 +1,13 @@
+{
+  "recorded_at": "2026-10-23T16:21:56.449360+08:00",
+  "evidence": "path-reference-analysis.json and d-empty-s0/reference-analysis.json",
+  "change": "D: differentiate filtered wrist positions on sensor clock, bounded by existing 1 rad/s; all other parameters unchanged",
+  "design": [
+    "Original, C, D and D+C use identical fixed empty actions",
+    "C and D+C use frozen axis-sweep path for contact/two-parcel comparison",
+    "Only a candidate passing empty and contact proceeds to full development seed 0",
+    "Freeze before held-out seeds 1 and 2, retain every outcome"
+  ],
+  "known_result": "D alone repairs zero velocity reference but wrist static error persists; C static improvement and no material proximal static regression in empty probe",
+  "promotion": "Full successful task timing and tracking evidence required; null official success remains null"
+}

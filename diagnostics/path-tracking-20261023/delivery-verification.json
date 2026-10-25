@@ -1,0 +1,163 @@
+{
+  "at": "2026-10-23T18:09:17.184242+08:00",
+  "path_patches": [
+    {
+      "patch": "axis.patch",
+      "sha256": "e811d1bafef37e38a75a28e76282bf373082e8c094bba4440c89b498e8fe42cd",
+      "output": "patching file configs/visual_cycle_four_parcels.yaml\npatching file run_scene1.py\npatching file scene1/command_sweep.py\npatching file scene1/release_retreat.py\npatching file scene1/residual.py\npatching file tests/test_axis_retreat.py\n",
+      "files_verified": 133,
+      "candidate": "candidate-policy-axis",
+      "manifest_sha256": "bb2c07da29994201a4bdf206b6ade3acf1e27f7fdc0b4f387b9f6c3ede7af72e"
+    },
+    {
+      "patch": "axis-sweep.patch",
+      "sha256": "1dd10202906ecc753a410cb72ed5976664170bbd27844bf272ed404991380655",
+      "output": "patching file configs/visual_cycle_four_parcels.yaml\npatching file run_scene1.py\npatching file scene1/residual.py\npatching file tests/test_axis_retreat.py\n",
+      "files_verified": 133,
+      "candidate": "candidate-policy-axis-sweep",
+      "manifest_sha256": "57edf0b06d59bbbdf4945850ae4f36aeabe38bead9ddb324ce89260a23f29be4"
+    },
+    {
+      "patch": "preflight-feasibility.patch",
+      "sha256": "d9e4f13ead606fe409c9b457263b3cf734ee002f66c1724676e17f993aa2c3e3",
+      "output": "patching file run_scene1.py\npatching file scene1/release_retreat.py\npatching file tests/test_axis_retreat.py\n",
+      "files_verified": 133,
+      "candidate": "candidate-policy-axis-feasible",
+      "manifest_sha256": "a32fefc8cd398e7a544495f0b2a57483c0c3779dcd6632cf50e049d6d007dd37"
+    }
+  ],
+  "control_patches": [
+    {
+      "patch": "control-c.patch",
+      "sha256": "38838a631bdaf37b68229aab33bd1863ffe6438b1f499de0e31ae945211e502e",
+      "output": "patching file src/humanoid-control/humanoid_controllers/src/humanoidController.cpp\n",
+      "label": "C",
+      "source_sha256": "0a990a16a51255afb98118cd0088e0672d8874a368e567fca897b39248e7fb8d"
+    },
+    {
+      "patch": "candidate-velocity/change.patch",
+      "sha256": "2d1292c937d4328d21bb089c8e82ac1276a90d8eeb91a1d42c42e37f6ae191ce",
+      "output": "patching file humanoidController.cpp\npatching file wrist_velocity_reference.h\n",
+      "label": "D",
+      "source_sha256": "aa89430454bda4bd43ae4aaee5ed3cec8113c70bf02b184a27fa87d7bc4beb5f"
+    },
+    {
+      "patch": "candidate-velocity-pd/change.patch",
+      "sha256": "2d1292c937d4328d21bb089c8e82ac1276a90d8eeb91a1d42c42e37f6ae191ce",
+      "output": "patching file humanoidController.cpp\npatching file wrist_velocity_reference.h\n",
+      "label": "D+C",
+      "source_sha256": "7b9d1bed1744efab4b4d889f43185e980649270491919b3d9c8ac4ec949ee3f2"
+    },
+    {
+      "patch": "mpc-arm-q.patch",
+      "sha256": "077928002ac07a8c1c7bbf3fdcf3abe60ac3147491199dda4a516c12414666ab",
+      "output": "patching file src/humanoid-control/humanoid_controllers/config/kuavo_v52/mpc/dynamic_qr.info\n",
+      "label": "E",
+      "qr_sha256": "af1b24419d8b65e5c1d086e7efadf97bb1bd66053a6633e17f283621347f4e08"
+    }
+  ],
+  "experiments": [
+    {
+      "label": "c-empty-s0",
+      "status": "completed",
+      "version": "candidate",
+      "archive_manifest_sha256": "d61e631fd6f9877f6d47901655872ede334eb587fd27deda07a9ec02c83efdbd",
+      "runtime_sha256": "a107d41d47239fb1b7ff678e90e9beab7cab7fed60b780a23c75fa39c88163ea"
+    },
+    {
+      "label": "d-empty-s0",
+      "status": "completed",
+      "version": "velocity",
+      "archive_manifest_sha256": "174597e240f0d13254e2a2732d0861d6a53df1d60a89431bea09a4f6f64c7467",
+      "runtime_sha256": "35b296d5c7cdaa66d31e40bb65b2898f4d1271029b253ed2771c17ae30711194"
+    },
+    {
+      "label": "dc-empty-s0",
+      "status": "completed",
+      "version": "velocity_pd",
+      "archive_manifest_sha256": "8d7582586c9b580914f0f131a311c84db095c882a768bd204271bfd3f651149a",
+      "runtime_sha256": "6b0b9c0ce09d9d51efeac7c0ec7bf3d82236db336f66ee9f258b88e004ebc4c9"
+    },
+    {
+      "label": "e-empty-s0",
+      "status": "completed",
+      "version": "mpc_q",
+      "archive_manifest_sha256": "b36e4554185d14afba080ba56d56b292ce5cab82028519631ff1308337ff13d4",
+      "runtime_sha256": "041c230099d0c2ce3074d7d6240cbb88a6a03ff050074fed5352332390e7a957"
+    },
+    {
+      "label": "original-empty-s0",
+      "status": "completed",
+      "version": "baseline",
+      "archive_manifest_sha256": "8a42a78101e666f6683fb1f3c66745b9017a7ce0bec3ad6604519dde3b9d521a",
+      "runtime_sha256": "9a0e5b43785034e3d675b5997ae9c8c4b7b88060f5b76928ee0e7d59d2b328b0"
+    },
+    {
+      "label": "axis-sweep-e-p2-s0",
+      "status": "policy_error",
+      "version": "mpc_q",
+      "archive_manifest_sha256": "2ff1d2a77b12bf6fbca914e6539c05dec4bc62cb94da70857bdd148d33c8a95e",
+      "runtime_sha256": "0c2892f8289599b143f8270dcb9e653ce78dc2229264bfbe18a0b9916b5cfa06"
+    },
+    {
+      "label": "axis-sweep-original-contact-s0",
+      "status": "policy_finished",
+      "version": "baseline",
+      "archive_manifest_sha256": "3a82d1d7e969ec88017e1a121f32fdb4f339b3b446c4e000cab01f0e63fd8c39",
+      "runtime_sha256": "db4c1e06d07fb3ee5bc0cb7058197e28e2e41cf40a96b20187159be27aba6851"
+    },
+    {
+      "label": "axis-sweep-pd-p2-s0",
+      "status": "policy_finished",
+      "version": "candidate",
+      "archive_manifest_sha256": "cea054162ea76f487b094cd06ad1258a50404d8d0d1ad7cce327aaddebab2286",
+      "runtime_sha256": "88f0dbcaeb7966a47ee23245137135bb2242f4da6d8ec6a9887e4479e475b7c8"
+    },
+    {
+      "label": "feasible-c-p2-s0",
+      "status": "policy_finished",
+      "version": "candidate",
+      "archive_manifest_sha256": "89f1b8c35566a32b156441794bd249eff66097ffe62e721eef23bc7fe4665bf9",
+      "runtime_sha256": "f376f1bf737cc0f9f03285fe94e8da3068f5e7f5857e2afaa021226c6374d32d"
+    },
+    {
+      "label": "feasible-c-p4-s0",
+      "status": "policy_error",
+      "version": "candidate",
+      "archive_manifest_sha256": "db2de63363679caad16c888852853c06225f5e5eedd7c7279505bda4ff4e3f7a",
+      "runtime_sha256": "86d4361467165be8c4ae01511d0968c9b3ed2567ec585ae6c9e0d35d67e95c57"
+    },
+    {
+      "label": "feasible-original-p4-s0",
+      "status": "policy_error",
+      "version": "baseline",
+      "archive_manifest_sha256": "4d67b3b25268fbd61c95ec18b78468b888270a2387702cc5769977a75ab2960c",
+      "runtime_sha256": "913c1336825b9564f0d72686b0ba61613b311b71013b0066d00873583e04c5dc"
+    }
+  ],
+  "errors": [],
+  "controller_artifacts": {
+    "baseline": {
+      "library_sha256": "e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4",
+      "dynamic_qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de"
+    },
+    "candidate": {
+      "library_sha256": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+      "dynamic_qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de"
+    },
+    "velocity": {
+      "library_sha256": "e2603ec0a306e8433eab849a8deb36fd132c9824650b5ec2c9ea16c6338ebae7",
+      "dynamic_qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de"
+    },
+    "velocity_pd": {
+      "library_sha256": "dafa16a8946e90af6727ffe6937f0075955fbb74f217351b365049f29dff0634",
+      "dynamic_qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de"
+    },
+    "mpc_q": {
+      "library_sha256": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+      "dynamic_qr_sha256": "af1b24419d8b65e5c1d086e7efadf97bb1bd66053a6633e17f283621347f4e08"
+    }
+  },
+  "heldout_seeds_used": [],
+  "status": "passed"
+}

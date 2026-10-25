@@ -1,0 +1,454 @@
+{
+  "at": "2026-10-25T16:59:12.810575+08:00",
+  "candidates": [
+    {
+      "candidate": "executor",
+      "manifest_sha256": "850073e6656ad1e8482024ade1f4d622c17d7a794d899e3cf0b9bd5d4b95e161",
+      "patch": "executor-certificate.patch",
+      "patch_sha256": "c8ed902386c7e5a42433e1d66c60e9efad6d05a5eda22be9a5f416be30a14253",
+      "files": 135,
+      "assets": []
+    },
+    {
+      "candidate": "executor-geometry",
+      "manifest_sha256": "cb9bf6868d6fbb4f289f84d5dfb90febc6d786c6ff5f71c61a7b5bff1066936c",
+      "patch": "release-geometry.patch",
+      "patch_sha256": "16c68dc3aae430595f4656e27983ca19a9586ff4c13676984e86bb00500892e9",
+      "files": 137,
+      "assets": [
+        {
+          "path": "tests/fixtures/release_geometry_missing_20261023.npz",
+          "sha256": "170894bd306ffddf8f5761d235f54bed40588a268e119228889a8670e5e21c63"
+        }
+      ]
+    },
+    {
+      "candidate": "executor-spatial",
+      "manifest_sha256": "b3d8e3791d99f218898a8551171d094bee7de00e93f010952c6278b6c9a8b5c5",
+      "patch": "executor-spatial.patch",
+      "patch_sha256": "8633bea67c186fb78fb7f923cc54dccb7af52e6ed7ea8e66266cfad3dddb02c5",
+      "files": 138,
+      "assets": [
+        {
+          "path": "tests/fixtures/release_geometry_merged_20261023.npz",
+          "sha256": "3ca3c76cac477d2ea5f80f27d7bec83971a799327cc58461fc905e0b09940bc0"
+        }
+      ]
+    },
+    {
+      "candidate": "executor-release",
+      "manifest_sha256": "721daccaad97c9fef455ccc0148540b6ac633c50f9517e0258ebd084c1de0212",
+      "patch": "executor-release.patch",
+      "patch_sha256": "a39c6bb9994391cbd3ce86b704c793ae662bd7c3d62df2429d86426f4b2426a2",
+      "files": 138,
+      "assets": []
+    },
+    {
+      "candidate": "executor-physical",
+      "manifest_sha256": "0f372c214fb91240ec948b1d87fb10538de0f7b9a9bc1e5b86a53e8004ada057",
+      "patch": "executor-physical.patch",
+      "patch_sha256": "2e30b7c0678e89f373e314bffa71fbd988f3909e6d87057bc4b9994936862516",
+      "files": 138,
+      "assets": []
+    },
+    {
+      "candidate": "executor-context",
+      "manifest_sha256": "84d4379568699e1906e06556de8fb0b3f1531ffecf03b4a1ec2edbcbe35c6d9b",
+      "patch": "executor-context.patch",
+      "patch_sha256": "2195da2162def108b5ade42c82ec1681899fc4fee69021cfa38296a09b9bbbd1",
+      "files": 142,
+      "assets": [
+        {
+          "path": "tests/fixtures/release_robot.urdf",
+          "sha256": "3d85ea8ef6b82b5584e245292f103980895eab826ee027e2e0ef383bbcb95248"
+        },
+        {
+          "path": "tests/fixtures/release_second_context_20261023.json",
+          "sha256": "bbe84ff716ce89004841a6093d28db879316ad6f180f4e1c81d9eddd5891800e"
+        },
+        {
+          "path": "tests/fixtures/release_second_context_20261023.npz",
+          "sha256": "6ee8100fe6e3f3bab43b83c6f670e020d8ffdaff67c04257aa90f5a0ad5a61a9"
+        }
+      ]
+    },
+    {
+      "candidate": "executor-hold",
+      "manifest_sha256": "3184d5a18b288d091b000918efa863215408198f2c5abd983b56792cd8aa6d85",
+      "patch": "executor-hold.patch",
+      "patch_sha256": "6d687d33368c696a92184edb20c17ba3fb797a8c34adb850d04454dc69a4f0bd",
+      "files": 143,
+      "assets": []
+    },
+    {
+      "candidate": "executor-open",
+      "manifest_sha256": "96cb14ac889cf29bd57366b900ee84b092bcab43373c51a43ac84b0190f35281",
+      "patch": "executor-open.patch",
+      "patch_sha256": "3d3b855526dc072d2fcf2554358afb72f5eb645f6cd3bb3e85501275f31495f7",
+      "files": 143,
+      "assets": []
+    },
+    {
+      "candidate": "executor-project",
+      "manifest_sha256": "e404c553f694fa8203c4978164f8001610d88e37c816b60c3eb39e99c8f6ba6c",
+      "patch": "executor-project.patch",
+      "patch_sha256": "e7fc934539a6d8049d304e298c1bde84419d96107e734f41a9f616de3bc01cff",
+      "files": 146,
+      "assets": [
+        {
+          "path": "tests/fixtures/retreat_blocked_reference_20261023.json",
+          "sha256": "56319db16d34f80a34060bfe483f22a265d3c2551d2ec473acf868c846eb4afe"
+        }
+      ]
+    },
+    {
+      "candidate": "executor-obb",
+      "manifest_sha256": "9c568987d81397cccce09833c5f5f1ac0e5178ebd1cb2d127dfe66d94a6909b2",
+      "patch": "executor-obb.patch",
+      "patch_sha256": "e1eb2fc6890978eb92adfa2a0533357dcce371425423aa9acf5730bb9bb90ba8",
+      "files": 149,
+      "assets": [
+        {
+          "path": "tests/fixtures/release_obb_center_20261023.json",
+          "sha256": "fd5f345d44f03909f14fba2170a2e3efcb4f2d8ae112739383d4a9b66c4ac0b1"
+        },
+        {
+          "path": "tests/fixtures/release_obb_center_20261023.npz",
+          "sha256": "b0e2b9d212deaf295970522aaed5d07a8e0c0f3ea006f92e2b4cdc596d883aa3"
+        }
+      ]
+    },
+    {
+      "candidate": "executor-fresh",
+      "manifest_sha256": "cc83160a2de86ca58ef16db6ba9d7f964a7d2abf8685464742e68ce3d2929bc3",
+      "patch": "executor-fresh.patch",
+      "patch_sha256": "ee952dae5a1c5b594484785abd6eb4a6090a2bfcf47a04f28b311f6ac22f37e2",
+      "files": 151,
+      "assets": [
+        {
+          "path": "tests/fixtures/stale_retreat_20261023.json",
+          "sha256": "f2cb04fe62c15b19e7075b769655427bb195dee3b4776cd8eaf91ba21e76b383"
+        }
+      ]
+    },
+    {
+      "candidate": "executor-fast",
+      "manifest_sha256": "b1b544157dd800718d160ba42199857706906340653603cffc56be05fcc58e07",
+      "patch": "executor-fast.patch",
+      "patch_sha256": "320162d21610075ebc24a89f8e8bea8022e67bfc715f09329eb7b61034b6d38b",
+      "files": 152,
+      "assets": []
+    },
+    {
+      "candidate": "executor-mpc-hold",
+      "manifest_sha256": "6719e3d0940ad62b759e026ce3b7b2abd561a8658737550bb198ebaeacb2e166",
+      "patch": "executor-mpc-hold.patch",
+      "patch_sha256": "e9379d25a74dd2e1e76f521fdfdbe73f20262273998d5c7f27c7fdd893e6b602",
+      "files": 153,
+      "assets": []
+    },
+    {
+      "candidate": "executor-numerics",
+      "manifest_sha256": "3d30bf401c66daf6ca62469601c1f88eebee0bf6b0533da21af23e7b2ebff1d2",
+      "patch": "executor-numerics.patch",
+      "patch_sha256": "8b8caf1dc91bdf2715e01a7b8d65a53bc3117f24999ce06162700e6b21635969",
+      "files": 155,
+      "assets": [
+        {
+          "path": "tests/fixtures/retreat_fixed_constraint_20261023.json",
+          "sha256": "d5849d09b46dbd732ee7e180c141b0308c53d4619db15beec255a20e17e18a27"
+        }
+      ]
+    },
+    {
+      "candidate": "executor-prepare",
+      "manifest_sha256": "d9a2b82023f45e55bdef839b5f9d71c4f510b6081debac1f9d1ea6875ef94510",
+      "patch": "executor-prepare.patch",
+      "patch_sha256": "eb5369fd6f5b7a5f09ac1fe30c6bf79e47d0f99d43b28833e2e9f26ad125402e",
+      "files": 156,
+      "assets": []
+    },
+    {
+      "candidate": "executor-prepare-adapt",
+      "manifest_sha256": "a8cf38b1560391c5f85efff9cb9f154402da01c68556f1bbac8859c8265fd3a1",
+      "patch": "executor-prepare-adapt.patch",
+      "patch_sha256": "7445e64b4846323547f1dd710d4b0bc3d4098b4b839aa00b7cfa60c9cb7b104f",
+      "files": 157,
+      "assets": []
+    },
+    {
+      "candidate": "executor-grasp-frame",
+      "manifest_sha256": "b190d5afd6a9cdbb3ffdf651c131ec02e368e978c79fd810f6106afb8875fef8",
+      "patch": "executor-grasp-frame.patch",
+      "patch_sha256": "425f79c7cce29f1b7ddb9cee338d53fd521081bf2481f4ab365c30dff4428939",
+      "files": 159,
+      "assets": [
+        {
+          "path": "tests/fixtures/grasp_yaw_clearance_20261024.json",
+          "sha256": "e9389d4be7d46bfe528bee872972bdf4ec9d4edc9de06efe6989531a517d3ee8"
+        }
+      ]
+    },
+    {
+      "candidate": "executor-grasp-gain",
+      "manifest_sha256": "54554270444ae2c8ceafd44f56d75ecf3916946046a96b6a12518e834df44ee8",
+      "patch": "executor-grasp-gain.patch",
+      "patch_sha256": "3fdf66c837eae3d64f3d3604f125107300e04694849ac27144581591892a5bcd",
+      "files": 159,
+      "assets": []
+    },
+    {
+      "candidate": "executor-grasp-settle",
+      "manifest_sha256": "e40c66abe065ed8c627fc90fed2d90b20473ee5b6f7de8ec9233c6a0f8a86563",
+      "patch": "executor-grasp-settle.patch",
+      "patch_sha256": "0268cee5ffe96c8e719859027a9196f12924190510a880b45f1160a3015e9c23",
+      "files": 160,
+      "assets": []
+    },
+    {
+      "candidate": "executor-support-heading",
+      "manifest_sha256": "21b59e6bda74e7e8cb081b16de8e29b6ac790f95bdbfb4b424695f421423e241",
+      "patch": "executor-support-heading.patch",
+      "patch_sha256": "2303d15d8f0d29f86cfc40faca879e1e56a9377c730937ab9b7472238e5b915c",
+      "files": 161,
+      "assets": []
+    },
+    {
+      "candidate": "executor-support-gain",
+      "manifest_sha256": "b22105b23b6929dc763806be4f9f5bbaa0d8435020cf22434783ef35bff99eac",
+      "patch": "executor-support-gain.patch",
+      "patch_sha256": "e13b8a029f2eca234395415622a228eb41964b41a91cd1f5891b13231750a531",
+      "files": 161,
+      "assets": []
+    },
+    {
+      "candidate": "executor-pending-hold",
+      "manifest_sha256": "99860875f0a916a5272341760e8505d5919ed47632dadaf4e7595080b5d38ea8",
+      "patch": "executor-pending-hold.patch",
+      "patch_sha256": "1c0bc988adf5d3782be5d8a463224de2d7dc9848ef7e1407f0aa59be0ed4b930",
+      "files": 163,
+      "assets": [
+        {
+          "path": "tests/fixtures/fresh_pending_hold_20261024.json",
+          "sha256": "5565f570de70fb5c69c9b83c982f77ff1e9c083f1752a3697baa6e50e6fbb383"
+        }
+      ]
+    },
+    {
+      "candidate": "executor-first-gain",
+      "manifest_sha256": "d60332b146eb3b5e7c8354ad30d76a4cd3cf577c32ebcf8a593f32e4ba8cf973",
+      "patch": "executor-first-gain.patch",
+      "patch_sha256": "55a165110219a6aaeaec190ee1f479f6f81a4fe9c3e88d23dfc993fc8ab50a8d",
+      "files": 164,
+      "assets": []
+    },
+    {
+      "candidate": "executor-arm-prepare",
+      "manifest_sha256": "1a5fa5f7859053dea3136696fdc0b32c5adf63a9be55aea41cc0ae38774a0fcc",
+      "patch": "executor-arm-prepare.patch",
+      "patch_sha256": "46ebbbbd151528a0898fb146568a86c513f74e9b3a851f8e7cad4e6ad12874b1",
+      "files": 165,
+      "assets": []
+    },
+    {
+      "candidate": "executor-soft-open",
+      "manifest_sha256": "8665aaa1a55cd5a61c9efb23fb65a7f261b823ca63b3cabb281c85144e6de771",
+      "patch": "executor-soft-open.patch",
+      "patch_sha256": "788494cf7f1b600c85b5ccf7a64df290284673efc3069a89306a562359b1017d",
+      "files": 166,
+      "assets": []
+    },
+    {
+      "candidate": "executor-support-prepare",
+      "manifest_sha256": "b20de35c5e4d40ed7117995fe12f80621f2ec29ed16d81ab21381c0e872a08d6",
+      "patch": "executor-support-prepare.patch",
+      "patch_sha256": "0e340a7994442149c8ad21ae459a84a0ed8456f339f23d0b1e2a0ce60d30aed5",
+      "files": 167,
+      "assets": []
+    },
+    {
+      "candidate": "executor-insert-pitch",
+      "manifest_sha256": "4c81c6a12f0c247e63513aeb7ef1d5070d6b77d1c211b4715e2f1c6d193eb2f8",
+      "patch": "executor-insert-pitch.patch",
+      "patch_sha256": "beccb22b06c82f8e726439571362dc13d1027ee83d9a5fbb3a4ba76a283cf920",
+      "files": 168,
+      "assets": []
+    },
+    {
+      "candidate": "executor-support-recover",
+      "manifest_sha256": "aed2babb39ca36b0ebde82544cc7b0191043a672b138930da1655975e5305a3d",
+      "patch": "executor-support-recover.patch",
+      "patch_sha256": "52d157f26ebf4ced4ee875c25ce8ff790c06c31c018cd1826ffe0a16216149e1",
+      "files": 169,
+      "assets": []
+    },
+    {
+      "candidate": "executor-placement-physical",
+      "manifest_sha256": "0c4fdba89fd804c974a1d309f706b8681d8192dab169ba2d8dbd64b86a17f69a",
+      "patch": "executor-placement-physical.patch",
+      "patch_sha256": "04b66468c31374a76bd16fda6e177068c24af00ce110b233faa08f0bd661a609",
+      "files": 171,
+      "assets": [
+        {
+          "path": "tests/fixtures/placement_offset_recovery_20261024.json",
+          "sha256": "9625977163a8a451bc835965b43442698ab1f27469af34f908d35f4c48274a7a"
+        }
+      ]
+    },
+    {
+      "candidate": "executor-release-quiet",
+      "manifest_sha256": "d6ca2278feb93267051dee12589f336f3b7f5ca9e674a0f85c568c0955291e79",
+      "patch": "executor-release-quiet.patch",
+      "patch_sha256": "9d0b6c26c1da2d979e67357ba791fb15433a9da5b040edc31f8804cbd72d3044",
+      "files": 173,
+      "assets": [
+        {
+          "path": "tests/fixtures/release_moving_20261024.json",
+          "sha256": "414e5aed29c17605aca7f6d8ad4071e37d633bf5715bd52fc31b06e3439ef071"
+        }
+      ]
+    },
+    {
+      "candidate": "executor-first-transport",
+      "manifest_sha256": "07702217378795656edd747032ad5b9831aae22d30b3870fcf1829216ae37f18",
+      "patch": "executor-first-transport.patch",
+      "patch_sha256": "44950afa78bfb04a29cbda50da4fc911cd189221884e42ce054db3106a3c7fee",
+      "files": 176,
+      "assets": [
+        {
+          "path": "tests/fixtures/first_transport_20261024.json",
+          "sha256": "3c116810d4eb00962609763f8cb1138abce9d04f9aef8c456a374d25ea55ec90"
+        }
+      ]
+    },
+    {
+      "candidate": "executor-first-pitch",
+      "manifest_sha256": "23ebcdf9d01ea35e8bac9ed4e48e3036bba668a2bf6c905aaeb22f3345d8f64b",
+      "patch": "executor-first-pitch.patch",
+      "patch_sha256": "ea463b0e0ea1c9a55b2405f198ffe0ded066d6c03ce50fb4968aeebe6dd39408",
+      "files": 177,
+      "assets": []
+    },
+    {
+      "candidate": "executor-first-pickup",
+      "manifest_sha256": "5480753729624659972b1e36dafc634f5684a72f4872a4422a60120b103c8ce0",
+      "patch": "executor-first-pickup.patch",
+      "patch_sha256": "de49431fdf856ffb191a3e1ea74acf3c60740a84dd218e8cfb3c96b82af11d8f",
+      "files": 179,
+      "assets": []
+    },
+    {
+      "candidate": "executor-first-select",
+      "manifest_sha256": "ccda57b644fff378cdbe199621c163c44b3d8ad594f12b25129986168fe5ab07",
+      "patch": "executor-first-select.patch",
+      "patch_sha256": "5d7fefd129a3ae846dfd5a171780b77c0110bf018a7925c2087b5a026d638126",
+      "files": 179,
+      "assets": []
+    },
+    {
+      "candidate": "executor-pickup-sweep",
+      "manifest_sha256": "c79ad062d91e0b010327b8f822844bb75175c8f22bf6869e82276fe73133d37c",
+      "patch": "executor-pickup-sweep.patch",
+      "patch_sha256": "dcea5f62b7ab129548aecd8aa668a6511bdb9912cda8fff70450a9dcf2815e1b",
+      "files": 179,
+      "assets": []
+    },
+    {
+      "candidate": "executor-first-clear",
+      "manifest_sha256": "848334809e85ae7191a863f1cbd0dcf9fcfe64d60926676e50ed7318be8bb25c",
+      "patch": "executor-first-clear.patch",
+      "patch_sha256": "4af2b505fcc77eacf5ba072c11e257ae84e3b994bc96590e9bae03dabf4c1cf9",
+      "files": 179,
+      "assets": []
+    },
+    {
+      "candidate": "executor-first-reobserve",
+      "manifest_sha256": "d42dfa90fdfa709bfb473afac6224277517690c287e4431c7adedd811fcf0595",
+      "patch": "executor-first-reobserve.patch",
+      "patch_sha256": "2560f978a941e60b775ccdd3789d0b113c84811d50e4744fb8ae6e329ed9f5fa",
+      "files": 179,
+      "assets": []
+    },
+    {
+      "candidate": "executor-pickup-hold-sweep",
+      "manifest_sha256": "4207965a856d191b4aac6a783fa57a6778d31dc5606ba0260c63ec19835f66f0",
+      "patch": "executor-pickup-hold-sweep.patch",
+      "patch_sha256": "7bb101ead854d28f394f8df6f1bf4d1bd71acc17b19a7f5d058fc0aa11e85a4d",
+      "files": 179,
+      "assets": []
+    },
+    {
+      "candidate": "executor-first-bin",
+      "manifest_sha256": "ddb7bffec8f4edb3ee0185add4b8a501d4cbe7005b84dbf29ca1b68f5c94c535",
+      "patch": "executor-first-bin.patch",
+      "patch_sha256": "fb071b3749f0861e61c39f1c77a74c63b2a3f19374e9cdb3607d63eab270ca10",
+      "files": 179,
+      "assets": []
+    },
+    {
+      "candidate": "executor-bin-components",
+      "manifest_sha256": "ca5b29772a96795baff67865913e3fcc37e69417c4523df00c967b4e965159f3",
+      "patch": "executor-bin-components.patch",
+      "patch_sha256": "6a0f37cb6201f5db6ccc26f63fba7fbe641b7ef81b899e1982d3d963e1b9f87c",
+      "files": 179,
+      "assets": []
+    },
+    {
+      "candidate": "executor-bin-dense",
+      "manifest_sha256": "35e6088289d0255ee712a603d4720febb150994ea9607fc6741e012c832a978b",
+      "patch": "executor-bin-dense.patch",
+      "patch_sha256": "af965a8731b8ee554847b35b049a1407ec9c12a12ee177c31416f1d62c3d69b4",
+      "files": 181,
+      "assets": [
+        {
+          "path": "tests/fixtures/bin_observation_20261024.json",
+          "sha256": "38cdf12851745ce10432041db5d9def516a52019656ac622e9f4d9e2817e7253"
+        },
+        {
+          "path": "tests/fixtures/bin_observation_20261024.npz",
+          "sha256": "43320d68a9a9e515a38e911b3a305aaf2a567842a6303b184526a1bafdbdddb4"
+        }
+      ]
+    },
+    {
+      "candidate": "executor-table-dense",
+      "manifest_sha256": "b8e246b663ec77f03eb6a44501765e6410c055c0c81796940ccf65efc97579c3",
+      "patch": "executor-table-dense.patch",
+      "patch_sha256": "c4f300936f2d8bd654ff0c558e819a84868e9acfbc93c6342e2997d5d26f6b87",
+      "files": 184,
+      "assets": [
+        {
+          "path": "tests/fixtures/table_dense_seed2.json",
+          "sha256": "998e3b13d4a2988ccf64fcecb19111548af16d7dfb2fe06add1521fac4778bbf"
+        },
+        {
+          "path": "tests/fixtures/table_dense_seed2_failure.npz",
+          "sha256": "980fa61c57663edba466e61fd95321c2c0a0bc9b02424ba7b43f6a6dd310b004"
+        },
+        {
+          "path": "tests/fixtures/table_dense_seed2_reference.npz",
+          "sha256": "9211051f37808e0501f2687b7ebd676d4253e7e2646711ab16956ad0f0395ac1"
+        }
+      ]
+    },
+    {
+      "candidate": "executor-pad-dense",
+      "manifest_sha256": "0cb5ebffceba00c8c230d71458e88dd46556d85e886364f65d2a3925c3a6fb81",
+      "patch": "executor-pad-dense.patch",
+      "patch_sha256": "f8634259975121b45f7b1c9eead6ba04426aba991724cc59d0a25f5cf4946e49",
+      "files": 187,
+      "assets": [
+        {
+          "path": "tests/fixtures/pad_dense_seed3.json",
+          "sha256": "ca45e1722674b5776200625a2b0e076defcd50a875c05f663b315cae392c5790"
+        },
+        {
+          "path": "tests/fixtures/pad_dense_seed3.npz",
+          "sha256": "4e2c62929eecabec1d073f3a94a360951e6a21143a91bb2a69917c0e94da28bd"
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "status": "passed"
+}

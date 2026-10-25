@@ -1,0 +1,139 @@
+2026-10-25最终状态：executor_pad_dense + A+C在seed0/2/4/5完成四包视觉验收；新seed4/5均通过。所有task_success=null，不宣称官方成功。529测试、43层补丁和90回合交付核验通过。原库/VR/task/QR已恢复，生产和v63未变，无实验继续运行。
+
+结论与局限见FINAL_REPORT-20261025.txt；未证明整任务提速，近端误差有退化，不自动替换生产。以下命令供复现，运行新试验会切换研究控制版本；结束后执行恢复命令。旧usage停止记录和失败均留档，本轮已由用户明确恢复并完成。
+
+工作目录
+  cd /home/krist/kuavo_course/scene1_act_optimization
+  以下命令只在当前回合驱动退出、两个容器空闲后执行。运行期间只查看日志。
+  生产上层和 v63 备份未被候选覆盖。每个新标签仅执行一次，不自动筛选重跑。
+
+路径候选与分因素补丁
+  candidate-policy-executor-pad-dense 是最终冻结研究候选，529测试通过；seed0/2/4/5四包视觉验收通过，其中4/5为冻结后新seed。
+  从前一轮 candidate-policy-axis-feasible 顺序应用：
+  executor-certificate.patch：以原逐步执行器和扫掠代替新增累计8度终点限制。
+  release-geometry.patch：退让前缺失观测的既有深度分离与原阶段预算内等待。
+  executor-spatial.patch：退让统一使用深度连通分组，分组选择不依赖碰撞检查结果。
+  executor-release.patch：实测释放保持、物理边界、新视觉阶段参考，保留MotionFilter。
+  executor-physical.patch：视觉再抓偏移预算不再限制为旧ACT邻域，物理/步长/速度/碰撞/超时保持。
+  executor-context.patch：统一每包控制器初始化，补齐第二包及后续包裹的限速器预检上下文。
+  executor-hold.patch：原张爪等待内闭环保持释放实测位姿，抑制卸载下沉；保持原步长与限速。
+  executor-open.patch：最短张爪等待12→4步，保留实测张开、实时观测、完整扫掠及原超时门槛。
+  executor-project.patch：原步长/物理边界内重规划被阻挡的退让命令；原包络/3mm余量不变。
+  executor-obb.patch：PCA旋转尺寸与同PCA系中心配对，纠正混用世界轴中心的误阻断；尺寸及伺服位置不变。
+  executor-fresh.patch：最终扫掠重新读取SDK反馈，避免把后台新消息误认为规划旧状态已更新。
+  executor-fast.patch：原SAT向量化及相同端点检查去重，回放证书/命令逐项相同；降低闭环计算阻塞。
+  executor-mpc-hold.patch：右4近端保持实际已发MPC目标连续，仅3腕移交实测；减少近端参考突变，原界限不变。
+  executor-numerics.patch：SLSQP不再优化不可改变的起点约束；原起点检查、全扫掠和3mm余量全部保留。
+  executor-continuity为离线被拒支线，不在当前候选补丁链内。
+  各清单为 executor*-manifest.json；全部失败和验证依据见 full-validation-amendment-*.json。
+
+同步独立候选（不能将整个 diagnostics 复制入容器，里面有大型证据目录符号链接）
+  sudo -n docker cp -L diagnostics/path-tracking-continuation-20261023/candidate-policy-executor-pad-dense/. kuavo-ros-noetic-s12-ready:/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-pad-dense/
+  sudo -n docker exec -w /root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-pad-dense kuavo-ros-noetic-s12-ready /root/miniforge3/envs/kls_dev/bin/python -m unittest discover -s tests
+  回合驱动会逐文件验证宿主及容器候选清单，拒绝不一致代码。
+
+正式回合及官方复位
+  sudo -n python3 diagnostics/path-tracking-continuation-20261023/run_one.py origin_pd UNIQUE-LABEL --policy executor_pad_dense --seed 0 --parcels 4
+  实际标签须仅包含小写字母、数字、下划线或连字符，不能重复使用历史标签。
+  四包使用 --parcels 4；自动设置16800步总上限，原阶段预算不变。
+  每回合从官方 challenge_task.py --scene scene1 --seed N --no-timer-gui 全新复位。
+  已完成开发seed0、回归seed2及冻结后新seed4/5的原版/组合四包对照，保留全部失败。seed0–5现均已使用，不可再次称为新鲜留出集。
+  run_one.py 自动切换库与配置、运行、分析、审计、归档；错误不会被当作成功。
+  task_success=null 单独披露，不能据此宣布官方成功。
+
+控制版本
+  baseline：原库e46e9a…、原task、原QR。
+  candidate：C库ab203251…、原task、原QR。
+  proximal_kp：F候选，C库相同，仅8个近端WBC任务Kp80→100，接触阶段退化并失败，当前不保留。
+  origin_pd：A+C，C库及原task/QR不变，ROS手臂首点由错位segment(24,14)改为正确tail(14)。
+  A可执行文件84768f81…；原VR可执行文件155191dc…。切换脚本对所有版本显式选择VR，baseline恢复原版。
+  A源码/补丁/构建配方位于diagnostics/mpc-wbc-tracking-20261022/candidate-reference-origin。
+  C是WBC输出后有界腕部补偿：Kp1、测量速度阻尼0.05、附加力矩±0.5Nm、总力矩±14.1Nm。
+  F保留六个腕关节WBC Kp80、全部Kd10.2、accArm权重9与MPC配置。
+  不把C外围补偿称为QP内部优化；installed WBC内部实现不可见。
+  switch_wrist_pd.py 检查空闲与哈希白名单，并分别原子替换库、dynamic_qr、task.info和VR可执行文件。
+  每回合 runtime.json 核对实际映射库、/taskFile和/dynamicQrFile的路径与哈希。
+
+空手相同动作比较
+  sudo -n python3 diagnostics/path-tracking-continuation-20261023/run_empty_one.py baseline UNIQUE-LABEL
+  分别将baseline替换为candidate、proximal_kp，使用新标签。
+  empty-proximal-registration.json 登记49秒相同轨迹；补充肩/肘运动以覆盖持物时退化的近端关节。
+  原参数2秒斜坡、5秒保持、原停止规则不变；每次独立官方复位。禁止持物场景运行空手探针。
+
+隔离构建C（通常直接使用已登记库；无需重复构建）
+  sudo -n docker exec kuavo_challenge_container_GPU_046e4301 mkdir -p /tmp/scene1-rebuild-c
+  sudo -n docker cp diagnostics/mpc-wbc-tracking-20261022/candidate-wrist-pd/humanoidController.cpp kuavo_challenge_container_GPU_046e4301:/tmp/scene1-rebuild-c/humanoidController.cpp
+  sudo -n docker cp diagnostics/path-tracking-continuation-20261023/candidate-velocity/build.py kuavo_challenge_container_GPU_046e4301:/tmp/scene1-rebuild-c/build.py
+  sudo -n docker exec kuavo_challenge_container_GPU_046e4301 python3 /tmp/scene1-rebuild-c/build.py --directory /tmp/scene1-rebuild-c
+  构建复用CMake编译/链接参数，隔离输出，不覆盖官方源码或活动库。新哈希必须重新登记验证。
+  F是配置差异，无须构建。其补丁、参数和基线位于candidate-proximal-kp及baseline-task。
+
+观察、分析及证据
+  sudo -n python3 diagnostics/path-tracking-continuation-20261023/live_status.py RUN-LABEL
+  tail -n 5 diagnostics/path-tracking-continuation-20261023/RUN-LABEL/robot_guard.log
+  空闲后可重新分析：analyze_single.py RUN-LABEL、audit_run.py RUN-LABEL、summarize_experiments.py。
+  analysis-full包含关节/FK误差、近端/腕部分组、时序/静差、释放瞬态、关节边界与原成功检查。
+  comparison.json和phase-metrics.csv保留所有回合；失败短耗时不计作提速。
+  原始证据位于 /media/krist/KINGSTON/scene1-path-tracking-continuation-20261023；工作目录仅符号链接。
+  archive_completed.py和archive_empty.py只在保留副本字节哈希一致后删除容器重复文件。
+  真实阻断仍被拒绝，包络中心错误产生的误报通过独立几何回放识别；replay_physical_release.py的名义释放和replay_level_bounds.py的反馈情景不能冒充实际动力学验证。
+
+恢复
+  sudo -n python3 diagnostics/path-tracking-continuation-20261023/switch_wrist_pd.py baseline
+  sudo -n python3 diagnostics/path-tracking-continuation-20261023/verify_environment.py final-verification.json
+  要求errors=[]；本目录的新切换脚本同时恢复库、原QR、原task及原VR可执行文件。旧历史脚本不具备完整恢复能力。
+  图形授权失效时：sudo -n env XAUTHORITY=/run/user/1000/gdm/Xauthority python3 diagnostics/path-tracking-continuation-20261023/prepare_display.py
+
+增量交付核验
+  python3 diagnostics/path-tracking-continuation-20261023/verify_path_delivery.py
+  从axis-feasible重建当前43项继续路径补丁并核对每个清单，原始NPZ/JSON/URDF回归夹具单独按哈希核对。
+  较早只读候选已字节核验后移至外盘policies目录，原工作路径为符号链接；生产/v63不受影响。
+  扩展空手对照：extended-empty-comparison.json。OBB中心误报证据：release-component-diagnostic.json、obb-cases-replay.json。
+
+新增诊断
+  retreat-age-diagnostic.json：实际发送前反馈与规划快照的差异；旧快照1.309秒、末端漂移25.524mm。
+  candidate-policy-executor-{fresh,fast}-preflight-replay.json：同55步证书和命令，profile0.644→0.195秒。
+  extended-ac-empty-comparison.json：相同49秒空手C与A+C，首点索引误差修正，跟踪收益不能夸大。
+  compare_task_runs.py REFERENCE CANDIDATE --output REPORT.json：按包、阶段比较，仅完整四包配对计算任务提速。
+  validate_delivery.py：全部回合退出并恢复后，重建补丁、核验所有原件、运行时库/VR/配置身份及恢复回执。
+
+A+C接触对照executor-fast-ac-p2-s0仍在释放后停止，原件保留；不把已确认索引正确性解释为已验证任务收益。
+mpc-hold-replay.json为假定保持释放实测位姿的运动学筛查；只有实际两包/四包及多seed结果能证明可靠性。
+
+
+
+历史停止记录（已被最新用户继续指令取代）：当时误按usage已用20%停止，四包6291步2包预算中断；原始异常及修复说明见usage-stop-receipt-20261024.json。没有四包/多seed验收结论。
+
+新增分因素补丁（原有清单之外，以CHAIN完整列表为准）
+  executor-arm-prepare：松爪前全7关节闭环准备，保留连续参考与450步总预算。
+  executor-soft-open：实际已发夹爪目标每步减少0.08；原反馈张开门槛、40步预算不变。
+  executor-support-prepare：准备启动后按原25mm支撑包络判断，不再被15mm中心圆重复阻挡；入口仍要求原中心圆。
+  executor-insert-pitch：仅原姿态门槛内把插入的闭合轴俯仰任务权重改为0.3；所有到位和碰撞条件不变。
+  executor-support-recover：3帧确认支撑失效后回到原放置纠偏，首帧参考连续且夹爪闭合，不重置450步预算。
+  wrist_damping/G：C的阻尼0.05→0.20，空手跟踪及持物退化，已拒绝；补丁及构建证据保留。
+  新增审计：audit_arm_preparation.py、audit_soft_open.py、audit_support_recovery.py RUN-LABEL。
+
+当前增量及运行器修复
+  executor-placement-physical：放置旧ACT偏移上限30deg→2pi；实际URDF、步长、碰撞、450步预算不变。
+  executor-release-quiet：仅最终松爪稳定门槛0.003→0.0003rad每观测帧；连续3帧，适应目标的quiet门槛不变。
+  H arm_weight：A+C及accArm18，空手小幅混合变化，未进入持物，已恢复9。
+  I pd_scale：A及C补偿幅度2倍，±0.5/14.1Nm边界不变；任务初始化持续裁剪，淘汰。
+  J候选pd_scale15：1.5倍补偿，初始化持续裁剪，已拒绝。
+  environment.stop对run_scene1.py增加有时限INT/TERM/KILL和PID启动标识校验；无ROS测试记录bounded-shutdown-test.json。
+  archive_completed允许初始化保护停止形成的空output，并验证容器同样为空后才删重复目录。
+  ALGO旧研究候选已归档外盘，最终候选为executor-pad-dense；重放旧版本先按确切host路径docker cp -L同步。
+
+2026-10-24新增：
+  executor-pickup-sweep.patch：视觉clear/hover/descend接入已有限速后、fresh SDK反馈的完整参考扫掠。离线42帧回放中4帧揭示原增量检查遗漏。
+  executor-first-clear.patch：沿用top+.12清空高度先抬手，再要求完整观察到原目标，防止遮挡导致选择更远包裹。
+  origin_mpc_q（K）：A+C加原stance近端MPCQ200到400；empty有腕部到位退化，loaded622步失败，目前不选。原件与对比均保留。
+  四边桌面检测可能受遮挡，但三边回放恢复出的位移也超过原30mm界限，未放宽停止条件。
+
+最终验收已完成：开发seed0、回归seed2通过后冻结pad-dense，再对新seed4、5完成原版/组合四包对照。旧bin-dense在seed2/3的失败完整保留，见MULTISEED-RESULTS-20261025.json。最终结果见MULTISEED-PAD-RESULTS-20261025.json。
+首包修正：first-reobserve额外水平退开60mm恢复原目标视野；first-bin显式head-only箱口观察；bin-components按实际3D连通点分组，bin-dense只在显式观察阶段用stride1。四边支持和原入箱余量未降低。
+
+2026-10-25最终新增补丁：
+  executor-table-dense.patch：仅桌面参考锚定/跟踪stride1，修复采样导致的尺寸假变化；原四边及尺寸/运动门槛不变。
+  executor-pad-dense.patch：仅observe_pad同帧表面stride2，保留60点、40%可见面积及两条非平行边要求。
+  冻结清单：path-control-freeze-pad-dense-20261025.json。
+  最终报告：FINAL_REPORT-20261025.txt；逐阶段表：final-phase-metrics-20261025.csv、final-parcel-phase-metrics-20261025.csv。

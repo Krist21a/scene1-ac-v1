@@ -1,0 +1,431 @@
+{
+  "source": "executor-placement-physical-ac-p4-s0-1024",
+  "previous": [
+    0.5827842354774475,
+    0.19586052000522614,
+    0.11772157996892929,
+    -2.2277214527130127,
+    -1.5708210468292236,
+    -0.42053601145744324,
+    -0.03906746581196785,
+    0.0032850622665137053,
+    -0.2827844023704529,
+    -0.4373621642589569,
+    -0.22558115422725677,
+    -0.5092067122459412,
+    1.3138864040374756,
+    -0.5882315039634705,
+    -0.1613582968711853,
+    0.5074783563613892
+  ],
+  "rows": [
+    {
+      "step": 445,
+      "observation_state": [
+        0.5827506184577942,
+        0.1958727091550827,
+        0.11771626770496368,
+        -2.2277145385742188,
+        -1.5708210468292236,
+        -0.42054322361946106,
+        -0.0390697680413723,
+        0.0032850587740540504,
+        -0.2828287184238434,
+        -0.4373091757297516,
+        -0.2255709320306778,
+        -0.50863116979599,
+        1.313919186592102,
+        -0.5892088413238525,
+        -0.16134993731975555,
+        0.5074792504310608
+      ],
+      "sent_action": [
+        0.5785611867904663,
+        0.19301971793174744,
+        0.12693557143211365,
+        -2.2647852897644043,
+        -1.5707963267949,
+        -0.4033180773258209,
+        -0.04233166575431824,
+        0.0,
+        -0.2827844023704529,
+        -0.4373621642589569,
+        -0.22928685491515127,
+        -0.5200031701428561,
+        1.3138864040374756,
+        -0.5882315039634705,
+        -0.15773617426354958,
+        0.98
+      ],
+      "cartesian_alignment": {
+        "state": "preparing_release_reference",
+        "arm": 1,
+        "phase_steps": 165,
+        "strategy": "act_residual",
+        "head_scan_stage": "correct",
+        "visible_box_points": 184,
+        "xy_error_m": 0.004728220249258235,
+        "bottom_gap_m": 0.0010935978035455374,
+        "bottom_height_spread_m": 0.0034619166364271425,
+        "visual_box": {
+          "points": 184,
+          "bottom_base_m": -0.0821081832923817,
+          "position_source": "rgbd_component",
+          "roof_normal_base": [
+            0.026024959779822467,
+            0.04263619943478947,
+            0.9987516487927396
+          ],
+          "heading_error_degrees": 14.915910920146809,
+          "tilt_degrees": 2.86319688386575,
+          "orientation_confirmed": true,
+          "orientation_difference_degrees": 0.6266263873222526
+        },
+        "placement_phase": "lower",
+        "level_stable_steps": 3,
+        "target_base_m": [
+          0.4233832294537718,
+          -0.5583576490532774,
+          -0.08320178109592724
+        ],
+        "heading_error_degrees": 14.91537386651211,
+        "heading_ready": true,
+        "heading_mode": "support_footprint",
+        "support_footprint_fit": true,
+        "original_centering_passed": true,
+        "support_position_rule": "prepared_footprint",
+        "heading_descent_ok": true,
+        "stable_steps": 13,
+        "release_preparation": {
+          "target_rad": [
+            -0.2827844023704529,
+            -0.4373621642589569,
+            -0.22928685491515127,
+            -0.5200031701428561,
+            1.3138864040374756,
+            -0.5882315039634705,
+            -0.15773617426354958
+          ],
+          "sent_error_rad": 0.0,
+          "whole_arm": true,
+          "tracking_error_rad": 0.01137200034686614,
+          "settled_movement_rad": 0.00097733736038208,
+          "wrist_error_rad": 0.0036137630562059764,
+          "wrist_movement_rad": 0.00097733736038208,
+          "original_support_checks_passed": true,
+          "support_checks_passed": true,
+          "support_position_rule": "prepared_footprint",
+          "stable_steps": 1,
+          "settled_target_adjustment_rad": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "gripper_kept_closed": true,
+          "shared_weighing_step_budget": 450
+        },
+        "placement_target_compensation": {
+          "original_target_base_m": [
+            0.4236321076536963,
+            -0.5583576490532774,
+            -0.08320178109592724
+          ],
+          "target_base_m": [
+            0.4233832294537718,
+            -0.5583576490532774,
+            -0.08320178109592724
+          ],
+          "roof_normal_base": [
+            -0.002425255553414201,
+            0.11262968692248822,
+            0.9936340733686838
+          ],
+          "offset_xy_m": [
+            -0.00024887819992445537,
+            0.0
+          ],
+          "max_offset_m": 0.008,
+          "axis": 0
+        },
+        "sensor_error": null,
+        "candidate_count": 4
+      }
+    },
+    {
+      "step": 446,
+      "observation_state": [
+        0.582712709903717,
+        0.19588907063007355,
+        0.11770892143249512,
+        -2.227705240249634,
+        -1.570820927619934,
+        -0.420553058385849,
+        -0.039072901010513306,
+        0.0032850552815943956,
+        -0.28289246559143066,
+        -0.4372279942035675,
+        -0.22555765509605408,
+        -0.5076747536659241,
+        1.3139899969100952,
+        -0.5907565355300903,
+        -0.16133776307106018,
+        0.5074812769889832
+      ],
+      "sent_action": [
+        0.5785611867904663,
+        0.19301971793174744,
+        0.12693557143211365,
+        -2.2647852897644043,
+        -1.5707963267949,
+        -0.4033180773258209,
+        -0.04233166575431824,
+        0.0,
+        -0.2827844023704529,
+        -0.4373621642589569,
+        -0.22928685491515127,
+        -0.5200031701428561,
+        1.3138864040374756,
+        -0.5882315039634705,
+        -0.15773617426354958,
+        0.98
+      ],
+      "cartesian_alignment": {
+        "state": "preparing_release_reference",
+        "arm": 1,
+        "phase_steps": 166,
+        "strategy": "act_residual",
+        "head_scan_stage": "correct",
+        "visible_box_points": 183,
+        "xy_error_m": 0.004789065365518182,
+        "bottom_gap_m": 0.001186651141677486,
+        "bottom_height_spread_m": 0.003371895525012686,
+        "visual_box": {
+          "points": 183,
+          "bottom_base_m": -0.08201512995424975,
+          "position_source": "rgbd_component",
+          "roof_normal_base": [
+            0.023426088182726793,
+            0.05417522970661132,
+            0.9982566117380295
+          ],
+          "heading_error_degrees": 15.070208969879781,
+          "tilt_degrees": 3.3837463829882712,
+          "orientation_confirmed": true,
+          "orientation_difference_degrees": 0.26492558019352774
+        },
+        "placement_phase": "lower",
+        "level_stable_steps": 3,
+        "target_base_m": [
+          0.4233832294537718,
+          -0.5583576490532774,
+          -0.08320178109592724
+        ],
+        "heading_error_degrees": 14.963873647496948,
+        "heading_ready": true,
+        "heading_mode": "support_footprint",
+        "support_footprint_fit": true,
+        "original_centering_passed": true,
+        "support_position_rule": "prepared_footprint",
+        "heading_descent_ok": true,
+        "stable_steps": 14,
+        "release_preparation": {
+          "target_rad": [
+            -0.2827844023704529,
+            -0.4373621642589569,
+            -0.22928685491515127,
+            -0.5200031701428561,
+            1.3138864040374756,
+            -0.5882315039634705,
+            -0.15773617426354958
+          ],
+          "sent_error_rad": 0.0,
+          "whole_arm": true,
+          "tracking_error_rad": 0.012328416476932058,
+          "settled_movement_rad": 0.001547694206237793,
+          "wrist_error_rad": 0.003601588807510603,
+          "wrist_movement_rad": 0.001547694206237793,
+          "original_support_checks_passed": true,
+          "support_checks_passed": true,
+          "support_position_rule": "prepared_footprint",
+          "stable_steps": 2,
+          "settled_target_adjustment_rad": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "gripper_kept_closed": true,
+          "shared_weighing_step_budget": 450
+        },
+        "placement_target_compensation": {
+          "original_target_base_m": [
+            0.4236321076536963,
+            -0.5583576490532774,
+            -0.08320178109592724
+          ],
+          "target_base_m": [
+            0.4233832294537718,
+            -0.5583576490532774,
+            -0.08320178109592724
+          ],
+          "roof_normal_base": [
+            -0.002425255553414201,
+            0.11262968692248822,
+            0.9936340733686838
+          ],
+          "offset_xy_m": [
+            -0.00024887819992445537,
+            0.0
+          ],
+          "max_offset_m": 0.008,
+          "axis": 0
+        },
+        "sensor_error": null,
+        "candidate_count": 4
+      }
+    },
+    {
+      "step": 447,
+      "observation_state": [
+        0.5826523900032043,
+        0.19591499865055084,
+        0.11769811064004898,
+        -2.2276928424835205,
+        -1.5708208084106445,
+        -0.4205651581287384,
+        -0.03907705470919609,
+        0.0032850506249815226,
+        -0.28301501274108887,
+        -0.43709835410118103,
+        -0.22554443776607513,
+        -0.5062106847763062,
+        1.314072608947754,
+        -0.593228816986084,
+        -0.1613032966852188,
+        0.5074872374534607
+      ],
+      "sent_action": [
+        0.5785611867904663,
+        0.19301971793174744,
+        0.12693557143211365,
+        -2.2647852897644043,
+        -1.5707963267949,
+        -0.4033180773258209,
+        -0.04233166575431824,
+        0.0,
+        -0.2827844023704529,
+        -0.4373621642589569,
+        -0.22928685491515127,
+        -0.5200031701428561,
+        1.3138864040374756,
+        -0.5882315039634705,
+        -0.15773617426354958,
+        0.98
+      ],
+      "cartesian_alignment": {
+        "state": "preparing_release_reference",
+        "arm": 1,
+        "phase_steps": 167,
+        "strategy": "act_residual",
+        "head_scan_stage": "correct",
+        "visible_box_points": 184,
+        "xy_error_m": 0.004851391165184681,
+        "bottom_gap_m": 0.0014600192487587843,
+        "bottom_height_spread_m": 0.00307843441164192,
+        "visual_box": {
+          "points": 184,
+          "bottom_base_m": -0.08174176184716846,
+          "position_source": "rgbd_component",
+          "roof_normal_base": [
+            0.018128936714415143,
+            0.04658538372816886,
+            0.9987497903261376
+          ],
+          "heading_error_degrees": 14.638627308533545,
+          "tilt_degrees": 2.8653278087282863,
+          "orientation_confirmed": true,
+          "orientation_difference_degrees": 0.5465731026429357
+        },
+        "placement_phase": "lower",
+        "level_stable_steps": 3,
+        "target_base_m": [
+          0.4233832294537718,
+          -0.5583576490532774,
+          -0.08320178109592724
+        ],
+        "heading_error_degrees": 14.870055199738381,
+        "heading_ready": true,
+        "heading_mode": "support_footprint",
+        "support_footprint_fit": true,
+        "original_centering_passed": true,
+        "support_position_rule": "prepared_footprint",
+        "heading_descent_ok": true,
+        "stable_steps": 15,
+        "release_preparation": {
+          "target_rad": [
+            -0.2827844023704529,
+            -0.4373621642589569,
+            -0.22928685491515127,
+            -0.5200031701428561,
+            1.3138864040374756,
+            -0.5882315039634705,
+            -0.15773617426354958
+          ],
+          "sent_error_rad": 0.0,
+          "whole_arm": true,
+          "tracking_error_rad": 0.013792485366549978,
+          "settled_movement_rad": 0.0024722814559936523,
+          "wrist_error_rad": 0.004997313022613525,
+          "wrist_movement_rad": 0.0024722814559936523,
+          "original_support_checks_passed": true,
+          "support_checks_passed": true,
+          "support_position_rule": "prepared_footprint",
+          "stable_steps": 3,
+          "settled_target_adjustment_rad": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "gripper_kept_closed": true,
+          "shared_weighing_step_budget": 450
+        },
+        "placement_target_compensation": {
+          "original_target_base_m": [
+            0.4236321076536963,
+            -0.5583576490532774,
+            -0.08320178109592724
+          ],
+          "target_base_m": [
+            0.4233832294537718,
+            -0.5583576490532774,
+            -0.08320178109592724
+          ],
+          "roof_normal_base": [
+            -0.002425255553414201,
+            0.11262968692248822,
+            0.9936340733686838
+          ],
+          "offset_xy_m": [
+            -0.00024887819992445537,
+            0.0
+          ],
+          "max_offset_m": 0.008,
+          "axis": 0
+        },
+        "sensor_error": null,
+        "candidate_count": 4
+      }
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-23T20:15:33.679758+08:00",
+  "candidate": "origin_pd",
+  "factor": "Correct 14-arm start knot using observation.state.tail(num_arm_joints_) instead of waist-shifted segment(24,14); keep C compensation",
+  "source": "diagnostics/mpc-wbc-tracking-20261022/candidate-reference-origin",
+  "runtime_executable_sha256": "84768f811b9c228d1a296a71644ede4ec44cd64656f76ad4bc42d77dce3ccf03",
+  "evidence": "executor-obb-c-p4-s0-origin.json: correct-order RMS1.01769rad vs waist-shifted0.002916rad",
+  "frozen": [
+    "executor_obb policy",
+    "C library",
+    "original WBC task/QR",
+    "normal direct_to_wbc=false",
+    "physical and collision constraints"
+  ],
+  "prior_evidence": "A alone previously passed empty probe with less than1% aggregate improvement; no previous loaded A+C test",
+  "validation_order": [
+    "same49second extended empty actions",
+    "independent official seed0 two-parcel contact",
+    "only after passing development full4 and heldout freeze"
+  ],
+  "unresolved": [
+    "release reference discontinuity",
+    "synchronous nominal certificate delay and observation age"
+  ],
+  "no_causal_success_claim": true,
+  "heldout_seeds_used": []
+}

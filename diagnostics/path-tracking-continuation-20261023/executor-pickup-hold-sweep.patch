@@ -1,0 +1,44 @@
+--- a/scene1/visual_pickup.py
++++ b/scene1/visual_pickup.py
+@@ -370,6 +370,12 @@
+             raise RuntimeError('Visual pickup timed out at '+self.stage)
+         info = dict(state='visual_pickup_'+self.stage, stage=self.stage,
+                     strategy='visual_pickup', policy_controls_arms=False)
++        if self.stage in ('first_clear', 'first_back', 'clear', 'hover', 'descend'):
++            # A held reference can still be in flight. Early sensor/reference
++            # holds must pass the same final-send sweep as new servo increments.
++            assist.command_sweep_context = dict(stage='visual_pickup_'+self.stage,
++                target=copy.deepcopy(self.target), plane=self.plane)
++            info['visual_pickup_sweep_required'] = True
+         if snapshot is None:
+             self.missing += 1
+             if self.missing >= 10:
+--- a/tests/test_first_pickup.py
++++ b/tests/test_first_pickup.py
+@@ -105,3 +105,16 @@
+             _,info=pickup.update(self.measured,snapshot,self.assist,None)
+         self.assertEqual(pickup.stage,'select');self.assertEqual(self.assist.command_sweep_context['stage'],'visual_pickup_first_back')
+         self.assertTrue(info['visual_pickup_sweep_required'])
++
++    def test_sensor_hold_still_checks_inflight_reference(self):
++        pickup,_=self.begin();command,info=pickup.update(self.measured,None,self.assist,None)
++        np.testing.assert_array_equal(command,self.sent)
++        self.assertTrue(info['visual_pickup_sweep_required'])
++        self.assertEqual(self.assist.command_sweep_context['stage'],'visual_pickup_first_clear')
++    def test_unverified_table_hold_still_checks_inflight_reference(self):
++        pickup,_=self.begin();pickup._stage('descend');pickup.table_reference={}
++        snapshot=dict(self.snapshot,stamp=1.,table_z_base_m=self.f['grasp']['plane'])
++        with patch('scene1.visual_pickup.table_hull',return_value=None),patch('scene1.visual_pickup.table_boundary',return_value=None):
++            command,info=pickup.update(self.measured,snapshot,self.assist,None)
++        self.assertTrue(info['table_reference_hold']);self.assertTrue(info['visual_pickup_sweep_required'])
++        np.testing.assert_array_equal(command,self.sent)
+--- a/tests/test_visual_pickup.py
++++ b/tests/test_visual_pickup.py
+@@ -240,6 +240,7 @@
+         pickup.anchor_target=dict(position_base_m=[.48,-.31,-.02],top_z_base_m=.02,
+             major_axis_xy=[1.,0.],oriented_extent_m=[.11,.04],extent_xy_m=[.11,.04],
+             grasp_goal_xy=[.45,-.31])
++        pickup.target=dict(pickup.anchor_target);pickup.plane=pickup.anchor_plane
+         pickup.anchor_grasp_goal=np.eye(4);pickup.anchor_grasp_goal[:3,3]=[.45,-.31,-.02]
+         pickup.anchor_approach_goal=pickup.anchor_grasp_goal.copy()
+         pickup.anchor_approach_goal[0,3]-=.01

@@ -1,0 +1,56 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -186,7 +186,7 @@
+   close_event_threshold: 0.25
+   max_translation_m: 0.02
+   max_joint_offset_rad: 0.2617993878
+-  max_placement_joint_offset_rad: 0.5235987756
++  max_placement_joint_offset_rad: 6.283185307179586
+   max_joint_step_rad: 0.012
+   gain: 0.2
+   grasp_tolerance_m: 0.012
+--- a/tests/test_placement_physical.py
++++ b/tests/test_placement_physical.py
+@@ -0,0 +1,42 @@
++import json
++from pathlib import Path
++import unittest
++import numpy as np
++import yaml
++from scene1.kinematics import UrdfArmKinematics
++from scene1.residual import ResidualAssist
++
++class PlacementPhysicalTests(unittest.TestCase):
++    def setUp(self):
++        p=Path(__file__).parent
++        self.f=json.loads((p/'fixtures/placement_offset_recovery_20261024.json').read_text())
++        self.k=UrdfArmKinematics(description=(p/'fixtures/release_robot.urdf').read_text())
++        config=yaml.safe_load((p.parent/'configs/visual_cycle_four_parcels.yaml').read_text())
++        lo=np.r_[self.k.limits[0][:,0],0.,self.k.limits[1][:,0],0.]
++        hi=np.r_[self.k.limits[0][:,1],1.,self.k.limits[1][:,1],1.]
++        self.a=ResidualAssist(config['visual_residual'],self.k,lo,hi)
++        self.base=np.array(self.f['act_action']);self.sent=np.array(self.f['sent_action'])
++        self.measured=np.array(self.f['observation_state'])
++        self.a.offset[8:15]=self.sent[8:15]-self.base[8:15]
++
++    def test_recorded_old_reference_cap_is_infeasible_despite_physical_command(self):
++        self.assertTrue(np.all(self.sent[8:15]>=self.a.low[8:15]))
++        self.assertTrue(np.all(self.sent[8:15]<=self.a.high[8:15]))
++        self.assertGreater(self.a.offset[12],.5235987756+.006)
++        with self.assertRaisesRegex(RuntimeError,'step cap'):
++            self.a._correct(self.base,self.measured,1,[0.,0.,0.],
++                step_scale=.5,offset_cap_rad=.5235987756)
++
++    def test_recovery_can_continue_beyond_old_reference_with_original_step_and_physical_bounds(self):
++        result=self.a._correct(self.base,self.measured,1,[.01,.01,0.],
++            step_scale=.5,offset_cap_rad=self.a.config['max_placement_joint_offset_rad'])
++        self.assertLessEqual(np.max(abs(result[8:15]-self.sent[8:15])),.006+1e-12)
++        self.assertTrue(np.all(result[8:15]>=self.a.low[8:15]))
++        self.assertTrue(np.all(result[8:15]<=self.a.high[8:15]))
++        self.assertGreater(result[12]-self.base[12],.5235987756)
++
++    def test_out_of_physical_command_still_rejected_without_jump(self):
++        self.a.offset[12]=self.a.high[12]+.02-self.base[12]
++        with self.assertRaisesRegex(RuntimeError,'step cap'):
++            self.a._correct(self.base,self.measured,1,[0.,0.,0.],
++                step_scale=.5,offset_cap_rad=self.a.config['max_placement_joint_offset_rad'])

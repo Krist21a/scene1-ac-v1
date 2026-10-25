@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-24T16:41:57.075938+08:00",
+  "parent": "executor-release-quiet",
+  "candidate": "executor-first-transport",
+  "factor": "First confirmed grasp enters existing VisualPickup lift/carry/prepare-weighing instead of ACT transport; no grasp/clearance/control changes",
+  "evidence": "Repeated first-parcel release failures, later parcels use visual weighing preparation with posture reserve; user removed ACT proximity requirement",
+  "unchanged": [
+    "A+C controller",
+    "first grasp checks",
+    "all release and swept clearance checks and original 3mm margin",
+    "500 visual stage budget and 450 weighing budget",
+    "hold contact and success checks"
+  ],
+  "heldout_seeds_used": [],
+  "tests_passed": 496,
+  "patch_chain_count": 31
+}

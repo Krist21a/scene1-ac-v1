@@ -1,0 +1,59 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -239,6 +239,7 @@
+   release_retreat_direction: measured_tool_axis
+   release_retreat_preflight: executor_sweep
+   release_geometry_reobserve: true
++  release_spatial_components: true
+   max_release_geometry_wait_steps: 20
+   release_short_retreat_m: 0.06
+   release_clearance_rise_m: 0.07
+--- a/run_scene1.py
++++ b/run_scene1.py
+@@ -46,6 +46,11 @@
+     split_enabled = config.get('visual_cycle', {}).get('settlement_spatial_components', False)
+     split = (settling and pending['kind'] == 'settle' and split_enabled
+              and visual_pickup is not None and visual_pickup.active)
++    # Use one predetermined grouping rule for every retreat observation.
++    # XY closing also merges fingers into otherwise accepted parcel groups;
++    # select no geometry based on whether a subsequent sweep passes.
++    split = split or (settling and pending['kind'] == 'short_retreat' and split_enabled
++                      and config.get('wrist_assist', {}).get('release_spatial_components', False))
+     snapshot = scene.read(candidate_stride=2 if settling else 4, spatial_components=split)
+     if (settling and pending['kind'] == 'short_retreat' and split_enabled
+             and config.get('wrist_assist', {}).get('release_geometry_reobserve', False)
+--- a/tests/test_release_geometry.py
++++ b/tests/test_release_geometry.py
+@@ -58,6 +58,32 @@
+                                           aligner, object(), None, config)
+         self.assertEqual(self.near(recovered, aligner), [])
+ 
++    def test_real_accepted_xy_merge_is_separated_before_any_sweep_decision(self):
++        snapshot, config, aligner = self.fixture()
++        root = Path(__file__).resolve().parent/'fixtures'
++        with np.load(root/'release_geometry_merged_20261023.npz') as data:
++            for key in ['rgb','depth_m','intrinsic','camera_to_base']:
++                snapshot[key] = data[key].copy()
++        calls = []
++        def read(**kw):
++            calls.append(kw)
++            out = snapshot.copy()
++            out['candidates'], out['table_z_base_m'] = metric_candidates(
++                out['rgb'],out['depth_m'],out['intrinsic'],out['camera_to_base'],
++                config['cartesian_alignment'],stride=kw['candidate_stride'],
++                spatial_components=kw['spatial_components'])
++            out['candidate_spatial_components'] = kw['spatial_components']
++            return out
++        merged = self.near(read(candidate_stride=2,spatial_components=False),aligner)[0]
++        recovered = read_manipulation_rgbd(SimpleNamespace(read=read),aligner,object(),None,config)
++        found = self.near(recovered,aligner)
++        self.assertEqual(calls[-1],dict(candidate_stride=2,spatial_components=True))
++        self.assertEqual(len(found),1)
++        self.assertGreater(merged['oriented_extent_m'][0],.17)
++        np.testing.assert_allclose(found[0]['oriented_extent_m'],[.1089392044,.0452723379],atol=1e-8)
++        self.assertEqual(found[0]['points'],201)
++        np.testing.assert_array_equal(snapshot['depth_m'],recovered['depth_m'])
++
+ 
+ class HoldGeometryTests(unittest.TestCase):
+     def setUp(self):

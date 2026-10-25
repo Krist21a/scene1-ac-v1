@@ -1,0 +1,63 @@
+{
+  "cases": [
+    {
+      "label": "executor-obb-c-p2-s0",
+      "initial_reference_sweep": {
+        "clear": true,
+        "first_blocked_fraction": null,
+        "samples": 13
+      },
+      "certified": true,
+      "nominal_steps": 44,
+      "position_residual_m": 0.009949432431462416,
+      "elapsed_s": 0.5852056309995533
+    },
+    {
+      "label": "executor-obb-c-p4-s0",
+      "initial_reference_sweep": {
+        "clear": true,
+        "first_blocked_fraction": null,
+        "samples": 13
+      },
+      "certified": true,
+      "nominal_steps": 45,
+      "position_residual_m": 0.009253342263833998,
+      "elapsed_s": 0.11310650300220004
+    },
+    {
+      "label": "executor-obb-f-p2-s0",
+      "initial_reference_sweep": {
+        "clear": false,
+        "first_blocked_fraction": 0.7777777777777778,
+        "samples": 19
+      },
+      "certified": false,
+      "error": "RuntimeError('No swept-clear retreat correction within original step and physical bounds')",
+      "elapsed_s": 0.6733055760014395
+    },
+    {
+      "label": "executor-fast-c-p2-s0",
+      "initial_reference_sweep": {
+        "clear": true,
+        "first_blocked_fraction": null,
+        "samples": 15
+      },
+      "certified": true,
+      "nominal_steps": 51,
+      "position_residual_m": 0.009299922597045332,
+      "elapsed_s": 0.13079616300092312
+    },
+    {
+      "label": "executor-fast-ac-p2-s0",
+      "initial_reference_sweep": {
+        "clear": false,
+        "first_blocked_fraction": 0.6875,
+        "samples": 17
+      },
+      "certified": false,
+      "error": "RuntimeError('No swept-clear retreat correction within original step and physical bounds')",
+      "elapsed_s": 0.30417524100266746
+    }
+  ],
+  "limitations": "Pose held at recorded release observation with new reference already applied. Later observed parcel geometry reused. This is kinematic screening only, not an unload dynamics simulation or success evidence."
+}

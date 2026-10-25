@@ -1,0 +1,144 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -281,6 +281,7 @@
+   enabled: true
+   max_parcels: 4
+   visual_after_first_parcel: true
++  first_visual_transport: true
+   weighing_gain_scale: 0.4
+   first_weighing_lower_gain_scale: 0.4
+   first_weighing_roof_offset_m: 0.008
+--- a/run_scene1.py
++++ b/run_scene1.py
+@@ -1,6 +1,7 @@
+ #!/usr/bin/env python3
+ """Run the original ACT with separately switchable scene-1 extensions."""
+ import argparse
++import copy
+ import json
+ import os
+ from pathlib import Path
+@@ -29,6 +30,7 @@
+ from scene1.handover_contract import HandoverContract, HandoverContractStop
+ from scene1.visual_cycle import VisualCycle
+ from scene1.visual_pickup import VisualPickup, grasp_template, grasp_plan, restore_next_context
++from scene1.first_transport import begin_first_transport
+ from scene1.pickup_resume import write_pickup_checkpoint, restore_weighing_context
+ from scene1.placement_gain import PlacementGain
+ from scene1.placement_target import PlacementTarget
+@@ -298,6 +300,7 @@
+     first_placement_target = PlacementTarget(config.get('visual_cycle', {}).get('first_weighing_roof_offset_m', 0.),
+         config.get('visual_cycle', {}).get('first_weighing_roof_axis'))
+     first_grasp_plan = None
++    first_grasp_context = None
+     weighing_pad = None
+     try:
+         deadline = time.monotonic() + config["startup_timeout_s"]
+@@ -518,6 +521,15 @@
+                 if config.get('visual_cycle', {}).get('visual_after_first_parcel') and first_grasp_plan is None:
+                     raise RuntimeError('No requested first grasp target was captured for visual continuation')
+                 pickup_template = grasp_template(aligner.geometry[1], first_grasp_plan)
++            if (config.get('visual_cycle', {}).get('first_visual_transport', False)
++                    and visual_pickup is None and visual_cycle is not None
++                    and visual_cycle.completed == 0 and isinstance(aligner, ResidualAssist)
++                    and aligner.first_grasp_complete and not aligner.regrasp_complete
++                    and aligner.pending is None):
++                visual_pickup, weighing_pad = begin_first_transport(
++                    visual_cycle, aligner, pickup_template, first_grasp_context,
++                    rgbd_snapshot, measured, previous_sent)
++                print(f'FIRST_VISUAL_TRANSPORT step={steps+1}', flush=True)
+             if weighing_pad is None and isinstance(aligner, ResidualAssist) and aligner.weighing_target is not None:
+                 weighing_pad = aligner.weighing_target.copy()
+             if visual_cycle is not None:
+@@ -629,6 +641,7 @@
+                         and aligner.pending is not None and aligner.pending['kind'] == 'grasp'
+                         and 'support_z_base_m' not in aligner.pending['target']
+                         and cartesian_info.get('grasp_target_base_m') is not None):
++                    first_grasp_context = dict(target=copy.deepcopy(aligner.pending['target']), plane=aligner.pending['plane'])
+                     first_grasp_plan = grasp_plan(aligner.pending['target'], aligner.pending['plane'],
+                                                  cartesian_info['grasp_target_base_m'])
+                 cartesian_info["sensor_error"] = rgbd_error
+--- a/scene1/first_transport.py
++++ b/scene1/first_transport.py
+@@ -0,0 +1,29 @@
++"""Enter the existing visual lift after the original first contact checks."""
++import copy
++import numpy as np
++from .visual_pickup import VisualPickup
++
++
++def begin_first_transport(cycle, assist, template, grasp_context, snapshot, measured, command):
++    if (cycle.completed != 0 or cycle.active or cycle.done or not assist.first_grasp_complete
++            or assist.regrasp_complete or assist.pending is not None):
++        raise RuntimeError('First visual transport requires original confirmed first contact')
++    if template is None or grasp_context is None or snapshot is None:
++        raise RuntimeError('First visual transport requires observed grasp and support context')
++    surfaces = [s for s in snapshot.get('surfaces', []) if not s.get('partial', True)
++                and s.get('points',0) >= 60 and min(s['extent_xy_m']) >= .145]
++    if len(surfaces) != 1:
++        raise RuntimeError('First visual transport requires one unambiguous complete observed pad')
++    surface = copy.deepcopy(surfaces[0])
++    geometry = copy.deepcopy(assist.geometry[1])
++    if geometry is None:
++        raise RuntimeError('First visual transport requires settled object-to-hand geometry')
++    goal = cycle.k.matrix(np.asarray(measured)[8:15], 1)
++    goal[2,3] += .16  # Same lift as VisualPickup.local_grasp, with the same observed lift gate.
++    resume = dict(target=copy.deepcopy(grasp_context['target']), plane=grasp_context['plane'],
++                  geometry=geometry, goal=goal, surface=surface, stage='lift')
++    pickup = VisualPickup(cycle,template,surface['position_base_m'],measured,command,resume)
++    pickup.motion.command = np.asarray(command).copy()
++    pickup.pose_frames = pickup.unverified_pose = 0
++    pickup.first_transport = True
++    return pickup, np.asarray(surface['position_base_m']).copy()
+--- a/tests/test_first_transport.py
++++ b/tests/test_first_transport.py
+@@ -0,0 +1,49 @@
++import copy,json,unittest
++from pathlib import Path
++from types import SimpleNamespace
++import numpy as np
++import yaml
++from scipy.spatial.transform import Rotation
++from scene1.kinematics import UrdfArmKinematics
++from scene1.visual_cycle import VisualCycle
++from scene1.first_transport import begin_first_transport
++
++class FirstTransportTests(unittest.TestCase):
++    def setUp(self):
++        p=Path(__file__).parent
++        self.f=json.loads((p/'fixtures/first_transport_20261024.json').read_text())
++        self.k=UrdfArmKinematics(description=(p/'fixtures/release_robot.urdf').read_text())
++        config=yaml.safe_load((p.parent/'configs/visual_cycle_four_parcels.yaml').read_text())
++        lo=np.r_[self.k.limits[0][:,0],0.,self.k.limits[1][:,0],0.]
++        hi=np.r_[self.k.limits[0][:,1],1.,self.k.limits[1][:,1],1.]
++        self.measured=np.array(self.f['contact']['observation_state']);self.sent=np.array(self.f['contact']['sent_action'])
++        self.cycle=VisualCycle(config['visual_cycle'],self.k,lo,hi,self.sent)
++        self.assist=SimpleNamespace(first_grasp_complete=True,regrasp_complete=False,pending=None,
++            geometry=[None,dict(center=np.array([0.,0.,.02]),rotation=Rotation.identity(),extent=np.array([.11,.04,.10]))])
++        self.snapshot=dict(surfaces=copy.deepcopy(self.f['contact']['rgbd_surfaces']))
++    def begin(self):
++        return begin_first_transport(self.cycle,self.assist,{},self.f['grasp'],self.snapshot,self.measured,self.sent)
++    def test_confirmed_contact_preserves_all_sent_commands_and_existing_lift(self):
++        pickup,pad=self.begin();np.testing.assert_array_equal(pickup.motion.command,self.sent)
++        expected=self.k.matrix(self.measured[8:15],1);expected[2,3]+=.16
++        np.testing.assert_array_equal(pickup.motion.goal[1],expected)
++        self.assertEqual(pickup.stage,'lift');self.assertEqual(pickup.motion.config['stage_timeout_steps'],500)
++        self.assertEqual(pickup.completed_parcels,0);self.assertEqual(pickup.pose_frames,0)
++    def test_unconfirmed_contact_cannot_start(self):
++        self.assist.first_grasp_complete=False
++        with self.assertRaisesRegex(RuntimeError,'confirmed first contact'):self.begin()
++    def test_missing_and_ambiguous_support_cannot_start(self):
++        original=copy.deepcopy(self.snapshot)
++        self.snapshot['surfaces']=[]
++        with self.assertRaisesRegex(RuntimeError,'unambiguous'):self.begin()
++        self.snapshot=original;self.snapshot['surfaces'].append(copy.deepcopy(self.snapshot['surfaces'][-1]))
++        with self.assertRaisesRegex(RuntimeError,'unambiguous'):self.begin()
++    def test_lost_grip_cannot_start(self):
++        self.measured[15]=0.
++        with self.assertRaisesRegex(RuntimeError,'contact'):self.begin()
++    def test_later_parcel_cannot_restart_first_transport(self):
++        self.cycle.completed=1
++        with self.assertRaisesRegex(RuntimeError,'confirmed first contact'):self.begin()
++    def test_preserves_geometry_without_aliasing(self):
++        pickup,pad=self.begin();pickup.motion.geometry['center'][0]=2
++        self.assertEqual(self.assist.geometry[1]['center'][0],0.)

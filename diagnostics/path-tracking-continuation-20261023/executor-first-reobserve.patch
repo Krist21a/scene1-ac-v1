@@ -1,0 +1,59 @@
+--- a/scene1/visual_pickup.py
++++ b/scene1/visual_pickup.py
+@@ -682,6 +682,17 @@
+                         arrived = False
+             if arrived and (self.stage != 'carry' or getattr(self, 'pose_frames', 0) >= 3):
+                 if self.stage == 'first_clear':
++                    goal = motion.k.matrix(measured[8:15], 1)
++                    axis = goal[:2, 2].copy()
++                    length = np.linalg.norm(axis)
++                    away = goal[:2, 3]-np.asarray(self.target['position_base_m'])[:2]
++                    if (not np.isfinite(axis).all() or length < .2
++                            or axis@away <= 0.):
++                        raise RuntimeError('Initial reobservation axis must point away from observed parcel')
++                    goal[:2, 3] += .06*axis/length
++                    motion.goal[1] = goal
++                    self._stage('first_back')
++                elif self.stage == 'first_back':
+                     motion.goal[1] = None
+                     self._stage('select')
+                 elif self.stage == 'clear':
+@@ -726,7 +737,7 @@
+             info['selected_target'] = self.target
+         if getattr(self, 'surface', None) is not None:
+             info['weighing_surface'] = self.surface
+-        if info['stage'] in ('first_clear', 'clear', 'hover', 'descend'):
++        if info['stage'] in ('first_clear', 'first_back', 'clear', 'hover', 'descend'):
+             # The runner checks fresh feedback through the full pending and
+             # filtered reference, not merely this update's servo increment.
+             assist.command_sweep_context = dict(stage='visual_pickup_'+info['stage'],
+--- a/tests/test_first_pickup.py
++++ b/tests/test_first_pickup.py
+@@ -83,10 +83,25 @@
+             command,info=pickup.update(self.measured,snapshot,self.assist,None)
+         np.testing.assert_array_equal(command,self.sent);self.assertEqual(info['first_target_matches'],0)
+         self.assertEqual(pickup.stage,'select');self.assertFalse(hasattr(pickup,'anchor_target'))
+-    def test_first_clear_exports_final_send_sweep_and_returns_to_select(self):
++    def test_first_clear_exports_final_send_sweep_and_starts_bounded_reobservation(self):
+         pickup,_=self.begin();snapshot=dict(self.snapshot,stamp=1.,table_z_base_m=self.f['grasp']['plane'])
+         with patch.object(pickup.motion,'_arrived',return_value=(True,[])):
+             command,info=pickup.update(self.measured,snapshot,self.assist,None)
+-        self.assertEqual(pickup.stage,'select');self.assertTrue(info['visual_pickup_sweep_required'])
++        self.assertEqual(pickup.stage,'first_back');self.assertTrue(info['visual_pickup_sweep_required'])
+         self.assertEqual(self.assist.command_sweep_context['stage'],'visual_pickup_first_clear')
+         self.assertIsNone(pickup.table_reference)
++
++    def test_reobservation_keeps_height_rotation_and_moves_60mm_away(self):
++        pickup,_=self.begin();pose=self.k.matrix(self.measured[8:15],1)
++        snapshot=dict(self.snapshot,stamp=1.,table_z_base_m=self.f['grasp']['plane'])
++        with patch.object(pickup.motion,'_arrived',return_value=(True,[])):
++            pickup.update(self.measured,snapshot,self.assist,None)
++        goal=pickup.motion.goal[1];np.testing.assert_array_equal(goal[:3,:3],pose[:3,:3])
++        self.assertEqual(goal[2,3],pose[2,3]);self.assertAlmostEqual(np.linalg.norm(goal[:2,3]-pose[:2,3]),.06)
++        self.assertGreater((goal[:2,3]-pose[:2,3])@(pose[:2,3]-np.asarray(pickup.target['position_base_m'])[:2]),0.)
++    def test_reobservation_finishes_before_selection_and_has_full_sweep(self):
++        pickup,_=self.begin();pickup._stage('first_back');snapshot=dict(self.snapshot,stamp=1.,table_z_base_m=self.f['grasp']['plane'])
++        with patch.object(pickup.motion,'_arrived',return_value=(True,[])):
++            _,info=pickup.update(self.measured,snapshot,self.assist,None)
++        self.assertEqual(pickup.stage,'select');self.assertEqual(self.assist.command_sweep_context['stage'],'visual_pickup_first_back')
++        self.assertTrue(info['visual_pickup_sweep_required'])

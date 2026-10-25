@@ -1,0 +1,22 @@
+{
+  "recorded_at": "2026-10-23T16:29:25.667730+08:00",
+  "selected_for_next_gate": "C",
+  "library_sha256": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+  "selection_is_not_production_promotion": true,
+  "implementation": "bounded compensation after WBC torque output, not an internal QP change",
+  "parameters": {
+    "kp_nm_per_rad": 1.0,
+    "damping_nm_per_rad_s": 0.05,
+    "extra_torque_limit_nm": 0.5,
+    "total_wrist_torque_limit_nm": 14.1,
+    "gravity_compensation_added": false
+  },
+  "original_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/candidate-wrist-pd/humanoidController.cpp",
+  "original_build_manifest": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/candidate-wrist-pd/build-manifest.json",
+  "patch_sha256": "38838a631bdaf37b68229aab33bd1863ffe6438b1f499de0e31ae945211e502e",
+  "rejected": {
+    "D": "Reference consistency repaired but static wrist error persists; insufficient standalone tracking improvement",
+    "DC": "Compared with C, wrist out/return settle time 0.515/0.312 to 1.366/2.595 s, overshoot 0.0148/0.00959 to 0.02195/0.01779 rad; no clipping or protective stop, but worse motion"
+  },
+  "limitations": "One empty trial per variant; approximate arrival alignment; full contact and task checks still required"
+}

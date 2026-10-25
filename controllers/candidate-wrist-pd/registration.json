@@ -1,0 +1,45 @@
+{
+  "at": "2026-10-22T17:20:54.484554+08:00",
+  "factor": "only bounded post-WBC wrist torque PD on original filtered WBC reference",
+  "joints": [
+    4,
+    5,
+    6,
+    11,
+    12,
+    13
+  ],
+  "kp_nm_per_rad": 1.0,
+  "kd_nm_s_per_rad": 0.05,
+  "ki": 0,
+  "added_torque_limit_nm": 0.5,
+  "total_wrist_torque_limit_nm": 14.1,
+  "simulation_only_guard": "!is_real_ and armNumReal_==14",
+  "reference_origin": "original binary",
+  "wbc_gains": "original 80/10.2",
+  "evidence": [
+    "user screenshot suggests post-WBC PID; no-wrist-reference claim does not match this workspace",
+    "wrist late empty error persists with near-zero speed, planned acceleration/error slope about80 and small actuator torque",
+    "gain-only candidate improves out bias but worsens return bias and overshoot; task also has baseline target clipping"
+  ],
+  "hypothesis": "direct low-amplitude joint torque feedback can reduce residual plant/model effects even when WBC achieves its nominal acceleration tracking task; does not identify gravity as sole cause",
+  "expected": "reduced empty wrist static error and settle delay; possible overshoot due simulation armature/delay",
+  "risks": [
+    "post-QP force is not coordinated by WBC constraints",
+    "higher contact stiffness; unverified on objects",
+    "additional diagnostic ROS output affects overhead slightly"
+  ],
+  "validation": "one official seed0 empty probe only; stop on probe guards, sustained added torque clipping or observed oscillation; no loaded/contact run while known outer clipping unresolved",
+  "unchanged": [
+    "scene physics",
+    "limits",
+    "outer v69",
+    "MPC",
+    "WBC task gains and weights",
+    "filters",
+    "missing distal velocity feedforward",
+    "production source"
+  ],
+  "baseline_library_sha256": "e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4",
+  "candidate_source_sha256": "0a990a16a51255afb98118cd0088e0672d8874a368e567fca897b39248e7fb8d"
+}

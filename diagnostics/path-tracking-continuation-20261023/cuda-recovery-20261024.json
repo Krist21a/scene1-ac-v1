@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-24T09:00:49.397879+08:00",
+  "failed_trial": "executor-prepare-c-p4-s0-1024",
+  "policy_steps": 0,
+  "reason": "ACT preflight CUDA unavailable; ALGO NVML Unknown Error. Host and SIM GPU healthy.",
+  "recovery": "Restarted idle ALGO container; nvidia-smi and CUDA tensor allocation/reduction succeeded",
+  "policy_and_controller_changes": false,
+  "orchestration_changes": [
+    "CUDA allocation preflight before official reset",
+    "Archive infrastructure failures even without steps.jsonl"
+  ],
+  "next_trial": "executor-prepare-c-p4-s0-1024-gpu",
+  "interpretation": "Infrastructure recovery, not selection among failed task attempts"
+}

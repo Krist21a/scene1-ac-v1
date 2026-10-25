@@ -1,0 +1,621 @@
+{
+  "cases": [
+    {
+      "fixture": "feasible-c-p4-s0-failed.json",
+      "sha256": "29245153f8e48bf90ea2874ee0cc2624ada7923ebdc8a6c1ad0234edfc35af56",
+      "failed_step": 6308,
+      "goal_base_m": [
+        0.3365049417814278,
+        -0.5409258084170863,
+        0.025583685413570534
+      ],
+      "position_tolerance_m": 0.014,
+      "orientation_tolerance_degrees": 8.0,
+      "starts": 16,
+      "certified_solutions": 0,
+      "minimum_position_residual_within_orientation_m": 0.014900245711857545,
+      "results": [
+        {
+          "start": "retained_solution",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 1,
+          "position_residual_m": 0.01490024571226923,
+          "orientation_residual_degrees": 7.999942704220672,
+          "joints": [
+            0.05585830397575575,
+            -0.8555081505613985,
+            0.22573214624873494,
+            -1.020603029013376,
+            0.6098292020496858,
+            -0.23108266192011934,
+            -0.2769580092264744
+          ],
+          "certified": false
+        },
+        {
+          "start": "measured",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 57,
+          "position_residual_m": 0.014900245712043927,
+          "orientation_residual_degrees": 7.999942704343904,
+          "joints": [
+            0.055858228309561275,
+            -0.855508268315585,
+            0.22573254616109809,
+            -1.020603029013376,
+            0.6098292020496858,
+            -0.23108290009599236,
+            -0.27695778043851305
+          ],
+          "certified": false
+        },
+        {
+          "start": "original_reference",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 51,
+          "position_residual_m": 0.01490024571198343,
+          "orientation_residual_degrees": 7.9999427043605955,
+          "joints": [
+            0.055858282592331006,
+            -0.8555080641781204,
+            0.2257321440366349,
+            -1.020603029013376,
+            0.6098292020496858,
+            -0.23108272528360677,
+            -0.27695791801872194
+          ],
+          "certified": false
+        },
+        {
+          "start": "box_midpoint",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 56,
+          "position_residual_m": 0.014900245712254997,
+          "orientation_residual_degrees": 7.999942704227325,
+          "joints": [
+            0.055858305675829466,
+            -0.8555081486299445,
+            0.22573213574940248,
+            -1.020603029013376,
+            0.6098292020496858,
+            -0.23108265309731704,
+            -0.2769580174530455
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_0",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 57,
+          "position_residual_m": 0.014900245712203867,
+          "orientation_residual_degrees": 7.999942704253339,
+          "joints": [
+            0.05585831045948037,
+            -0.8555081827052825,
+            0.22573219735701058,
+            -1.020603029013376,
+            0.6098292020496858,
+            -0.2310827366704213,
+            -0.27695795828445124
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_1",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 58,
+          "position_residual_m": 0.014900245712270931,
+          "orientation_residual_degrees": 7.999942704222069,
+          "joints": [
+            0.05585829220758353,
+            -0.8555081892511225,
+            0.22573218983584717,
+            -1.020603029013376,
+            0.6098292020496858,
+            -0.23108266567531238,
+            -0.2769580049919541
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_2",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 51,
+          "position_residual_m": 0.014900245712149535,
+          "orientation_residual_degrees": 7.999942704277662,
+          "joints": [
+            0.0558583180338051,
+            -0.8555081382764373,
+            0.2257320820154542,
+            -1.020603029013376,
+            0.6098292020496858,
+            -0.23108260939562708,
+            -0.2769580616582782
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_3",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 67,
+          "position_residual_m": 0.014900245711857545,
+          "orientation_residual_degrees": 7.999942704420889,
+          "joints": [
+            0.05585831394361913,
+            -0.855508224443232,
+            0.22573215804077043,
+            -1.020603029013376,
+            0.6098292020496858,
+            -0.23108257578229993,
+            -0.2769581089631714
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_4",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 44,
+          "position_residual_m": 0.014900245712236448,
+          "orientation_residual_degrees": 7.999942704236193,
+          "joints": [
+            0.05585831069484822,
+            -0.855508146083841,
+            0.22573212310127133,
+            -1.020603029013376,
+            0.6098292020496859,
+            -0.2310826478996108,
+            -0.27695802527881264
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_5",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 51,
+          "position_residual_m": 0.01490024571212234,
+          "orientation_residual_degrees": 7.999942704290058,
+          "joints": [
+            0.05585831959520381,
+            -0.8555081309783408,
+            0.22573207860151018,
+            -1.020603029013376,
+            0.6098292020496859,
+            -0.23108262119622294,
+            -0.2769580510578142
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_6",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 59,
+          "position_residual_m": 0.014900245712150149,
+          "orientation_residual_degrees": 7.999942704290839,
+          "joints": [
+            0.05585829459539735,
+            -0.855508302200322,
+            0.2257324228126507,
+            -1.020603029013376,
+            0.6098292020496859,
+            -0.2310828239699922,
+            -0.27695790544001786
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_7",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 65,
+          "position_residual_m": 0.01490024571214678,
+          "orientation_residual_degrees": 7.999942704278755,
+          "joints": [
+            0.05585829393081493,
+            -0.8555081548933808,
+            0.2257321420381568,
+            -1.020603029013376,
+            0.6098292020496858,
+            -0.23108262865828263,
+            -0.2769580298243931
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_8",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 67,
+          "position_residual_m": 0.014900245712266896,
+          "orientation_residual_degrees": 7.999942704221666,
+          "joints": [
+            0.05585830161642767,
+            -0.8555081549997923,
+            0.22573215644957143,
+            -1.020603029013376,
+            0.6098292020496858,
+            -0.23108266143293574,
+            -0.27695800910413454
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_9",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 53,
+          "position_residual_m": 0.014900245712244886,
+          "orientation_residual_degrees": 7.999942704233583,
+          "joints": [
+            0.05585829483235768,
+            -0.8555081518287363,
+            0.22573212436122064,
+            -1.020603029013376,
+            0.6098292020496859,
+            -0.2310826198836911,
+            -0.27695803637655036
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_10",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 46,
+          "position_residual_m": 0.014900245712264676,
+          "orientation_residual_degrees": 7.99994270422362,
+          "joints": [
+            0.05585829832843035,
+            -0.8555081620344144,
+            0.22573215374935474,
+            -1.020603029013376,
+            0.6098292020496858,
+            -0.2310826528763924,
+            -0.27695801451852925
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_11",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 54,
+          "position_residual_m": 0.014900245712237355,
+          "orientation_residual_degrees": 7.999942704239238,
+          "joints": [
+            0.0558583610274215,
+            -0.8555080540493206,
+            0.22573199095291938,
+            -1.020603029013376,
+            0.6098292020496859,
+            -0.23108269162823475,
+            -0.2769580065831336
+          ],
+          "certified": false
+        }
+      ]
+    },
+    {
+      "fixture": "feasible-original-p4-s0-failed.json",
+      "sha256": "44b73ab5c236d306ff2a07deb63b8ee2f51718eeb747307b357832983c7e2369",
+      "failed_step": 3980,
+      "goal_base_m": [
+        0.3425992696051009,
+        -0.5507125969456281,
+        0.06516403521229355
+      ],
+      "position_tolerance_m": 0.014,
+      "orientation_tolerance_degrees": 8.0,
+      "starts": 16,
+      "certified_solutions": 0,
+      "minimum_position_residual_within_orientation_m": 0.0501644103853147,
+      "results": [
+        {
+          "start": "retained_solution",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 1,
+          "position_residual_m": 0.05016441038629953,
+          "orientation_residual_degrees": 7.999942704253454,
+          "joints": [
+            0.020223862053708398,
+            -0.6116571317594138,
+            -0.16364059684987317,
+            -0.9513116799627283,
+            0.8104837586711284,
+            -0.174532925197732,
+            -0.373760184132505
+          ],
+          "certified": false
+        },
+        {
+          "start": "measured",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 28,
+          "position_residual_m": 0.05016441038593185,
+          "orientation_residual_degrees": 7.999942704308371,
+          "joints": [
+            0.020223657161577056,
+            -0.6116571863560163,
+            -0.16364055990880422,
+            -0.9513114179106933,
+            0.8104837586711285,
+            -0.174532925197732,
+            -0.3737603696409592
+          ],
+          "certified": false
+        },
+        {
+          "start": "original_reference",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 31,
+          "position_residual_m": 0.050164410386092116,
+          "orientation_residual_degrees": 7.9999427042839155,
+          "joints": [
+            0.02022369554261213,
+            -0.6116571910214181,
+            -0.16364057676097715,
+            -0.951311446277764,
+            0.8104837586711284,
+            -0.17453292519773217,
+            -0.3737603602212031
+          ],
+          "certified": false
+        },
+        {
+          "start": "box_midpoint",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 28,
+          "position_residual_m": 0.0501644103853147,
+          "orientation_residual_degrees": 7.999942704415972,
+          "joints": [
+            0.020223824103310445,
+            -0.6116572780463841,
+            -0.1636407555461854,
+            -0.9513113575466429,
+            0.8104837586711284,
+            -0.174532925197732,
+            -0.3737607359772422
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_0",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 30,
+          "position_residual_m": 0.050164410385774696,
+          "orientation_residual_degrees": 7.999942704332101,
+          "joints": [
+            0.020223680739189762,
+            -0.6116571709595514,
+            -0.16364053476093415,
+            -0.9513114779081401,
+            0.8104837586711284,
+            -0.174532925197732,
+            -0.37376030012879347
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_1",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 30,
+          "position_residual_m": 0.05016441038643282,
+          "orientation_residual_degrees": 7.9999427042338755,
+          "joints": [
+            0.020223578763174856,
+            -0.6116572110036372,
+            -0.16364057060453902,
+            -0.9513113023056213,
+            0.8104837586711288,
+            -0.174532925197732,
+            -0.3737604393501816
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_2",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 24,
+          "position_residual_m": 0.05016441038627172,
+          "orientation_residual_degrees": 7.999942704256801,
+          "joints": [
+            0.020223715734049273,
+            -0.6116571997836046,
+            -0.16364058185694788,
+            -0.9513114604856987,
+            0.8104837586711284,
+            -0.174532925197732,
+            -0.3737603413259911
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_3",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 33,
+          "position_residual_m": 0.050164410386268406,
+          "orientation_residual_degrees": 7.999942704259851,
+          "joints": [
+            0.020223747004380108,
+            -0.6116571096871682,
+            -0.16364059007630136,
+            -0.9513115629950878,
+            0.8104837586711284,
+            -0.174532925197732,
+            -0.3737603107191297
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_4",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 29,
+          "position_residual_m": 0.050164410385697814,
+          "orientation_residual_degrees": 7.999942704346015,
+          "joints": [
+            0.020223674341121645,
+            -0.6116572226633686,
+            -0.16364052239625537,
+            -0.9513114141595106,
+            0.8104837586711284,
+            -0.174532925197732,
+            -0.37376044424000215
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_5",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 27,
+          "position_residual_m": 0.05016441038609947,
+          "orientation_residual_degrees": 7.999942704282886,
+          "joints": [
+            0.02022369302131634,
+            -0.6116572017372301,
+            -0.1636405718583474,
+            -0.9513114408790798,
+            0.8104837586711284,
+            -0.174532925197732,
+            -0.37376034181744605
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_6",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 31,
+          "position_residual_m": 0.05016441038649338,
+          "orientation_residual_degrees": 7.999942704223187,
+          "joints": [
+            0.020223689019103593,
+            -0.611657201863565,
+            -0.16364056166675792,
+            -0.9513114386023169,
+            0.8104837586711284,
+            -0.17453292519773203,
+            -0.3737603620722482
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_7",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 33,
+          "position_residual_m": 0.05016441038650509,
+          "orientation_residual_degrees": 7.999942704221325,
+          "joints": [
+            0.02022371198497848,
+            -0.6116571930873084,
+            -0.16364056669732263,
+            -0.9513114696303427,
+            0.8104837586711295,
+            -0.174532925197732,
+            -0.37376034099688715
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_8",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 30,
+          "position_residual_m": 0.05016441038646697,
+          "orientation_residual_degrees": 7.999942704227094,
+          "joints": [
+            0.02022370033608023,
+            -0.6116571983292596,
+            -0.16364056310071776,
+            -0.9513114540034033,
+            0.8104837586711292,
+            -0.174532925197732,
+            -0.3737603504964281
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_9",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 27,
+          "position_residual_m": 0.05016441038641889,
+          "orientation_residual_degrees": 7.999942704234654,
+          "joints": [
+            0.02022364815531561,
+            -0.6116572103957848,
+            -0.16364053653922178,
+            -0.9513114042283083,
+            0.8104837586711284,
+            -0.17453292519773203,
+            -0.3737603557719661
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_10",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 25,
+          "position_residual_m": 0.05016441038613472,
+          "orientation_residual_degrees": 7.999942704278605,
+          "joints": [
+            0.02022357824551473,
+            -0.6116572177035682,
+            -0.1636405148519857,
+            -0.9513113387641337,
+            0.8104837586711284,
+            -0.174532925197732,
+            -0.3737603541374195
+          ],
+          "certified": false
+        },
+        {
+          "start": "fixed_random_11",
+          "solver_success": true,
+          "solver_message": "Optimization terminated successfully",
+          "iterations": 26,
+          "position_residual_m": 0.05016441038650793,
+          "orientation_residual_degrees": 7.999942704220902,
+          "joints": [
+            0.020223692370352687,
+            -0.6116572001586559,
+            -0.16364055666873412,
+            -0.9513114484813958,
+            0.8104837586711284,
+            -0.174532925197732,
+            -0.37376034601696184
+          ],
+          "certified": false
+        }
+      ]
+    }
+  ],
+  "commands_sent": false,
+  "policy_changed": false,
+  "limitations": [
+    "Offline numerical evidence, not a global infeasibility proof",
+    "The 8-degree orientation gate was introduced by this path candidate",
+    "All initial guesses retained; no task retry or tolerance relaxation"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-23T20:56:08.054167+08:00",
+  "candidate": "executor-numerics",
+  "parent": "executor-mpc-hold",
+  "manifest_sha256": "3d30bf401c66daf6ca62469601c1f88eebee0bf6b0533da21af23e7b2ebff1d2",
+  "factor": "Remove immutable measured-pose constraint from SLSQP only; retain independent start and full-sweep checks",
+  "evidence": "Second parcel nominal step7: measured separating gap0.999999251662um, fixed1um constraint infeasible from7.48e-13m roundoff; omission certifies47steps residual9.360mm",
+  "unchanged": [
+    "3mm parcel margin and all geometry",
+    "full start/proposed/filtered sweeps",
+    "all physical, torque, step and timeout bounds",
+    "60mm horizontal and70mm rise",
+    "C library and original VR/task/QR"
+  ],
+  "tests_passed": 439,
+  "next_trial": "executor-numerics-c-p2-s0",
+  "heldout_seeds_used": []
+}

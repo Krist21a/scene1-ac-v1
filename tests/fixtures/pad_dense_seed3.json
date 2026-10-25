@@ -1,0 +1,161 @@
+{
+  "reference": {
+    "position_base_m": [
+      0.42662284654577054,
+      -0.5653343860966655,
+      -0.08429171181331119
+    ],
+    "extent_xy_m": [
+      0.1826414520478274,
+      0.1854414618211312
+    ],
+    "points": 138,
+    "partial": false,
+    "footprint_xy_m": [
+      [
+        0.5235751271247864,
+        -0.49442169070243835
+      ],
+      [
+        0.5174092650413513,
+        -0.4723033308982849
+      ],
+      [
+        0.38536304235458374,
+        -0.46415919065475464
+      ],
+      [
+        0.3491166830062866,
+        -0.46485579013824463
+      ],
+      [
+        0.33524394035339355,
+        -0.4850460886955261
+      ],
+      [
+        0.328307569026947,
+        -0.49514126777648926
+      ],
+      [
+        0.32515639066696167,
+        -0.5260546803474426
+      ],
+      [
+        0.3296980857849121,
+        -0.6570331454277039
+      ],
+      [
+        0.38768652081489563,
+        -0.6622506380081177
+      ],
+      [
+        0.4078659117221832,
+        -0.6639957427978516
+      ],
+      [
+        0.5017696619033813,
+        -0.6599729061126709
+      ],
+      [
+        0.518009603023529,
+        -0.6363373398780823
+      ],
+      [
+        0.5224185585975647,
+        -0.5288313031196594
+      ]
+    ]
+  },
+  "config": {
+    "stop_dynamic_tf_after_calibration": true,
+    "enabled": true,
+    "strategy": "act_residual",
+    "base_frame": "base_link",
+    "camera_frame": "Head Camera View",
+    "camera_mount_frame": "camera_base",
+    "description_param": "/humanoid_description",
+    "head_joint_indices": [
+      -2,
+      -1
+    ],
+    "fixed_ik_waist": true,
+    "rgb_topic": "/cam_h/color/image_raw/compressed",
+    "depth_topic": "/cam_h/depth/image_raw/compressedDepth",
+    "info_topic": "/cam_h/color/camera_info",
+    "image_wh": [
+      848,
+      480
+    ],
+    "max_sensor_age_s": 1.0,
+    "max_rgb_depth_dt_s": 0.1,
+    "max_rgb_joint_dt_s": 0.035,
+    "workspace_min": [
+      0.1,
+      -0.8,
+      -0.4
+    ],
+    "workspace_max": [
+      1.2,
+      0.8,
+      0.3
+    ],
+    "table_hsv": [
+      [
+        40,
+        100,
+        15
+      ],
+      [
+        85,
+        255,
+        255
+      ]
+    ],
+    "min_object_height_m": 0.025,
+    "max_object_height_m": 0.14,
+    "grid_resolution_m": 0.0075,
+    "min_component_points": 30,
+    "max_object_extent_m": 0.19,
+    "max_object_width_m": 0.065,
+    "close_threshold": 0.6,
+    "open_threshold": 0.25,
+    "other_arm_closed_threshold": 0.55,
+    "skip_initial_grasps": 0,
+    "max_target_distance_m": 0.12,
+    "max_xy_correction_m": 0.1,
+    "max_joint_residual_rad": 0.5,
+    "alignment_tolerance_m": 0.012,
+    "alignment_timeout_steps": 50,
+    "loaded_alignment_timeout_steps": 90,
+    "clearance_m": 0.07,
+    "alignment_z_tolerance_m": 0.015,
+    "orientation_tolerance_rad": 0.15,
+    "stable_steps": 3,
+    "settle_motion_m": 0.003,
+    "close_dwell_steps": 6,
+    "release_dwell_steps": 8,
+    "release_tolerance_m": 0.02,
+    "closed_command": 0.98,
+    "approach_joint_velocity_rad_s": 0.6,
+    "transport_offset_decay": 0.8,
+    "lift_before_offset_decay_m": 0.06,
+    "target_memory_steps": 40,
+    "target_stable_frames": 3,
+    "target_association_distance_m": 0.025,
+    "placement_margin_m": 0.025,
+    "weighing_release_height_m": 0.08,
+    "max_weighing_release_height_m": 0.16,
+    "placement_vertical_step_m": 0.035,
+    "tracking_compensation_gain": 2.0,
+    "tracking_compensation_alpha": 0.1,
+    "max_tracking_compensation_rad": 0.2,
+    "max_loaded_tracking_compensation_rad": 1.2,
+    "max_loaded_feedforward_rad": 1.2,
+    "loaded_tracking_compensation_gain": 1.0,
+    "loaded_tracking_compensation_alpha": 0.08,
+    "side_grasp_insertion_m": 0.02
+  },
+  "plane": -0.08331305865730337,
+  "source": "frozen-executor-bin-dense-ac-p4-s3-1025",
+  "step": 4180
+}

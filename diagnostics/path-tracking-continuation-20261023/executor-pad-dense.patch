@@ -1,0 +1,127 @@
+--- a/run_scene1.py
++++ b/run_scene1.py
+@@ -17,7 +17,7 @@
+ from scene1.grasp import GraspMonitor
+ from scene1.servo import VisualServo
+ from scene1.vision import ParcelDetector, rgb_image
+-from scene1.rgbd import RgbdScene, metric_candidates
++from scene1.rgbd import RgbdScene, metric_candidates, surface_candidates
+ from scene1.settlement import resting_observation
+ from scene1.cartesian import ArmKinematics, CartesianGraspAligner
+ from scene1.residual import ResidualAssist
+@@ -64,6 +64,17 @@
+     split = split or (settling and pending['kind'] == 'short_retreat' and split_enabled
+                       and config.get('wrist_assist', {}).get('release_spatial_components', False))
+     snapshot = scene.read(candidate_stride=2 if settling else 4, spatial_components=split)
++    if (snapshot is not None and visual_pickup is not None
++            and getattr(visual_pickup, 'active', False)
++            and getattr(visual_pickup, 'stage', None) == 'observe_pad'):
++        # Resample the same registered depth; preserve the stored complete pad
++        # boundary and all original area/edge/height confirmation thresholds.
++        snapshot = snapshot.copy()
++        snapshot['surfaces'] = surface_candidates(
++            snapshot['rgb'], snapshot['depth_m'], snapshot['intrinsic'],
++            snapshot['camera_to_base'], snapshot['table_z_base_m'],
++            config['cartesian_alignment'], stride=2)
++        snapshot['surface_sampling_stride'] = 2
+     if (settling and pending['kind'] == 'short_retreat' and split_enabled
+             and config.get('wrist_assist', {}).get('release_geometry_reobserve', False)
+             and snapshot is not None):
+--- a/scene1/rgbd.py
++++ b/scene1/rgbd.py
+@@ -344,13 +344,15 @@
+         self.listener.unregister()
+ 
+ 
+-def surface_candidates(rgb, depth, intrinsic, camera_to_base, plane_z, config):
++def surface_candidates(rgb, depth, intrinsic, camera_to_base, plane_z, config, stride=4):
+     """Bright green/yellow planar pad observed on the tabletop."""
++    if stride not in (1, 2, 4):
++        raise ValueError('Surface stride must be 1, 2 or 4 pixels')
+     hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+     mask = cv2.inRange(hsv, np.array([20, 120, 175], np.uint8), np.array([85, 255, 255], np.uint8))
+     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8))
+     _, labels = cv2.connectedComponents(mask)
+-    v, u = np.mgrid[0:depth.shape[0]:4, 0:depth.shape[1]:4]
++    v, u = np.mgrid[0:depth.shape[0]:stride, 0:depth.shape[1]:stride]
+     u, v = u.reshape(-1), v.reshape(-1)
+     z = depth[v, u]
+     camera = np.column_stack(((u - intrinsic[0, 2]) * z / intrinsic[0, 0],
+--- a/scene1/visual_pickup.py
++++ b/scene1/visual_pickup.py
+@@ -495,7 +495,8 @@
+             observed = visible_pad(self.surface_reference, snapshot)
+             if fresh:
+                 self.pad_frames = self.pad_frames+1 if observed else 0
+-            info.update(pad_boundary_observed=observed, pad_stable_frames=self.pad_frames)
++            info.update(pad_boundary_observed=observed, pad_stable_frames=self.pad_frames,
++                        pad_surface_stride=snapshot.get('surface_sampling_stride', 4))
+             if self.pad_frames >= 3:
+                 self.surface = copy.deepcopy(self.surface_reference)
+                 center, rotation, extent = motion.world_box(measured)
+--- a/tests/test_pad_dense.py
++++ b/tests/test_pad_dense.py
+@@ -0,0 +1,63 @@
++import copy
++import json
++from pathlib import Path
++from types import SimpleNamespace
++import unittest
++import numpy as np
++
++from scene1.rgbd import surface_candidates
++from scene1.visual_pickup import visible_pad
++from run_scene1 import read_manipulation_rgbd
++
++
++class DensePadTests(unittest.TestCase):
++    def setUp(self):
++        fixtures = Path(__file__).parent / 'fixtures'
++        self.meta = json.loads((fixtures / 'pad_dense_seed3.json').read_text())
++        with np.load(fixtures / 'pad_dense_seed3.npz') as data:
++            self.snapshot = dict(data)
++        self.snapshot['table_z_base_m'] = self.meta['plane']
++        self.snapshot['surfaces'] = self.surfaces(4)
++
++    def surfaces(self, stride):
++        s = self.snapshot
++        return surface_candidates(s['rgb'], s['depth_m'], s['intrinsic'],
++                                  s['camera_to_base'], self.meta['plane'],
++                                  self.meta['config'], stride=stride)
++
++    def test_recorded_occlusion_passes_original_area_and_edge_gates_with_dense_samples(self):
++        reference = copy.deepcopy(self.meta['reference'])
++        self.assertFalse(visible_pad(reference, dict(surfaces=self.surfaces(4))))
++        self.assertTrue(visible_pad(reference, dict(surfaces=self.surfaces(2))))
++        self.assertEqual(reference, self.meta['reference'])
++
++    def test_only_active_pad_observation_resamples_same_snapshot(self):
++        for stage, active in [('observe_pad', True), ('observe_pad', False), ('carry', True)]:
++            with self.subTest(stage=stage, active=active):
++                source = self.snapshot
++                result = read_manipulation_rgbd(SimpleNamespace(read=lambda **kw: source),
++                    SimpleNamespace(pending=None), None,
++                    SimpleNamespace(stage=stage, active=active),
++                    dict(cartesian_alignment=self.meta['config']))
++                if active and stage == 'observe_pad':
++                    self.assertEqual(result['surface_sampling_stride'], 2)
++                    self.assertIs(result['depth_m'], source['depth_m'])
++                    self.assertTrue(visible_pad(self.meta['reference'], result))
++                else:
++                    self.assertIs(result, source)
++                self.assertNotIn('surface_sampling_stride', source)
++
++    def test_dense_observation_cannot_pass_wrong_height_or_outside_reference(self):
++        surfaces = self.surfaces(2)
++        for case in ['height', 'outside']:
++            changed = copy.deepcopy(surfaces)
++            for surface in changed:
++                if case == 'height':
++                    surface['position_base_m'][2] += .03
++                else:
++                    surface['footprint_xy_m'] = (np.asarray(surface['footprint_xy_m']) + [.1, 0.]).tolist()
++            self.assertFalse(visible_pad(self.meta['reference'], dict(surfaces=changed)))
++
++    def test_invalid_sampling_rejects(self):
++        with self.assertRaises(ValueError):
++            self.surfaces(3)

@@ -1,0 +1,324 @@
+{
+  "sample_dt_sim_s": 0.01,
+  "samples": 28652,
+  "groups": {
+    "proximal": [
+      0,
+      1,
+      2,
+      3,
+      7,
+      8,
+      9,
+      10
+    ],
+    "wrist": [
+      4,
+      5,
+      6,
+      11,
+      12,
+      13
+    ]
+  },
+  "tracking": {
+    "proximal": {
+      "rmse_rad": 0.004766808534214393,
+      "per_joint_rmse_rad": [
+        0.002226461065809038,
+        0.0016790275334626376,
+        0.004875362179738139,
+        0.004862502665811224,
+        0.002774207694544346,
+        0.0031216136324901883,
+        0.008592784578414291,
+        0.005942534064394568
+      ],
+      "static_samples": 20,
+      "static_bias_rad": [
+        0.00146411741738878,
+        0.0009669839198406013,
+        -0.0017803637706667777,
+        0.004566350817782805,
+        0.0012644362193457547,
+        -0.0007250356037887401,
+        0.000932027688816818,
+        0.0038214144344310475
+      ],
+      "static_position_std_rad": [
+        0.00012026451686428957,
+        7.582429133183138e-05,
+        0.0001468828435866199,
+        0.0003814936519980425,
+        0.00010478903911947807,
+        5.669391486163503e-05,
+        7.831345668509433e-05,
+        0.00031984118849612937
+      ],
+      "approximate_dynamic_lag_per_joint": [
+        {
+          "sim_lag_s": 0.0,
+          "velocity_correlation": 0.9905115329996558,
+          "at_search_boundary": true
+        },
+        {
+          "sim_lag_s": 0.0,
+          "velocity_correlation": 0.9550260876842256,
+          "at_search_boundary": true
+        },
+        {
+          "sim_lag_s": 0.0,
+          "velocity_correlation": 0.8802780484799584,
+          "at_search_boundary": true
+        },
+        {
+          "sim_lag_s": 0.0,
+          "velocity_correlation": 0.964455805928202,
+          "at_search_boundary": true
+        },
+        {
+          "sim_lag_s": 0.0,
+          "velocity_correlation": 0.9828022705662813,
+          "at_search_boundary": true
+        },
+        {
+          "sim_lag_s": 0.0,
+          "velocity_correlation": 0.971945070228357,
+          "at_search_boundary": true
+        },
+        {
+          "sim_lag_s": 0.0,
+          "velocity_correlation": 0.8706613990861556,
+          "at_search_boundary": true
+        },
+        {
+          "sim_lag_s": 0.0,
+          "velocity_correlation": 0.9744070105139564,
+          "at_search_boundary": true
+        }
+      ]
+    },
+    "wrist": {
+      "rmse_rad": 0.06341841456563163,
+      "per_joint_rmse_rad": [
+        0.03313247087548149,
+        0.07105791193532517,
+        0.01601616534002228,
+        0.05218635479743744,
+        0.11849314605786154,
+        0.03104553944215161
+      ],
+      "static_samples": 20,
+      "static_bias_rad": [
+        -0.020048910493215964,
+        -0.036456498450648474,
+        0.011407683898456035,
+        0.02418274131415309,
+        0.045379602049905106,
+        -0.01201738336548475
+      ],
+      "static_position_std_rad": [
+        0.00012599788732596363,
+        0.00012699613060600083,
+        1.6297043350667887e-05,
+        0.000373052948003003,
+        0.00012791269412994126,
+        1.582398332515336e-05
+      ],
+      "approximate_dynamic_lag_per_joint": [
+        {
+          "sim_lag_s": 0.31,
+          "velocity_correlation": 0.39253585593764817,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.32,
+          "velocity_correlation": 0.5880958858767409,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.33,
+          "velocity_correlation": 0.7787190441251639,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.29,
+          "velocity_correlation": 0.33380493063731037,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.25,
+          "velocity_correlation": 0.7306427765710315,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.32,
+          "velocity_correlation": 0.6036832570249004,
+          "at_search_boundary": false
+        }
+      ]
+    }
+  },
+  "reference_consistency": {
+    "proximal": {
+      "position_derivative_rms_rad_s": 0.07717652660162494,
+      "published_velocity_rms_rad_s": 0.28913322841063543,
+      "position_velocity_disagreement_rms_rad_s": 0.2722560658182677,
+      "moving_joint_samples": 94618,
+      "zero_velocity_while_moving_fraction": 3.170644063497432e-05
+    },
+    "wrist": {
+      "position_derivative_rms_rad_s": 0.12950055572839755,
+      "published_velocity_rms_rad_s": 0.0,
+      "position_velocity_disagreement_rms_rad_s": 0.12950055572839755,
+      "moving_joint_samples": 61594,
+      "zero_velocity_while_moving_fraction": 1.0
+    }
+  },
+  "upper_to_wbc": {
+    "proximal": {
+      "rmse_rad": 0.03440265997370192,
+      "per_joint_rmse_rad": [
+        0.017263430057700854,
+        0.01163808009446926,
+        0.03420617323127774,
+        0.0355484545182945,
+        0.021227576396665983,
+        0.01944268205623262,
+        0.057293522733888144,
+        0.049899325068028494
+      ],
+      "static_samples": 201,
+      "static_bias_rad": [
+        0.0059810075486245885,
+        0.003840262733593704,
+        -0.00985782687816165,
+        0.031012623358667175,
+        0.0042164362909007875,
+        -0.008599175662648176,
+        0.03299713908440106,
+        0.0407452776145943
+      ],
+      "static_position_std_rad": [
+        0.0020501732264630373,
+        0.0012480314901155453,
+        0.0012678162956796099,
+        0.0011235892570964831,
+        0.0037311806205741183,
+        0.005533378864860606,
+        0.029960749920844642,
+        0.017305220344235945
+      ],
+      "approximate_dynamic_lag_per_joint": [
+        {
+          "sim_lag_s": 0.26,
+          "velocity_correlation": 0.9660412268379256,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.27,
+          "velocity_correlation": 0.9093720873167944,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.28,
+          "velocity_correlation": 0.8248837614975433,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.28,
+          "velocity_correlation": 0.9275315877791549,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.28,
+          "velocity_correlation": 0.947535938536772,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.3,
+          "velocity_correlation": 0.9266586528700768,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.32,
+          "velocity_correlation": 0.8078658736653282,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.28,
+          "velocity_correlation": 0.9462967632356537,
+          "at_search_boundary": false
+        }
+      ]
+    },
+    "wrist": {
+      "rmse_rad": 0.005612610359468294,
+      "per_joint_rmse_rad": [
+        0.004775804600273028,
+        0.003677669369298565,
+        0.0027456241337955527,
+        0.007361771466624617,
+        0.0075815990155366705,
+        0.0057844648905601825
+      ],
+      "static_samples": 201,
+      "static_bias_rad": [
+        1.0478441435916899e-06,
+        1.2505436379286767e-06,
+        2.0177389821319948e-07,
+        -5.524283824429389e-06,
+        -2.6482515347488836e-05,
+        -1.91935253495891e-06
+      ],
+      "static_position_std_rad": [
+        1.097258133903841e-05,
+        1.1959332696178702e-05,
+        2.377765014912641e-06,
+        0.00022675062889645394,
+        0.00029866587186409165,
+        0.00013792917225310505
+      ],
+      "approximate_dynamic_lag_per_joint": [
+        {
+          "sim_lag_s": 0.07,
+          "velocity_correlation": 0.48437710237882803,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.04,
+          "velocity_correlation": 0.6962010399488788,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.04,
+          "velocity_correlation": 0.8469516132816408,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.06,
+          "velocity_correlation": 0.3883694791892611,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.06,
+          "velocity_correlation": 0.8475544823729043,
+          "at_search_boundary": false
+        },
+        {
+          "sim_lag_s": 0.06,
+          "velocity_correlation": 0.7609035927651918,
+          "at_search_boundary": false
+        }
+      ]
+    }
+  },
+  "mpc_to_wbc_proximal_rmse_rad": 0.0018783065903161462,
+  "limitations": [
+    "Unstamped references aligned by callback arrival and interpolated sensor simulation clock",
+    "10ms grid; not exact application delay, QP constraint audit, or whole robot stability proof",
+    "Dynamic lag uses velocity correlation over 0..400ms; boundary/low-correlation fits are inconclusive",
+    "Static variation aggregates eligible plateaus; no plateau yields null",
+    "Position derivative inferred from sampled filtered positions; high-frequency content can alias"
+  ]
+}

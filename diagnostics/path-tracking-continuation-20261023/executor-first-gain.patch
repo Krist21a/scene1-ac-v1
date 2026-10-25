@@ -1,0 +1,86 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -253,6 +253,7 @@
+   release_reference_mode: mpc_continuous
+   grasp_align_parcel_yaw: true
+   grasp_motion_settle: true
++  first_grasp_gain_scale: 0.35
+   release_prepare_before_open: true
+   release_prepare_adapt_settled: true
+   release_cartesian_open_hold: true
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -244,7 +244,7 @@
+         return min(distances) if distances else None
+ 
+     def _correct(self, base, measured, side, xyz_error, angular_error=None, level_axis=None,
+-                 step_scale=1., offset_cap_rad=None, translation_limit_m=None, view_target=None):
++                 step_scale=1., offset_cap_rad=None, translation_limit_m=None, view_target=None, gain_scale=1.):
+         """Damped local correction, with optional bottom-leveling rotation."""
+         start = (0, 8)[side]
+         error = np.asarray(xyz_error, float).copy()
+@@ -316,7 +316,9 @@
+         # Solve with the limits included, so a saturated wrist does not absorb
+         # all further requests that could be shared by other arm joints.
+         matrix=np.vstack((jacobian,.015*np.eye(7)))
+-        target=np.r_[self.config['gain']*requested,np.zeros(7)]
++        if not np.isfinite(gain_scale) or not 0. < gain_scale <= 1.:
++            raise ValueError('Correction gain scale must be finite and in (0, 1]')
++        target=np.r_[self.config['gain']*gain_scale*requested,np.zeros(7)]
+         free=upper-lower > 1e-10
+         change=(lower+upper)/2
+         if np.any(free):
+@@ -1133,7 +1135,13 @@
+                 motion_ready = movement <= .0015
+                 info.update(grasp_movement_m=movement, grasp_motion_ready=motion_ready,
+                             grasp_velocity_brake_m=(-2.*velocity).tolist())
+-            result = self._correct(p['base'], measured, side, correction, angular_error)
++            first_grasp_scale = (self.wrist_config.get('first_grasp_gain_scale', 1.)
++                if side == 1 and 'grasp_rotation' not in p
++                and 'support_z_base_m' not in p['target'] else 1.)
++            result = self._correct(p['base'], measured, side, correction, angular_error,
++                                   gain_scale=first_grasp_scale)
++            if first_grasp_scale != 1.:
++                info['first_grasp_gain_scale'] = float(first_grasp_scale)
+             result[grip] = 0
+             arrived = (motion_ready and orientation_ok and np.linalg.norm(error[:2]) <= self.config['grasp_tolerance_m']
+                        and abs(error[2]) <= self.config['grasp_z_tolerance_m']
+--- /dev/null
++++ b/tests/test_first_grasp_gain.py
+@@ -0,0 +1,36 @@
++import unittest
++from unittest.mock import patch
++import numpy as np
++from scipy.spatial.transform import Rotation
++import test_residual as original
++
++
++class FirstGraspGainTests(unittest.TestCase):
++    setUp=original.ResidualTests.setUp
++
++    def test_scaled_increment_and_original_bounds(self):
++        base=self.raw.copy()
++        full=self.a._correct(base,self.measured,1,[.001,0.,0.])
++        self.a.offset[:]=0.
++        low=self.a._correct(base,self.measured,1,[.001,0.,0.],gain_scale=.35)
++        np.testing.assert_allclose(low-base,.35*(full-base),atol=1e-10)
++        self.assertLessEqual(max(abs(low-base)),self.a.config['max_joint_step_rad'])
++
++    def test_scale_not_stacked_on_later_visual_grasp(self):
++        self.a.wrist_config['first_grasp_gain_scale']=.35
++        target=self.snapshot['candidates'][0]
++        for later, expected in [(False,.35),(True,1.)]:
++            kwargs={'grasp_rotation':Rotation.identity()} if later else {}
++            self.a._begin('grasp',1,self.raw,target=target,plane=-.08,grasp_z=0.,
++                wrist_verified=False,**kwargs)
++            with patch.object(self.a,'_correct',return_value=self.raw.copy()) as correct:
++                self.a._pending_action(self.measured,self.snapshot)
++                self.assertEqual(correct.call_args.kwargs['gain_scale'],expected)
++
++    def test_invalid_scale_rejected(self):
++        for scale in [0.,-.1,1.1,float('nan'),float('inf')]:
++            with self.assertRaisesRegex(ValueError,'Correction gain scale'):
++                self.a._correct(self.raw,self.measured,1,[0.,0.,0.],gain_scale=scale)
++
++
++if __name__=='__main__':unittest.main()

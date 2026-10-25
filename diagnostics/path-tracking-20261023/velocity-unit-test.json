@@ -1,0 +1,28 @@
+{
+  "at": "2026-10-23T18:08:37.045255+08:00",
+  "test": "test_wrist_velocity_reference.cpp",
+  "header_sha256": "fd6900c9e646ebe1986210d5171b20dc0fec80f93404f99d969bf846c877acfd",
+  "test_sha256": "861e6aeeb5ce8547872ecd330d2223c582e1999f343f3ce692ce2677a59700a7",
+  "container": "kuavo_challenge_container_GPU_046e4301",
+  "compile": [
+    "g++",
+    "-std=c++14",
+    "-Wall",
+    "-Wextra",
+    "-pedantic"
+  ],
+  "compile_returncode": 0,
+  "execution_returncode": 0,
+  "assertions_enabled": true,
+  "cases": [
+    "first sample",
+    "wrist derivative",
+    "proximal excluded",
+    "duplicate timestamp",
+    "velocity clipping",
+    "disable/re-enable",
+    "time gap",
+    "backward time",
+    "nonfinite input"
+  ]
+}

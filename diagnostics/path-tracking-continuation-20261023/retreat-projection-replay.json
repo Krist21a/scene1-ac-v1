@@ -1,0 +1,72 @@
+{
+  "audit": {
+    "applied": true,
+    "original": {
+      "proposed": {
+        "clear": false,
+        "first_blocked_fraction": 1.0,
+        "samples": 9
+      },
+      "filtered": {
+        "clear": false,
+        "first_blocked_fraction": 1.0,
+        "samples": 9
+      },
+      "bounds_clipped": false
+    },
+    "final": {
+      "proposed": {
+        "clear": true,
+        "first_blocked_fraction": null,
+        "samples": 9
+      },
+      "filtered": {
+        "clear": true,
+        "first_blocked_fraction": null,
+        "samples": 9
+      },
+      "bounds_clipped": false
+    },
+    "solver_success": true,
+    "solver_message": "Optimization terminated successfully",
+    "iterations": 8,
+    "max_step_rad": 0.006000000000000005,
+    "proposal_adjustment_rad": [
+      -7.863177859016024e-05,
+      0.0003729093000618411,
+      0.00021322867978348925,
+      0.0,
+      7.269211090044081e-05,
+      2.458164612750835e-06,
+      0.0
+    ],
+    "margin_m": 0.003
+  },
+  "elapsed_s": 0.16594781700041494,
+  "chosen": [
+    0.5761134624481201,
+    0.19376561045646667,
+    0.12708649039268494,
+    -2.2646074295043945,
+    -1.5707963267949,
+    -0.40448901057243347,
+    -0.042811453342437744,
+    0.0,
+    -0.1807181137574457,
+    -0.4942067713727973,
+    -0.1821129564198443,
+    -0.5834893973275916,
+    1.0274310866936234,
+    -0.6245585799104333,
+    -0.38679885639447464,
+    0.0
+  ],
+  "previous_goal_error_m": 0.06330187420936974,
+  "chosen_goal_error_m": 0.061632824613840065,
+  "proposed_goal_error_m": 0.06161400036376678,
+  "separation_m": [
+    0.03315931573664088,
+    9.999999046814145e-07
+  ],
+  "limitation": "One actual blocked command replanned with unchanged sampled geometry and bounds; not a future dynamics guarantee"
+}

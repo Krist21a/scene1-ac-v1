@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-23T18:37:59.290129+08:00",
+  "candidate": "executor_geometry",
+  "parent_manifest": "850073e6656ad1e8482024ade1f4d622c17d7a794d899e3cf0b9bd5d4b95e161",
+  "manifest_sha256": "cb9bf6868d6fbb4f289f84d5dfb90febc6d786c6ff5f71c61a7b5bff1066936c",
+  "factor": "Before release retreat only, recover a zero-candidate observation with the existing depth-connected RGB-D split; bounded reacquisition inside the unchanged 140-step phase budget",
+  "evidence": "executor-c-p2-s0-r2 failed at step393; same raw frame returns the real 212-point parcel under existing depth-connected grouping",
+  "tests": {
+    "count": 403,
+    "passed": true,
+    "log": "tests-executor-geometry.log"
+  },
+  "unmodified": [
+    "parcel dimensions/envelope",
+    "collision margin",
+    "physical limits",
+    "original success checks",
+    "motion control",
+    "phase timeout"
+  ],
+  "not_allowed": "Do not replace an existing candidate or infer invisible geometry",
+  "next_trial": {
+    "label": "executor-geometry-c-p2-s0",
+    "seed": 0,
+    "parcels": 2,
+    "controller": "C"
+  },
+  "promotion": false
+}

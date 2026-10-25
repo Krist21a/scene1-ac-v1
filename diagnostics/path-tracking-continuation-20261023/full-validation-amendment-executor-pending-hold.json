@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-24T10:42:57.179295+08:00",
+  "parent": "executor-support-gain",
+  "candidate": "executor-pending-hold",
+  "factor": "Hold previous fully swept-clear reference on fresh-feedback-only retreat proposal block, then recheck fresh feedback before send",
+  "evidence": "Full4 stopped3472steps1complete; new proposal blocked at0.875 sweep fraction after15.6mrad feedback change; previous full sweep clear. Offline projection feasible within0.006rad but adds0.135sec.",
+  "unchanged": [
+    "Reject blocked measured pose or blocked previous sweep",
+    "Original phase clocks, limits,3mm parcel margin",
+    "Second fresh final guard still mandatory",
+    "No modifications to MPC/WBC/C"
+  ],
+  "tests_passed": 464,
+  "next_trial": "executor-pending-hold-c-p2-s0-1024",
+  "heldout_seeds_used": []
+}

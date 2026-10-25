@@ -1,0 +1,117 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -246,7 +246,7 @@
+   release_short_retreat_m: 0.06
+   release_clearance_rise_m: 0.07
+   release_measured_reference_hold: true
+-  release_reference_mode: measured_physical
++  release_reference_mode: continuous_command
+   release_cartesian_open_hold: true
+   release_open_hold_position_gain: 2.0
+   release_retreat_ready_m: 0.014
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -1065,9 +1065,9 @@
+                             np.any(observed > joint_high + 5e-4)):
+                         raise RuntimeError('Measured release pose is outside physical bounds')
+                     reference_mode = self.wrist_config.get('release_reference_mode', 'original_act_budget')
+-                    if reference_mode not in ('original_act_budget', 'measured_physical'):
++                    if reference_mode not in ('original_act_budget', 'measured_physical', 'continuous_command'):
+                         raise ValueError('Unknown release reference mode')
+-                    cap = (None if reference_mode == 'measured_physical' else self.config.get(
++                    cap = (None if reference_mode in ('measured_physical', 'continuous_command') else self.config.get(
+                         'max_placement_joint_offset_rad', self.config['max_joint_offset_rad']))
+                     original_reference = p['reference_base'][8:15]
+                     lower = joint_low if cap is None else np.maximum(joint_low, original_reference - cap)
+@@ -1075,17 +1075,30 @@
+                     if np.any(lower > upper):
+                         raise RuntimeError('Release reference has no feasible original correction budget')
+                     prior = result[8:15].copy()
+-                    bounded = np.minimum(np.maximum(observed, lower), upper)
++                    target = observed
++                    if reference_mode == 'continuous_command':
++                        if self.last_sent is None:
++                            raise RuntimeError('Continuous release requires an observed sent command')
++                        target = self.last_sent[8:15].copy()
++                        if (not np.isfinite(target).all() or np.any(target < joint_low)
++                                or np.any(target > joint_high)):
++                            raise RuntimeError('Previous release command is outside physical bounds')
++                        prior = target.copy()
++                    bounded = np.minimum(np.maximum(target, lower), upper)
+                     result[8:15] = bounded
+                     info['release_reference_transfer'] = dict(
+                         previous_command_rad=prior.tolist(), measured_target_rad=observed.tolist(),
++                        selected_target_rad=target.tolist(),
+                         bounded_target_rad=bounded.tolist(), original_reference_rad=original_reference.tolist(),
+                         correction_cap_rad=cap, reference_mode=reference_mode,
+                         physical_lower_joint_rad=joint_low.tolist(), physical_upper_joint_rad=joint_high.tolist(),
+-                        bound_active=(bounded != observed).tolist(),
+-                        remaining_target_error_rad=(bounded-observed).tolist(),
++                        bound_active=(bounded != target).tolist(),
++                        remaining_target_error_rad=(bounded-target).tolist(),
++                        measured_reference_difference_rad=(bounded-observed).tolist(),
+                         requested_change_rad=(bounded-prior).tolist(),
+-                        interpretation='Physical measured hold with a new visual phase reference' if cap is None else
++                        interpretation='Continuous sent reference; measured TCP remains the Cartesian hold goal'
++                            if reference_mode == 'continuous_command' else
++                            'Physical measured hold with a new visual phase reference' if cap is None else
+                             'Original ACT-budget reference construction; both modes use unchanged MotionFilter')
+                 extent = self.geometry[1]['extent'].copy()
+                 self.opening[1] = True
+@@ -1099,7 +1112,7 @@
+                     raise RuntimeError('Verified release command is outside configured bounds')
+                 old_inactive_reference = reference[:8].copy()
+                 reference[:8] = result[:8] - self.offset[:8]
+-                visual_reference = (self.wrist_config.get('release_reference_mode') == 'measured_physical'
++                visual_reference = (self.wrist_config.get('release_reference_mode') in ('measured_physical', 'continuous_command')
+                                     and self.wrist_config.get('release_measured_reference_hold', False))
+                 if visual_reference:
+                     # A visual release starts its next phase at the accepted
+@@ -1114,7 +1127,8 @@
+                     retained_inactive_offset=self.offset[:8].tolist(),
+                     discarded_reference_delta=(old_inactive_reference-reference[:8]).tolist(),
+                     active_arm_reference_unchanged=not visual_reference,
+-                    active_reference_source='measured_physical_release' if visual_reference else 'original_act')
++                    active_reference_source=(self.wrist_config['release_reference_mode']+'_release')
++                        if visual_reference else 'original_act')
+                 self.offset[8:15] = result[8:15]-reference[8:15]
+                 self.unwinding_placement = bool(np.max(np.abs(self.offset[8:15])) > self.config['max_joint_offset_rad'])
+                 self._begin('short_retreat', 1, reference, surface=copy.deepcopy(p['surface']), extent=extent,
+--- a/tests/test_release_reference_transfer.py
++++ b/tests/test_release_reference_transfer.py
+@@ -85,3 +85,35 @@
+         self.assertTrue(audit['velocity_limited'])
+         self.assertFalse(audit['bounds_clipped'])
+         self.assertLessEqual(np.max(abs(sent[8:15]-accepted[8:15])),.0600000001)
++
++    def test_continuous_release_keeps_sent_reference_and_measured_cartesian_goal(self):
++        reference, accepted = self.fixture()
++        self.a.wrist_config.update(release_reference_mode='continuous_command',
++            release_cartesian_open_hold=True, release_open_hold_position_gain=2.)
++        self.measured[11] = reference[11] + .7
++        sent = accepted.copy(); sent[8:15] += .02
++        self.a.observe_command(sent)
++        result, info = self.a._pending_action(self.measured, self.snapshot)
++        np.testing.assert_array_equal(result[8:15], sent[8:15])
++        np.testing.assert_array_equal(self.a.pending['base'][8:15], sent[8:15])
++        np.testing.assert_array_equal(info['release_reference_transfer']['requested_change_rad'], np.zeros(7))
++        np.testing.assert_array_equal(self.a.pending['release_hold_position'], self.measured[8:11])
++        np.testing.assert_array_equal(self.a.offset[8:15], np.zeros(7))
++        self.assertEqual(result[15], 0.)
++        held, _ = self.a._pending_action(self.measured, self.snapshot)
++        np.testing.assert_array_equal(held[8:15], sent[8:15])
++
++    def test_continuous_release_requires_actual_sent_command(self):
++        self.fixture()
++        self.a.wrist_config['release_reference_mode'] = 'continuous_command'
++        with self.assertRaisesRegex(RuntimeError, 'requires an observed sent command'):
++            self.a._pending_action(self.measured, self.snapshot)
++        self.assertEqual(self.a.pending['kind'], 'weighing')
++
++    def test_continuous_release_rejects_invalid_previous_command(self):
++        for invalid in [float('nan'), self.a.high[8]+.01]:
++            self.fixture()
++            self.a.wrist_config['release_reference_mode'] = 'continuous_command'
++            self.a.last_sent = self.raw.copy(); self.a.last_sent[8] = invalid
++            with self.assertRaisesRegex(RuntimeError, 'Previous release command is outside'):
++                self.a._pending_action(self.measured, self.snapshot)

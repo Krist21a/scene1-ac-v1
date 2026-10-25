@@ -1,0 +1,119 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -256,6 +256,7 @@
+   first_grasp_gain_scale: 0.35
+   release_prepare_before_open: true
+   release_prepare_adapt_settled: true
++  release_prepare_whole_arm: true
+   release_cartesian_open_hold: true
+   release_open_hold_position_gain: 2.0
+   release_retreat_ready_m: 0.014
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -746,7 +746,9 @@
+         return float(np.arctan2(closing[0]*minor[1]-closing[1]*minor[0],closing@minor))
+ 
+     def _prepare_release_reference(self, measured, support_ok, result, info):
+-        """Settle the wrist handoff while still gripping; share weighing budget."""
++        """Settle the configured handoff while gripping; share weighing budget."""
++        whole_arm = self.wrist_config.get("release_prepare_whole_arm", False)
++        active = slice(8,15) if whole_arm else slice(12,15)
+         p = self.pending
+         if 'release_prepare_target' not in p:
+             if self.last_sent is None:
+@@ -754,6 +756,8 @@
+             target = result.copy()
+             target[8:12] = self.last_sent[8:12]
+             target[12:15] = measured[12:15]
++            if whole_arm:
++                target[8:15] = self.last_sent[8:15]
+             target[15] = p['hold_grip']
+             if not np.isfinite(target).all() or np.any(target < self.low) or np.any(target > self.high):
+                 raise RuntimeError('Release preparation target outside physical bounds')
+@@ -762,27 +766,31 @@
+         target = p['release_prepare_target']
+         sent_error = float(np.max(abs(self.last_sent[8:15]-target[8:15])))
+         wrist_error = float(np.max(abs(measured[12:15]-target[12:15])))
++        tracking_error = float(np.max(abs(measured[active]-target[active])))
+         previous = p.get('release_prepare_previous_wrist')
+-        wrist_movement = np.inf if previous is None else float(np.max(abs(measured[12:15]-previous)))
+-        p['release_prepare_previous_wrist'] = measured[12:15].copy()
++        wrist_movement = np.inf if previous is None else float(np.max(abs(measured[active]-previous)))
++        p['release_prepare_previous_wrist'] = measured[active].copy()
+         quiet = support_ok and sent_error <= .005 and wrist_movement <= .003
+         p['release_prepare_quiet'] = p.get('release_prepare_quiet',0)+1 if quiet else 0
+-        adjustment = np.zeros(3)
++        adjustment = np.zeros(7 if whole_arm else 3)
+         if (self.wrist_config.get('release_prepare_adapt_settled',False)
+-                and p['release_prepare_quiet'] >= 3 and wrist_error > .015):
++                and p['release_prepare_quiet'] >= 3 and tracking_error > .015):
+             step = self.config['max_joint_step_rad']
+-            adjustment = np.clip(measured[12:15]-target[12:15],-step,step)
+-            updated = np.clip(target[12:15]+adjustment,self.low[12:15],self.high[12:15])
+-            adjustment = updated-target[12:15]
+-            target[12:15] = updated
++            adjustment = np.clip(measured[active]-target[active],-step,step)
++            updated = np.clip(target[active]+adjustment,self.low[active],self.high[active])
++            adjustment = updated-target[active]
++            target[active] = updated
+             p['release_prepare_quiet'] = 0
+             sent_error = float(np.max(abs(self.last_sent[8:15]-target[8:15])))
+             wrist_error = float(np.max(abs(measured[12:15]-target[12:15])))
+-        ready = support_ok and sent_error <= .005 and wrist_error <= .015 and wrist_movement <= .003
++        tracking_error = float(np.max(abs(measured[active]-target[active])))
++        ready = support_ok and sent_error <= .005 and tracking_error <= .015 and wrist_movement <= .003
+         p['release_prepare_stable'] = p['release_prepare_stable']+1 if ready else 0
+         self.offset[8:15] = target[8:15]-p['base'][8:15]
+         info.update(state='preparing_release_reference', release_preparation=dict(
+             target_rad=target[8:15].tolist(), sent_error_rad=sent_error,
++            whole_arm=whole_arm, tracking_error_rad=tracking_error,
++            settled_movement_rad=wrist_movement,
+             wrist_error_rad=wrist_error, wrist_movement_rad=wrist_movement,
+             original_support_checks_passed=bool(support_ok), stable_steps=p['release_prepare_stable'],
+             settled_target_adjustment_rad=adjustment.tolist(),
+--- a/tests/test_release_arm_preparation.py
++++ b/tests/test_release_arm_preparation.py
+@@ -0,0 +1,43 @@
++import unittest
++import numpy as np
++import test_release_preparation as preparation
++
++class ArmPreparationTests(unittest.TestCase):
++    setUp=preparation.PreparationTests.setUp
++    fixture=preparation.PreparationTests.fixture
++    setup_preparation=preparation.PreparationTests.setup_preparation
++
++    def setup_arm(self):
++        accepted=self.setup_preparation()
++        self.measured[8:15]=accepted[8:15]
++        self.measured[10]+=.151
++        self.a.wrist_config.update(release_prepare_whole_arm=True,release_prepare_adapt_settled=True)
++        return accepted
++
++    def test_recorded_proximal_bias_cannot_open_with_only_wrist_settled(self):
++        accepted=self.setup_arm();previous=accepted.copy()
++        for i in range(100):
++            self.a.pending['steps']+=1
++            info={};result=self.a._prepare_release_reference(self.measured,True,accepted,info)
++            self.assertLessEqual(max(abs(result[8:15]-previous[8:15])),self.a.config['max_joint_step_rad']+1e-12)
++            self.assertEqual(result[15],.98)
++            self.a.observe_command(result);previous=result.copy()
++            if self.a.pending.get('reference_prepared'):break
++        self.assertGreater(i,10)
++        self.assertTrue(self.a.pending['reference_prepared'])
++        self.assertLessEqual(max(abs(result[8:15]-self.measured[8:15])),.015)
++
++    def test_proximal_motion_or_support_loss_prevents_adaptation_and_opening(self):
++        for support,drift in [(False,0.),(True,.01)]:
++            self.setUp();accepted=self.setup_arm()
++            for i in range(8):
++                self.measured[8]+=drift
++                result=self.a._prepare_release_reference(self.measured,support,accepted,{})
++                np.testing.assert_array_equal(result[8:15],accepted[8:15])
++                self.a.observe_command(result)
++            self.assertFalse(self.a.pending.get('reference_prepared',False))
++
++    def test_original_timeout_still_applies_to_proximal_bias(self):
++        accepted=self.setup_arm();self.a.pending['steps']=self.a.config['max_release_steps']
++        with self.assertRaisesRegex(RuntimeError,'original weighing budget'):
++            self.a._prepare_release_reference(self.measured,True,accepted,{})

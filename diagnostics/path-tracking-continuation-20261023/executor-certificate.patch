@@ -1,0 +1,280 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -237,6 +237,7 @@
+   regrasp_visible_v_fraction: 0.67
+   release_open_dwell_steps: 12
+   release_retreat_direction: measured_tool_axis
++  release_retreat_preflight: executor_sweep
+   release_short_retreat_m: 0.06
+   release_clearance_rise_m: 0.07
+   release_measured_reference_hold: true
+--- a/run_scene1.py
++++ b/run_scene1.py
+@@ -341,6 +341,9 @@
+             if config['cartesian_alignment'].get('strategy') == 'act_residual':
+                 aligner = ResidualAssist(config['visual_residual'], kinematics,
+                                          env.action_space.low, env.action_space.high)
++                aligner.retreat_motion_config = dict(alpha=config['motion']['smoothing_alpha'],
++                    max_velocity=config['cartesian_alignment']['approach_joint_velocity_rad_s'],
++                    period=1.0/env.ros_rate)
+                 if config['wrist_assist']['enabled']:
+                     aligner.wrist_projector = WristProjector(
+                         rospy, rgbd_scene.buffer, kinematics, config['wrist_assist'])
+@@ -635,7 +638,8 @@
+             # Original env.step clips against the same action_space.
+             sent = filtered if args.mode == "optimized" else np.clip(raw_action, env.action_space.low, env.action_space.high)
+             if (config['wrist_assist'].get('command_sweep_diagnostics', False)
+-                    and cartesian_info.get('regrasp_stage') is not None
++                    and (cartesian_info.get('regrasp_stage') is not None
++                         or cartesian_info.get('retreat_sweep_required', False))
+                     and getattr(aligner, 'command_sweep_context', None) is not None):
+                 cartesian_info['command_sweep'] = command_sweep_audit(
+                     kinematics, measured, residual, sent, previous_sent, aligner.command_sweep_context)
+--- a/scene1/release_retreat.py
++++ b/scene1/release_retreat.py
+@@ -12,7 +12,7 @@
+ 
+ def axis_retreat_goal(kinematics, measured, reference, low, high, offset,
+                       cap, unwinding, snapshot, pad_xy, extent, distance,
+-                      rise, tolerance):
++                      rise, tolerance, execution_validator=None):
+     """Reject ambiguity or an uncertified goal; never change limits.
+ 
+     The bounded solves are feasibility checks, not a replacement command
+@@ -54,6 +54,25 @@
+     upper = np.minimum(np.asarray(high)[8:15], reference + upper_offset)
+     if np.any(lower > upper) or not np.isfinite(np.r_[lower, upper]).all():
+         raise RuntimeError('Release retreat rejected: no feasible original joint/correction bounds')
++    if execution_validator is not None:
++        certificate = execution_validator(goal, parcel)
++        audit = dict(direction_source='measured_tool_positive_z_horizontal_projection',
++                     projection_norm=projection, direction_xy=direction.tolist(),
++                     origin_base_m=pose[:3, 3].tolist(), goal_base_m=goal.tolist(),
++                     observed_parcel=parcel, observation_stamp=snapshot.get('stamp'),
++                     away_dot_m=away, horizontal_distance_m=float(distance), rise_m=float(rise),
++                     lower_joint_rad=lower.tolist(), upper_joint_rad=upper.tolist(),
++                     original_reference_rad=reference.tolist(), correction_cap_rad=float(cap),
++                     position_tolerance_m=float(tolerance), **certificate)
++        solution = np.asarray(certificate['feasibility_joint_rad'])
++        certified = (certificate['certified'] and np.isfinite(solution).all()
++                     and np.all(solution >= lower-1e-10) and np.all(solution <= upper+1e-10)
++                     and np.isfinite(certificate['position_residual_m'])
++                     and certificate['position_residual_m'] <= tolerance)
++        audit['certified'] = bool(certified)
++        if not certified:
++            raise RetreatPreflightError('Release retreat rejected: ' + certificate['reason'], audit)
++        return goal, audit
+     rotation = Rotation.from_matrix(pose[:3, :3])
+     free = upper - lower > 1e-10
+     solved = (lower + upper) / 2
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -12,6 +12,7 @@
+ from .settlement import SettlementMonitor, resting_observation, track_resting_roof
+ from .clearance import open_fingers_clear
+ from .release_retreat import axis_retreat_goal
++from .retreat_certificate import certify_retreat_execution
+ from .command_sweep import sampled_sweep
+ 
+ 
+@@ -692,13 +693,25 @@
+                 return result, info
+             if p.get('goal') is None:
+                 if self.wrist_config.get('release_retreat_direction') == 'measured_tool_axis':
++                    validator = None
++                    if self.wrist_config.get('release_retreat_preflight') == 'executor_sweep':
++                        if snapshot is None or not np.isfinite(snapshot.get('table_z_base_m', np.nan)):
++                            raise RuntimeError('Release retreat requires an observed parcel plane')
++                        validator = lambda goal, parcel: certify_retreat_execution(
++                            self, p['base'], measured, goal, parcel, snapshot['table_z_base_m'],
++                            self.wrist_config.get('max_short_retreat_steps', 90)-p['steps']+1,
++                            getattr(self, 'retreat_motion_config', None))
+                     p['goal'], p['retreat_goal_check'] = axis_retreat_goal(
+                         self.kinematics, measured, p['base'], self.low, self.high, self.offset,
+                         self.wrist_config.get('max_regrasp_joint_offset_rad', self.config['max_joint_offset_rad']),
+                         self.unwinding_placement, snapshot, self.weighing_target[:2], p['extent'],
+                         self.wrist_config['release_short_retreat_m'],
+                         self.wrist_config['release_clearance_rise_m'],
+-                        self.wrist_config.get('release_retreat_ready_m', .014))
++                        self.wrist_config.get('release_retreat_ready_m', .014),
++                        execution_validator=validator)
++                    if validator is not None:
++                        p['retreat_sweep_target'] = copy.deepcopy(p['retreat_goal_check']['observed_parcel'])
++                        p['retreat_sweep_plane'] = snapshot['table_z_base_m']
+                 else:
+                     direction = -np.asarray(self.weighing_target[:2], float)
+                     direction /= max(np.linalg.norm(direction), 1e-9)
+@@ -712,6 +725,10 @@
+                         np.asarray(pose.pos_xyz)-p['last_position'])
+             result = self._correct(p['base'], measured, side, error-1.5*velocity, step_scale=.5)
+             result[15] = 0.
++            if self.wrist_config.get('release_retreat_preflight') == 'executor_sweep':
++                self.command_sweep_context = dict(target=p['retreat_sweep_target'],
++                    plane=p['retreat_sweep_plane'], stage='short_retreat')
++                info['retreat_sweep_required'] = True
+             movement = (np.inf if p.get('last_position') is None else
+                         np.linalg.norm(np.asarray(pose.pos_xyz)-p['last_position']))
+             p['last_position'] = np.asarray(pose.pos_xyz).copy()
+--- /dev/null
++++ b/scene1/retreat_certificate.py
+@@ -0,0 +1,74 @@
++"""Nominal executable retreat certificate using the actual local corrector.
++
++This is a kinematic preflight, not a prediction of contact dynamics. Live
++filtered-command sweeps and the existing execution timeout remain mandatory.
++"""
++import copy
++import numpy as np
++from scipy.spatial.transform import Rotation
++
++from .command_sweep import sampled_sweep
++from .motion import MotionFilter
++
++
++def certify_retreat_execution(assist, base, measured, goal, target, plane,
++                              remaining_steps, motion_config):
++    shadow = copy.copy(assist)
++    shadow.offset = assist.offset.copy()
++    measured = np.asarray(measured, float).copy()
++    base = np.asarray(base, float).copy()
++    goal = np.asarray(goal, float)
++    if remaining_steps < 1 or motion_config is None or assist.last_sent is None:
++        raise RuntimeError('Release retreat certificate lacks remaining budget or filter state')
++    motion = MotionFilter(assist.low, assist.high, motion_config['alpha'], motion_config['max_velocity'])
++    motion.reset(assist.last_sent)
++    period = motion_config['period']
++    tolerance = assist.wrist_config.get('release_retreat_ready_m', .014)
++    start_rotation = Rotation.from_matrix(assist.kinematics.matrix(measured[8:15], 1)[:3, :3])
++    previous_position = None
++    stable = 0
++    records = []
++    reason = 'nominal executor did not settle within remaining original steps'
++    certified = False
++    max_rotation = 0.
++    for index in range(remaining_steps):
++        pose = assist.kinematics.matrix(measured[8:15], 1)
++        position = pose[:3, 3]
++        error = goal - position
++        velocity = np.zeros(3) if previous_position is None else position - previous_position
++        movement = np.inf if previous_position is None else float(np.linalg.norm(velocity))
++        proposed = shadow._correct(base, measured, 1, error - 1.5 * velocity, step_scale=.5)
++        proposed[15] = 0.
++        sent, motion_info = motion.apply(proposed, period)
++        complete = sampled_sweep(assist.kinematics, measured[8:15], proposed[8:15], target, plane)
++        filtered = sampled_sweep(assist.kinematics, measured[8:15], sent[8:15], target, plane)
++        rotation = float(np.rad2deg((start_rotation.inv() * Rotation.from_matrix(pose[:3, :3])).magnitude()))
++        max_rotation = max(max_rotation, rotation)
++        stable = stable + 1 if np.linalg.norm(error) <= tolerance and movement <= .004 else 0
++        records.append(dict(index=index, error_m=float(np.linalg.norm(error)),
++                            cumulative_rotation_degrees=rotation, proposed_sweep=complete,
++                            filtered_sweep=filtered, motion=motion_info, stable_steps=stable))
++        if motion_info['bounds_clipped'] or not complete['clear'] or not filtered['clear']:
++            reason = 'nominal executor sweep or physical command bounds rejected'
++            break
++        previous_position = position.copy()
++        measured = sent.copy()
++        if stable >= 3:
++            certified = True
++            reason = 'nominal bounded executor reached original position and dwell criteria'
++            break
++    # Certify the final command explicitly, rather than assuming its FK equals
++    # the pose evaluated before the last command.
++    final = assist.kinematics.matrix(measured[8:15], 1)
++    residual = float(np.linalg.norm(final[:3, 3] - goal))
++    certified = certified and residual <= tolerance
++    return dict(certified=bool(certified), reason=reason,
++                feasibility_joint_rad=measured[8:15].tolist(), position_residual_m=residual,
++                orientation_residual_degrees=float(np.rad2deg((start_rotation.inv() *
++                    Rotation.from_matrix(final[:3, :3])).magnitude())),
++                orientation_tolerance_degrees=None,
++                orientation_criterion='unchanged per-step executor plus full sampled finger sweeps; no added cumulative angle gate',
++                solver_method='nominal_incremental_executor_sweep', remaining_steps=remaining_steps,
++                nominal_steps=len(records), max_cumulative_rotation_degrees=max_rotation,
++                nominal_filter=dict(motion_config), nominal_records=records,
++                limitation='Perfect-tracking kinematic preflight only; live sweep and original timeout remain active')
+--- /dev/null
++++ b/tests/test_retreat_certificate.py
+@@ -0,0 +1,83 @@
++import unittest
++import numpy as np
++from scipy.spatial.transform import Rotation
++
++from scene1.residual import ResidualAssist
++from scene1.retreat_certificate import certify_retreat_execution
++
++
++class CoupledArm:
++    def matrix(self, q, side):
++        result = np.eye(4)
++        result[:3, 3] = q[:3]
++        result[:3, :3] = Rotation.from_euler('y', 4*q[2]).as_matrix()
++        return result
++
++
++class RetreatCertificateTests(unittest.TestCase):
++    def setUp(self):
++        self.q = np.zeros(16)
++        self.q[8:11] = [.3, -.2, .15]
++        self.assist = ResidualAssist(dict(max_translation_m=.02,
++            max_joint_offset_rad=.5235987756, max_joint_step_rad=.012, gain=.2),
++            CoupledArm(), np.full(16, -3.), np.full(16, 3.))
++        self.assist.wrist_config = dict(max_regrasp_joint_offset_rad=.5235987756,
++                                       release_retreat_ready_m=.014)
++        self.assist.weighing_target = np.array([.7, -.2, .1])
++        self.assist.observe_command(self.q)
++        self.target = dict(position_base_m=[.7, -.2, .15], top_z_base_m=.2,
++                           extent_xy_m=[.1, .04])
++        self.kw = dict(assist=self.assist, base=self.q, measured=self.q,
++                       goal=self.q[8:11]+[-.06, 0., .07], target=self.target, plane=.1,
++                       remaining_steps=128, motion_config=dict(alpha=1., max_velocity=.6, period=.1))
++
++    def test_executor_can_certify_clear_path_above_added_eight_degree_gate(self):
++        offset = self.assist.offset.copy()
++        command = self.assist.last_sent.copy()
++        result = certify_retreat_execution(**self.kw)
++        self.assertTrue(result['certified'], result['reason'])
++        self.assertGreater(result['orientation_residual_degrees'], 8.)
++        self.assertIsNone(result['orientation_tolerance_degrees'])
++        self.assertLessEqual(result['position_residual_m'], .014)
++        np.testing.assert_array_equal(self.assist.offset, offset)
++        np.testing.assert_array_equal(self.assist.last_sent, command)
++        np.testing.assert_array_equal(self.kw['base'], self.q)
++
++    def test_collision_is_rejected_even_if_goal_is_reachable(self):
++        self.kw['target'] = dict(position_base_m=self.q[8:11], top_z_base_m=.25,
++                                 extent_xy_m=[.3, .3])
++        result = certify_retreat_execution(**self.kw)
++        self.assertFalse(result['certified'])
++        self.assertFalse(result['nominal_records'][0]['filtered_sweep']['clear'])
++
++    def test_pending_filtered_reference_is_not_ignored(self):
++        self.kw['target'] = dict(position_base_m=[.3, -.2, -.02], top_z_base_m=.04,
++                                 extent_xy_m=[.3, .3])
++        self.kw['plane'] = -.08
++        command = self.q.copy(); command[10] = -.05
++        self.assist.observe_command(command)
++        result = certify_retreat_execution(**self.kw)
++        self.assertFalse(result['certified'])
++        self.assertTrue(result['nominal_records'][0]['proposed_sweep']['clear'])
++        self.assertFalse(result['nominal_records'][0]['filtered_sweep']['clear'])
++
++    def test_original_remaining_phase_budget_is_not_extended(self):
++        self.kw['remaining_steps'] = 2
++        result = certify_retreat_execution(**self.kw)
++        self.assertFalse(result['certified'])
++        self.assertEqual(result['nominal_steps'], 2)
++
++    def test_physical_bounds_still_reject_unreachable_goal(self):
++        self.assist.high[10] = self.q[10]+.002
++        result = certify_retreat_execution(**self.kw)
++        self.assertFalse(result['certified'])
++        self.assertLessEqual(result['feasibility_joint_rad'][2], self.assist.high[10])
++
++    def test_missing_filter_state_does_not_invent_certificate(self):
++        self.assist.last_sent = None
++        with self.assertRaisesRegex(RuntimeError, 'filter state'):
++            certify_retreat_execution(**self.kw)
++
++
++if __name__ == '__main__':
++    unittest.main()

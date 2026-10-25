@@ -1,0 +1,26 @@
+{
+  "at": "2026-10-23T18:13:05.706457+08:00",
+  "intent": "Continue path and tracking corrections after negative full-task gate",
+  "parent": "../path-tracking-20261023",
+  "first_step": "Offline replay of original bounded incremental executor against both failed goals; audit added orientation criterion and actual sweep",
+  "unchanged": [
+    "60mm tool-axis retreat",
+    "70mm rise",
+    "physical joint and torque bounds",
+    "per-step and velocity limits",
+    "stage time/step budgets",
+    "original parcel envelopes/margins",
+    "RGB-D/wrist/contact/success checks"
+  ],
+  "no_assumed_acceptance": "Removing or changing added 8deg certificate is not authorized by a mere successful unconstrained solve; executable path and unchanged clearance must be established",
+  "next_control_question": "After fixed path, reduce proximal regression without hiding it in wrist average",
+  "heldout_seeds_used": [],
+  "production_promoted": false,
+  "latest_user_steering": {
+    "at": "2026-10-23T18:17:36.370596+08:00",
+    "completion_gate": "Path and control fixes plus multi-seed four-parcel acceptance; do not stop at a negative development gate",
+    "act_proximity_constraint_required": false,
+    "reason": "User states most actions already use visual control, not ACT; closeness to old ACT is not an acceptance requirement"
+  },
+  "next_step": "Ablate cumulative orientation certificate and obsolete ACT-relative bounds independently, retaining physical sweep and execution budgets"
+}

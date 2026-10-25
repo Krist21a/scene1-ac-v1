@@ -1,0 +1,17 @@
+2026-10-25T12:00:27.357646+08:00 Resumed by explicit user request to complete multi-seed acceptance. Priorquota fulfilled; only prior quota stop disabled, robot/collision/torque/disk/timeguards unchanged. Containers restarted, CUDA/displaygood, serialresume-verification-idle errors[], 41patches pass. First idlecheck had concurrentCUDAprobe listedactive, originalreceipt retained. Same bin-dense policy starting seed1 full4 fresh official reset, label executor-bin-dense-ac-p4-s1-resume-1025. Prior seed1quota partial retained.
+
+12:36 seed1四包12802步完成；全部流水线和四项额外审计通过。冻结manifest35e608…，freeze cc081c…，开始六轮固定顺序对照。分析暂存字节归档后根盘4.67GB。
+
+13:26 冻结bin-dense全部六轮完成：baseline0/1/2/3均释放准备超时0包（1573/1701/1610/1666步），AC2 3367步1包桌面参考失败，AC3 4199步1包observe_pad超时；新增seed均未通过。MULTISEED-RESULTS保留八条件结果。seed2RGB-D回放四边齐全，稀疏尺寸假缩短8.38mm超8mm，密集同帧0.98mm，原阈值通过。新executor_table_dense仅table reference两调用stride1，525测试通过，独立补丁重建通过；旧冻结不变。开始seed2两包回归，随后需开发0全四包/回归2全四包，再冻结新seed4/5。seed3托盘观察失败仍待诊断，不能混入当前采样单因素候选。
+
+13:46 table-dense seed2两包6349步完成，流水线全0和4额外审计通过。seed3托盘回放：参考完整边界不变，stride4 59点/39.31%面积失败，stride2 230点/43.64%面积通过原60点/40%/两非平行边要求，stride1也通过。executor_pad_dense仅observe_pad重采样surfaces stride2，加日志pad_surface_stride；四项新测试，完整529通过，43层补丁重建通过，归档。启动executor-pad-dense-ac-p2-s3-1025，之后仍需full4开发0/回归2，再冻结fresh4/5原版组合对照。旧freeze验收失败保留，不把2/3再算fresh。
+
+14:05 executor-pad-dense-ac-p2-s3-1025两包6126步完成；流水线/4额外审计通过，dense-sampling-audit确认两次observe_pad各3帧均合格，stride2，均推理约0.10s。自动验证脚本run_successor_validation.py/session80091已转入executor-pad-dense-ac-p4-s0-1025；其后成功才跑full4seed2、freeze4/5对照。用status_successor.py监控当前label。单轮pad2主run_one session81925已完成。
+
+15:19 pad-dense seed0 full4 12679步，全部流水线/额外审计通过，policywall2072.1174s，正式92291样本0附加/总裁剪，target0/velocity1，准备160/147/156/213步，最终tracking.013734/.012414/.012060/.011767rad。seed2 full4 regression12727步已完成，正在分析；自动脚本审计全通过才freeze fresh4/5。
+
+15:21 seed2 full4全部流水线和额外审计通过。path-control-freeze-pad-dense-20261025.json已冻结，fresh4/5此前未用于实验。自动进入六轮对照：base0、base2、base4、AC4、base5、AC5；frozen-pad-acceptance-20261025.json记录，status_successor.py自动追踪。新冻结不得修改候选/阈值/控制。最终必须恢复baseline、全量validate_delivery并完成报告。
+
+16:12 fresh seed4 A+C full4 12621步完成，正在审计归档。冻结后base0释放准备失败、base2 515步Selected parcel moved during visual open-hand approach保护失败、base4 1558步释放准备失败，均0包；保留不重跑。seed0共同准备阶段腕RMS.39375→.04126rad，近端.00263→.00422rad，必须披露近端退化，不能只报腕收益。seed5对照仍待自动执行。
+
+最终交付完成：seed5 A+C四包12644步通过，最终seed0/2/4/5全部四包视觉通过，新seed4/5各一次通过；原版对应四轮均失败，保留全部记录。所有官方task_success=null。529测试、43补丁、90实验/独立ROS运行全量交付校验passed/errors=[]。原控制库、VR、task、QR已恢复，生产及v63备份核验无变化。FINAL_REPORT-20261025.txt、FINAL-MEASUREMENTS-20261025.json和两份逐阶段CSV已生成。未证明提速、近端退化和静差/延迟均披露；不晋升生产。无实验继续运行。

@@ -1,0 +1,23 @@
+{
+  "recorded_at": "2026-10-23T17:13:12.218583+08:00",
+  "parent": "axis_sweep",
+  "candidate": "axis_feasible",
+  "factor": "Feasibility solver fallback with explicit unchanged orientation constraint",
+  "evidence": "E failure replay: weighted residual 15.408 mm/4.590 deg; same-box feasible solution 12.518 mm/5.986 deg",
+  "unchanged": [
+    "goal direction and distance",
+    "70 mm rise",
+    "14 mm and 8 deg acceptance",
+    "joint bounds and correction budget",
+    "original incremental execution controller",
+    "sweep envelope, 3 mm margin, stop budgets",
+    "C parameters"
+  ],
+  "tests_passed": 390,
+  "changed_files": [
+    "run_scene1.py",
+    "scene1/release_retreat.py",
+    "tests/test_axis_retreat.py"
+  ],
+  "next_gate": "new official seed0 two-parcel with original QR and C; then full seed0 before frozen heldouts"
+}

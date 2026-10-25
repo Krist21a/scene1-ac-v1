@@ -1,0 +1,258 @@
+{
+  "label": "executor-context-c-p2-s0",
+  "steps": 413,
+  "step_sequence_contiguous": true,
+  "summary": {
+    "steps": 413,
+    "reason": "error",
+    "task_success": null,
+    "error": "Release retreat rejected: nominal executor sweep or physical command bounds rejected",
+    "handover_contract_stop": null,
+    "last_sensor_receipts": {
+      "/sensors_data_raw": {
+        "receipt_monotonic_s": 13420.575137944,
+        "source_stamp_s": 1792753628.945686,
+        "receipts": 43827
+      },
+      "/gripper/state": {
+        "receipt_monotonic_s": 13420.575218688,
+        "source_stamp_s": 1792753628.9456947,
+        "receipts": 80500
+      },
+      "/cam_h/color/image_raw/compressed": {
+        "receipt_monotonic_s": 13420.566523401,
+        "source_stamp_s": 1792753628.9154253,
+        "receipts": 2670
+      },
+      "/cam_l/color/image_raw/compressed": {
+        "receipt_monotonic_s": 13420.545434546,
+        "source_stamp_s": 1792753628.88574,
+        "receipts": 2630
+      },
+      "/cam_r/color/image_raw/compressed": {
+        "receipt_monotonic_s": 13420.567335166,
+        "source_stamp_s": 1792753628.921717,
+        "receipts": 2584
+      }
+    },
+    "trace_manifest_error": null,
+    "visual_confirmed_parcels": 0,
+    "note": "Original KuavoSimEnv returns reward=0 and does not judge scene1 success."
+  },
+  "ros_run_id": "a52dc826-ced1-11f1-bb06-c85ea94bd8c7",
+  "controller_sha": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+  "policy_sha": "84d4379568699e1906e06556de8fb0b3f1531ffecf03b4a1ec2edbcbe35c6d9b",
+  "requested_parcels": 2,
+  "bin_confirmations": [],
+  "complete_events": [],
+  "gripper_events": [
+    {
+      "step": 150,
+      "side": "right",
+      "action": "close",
+      "phase": "small_grasp"
+    },
+    {
+      "step": 401,
+      "side": "right",
+      "action": "open",
+      "phase": "weighing_release"
+    }
+  ],
+  "gripper_event_count": 2,
+  "unpaused_ACT_steps_after_first_complete": 0,
+  "target_clips": 0,
+  "velocity_limited_steps": 3,
+  "regrasp_sweep_block_steps": 0,
+  "regrasp_forward_gate_hold_steps": 0,
+  "pd_limits_50hz": {
+    "initialization": {
+      "samples": 1727,
+      "raw_clipped_samples": 3,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.517776912768712,
+      "added_peak_nm": 0.5,
+      "wrist_command_peak_nm": 1.1750960738583782,
+      "longest_observed_clip_s": 0.022303109000858967,
+      "available": true
+    },
+    "formal_policy": {
+      "samples": 2757,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.3677181103105901,
+      "added_peak_nm": 0.3677181103105902,
+      "wrist_command_peak_nm": 1.4959895338701945,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    },
+    "after_policy": {
+      "samples": 123,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.06184773109151862,
+      "added_peak_nm": 0.06184773109151864,
+      "wrist_command_peak_nm": 0.9567418547307618,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    }
+  },
+  "task_success": null,
+  "limitations": "Gripper events are upper command threshold crossings (0.25/0.6 hysteresis), not proof of contact. Original visual checks and raw feedback evidence retained. 50Hz clipping can miss shorter events; online guard is separate. null is not an official verdict.",
+  "release_reference_transfers": [
+    {
+      "step": 401,
+      "bound_active_count": 0,
+      "original_cap_rad": null,
+      "reference_mode": "measured_physical",
+      "max_offset_rad": 0.6162496507167816,
+      "remaining_reference_error_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_requested_change_rad": 0.1576193583952033,
+      "motion_filter_velocity_limited": true,
+      "motion_filter_bounds_clipped": false
+    }
+  ],
+  "release_reference_transfer_interpretation": "Physical bounds and MotionFilter checked separately. measured_physical intentionally replaces obsolete ACT anchoring with a new visual-phase reference; this is not measured tracking evidence.",
+  "post_level_geometry_refreshes": [],
+  "retreat_goal_certificates": [],
+  "rejected_retreat_certificate": {
+    "direction_source": "measured_tool_positive_z_horizontal_projection",
+    "projection_norm": 0.9694350171530652,
+    "direction_xy": [
+      -0.9584886172479057,
+      0.2851307956117642
+    ],
+    "origin_base_m": [
+      0.37409406249566274,
+      -0.5409379322948739,
+      -0.048698558186123536
+    ],
+    "goal_base_m": [
+      0.3165847454607884,
+      -0.523830084558168,
+      0.02130144181387647
+    ],
+    "observed_parcel": {
+      "position_base_m": [
+        0.42057879456100444,
+        -0.5605561535492698,
+        -0.01517428791264117
+      ],
+      "extent_xy_m": [
+        0.11466235861961394,
+        0.05591520789236448
+      ],
+      "points": 225,
+      "minor_extent_m": 0.04966918754761196,
+      "major_axis_xy": [
+        -0.9865996852424588,
+        0.16315961840933965
+      ],
+      "oriented_extent_m": [
+        0.1145753035092113,
+        0.04966918754761196
+      ],
+      "top_z_base_m": 0.02203816126291298,
+      "uv": [
+        426.0,
+        230.0
+      ],
+      "bbox": [
+        410,
+        210,
+        45,
+        41
+      ]
+    },
+    "observation_stamp": 1792753628.6490943,
+    "away_dot_m": 0.05014884559520229,
+    "horizontal_distance_m": 0.06,
+    "rise_m": 0.07,
+    "lower_joint_rad": [
+      -3.14,
+      -3.14,
+      -1.48352986419518,
+      -2.61799387799149,
+      -1.5707963267949,
+      -0.698131700797732,
+      -0.698131700797732
+    ],
+    "upper_joint_rad": [
+      1.5707963267949,
+      0.349065850398866,
+      1.48352986419518,
+      0.0,
+      1.5707963267949,
+      1.30899693899575,
+      0.698131700797732
+    ],
+    "original_reference_rad": [
+      -0.29931366443634033,
+      -0.46982860565185547,
+      -0.1373293697834015,
+      -0.4329644739627838,
+      1.117889165878296,
+      -0.5594847798347473,
+      -0.2818368375301361
+    ],
+    "correction_cap_rad": 6.283185307179586,
+    "position_tolerance_m": 0.014,
+    "certified": false,
+    "reason": "nominal executor sweep or physical command bounds rejected",
+    "feasibility_joint_rad": [
+      -0.30962347984313965,
+      -0.46782344579696655,
+      -0.08542970567941666,
+      -0.3833881914615631,
+      1.1343739032745361,
+      -0.4957362115383148,
+      -0.2781729996204376
+    ],
+    "position_residual_m": 0.09219544457292887,
+    "orientation_residual_degrees": 0.0,
+    "orientation_tolerance_degrees": null,
+    "orientation_criterion": "unchanged per-step executor plus full sampled finger sweeps; no added cumulative angle gate",
+    "solver_method": "nominal_incremental_executor_sweep",
+    "remaining_steps": 128,
+    "nominal_steps": 1,
+    "max_cumulative_rotation_degrees": 0.0,
+    "nominal_filter": {
+      "alpha": 1.0,
+      "max_velocity": 0.6,
+      "period": 0.1
+    },
+    "nominal_records": [
+      {
+        "index": 0,
+        "error_m": 0.09219544457292887,
+        "cumulative_rotation_degrees": 0.0,
+        "proposed_sweep": {
+          "clear": false,
+          "first_blocked_fraction": 0.0,
+          "samples": 7
+        },
+        "filtered_sweep": {
+          "clear": false,
+          "first_blocked_fraction": 0.0,
+          "samples": 7
+        },
+        "motion": {
+          "velocity_limited": false,
+          "velocity_scale": 1.0,
+          "bounds_clipped": false,
+          "max_joint_change_rad": 0.006000000000000005
+        },
+        "stable_steps": 0
+      }
+    ],
+    "limitation": "Perfect-tracking kinematic preflight only; live sweep and original timeout remain active"
+  }
+}

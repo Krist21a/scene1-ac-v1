@@ -1,0 +1,40 @@
+{
+  "at": "2026-10-25T13:31:36.139618+08:00",
+  "parent": "executor-table-dense",
+  "candidate": "executor-pad-dense",
+  "factor": "Surface sampling stride2 only during active observe_pad, preserving original complete reference and all geometric gates",
+  "evidence": "heldout-seed3-pad-diagnostic.json",
+  "tests": 529,
+  "used_research_seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "fresh_reserved_seeds": [
+    4,
+    5
+  ],
+  "unchanged": [
+    "visible_pad 60points/40percent area/two nonparallel edges",
+    "stored complete support footprint",
+    "table and collision thresholds",
+    "controller A+C",
+    "phase budgets"
+  ],
+  "validation_order": [
+    "finish table-only seed2 two-parcel regression",
+    "pad-dense seed3 two-parcel regression",
+    "seed0 full4",
+    "seed2 full4",
+    "freeze then original/A+C seeds0,2,4,5"
+  ],
+  "source_hashes": {
+    "run_scene1.py": "5e37d5f68441f7c8fb79004bf997ab709e1e54446a0de7d6a8ea4ec685d30701",
+    "scene1/rgbd.py": "c92a03cdcfe141117c2e95ff1f43e29c4cd2fad8da4d67dc31d27dff32a53e44",
+    "scene1/visual_pickup.py": "72e9bb1ddace0f6d3cd76ba03bbccaad48678002e3e1f7d3d326f2e8c1eb8c48",
+    "tests/fixtures/pad_dense_seed3.json": "ca45e1722674b5776200625a2b0e076defcd50a875c05f663b315cae392c5790",
+    "tests/fixtures/pad_dense_seed3.npz": "4e2c62929eecabec1d073f3a94a360951e6a21143a91bb2a69917c0e94da28bd",
+    "tests/test_pad_dense.py": "47c8e82daba72f5639f331fc07f7fee17510a7b62f12651e4fe1c077f97b0b61"
+  }
+}

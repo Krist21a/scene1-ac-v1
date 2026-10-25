@@ -1,0 +1,1164 @@
+{
+  "run": "20261018-050505",
+  "source_sha256": "a0d39a214417d9d46822b916fdd306793e836caaef7182905848b1f15df90190",
+  "public_urdf": "<?xml version='1.0' encoding='utf-8'?>\n<robot name=\"biped_s52\">\n  <mujoco>\n    <compiler meshdir=\"../meshes/\" balanceinertia=\"true\" discardvisual=\"false\" />\n  </mujoco>\n  <link name=\"dummy_link\" />\n  <link name=\"base_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( -0.05495950, -0.00028705, -0.01468007 ) -->\n      <origin xyz=\"-0.05495950 -0.00028705 -0.01468007\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a7.06404632 kg -->\n      <mass value=\"7.06405\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09- \u6765\u81eatorso Lxx/Lyy/Lzz -->\n      <inertia\n        ixx=\"0.07432439\"\n        ixy=\"0.0\"\n        ixz=\"-0.01900645\"\n        iyy=\"0.05497594\"\n        iyz=\"0.0\"\n        izz=\"0.07548789\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/torso.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"0.752941176470588 0.752941176470588 0.752941176470588 1\" />\n      </material>\n    </visual>\n    <collision>\n      <origin xyz=\"-0.025 0.095 -0.065\" rpy=\"0 1.57 0\" />\n      <geometry>\n        <cylinder radius=\"0.06\" length=\"0.24\" />\n      </geometry>\n    </collision>\n    <collision>\n      <origin xyz=\"-0.025 -0.095 -0.065\" rpy=\"0 1.57 0\" />\n      <geometry>\n        <cylinder radius=\"0.06\" length=\"0.24\" />\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"dummy_to_base_link\" type=\"fixed\">\n    <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n    <parent link=\"dummy_link\" />\n    <child link=\"base_link\" />\n  </joint>\n  <!-- ============ l_leg_roll ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1al_leg_yaw_roll -->\n  <!-- \u5bf9\u79f0\u6e90\uff1ar_leg_roll (X-Z\u5e73\u9762\u5bf9\u79f0) -->\n  <link name=\"leg_l1_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a\u53f3\u817f(-0.00560896, -0.00032862, -0.00212773) -> \u5de6\u817f(-0.00560896, +0.00032862, -0.00212773) -->\n      <origin xyz=\"-0.00560896 0.00032862 -0.00212773\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a1.55641268 kg -->\n      <mass value=\"1.55641\" />\n      <!-- \u2705 \u60ef\u6027\u5f20\u91cf\uff1a\u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5bf9\u9f50\u8f93\u51fa\u5750\u6807\u7cfb\uff0c\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff0cixy/ixz/iyz\u7b26\u53f7\u53d6\u53cd -->\n      <inertia\n        ixx=\"0.00191127\"\n        ixy=\"-0.00001633\"      \n        ixz=\"-0.00000320\"     \n        iyy=\"0.00254335\"\n        iyz=\"0.00000055\"     \n        izz=\"0.00260594\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/l_leg_roll.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"leg_l1_joint\" type=\"revolute\">\n    <origin xyz=\"0.0 0.095075 -0.066\" rpy=\"0 0 0\" />\n    <parent link=\"base_link\" />\n    <child link=\"leg_l1_link\" />\n    <axis xyz=\"1 0 0\" />\n    <limit lower=\"-0.314159265358979\" upper=\"0.663225115757845\" effort=\"127.0\" velocity=\"10.4\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n  <!-- ============ l_leg_yaw ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1al_leg_yaw_roll -->\n  <!-- \u5bf9\u79f0\u6e90\uff1ar_leg_yaw (X-Z\u5e73\u9762\u5bf9\u79f0) -->\n  <link name=\"leg_l2_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a\u53f3\u817f(0.00006341, 0.00960017, -0.09308949) -> \u5de6\u817f(0.00006341, -0.00960017, -0.09308949) -->\n      <origin xyz=\"0.00006341 -0.00960017 -0.09308949\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.75872512 kg -->\n      <mass value=\"0.75873\" />\n      <!-- \u2705 \u60ef\u6027\u5f20\u91cf\uff1a\u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5bf9\u9f50\u8f93\u51fa\u5750\u6807\u7cfb\uff0c\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff0cixy/ixz/iyz\u7b26\u53f7\u53d6\u53cd -->\n      <inertia\n        ixx=\"0.00348980\"\n        ixy=\"0.00000617\"     \n        ixz=\"-0.00000543\"      \n        iyy=\"0.00201021\"\n        iyz=\"-0.00030265\"      \n        izz=\"0.00236363\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/l_leg_yaw.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"leg_l2_joint\" type=\"revolute\">\n    <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n    <parent link=\"leg_l1_link\" />\n    <child link=\"leg_l2_link\" />\n    <axis xyz=\"0 0 1\" />\n    <limit lower=\"-0.785398163397448\" upper=\"1.91986217719376\" effort=\"71.0\" velocity=\"8.7\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ l_leg_pitch ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1al_leg_pitch -->\n  <!-- \u5bf9\u79f0\u6e90\uff1ar_leg_pitch (X-Z\u5e73\u9762\u5bf9\u79f0) -->\n  <link name=\"leg_l3_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a\u53f3\u817f(0.00273544, -0.01478421, -0.09011501) -> \u5de6\u817f(0.00273544, +0.01478421, -0.09011501) -->\n      <origin xyz=\"0.00273544 0.01478421 -0.09011501\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a6.68074305 kg -->\n      <mass value=\"6.68074\" />\n      <!-- \u2705 \u60ef\u6027\u5f20\u91cf\uff1a\u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5bf9\u9f50\u8f93\u51fa\u5750\u6807\u7cfb\uff0c\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff0cixy/ixz/iyz\u7b26\u53f7\u53d6\u53cd -->\n      <inertia\n        ixx=\"0.06155086\"\n        ixy=\"0.00016595\"      \n        ixz=\"-0.00169943\"      \n        iyy=\"0.05999156\"\n        iyz=\"0.00073898\"     \n        izz=\"0.01575336\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/l_leg_pitch.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"leg_l3_joint\" type=\"revolute\">\n    <origin xyz=\"0 0 -0.1437\" rpy=\"0 0 0\" />\n    <parent link=\"leg_l2_link\" />\n    <child link=\"leg_l3_link\" />\n    <axis xyz=\"0 1 0\" />\n    <limit lower=\"-1.91986217719376\" upper=\"1.5707963267949\" effort=\"132\" velocity=\"12.7\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ l_knee ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1al_knee -->\n  <!-- \u5bf9\u79f0\u6e90\uff1ar_knee (X-Z\u5e73\u9762\u5bf9\u79f0) -->\n  <link name=\"leg_l4_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a\u53f3\u817f(0.00684787, -0.00006281, -0.16262733) -> \u5de6\u817f(0.00684787, +0.00006281, -0.16262733) -->\n      <origin xyz=\"0.00684787 0.00006281 -0.16262733\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a3.64665831 kg -->\n      <mass value=\"3.64666\" />\n      <!-- \u2705 \u60ef\u6027\u5f20\u91cf\uff1a\u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5bf9\u9f50\u8f93\u51fa\u5750\u6807\u7cfb\uff0c\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff0cixy/ixz/iyz\u7b26\u53f7\u53d6\u53cd -->\n      <inertia\n        ixx=\"0.04372691\"\n        ixy=\"0.00000494\"     \n        ixz=\"0.00053020\"      \n        iyy=\"0.04357016\"\n        iyz=\"-0.00006946\"      \n        izz=\"0.00246985\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/l_knee.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"leg_l4_joint\" type=\"revolute\">\n    <origin xyz=\"-0.0011639 0 -0.284\" rpy=\"0 0 0\" />\n    <parent link=\"leg_l3_link\" />\n    <child link=\"leg_l4_link\" />\n    <axis xyz=\"0 1 0\" />\n    <limit lower=\"0.0\" upper=\"2.53072741539178\" effort=\"280.0\" velocity=\"10.4\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ l_foot_pitch ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1al_foot_pitch_roll -->\n  <!-- \u5bf9\u79f0\u6e90\uff1ar_foot_pitch (\u5b8c\u5168\u5bf9\u79f0) -->\n  <link name=\"leg_l5_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( 0, 0, 0 ) -->\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.07848005 kg -->\n      <mass value=\"0.07848\" />\n      <!-- \u2705 \u60ef\u6027\u5f20\u91cf\uff1a\u5b8c\u5168\u5bf9\u79f0\uff0c\u4e0e\u53f3\u817f\u5b8c\u5168\u76f8\u540c -->\n      <inertia\n        ixx=\"0.00000757\"\n        ixy=\"0.00000000\"\n        ixz=\"0.00000000\"\n        iyy=\"0.00000757\"\n        iyz=\"0.00000000\"\n        izz=\"0.00001318\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/l_foot_pitch.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"leg_l5_joint\" type=\"revolute\">\n    <origin xyz=\"0.002 0 -0.416\" rpy=\"0 0 0\" />\n    <parent link=\"leg_l4_link\" />\n    <child link=\"leg_l5_link\" />\n    <axis xyz=\"0 1 0\" />\n    <limit lower=\"-0.872664625997165\" upper=\"0.349065850398866\" effort=\"91.6\" velocity=\"17.8\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n  <!-- ============ l_foot_roll ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1al_foot_pitch_roll -->\n  <!-- \u5bf9\u79f0\u6e90\uff1ar_foot_roll (\u5b8c\u5168\u5bf9\u79f0\uff0c\u7528\u6237\u8986\u76d6\u503c\u76f8\u540c) -->\n  <link name=\"leg_l6_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff08\u7528\u6237\u8986\u76d6\uff09\uff1a( 0.02655895, -0.00004538, -0.03373024 ) -->\n      <origin xyz=\"0.02655895 -0.00004538 -0.03373024\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff08\u7528\u6237\u8986\u76d6\uff09\uff1a0.69242441 kg -->\n      <mass value=\"0.69242\" />\n      <!-- \u2705 \u60ef\u6027\u5f20\u91cf\uff1a\u5b8c\u5168\u5bf9\u79f0\uff0c\u4e0e\u53f3\u817f\u5b8c\u5168\u76f8\u540c\uff08\u8d28\u5fc3Y\u4e3a\u8d1f\uff0c\u65e0\u9700\u955c\u50cf\uff09 -->\n      <inertia\n        ixx=\"0.00051423\"\n        ixy=\"-0.00000078\"\n        ixz=\"0.00014745\"\n        iyy=\"0.00189913\"\n        iyz=\"0.00000033\"\n        izz=\"0.00199352\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/l_foot_roll.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n    <collision>\n      <origin xyz=\"0.0488 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <box size=\"0.25 0.1 0.04\" />\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"leg_l6_joint\" type=\"revolute\">\n    <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n    <parent link=\"leg_l5_link\" />\n    <child link=\"leg_l6_link\" />\n    <axis xyz=\"1 0 0\" />\n    <limit lower=\"-0.261799387799149\" upper=\"0.261799387799149\" effort=\"30.0\" velocity=\"17.8\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n  <link name=\"ll_foot_toe\">\n    <collision>\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\" />\n      <geometry>\n        <sphere radius=\"0.005\" />\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"ll_foot_toe_joint\" type=\"fixed\">\n    <origin xyz=\"0.17084 0.05 -0.0595\" rpy=\"0 0 0\" />\n    <parent link=\"leg_l6_link\" />\n    <child link=\"ll_foot_toe\" />\n  </joint>\n  <link name=\"ll_foot_heel\">\n    <collision>\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\" />\n      <geometry>\n        <sphere radius=\"0.005\" />\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"ll_foot_heel_joint\" type=\"fixed\">\n    <origin xyz=\"-0.073164 0.05 -0.0595\" rpy=\"0 0 0\" />\n    <parent link=\"leg_l6_link\" />\n    <child link=\"ll_foot_heel\" />\n  </joint>\n  <link name=\"lr_foot_toe\">\n    <collision>\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\" />\n      <geometry>\n        <sphere radius=\"0.005\" />\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"lr_foot_toe_joint\" type=\"fixed\">\n    <origin xyz=\"0.17084 -0.05 -0.0595\" rpy=\"0 0 0\" />\n    <parent link=\"leg_l6_link\" />\n    <child link=\"lr_foot_toe\" />\n  </joint>\n  <link name=\"lr_foot_heel\">\n    <collision>\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\" />\n      <geometry>\n        <sphere radius=\"0.005\" />\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"lr_foot_heel_joint\" type=\"fixed\">\n    <origin xyz=\"-0.073164 -0.05 -0.0595\" rpy=\"0 0 0\" />\n    <parent link=\"leg_l6_link\" />\n    <child link=\"lr_foot_heel\" />\n  </joint>\n  <link name=\"l_foot_toe\">\n    <collision>\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\" />\n      <geometry>\n        <sphere radius=\"0.005\" />\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"l_foot_toe_joint\" type=\"fixed\">\n    <origin xyz=\"0.17084 0.0 -0.0595\" rpy=\"0 0 0\" />\n    <parent link=\"leg_l6_link\" />\n    <child link=\"l_foot_toe\" />\n  </joint>\n  <link name=\"l_foot_heel\">\n    <collision>\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\" />\n      <geometry>\n        <sphere radius=\"0.005\" />\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"l_foot_heel_joint\" type=\"fixed\">\n    <origin xyz=\"-0.073164 0.0 -0.0595\" rpy=\"0 0 0\" />\n    <parent link=\"leg_l6_link\" />\n    <child link=\"l_foot_heel\" />\n  </joint>\n  <!-- ============ r_leg_roll ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1ar_leg_roll_yaw -->\n  <link name=\"leg_r1_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( -0.00560896, -0.00032862, -0.00212773 ) -->\n      <origin xyz=\"-0.00560896 -0.00032862 -0.00212773\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a1.55641268 kg -->\n      <mass value=\"1.55641\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00191127\"\n        ixy=\"0.00001633\"\n        ixz=\"0.00000320\"\n        iyy=\"0.00254335\"\n        iyz=\"-0.00000055\"\n        izz=\"0.00260594\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/r_leg_roll.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"leg_r1_joint\" type=\"revolute\">\n    <origin xyz=\"0.0 -0.095075 -0.066\" rpy=\"0 0 0\" />\n    <parent link=\"base_link\" />\n    <child link=\"leg_r1_link\" />\n    <axis xyz=\"1 0 0\" />\n    <limit lower=\"-0.663225115757845\" upper=\"0.314159265358979\" effort=\"127.0\" velocity=\"10.4\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n  <!-- ============ r_leg_yaw ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1ar_leg_roll_yaw -->\n  <link name=\"leg_r2_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( 0.00006341, 0.00960017, -0.09308949 ) -->\n      <origin xyz=\"0.00006341 0.00960017 -0.09308949\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.75872512 kg -->\n      <mass value=\"0.75873\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00348980\"\n        ixy=\"-0.00000617\"\n        ixz=\"0.00000543\"\n        iyy=\"0.00201021\"\n        iyz=\"0.00030265\"\n        izz=\"0.00236363\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/r_leg_yaw.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"leg_r2_joint\" type=\"revolute\">\n    <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n    <parent link=\"leg_r1_link\" />\n    <child link=\"leg_r2_link\" />\n    <axis xyz=\"0 0 1\" />\n    <limit lower=\"-1.91986217719376\" upper=\"0.785398163397448\" effort=\"71.0\" velocity=\"8.7\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n  <!-- ============ r_leg_pitch ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1ar_leg_pitch -->\n  <link name=\"leg_r3_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( 0.00273544, -0.01478421, -0.09011501 ) -->\n      <origin xyz=\"0.00273544 -0.01478421 -0.09011501\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a6.68074305 kg -->\n      <mass value=\"6.68074\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.06155086\"\n        ixy=\"-0.00016595\"\n        ixz=\"0.00169943\"\n        iyy=\"0.05999156\"\n        iyz=\"-0.00073898\"\n        izz=\"0.01575336\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/r_leg_pitch.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"leg_r3_joint\" type=\"revolute\">\n    <origin xyz=\"0 0 -0.1437\" rpy=\"0 0 0\" />\n    <parent link=\"leg_r2_link\" />\n    <child link=\"leg_r3_link\" />\n    <axis xyz=\"0 1 0\" />\n    <limit lower=\"-1.91986217719376\" upper=\"1.5707963267949\" effort=\"132.0\" velocity=\"12.7\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ r_knee ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1ar_knee -->\n  <link name=\"leg_r4_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( 0.00684787, -0.00006281, -0.16262733 ) -->\n      <origin xyz=\"0.00684787 -0.00006281 -0.16262733\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a3.64665831 kg -->\n      <mass value=\"3.64666\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.04372691\"\n        ixy=\"-0.00000494\"\n        ixz=\"-0.00053020\"\n        iyy=\"0.04357016\"\n        iyz=\"0.00006946\"\n        izz=\"0.00246985\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/r_knee.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"leg_r4_joint\" type=\"revolute\">\n    <origin xyz=\"-0.0011639 0 -0.284\" rpy=\"0 0 0\" />\n    <parent link=\"leg_r3_link\" />\n    <child link=\"leg_r4_link\" />\n    <axis xyz=\"0 1 0\" />\n    <limit lower=\"0.0\" upper=\"2.53072741539178\" effort=\"280.0\" velocity=\"10.4\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ r_foot_pitch ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1ar_foot_pitch_roll -->\n  <link name=\"leg_r5_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( 0, 0, 0 ) -->\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.07848005 kg -->\n      <mass value=\"0.07848\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09- \u4e0e\u8f93\u51fa\u5750\u6807\u7cfb\u76f8\u540c\u56e0\u4e3a\u8d28\u5fc3\u5728\u539f\u70b9 -->\n      <inertia\n        ixx=\"0.00000757\"\n        ixy=\"0.00000000\"\n        ixz=\"0.00000000\"\n        iyy=\"0.00000757\"\n        iyz=\"0.00000000\"\n        izz=\"0.00001318\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/r_foot_pitch.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"leg_r5_joint\" type=\"revolute\">\n    <origin xyz=\"0.002 0 -0.416\" rpy=\"0 0 0\" />\n    <parent link=\"leg_r4_link\" />\n    <child link=\"leg_r5_link\" />\n    <axis xyz=\"0 1 0\" />\n    <limit lower=\"-0.872664625997165\" upper=\"0.349065850398866\" effort=\"91.6\" velocity=\"17.8\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ r_foot_roll ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1ar_foot_pitch_roll -->\n  <link name=\"leg_r6_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff08\u7528\u6237\u8986\u76d6\uff09\uff1a( 0.02655895, -0.00004538, -0.03373024 ) -->\n      <origin xyz=\"0.02655895 -0.00004538 -0.03373024\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff08\u7528\u6237\u8986\u76d6\uff09\uff1a0.69242441 kg -->\n      <mass value=\"0.69242\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00051423\"\n        ixy=\"-0.00000078\"\n        ixz=\"0.00014745\"\n        iyy=\"0.00189913\"\n        iyz=\"0.00000033\"\n        izz=\"0.00199352\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/r_foot_roll.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n    <collision>\n      <origin xyz=\"0.0488 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <box size=\"0.25 0.1 0.04\" />\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"leg_r6_joint\" type=\"revolute\">\n    <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n    <parent link=\"leg_r5_link\" />\n    <child link=\"leg_r6_link\" />\n    <axis xyz=\"1 0 0\" />\n    <limit lower=\"-0.261799387799149\" upper=\"0.261799387799149\" effort=\"30.0\" velocity=\"17.8\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n  <link name=\"rl_foot_toe\">\n    <collision>\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\" />\n      <geometry>\n        <sphere radius=\"0.005\" />\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"rl_foot_toe_joint\" type=\"fixed\">\n    <origin xyz=\"0.17084 0.05 -0.0595\" rpy=\"0 0 0\" />\n    <parent link=\"leg_r6_link\" />\n    <child link=\"rl_foot_toe\" />\n  </joint>\n  <link name=\"rl_foot_heel\">\n    <collision>\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\" />\n      <geometry>\n        <sphere radius=\"0.005\" />\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"rl_foot_heel_joint\" type=\"fixed\">\n    <origin xyz=\"-0.073164 0.05 -0.0595\" rpy=\"0 0 0\" />\n    <parent link=\"leg_r6_link\" />\n    <child link=\"rl_foot_heel\" />\n  </joint>\n  <link name=\"rr_foot_toe\">\n    <collision>\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\" />\n      <geometry>\n        <sphere radius=\"0.005\" />\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"rr_foot_toe_joint\" type=\"fixed\">\n    <origin xyz=\"0.17084 -0.05 -0.0595\" rpy=\"0 0 0\" />\n    <parent link=\"leg_r6_link\" />\n    <child link=\"rr_foot_toe\" />\n  </joint>\n  <link name=\"rr_foot_heel\">\n    <collision>\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\" />\n      <geometry>\n        <sphere radius=\"0.005\" />\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"rr_foot_heel_joint\" type=\"fixed\">\n    <origin xyz=\"-0.073164 -0.05 -0.0595\" rpy=\"0 0 0\" />\n    <parent link=\"leg_r6_link\" />\n    <child link=\"rr_foot_heel\" />\n  </joint>\n  <link name=\"r_foot_toe\">\n    <collision>\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\" />\n      <geometry>\n        <sphere radius=\"0.005\" />\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"r_foot_toe_joint\" type=\"fixed\">\n    <origin xyz=\"0.17084 0.0 -0.0595\" rpy=\"0 0 0\" />\n    <parent link=\"leg_r6_link\" />\n    <child link=\"r_foot_toe\" />\n  </joint>\n  <link name=\"r_foot_heel\">\n    <collision>\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\" />\n      <geometry>\n        <sphere radius=\"0.005\" />\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"r_foot_heel_joint\" type=\"fixed\">\n    <origin xyz=\"-0.073164 0.0 -0.0595\" rpy=\"0 0 0\" />\n    <parent link=\"leg_r6_link\" />\n    <child link=\"r_foot_heel\" />\n  </joint>\n  <link name=\"waist_yaw_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( -0.00044187, -0.00068282, 0.16674017 ) -->\n      <origin xyz=\"0.04044187 -0.00068282 0.16674017\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a17.11065787 kg -->\n      <mass value=\"19.54016\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09- \u6765\u81eawaist_yaw Lxx/Lyy/Lzz -->\n      <inertia\n        ixx=\"0.34143343\"\n        ixy=\"0.0\"\n        ixz=\"0.0\"\n        iyy=\"0.25757527\"\n        iyz=\"0.0\"\n        izz=\"0.20167280\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/waist_yaw.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"waist_yaw_joint\" type=\"revolute\">\n    <origin xyz=\"0 0 0.1114\" rpy=\"0 0 0\" />\n    <parent link=\"base_link\" />\n    <child link=\"waist_yaw_link\" />\n    <axis xyz=\"0 0 1\" />\n    <limit lower=\"-3.14159\" upper=\"3.14159\" effort=\"102.0\" velocity=\"8.7\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n  <!-- ============ l_arm_pitch ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1al_arm_pitch_roll_yaw -->\n  <link\n    name=\"zarm_l1_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( 0.00080154, -0.00930333, 0.00031203 ) -->\n      <origin xyz=\"0.00080154 -0.00930333 0.00031203\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.94520767 kg -->\n      <mass value=\"0.94521\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00133347\"\n        ixy=\"-0.00000676\"\n        ixz=\"0.00000067\"\n        iyy=\"0.00088618\"\n        iyz=\"-0.00000295\"\n        izz=\"0.00133859\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh\n          filename=\"package://kuavo_assets/models/biped_s52/meshes/l_arm_pitch.STL\" />\n      </geometry>\n      <material\n        name=\"\">\n        <color\n          rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint\n    name=\"zarm_l1_joint\"\n    type=\"revolute\">\n    <origin\n      xyz=\"-0.003 0.2527 0.283\"\n      rpy=\"0 0 0\" />\n    <parent\n      link=\"waist_yaw_link\" />\n    <child\n      link=\"zarm_l1_link\" />\n    <axis\n      xyz=\"0 1 0\" />\n    <limit lower=\"-3.14159265358979\" upper=\"1.5707963267949\" effort=\"66.0\" velocity=\"18.8\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n  <!-- ============ l_arm_roll ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1al_arm_pitch_roll_yaw -->\n  <link\n    name=\"zarm_l2_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( -0.00087383, -0.00000389, -0.04690210 ) -->\n      <origin xyz=\"-0.00087383 -0.00000389 -0.04690210\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.41921257 kg -->\n      <mass value=\"0.41921\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00084950\"\n        ixy=\"0.00000011\"\n        ixz=\"-0.00002039\"\n        iyy=\"0.00123033\"\n        iyz=\"0.00000014\"\n        izz=\"0.00074285\" />\n    </inertial>\n    <visual>\n      <origin\n        xyz=\"0 0 0\"\n        rpy=\"0 0 0\" />\n      <geometry>\n        <mesh\n          filename=\"package://kuavo_assets/models/biped_s52/meshes/l_arm_roll.STL\" />\n      </geometry>\n      <material\n        name=\"\">\n        <color\n          rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint\n    name=\"zarm_l2_joint\"\n    type=\"revolute\">\n    <origin\n      xyz=\"0 0 0\"\n      rpy=\"0 0 0\" />\n    <parent\n      link=\"zarm_l1_link\" />\n    <child\n      link=\"zarm_l2_link\" />\n    <axis\n      xyz=\"1 0 0\" />\n    <limit lower=\"-0.349065850398866\" upper=\"3.49065850398866\" effort=\"75.0\" velocity=\"8.0\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ l_arm_yaw ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1al_arm_pitch_roll_yaw -->\n  <link\n    name=\"zarm_l3_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( 0.00961457, 0.00303320, -0.22991934 ) -->\n      <origin xyz=\"0.00961457 0.00303320 -0.22991934\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a1.78857489 kg -->\n      <mass value=\"1.78857\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00709279\"\n        ixy=\"-0.00006786\"\n        ixz=\"0.00082655\"\n        iyy=\"0.00718506\"\n        iyz=\"0.00029056\"\n        izz=\"0.00191640\" />\n    </inertial>\n    <visual>\n      <origin\n        xyz=\"0 0 0\"\n        rpy=\"0 0 0\" />\n      <geometry>\n        <mesh\n          filename=\"package://kuavo_assets/models/biped_s52/meshes/l_arm_yaw.STL\" />\n      </geometry>\n      <material\n        name=\"\">\n        <color\n          rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint\n    name=\"zarm_l3_joint\"\n    type=\"revolute\">\n    <origin\n      xyz=\"0 0 0\"\n      rpy=\"0 0 0\" />\n    <parent\n      link=\"zarm_l2_link\" />\n    <child\n      link=\"zarm_l3_link\" />\n    <axis\n      xyz=\"0 0 1\" />\n    <limit lower=\"-1.48352986419518\" upper=\"1.48352986419518\" effort=\"57.0\" velocity=\"7.5\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ l_foream ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1al_foream -->\n  <link\n    name=\"zarm_l4_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( -0.01815271, 0.00143762, -0.06748280 ) -->\n      <origin xyz=\"-0.01815271 0.00143762 -0.06748280\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.63148736 kg -->\n      <mass value=\"0.63149\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00152253\"\n        ixy=\"-0.00000788\"\n        ixz=\"-0.00012859\"\n        iyy=\"0.00131180\"\n        iyz=\"-0.00003238\"\n        izz=\"0.00069075\" />\n    </inertial>\n    <visual>\n      <origin\n        xyz=\"0 0 0\"\n        rpy=\"0 0 0\" />\n      <geometry>\n        <mesh\n          filename=\"package://kuavo_assets/models/biped_s52/meshes/l_forearm.STL\" />\n      </geometry>\n      <material\n        name=\"\">\n        <color\n          rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint\n    name=\"zarm_l4_joint\"\n    type=\"revolute\">\n    <origin\n      xyz=\"0.02 0 -0.2837\"\n      rpy=\"0 0 0\" />\n    <parent\n      link=\"zarm_l3_link\" />\n    <child\n      link=\"zarm_l4_link\" />\n    <axis\n      xyz=\"0 1 0\" />\n    <limit lower=\"-2.61799387799149\" upper=\"0.0\" effort=\"75.0\" velocity=\"8.0\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ l_hand_yaw ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1al_hand_yaw -->\n  <link\n    name=\"zarm_l5_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( -0.00516386, 0.00001560, -0.05589705 ) -->\n      <origin xyz=\"-0.00516386 0.00001560 -0.05589705\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.60827684 kg -->\n      <mass value=\"0.60828\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00065900\"\n        ixy=\"0.00000008\"\n        ixz=\"-0.00002661\"\n        iyy=\"0.00092404\"\n        iyz=\"0.00000000\"\n        izz=\"0.00049898\" />\n    </inertial>\n    <visual>\n      <origin\n        xyz=\"0 0 0\"\n        rpy=\"0 0 0\" />\n      <geometry>\n        <mesh\n          filename=\"package://kuavo_assets/models/biped_s52/meshes/l_hand_yaw.STL\" />\n      </geometry>\n      <material\n        name=\"\">\n        <color\n          rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint\n    name=\"zarm_l5_joint\"\n    type=\"revolute\">\n    <origin xyz=\"-0.02 0 -0.1201\" rpy=\"0 0 0\" />\n    <parent\n      link=\"zarm_l4_link\" />\n    <child\n      link=\"zarm_l5_link\" />\n    <axis\n      xyz=\"0 0 1\" />\n    <limit lower=\"-1.5707963267949\" upper=\"1.5707963267949\" effort=\"14.1\" velocity=\"17.5\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ l_hand_roll ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1al_hand_roll -->\n  <link\n    name=\"zarm_l6_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( -0.00674799, 0.00638282, -0.00862654 ) -->\n      <origin xyz=\"-0.00674799 0.00638282 -0.00862654\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.50616416 kg -->\n      <mass value=\"0.50616\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09- \u7b2c\u4e00\u4e2a\u5f20\u91cf -->\n      <inertia\n        ixx=\"0.00038064\"\n        ixy=\"-0.00002132\"\n        ixz=\"0.00013787\"\n        iyy=\"0.00052077\"\n        iyz=\"0.00003086\"\n        izz=\"0.00032724\" />\n    </inertial>\n    <visual>\n      <origin\n        xyz=\"0 0 0\"\n        rpy=\"0 0 0\" />\n      <geometry>\n        <mesh\n          filename=\"package://kuavo_assets/models/biped_s52/meshes/l_hand_roll.STL\" />\n      </geometry>\n      <material\n        name=\"\">\n        <color\n          rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint\n    name=\"zarm_l6_joint\"\n    type=\"revolute\">\n    <origin\n      xyz=\"0.0 0 -0.114\"\n      rpy=\"0 0 0\" />\n    <parent\n      link=\"zarm_l5_link\" />\n    <child\n      link=\"zarm_l6_link\" />\n    <axis\n      xyz=\"1 0 0\" />\n    <limit lower=\"-1.30899693899575\" upper=\"0.698131700797732\" effort=\"14.1\" velocity=\"17.5\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ l_hand_pitch ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1al_hand_pitch -->\n  <link\n    name=\"zarm_l7_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( 0.03810742, 0.00267575, -0.05086389 ) -->\n      <origin xyz=\"0.00481393 0.00873606 -0.0837543\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.18939501 kg -->\n      <mass value=\"0.7374\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00112502\"\n        ixy=\"0\"\n        ixz=\"0\"\n        iyy=\"0.00133239\"\n        iyz=\"0\"\n        izz=\"0.000373427\" />\n    </inertial>\n  </link>\n  <joint\n    name=\"zarm_l7_joint\"\n    type=\"revolute\">\n    <origin\n      xyz=\"0 0 -0.021\"\n      rpy=\"0 0 0\" />\n    <parent\n      link=\"zarm_l6_link\" />\n    <child\n      link=\"zarm_l7_link\" />\n    <axis\n      xyz=\"0 1 0\" />\n    <limit lower=\"-0.698131700797732\" upper=\"0.698131700797732\" effort=\"14.1\" velocity=\"17.5\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n<link name=\"left_wrist_camera_link\">\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/D405.stl\" scale=\"0.001 0.001 0.001\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"left_wrist_camera_joint\" type=\"fixed\">\n    <origin xyz=\"0 0.06 0\" rpy=\"3.14159 0 3.14159\" />\n    <parent link=\"zarm_l7_link\" />\n    <child link=\"left_wrist_camera_link\" />\n  </joint>\n  <!-- \u5de6\u624b\u5939\u722a\u5e95\u5ea7 -->\n  <link name=\"left_gripper_base\">\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/robotiq_85_base_link_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"0.149 0.149 0.149 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"left_gripper_base_joint\" type=\"fixed\">\n    <origin xyz=\"0 0 -0.0038\" rpy=\"3.14159 0 1.5708\" />\n    <parent link=\"zarm_l7_link\" />\n    <child link=\"left_gripper_base\" />\n  </joint>\n  <!-- \u5de6\u5939\u722a\u5de6\u4fa7\u624b\u6307\u94fe -->\n  <link name=\"left_gripper_left_outer_knuckle\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/outer_knuckle_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"left_gripper_left_outer_knuckle_joint\" type=\"revolute\">\n    <origin xyz=\"0 -0.0306011 0.054904\" rpy=\"0 0 3.14159\" />\n    <parent link=\"left_gripper_base\" />\n    <child link=\"left_gripper_left_outer_knuckle\" />\n    <axis xyz=\"1 0 0\" />\n    <limit lower=\"0\" upper=\"0.8\" effort=\"5\" velocity=\"2\" />\n    <mimic joint=\"left_gripper_joint\" multiplier=\"1\" offset=\"0\" />\n  </joint>\n  <link name=\"left_gripper_left_outer_finger\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/outer_finger_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"left_gripper_left_outer_finger_joint\" type=\"fixed\">\n    <origin xyz=\"0 0.0315 -0.0041\" rpy=\"0 0 0\" />\n    <parent link=\"left_gripper_left_outer_knuckle\" />\n    <child link=\"left_gripper_left_outer_finger\" />\n  </joint>\n  <link name=\"left_gripper_left_inner_finger\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/inner_finger_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"left_gripper_left_inner_finger_joint\" type=\"fixed\">\n    <origin xyz=\"0 0.0061 0.0471\" rpy=\"0 0 0\" />\n    <parent link=\"left_gripper_left_outer_finger\" />\n    <child link=\"left_gripper_left_inner_finger\" />\n  </joint>\n  <link name=\"left_gripper_left_inner_knuckle\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/inner_knuckle_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"left_gripper_left_inner_knuckle_joint\" type=\"fixed\">\n    <origin xyz=\"0 -0.0127 0.06142\" rpy=\"0 0 3.14159\" />\n    <parent link=\"left_gripper_base\" />\n    <child link=\"left_gripper_left_inner_knuckle\" />\n  </joint>\n  <!-- \u5de6\u5939\u722a\u53f3\u4fa7\u624b\u6307\u94fe -->\n  <link name=\"left_gripper_right_outer_knuckle\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/outer_knuckle_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"left_gripper_joint\" type=\"revolute\">\n    <origin xyz=\"0 0.0306011 0.054904\" rpy=\"0 0 0\" />\n    <parent link=\"left_gripper_base\" />\n    <child link=\"left_gripper_right_outer_knuckle\" />\n    <axis xyz=\"1 0 0\" />\n    <limit lower=\"0\" upper=\"0.8\" effort=\"5\" velocity=\"2\" />\n  </joint>\n  <link name=\"left_gripper_right_outer_finger\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/outer_finger_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"left_gripper_right_outer_finger_joint\" type=\"fixed\">\n    <origin xyz=\"0 0.0315 -0.0041\" rpy=\"0 0 0\" />\n    <parent link=\"left_gripper_right_outer_knuckle\" />\n    <child link=\"left_gripper_right_outer_finger\" />\n  </joint>\n  <link name=\"left_gripper_right_inner_finger\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/inner_finger_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"left_gripper_right_inner_finger_joint\" type=\"fixed\">\n    <origin xyz=\"0 0.0061 0.0471\" rpy=\"0 0 0\" />\n    <parent link=\"left_gripper_right_outer_finger\" />\n    <child link=\"left_gripper_right_inner_finger\" />\n  </joint>\n  <link name=\"left_gripper_right_inner_knuckle\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/inner_knuckle_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"left_gripper_right_inner_knuckle_joint\" type=\"fixed\">\n    <origin xyz=\"0 0.0127 0.06142\" rpy=\"0 0 0\" />\n    <parent link=\"left_gripper_base\" />\n    <child link=\"left_gripper_right_inner_knuckle\" />\n  </joint>\n    <link name=\"zarm_l7_end_effector\">\n  </link>\n  <joint name=\"zarm_l7_end_effector_joint\" type=\"fixed\">\n    <origin xyz=\"0 0.0 -0.17\" rpy=\"0 0 0\" />\n    <parent link=\"zarm_l7_link\" />\n    <child link=\"zarm_l7_end_effector\" />\n  </joint>\n  <!-- ============ r_arm_pitch ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1ar_arm_pitch_roll_yaw -->\n  <link\n    name=\"zarm_r1_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( 0.00162594, 0.00950442, -0.00031733 ) -->\n      <origin xyz=\"0.00162594 0.00950442 -0.00031733\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.92946504 kg -->\n      <mass value=\"0.92947\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00132776\"\n        ixy=\"0.00001398\"\n        ixz=\"-0.00000091\"\n        iyy=\"0.00084780\"\n        iyz=\"-0.00000301\"\n        izz=\"0.00130062\" />\n    </inertial>\n    <visual>\n      <origin\n        xyz=\"0 0 0\"\n        rpy=\"0 0 0\" />\n      <geometry>\n        <mesh\n          filename=\"package://kuavo_assets/models/biped_s52/meshes/r_arm_pitch.STL\" />\n      </geometry>\n      <material\n        name=\"\">\n        <color\n          rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint\n    name=\"zarm_r1_joint\"\n    type=\"revolute\">\n    <origin\n      xyz=\"-0.003 -0.2527 0.283\"\n      rpy=\"0 0 0\" />\n    <parent\n      link=\"waist_yaw_link\" />\n    <child\n      link=\"zarm_r1_link\" />\n    <axis\n      xyz=\"0 1 0\" />\n    <limit lower=\"-3.14159265358979\" upper=\"1.5707963267949\" effort=\"66.0\" velocity=\"18.8\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ r_arm_roll ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1ar_arm_pitch_roll_yaw -->\n  <link\n    name=\"zarm_r2_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( -0.00082502, -0.00000618, -0.04699917 ) -->\n      <origin xyz=\"-0.00082502 -0.00000618 -0.04699917\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.41522857 kg -->\n      <mass value=\"0.41523\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00084475\"\n        ixy=\"0.00000011\"\n        ixz=\"-0.00002054\"\n        iyy=\"0.00122057\"\n        iyz=\"0.00000014\"\n        izz=\"0.00073617\" />\n    </inertial>\n    <visual>\n      <origin\n        xyz=\"0 0 0\"\n        rpy=\"0 0 0\" />\n      <geometry>\n        <mesh\n          filename=\"package://kuavo_assets/models/biped_s52/meshes/r_arm_roll.STL\" />\n      </geometry>\n      <material\n        name=\"\">\n        <color\n          rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint\n    name=\"zarm_r2_joint\"\n    type=\"revolute\">\n    <origin\n      xyz=\"0 0 0\"\n      rpy=\"0 0 0\" />\n    <parent\n      link=\"zarm_r1_link\" />\n    <child\n      link=\"zarm_r2_link\" />\n    <axis\n      xyz=\"1 0 0\" />\n    <limit lower=\"-3.49065850398866\" upper=\"0.349065850398866\" effort=\"75.0\" velocity=\"8.0\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ r_arm_yaw ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1ar_arm_pitch_roll_yaw -->\n  <link\n    name=\"zarm_r3_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( 0.00936686, -0.00338228, -0.22947022 ) -->\n      <origin xyz=\"0.00936686 -0.00338228 -0.22947022\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a1.78472650 kg -->\n      <mass value=\"1.78473\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00706267\"\n        ixy=\"0.00007037\"\n        ixz=\"0.00081612\"\n        iyy=\"0.00715549\"\n        iyz=\"-0.00033921\"\n        izz=\"0.00187467\" />\n    </inertial>\n    <visual>\n      <origin\n        xyz=\"0 0 0\"\n        rpy=\"0 0 0\" />\n      <geometry>\n        <mesh\n          filename=\"package://kuavo_assets/models/biped_s52/meshes/r_arm_yaw.STL\" />\n      </geometry>\n      <material\n        name=\"\">\n        <color\n          rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint\n    name=\"zarm_r3_joint\"\n    type=\"revolute\">\n    <origin\n      xyz=\"0 0 0\"\n      rpy=\"0 0 0\" />\n    <parent\n      link=\"zarm_r2_link\" />\n    <child\n      link=\"zarm_r3_link\" />\n    <axis\n      xyz=\"0 0 1\" />\n    <limit lower=\"-1.48352986419518\" upper=\"1.48352986419518\" effort=\"57.0\" velocity=\"7.5\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ r_foream ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1ar_foream -->\n  <link\n    name=\"zarm_r4_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( -0.01808595, -0.00140005, -0.06722746 ) -->\n      <origin xyz=\"-0.01808595 -0.00140005 -0.06722746\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.63548283 kg -->\n      <mass value=\"0.63548\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00154594\"\n        ixy=\"0.00000786\"\n        ixz=\"-0.00013011\"\n        iyy=\"0.00133341\"\n        iyz=\"0.00003163\"\n        izz=\"0.00070186\" />\n    </inertial>\n    <visual>\n      <origin\n        xyz=\"0 0 0\"\n        rpy=\"0 0 0\" />\n      <geometry>\n        <mesh\n          filename=\"package://kuavo_assets/models/biped_s52/meshes/r_forearm.STL\" />\n      </geometry>\n      <material\n        name=\"\">\n        <color\n          rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint\n    name=\"zarm_r4_joint\"\n    type=\"revolute\">\n    <origin\n      xyz=\"0.02 0 -0.2837\"\n      rpy=\"0 0 0\" />\n    <parent\n      link=\"zarm_r3_link\" />\n    <child\n      link=\"zarm_r4_link\" />\n    <axis\n      xyz=\"0 1 0\" />\n    <limit lower=\"-2.61799387799149\" upper=\"0.0\" effort=\"75.0\" velocity=\"8.0\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ r_hand_yaw ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1ar_hand_yaw -->\n  <link\n    name=\"zarm_r5_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( -0.00505317, 0.00001432, -0.05619135 ) -->\n      <origin xyz=\"-0.00505317 0.00001432 -0.05619135\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.61020748 kg -->\n      <mass value=\"0.61021\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00065686\"\n        ixy=\"0.00000010\"\n        ixz=\"-0.00002535\"\n        iyy=\"0.00092519\"\n        iyz=\"0.00000000\"\n        izz=\"0.00050244\" />\n    </inertial>\n    <visual>\n      <origin\n        xyz=\"0 0 0\"\n        rpy=\"0 0 0\" />\n      <geometry>\n        <mesh\n          filename=\"package://kuavo_assets/models/biped_s52/meshes/r_hand_yaw.STL\" />\n      </geometry>\n      <material\n        name=\"\">\n        <color\n          rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint\n    name=\"zarm_r5_joint\"\n    type=\"revolute\">\n    <origin xyz=\"-0.02 0 -0.1201\" rpy=\"0 0 0\" />\n    <parent\n      link=\"zarm_r4_link\" />\n    <child\n      link=\"zarm_r5_link\" />\n    <axis\n      xyz=\"0 0 1\" />\n    <limit lower=\"-1.5707963267949\" upper=\"1.5707963267949\" effort=\"14.1\" velocity=\"17.5\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ r_hand_roll ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1ar_hand_roll -->\n  <link\n    name=\"zarm_r6_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( -0.00633080, -0.00581708, -0.00833296 ) -->\n      <origin xyz=\"-0.00633080 -0.00581708 -0.00833296\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.53821377 kg -->\n      <mass value=\"0.53821\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00039845\"\n        ixy=\"0.00001950\"\n        ixz=\"0.00013771\"\n        iyy=\"0.00056523\"\n        iyz=\"-0.00003046\"\n        izz=\"0.00037323\" />\n    </inertial>\n    <visual>\n      <origin\n        xyz=\"0 0 0\"\n        rpy=\"0 0 0\" />\n      <geometry>\n        <mesh\n          filename=\"package://kuavo_assets/models/biped_s52/meshes/r_hand_roll.STL\" />\n      </geometry>\n      <material\n        name=\"\">\n        <color\n          rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint\n    name=\"zarm_r6_joint\"\n    type=\"revolute\">\n    <origin\n      xyz=\"0.0 0 -0.114\"\n      rpy=\"0 0 0\" />\n    <parent\n      link=\"zarm_r5_link\" />\n    <child\n      link=\"zarm_r6_link\" />\n    <axis\n      xyz=\"1 0 0\" />\n    <limit lower=\"-0.698131700797732\" upper=\"1.30899693899575\" effort=\"14.1\" velocity=\"17.5\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ r_hand_pitch ============ -->\n  <!-- \u5750\u6807\u7cfb\uff1ar_hand_pitch -->\n  <link\n    name=\"zarm_r7_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( 0.03616769, -0.00232464, -0.04975256 ) -->\n      <origin xyz=\"0.00481393 -0.00870857 -0.0836411\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.19960270 kg -->\n      <mass value=\"0.7374\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09 -->\n      <inertia\n        ixx=\"0.00110836\"\n        ixy=\"0\"\n        ixz=\"0\"\n        iyy=\"0.00131607\"\n        iyz=\"0\"\n        izz=\"0.000374168\" />\n    </inertial>\n  </link>\n  <joint\n    name=\"zarm_r7_joint\"\n    type=\"revolute\">\n    <origin\n      xyz=\"0.0 0 -0.021\"\n      rpy=\"0 0 0\" />\n    <parent\n      link=\"zarm_r6_link\" />\n    <child\n      link=\"zarm_r7_link\" />\n    <axis\n      xyz=\"0 1 0\" />\n    <limit lower=\"-0.698131700797732\" upper=\"0.698131700797732\" effort=\"14.1\" velocity=\"17.5\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n<link name=\"right_wrist_camera_link\">\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/D405.stl\" scale=\"0.001 0.001 0.001\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"right_wrist_camera_joint\" type=\"fixed\">\n    <origin xyz=\"0 -0.06 0\" rpy=\"3.14159 0 0\" />\n    <parent link=\"zarm_r7_link\" />\n    <child link=\"right_wrist_camera_link\" />\n  </joint>\n  <!-- \u53f3\u624b\u5939\u722a\u5e95\u5ea7 -->\n  <link name=\"right_gripper_base\">\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/robotiq_85_base_link_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"0.149 0.149 0.149 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"right_gripper_base_joint\" type=\"fixed\">\n    <origin xyz=\"0 0 -0.0038\" rpy=\"3.14159 0 1.5708\" />\n    <parent link=\"zarm_r7_link\" />\n    <child link=\"right_gripper_base\" />\n  </joint>\n  <!-- \u53f3\u5939\u722a\u5de6\u4fa7\u624b\u6307\u94fe -->\n  <link name=\"right_gripper_left_outer_knuckle\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/outer_knuckle_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"right_gripper_left_outer_knuckle_joint\" type=\"revolute\">\n    <origin xyz=\"0 -0.0306011 0.054904\" rpy=\"0 0 3.14159\" />\n    <parent link=\"right_gripper_base\" />\n    <child link=\"right_gripper_left_outer_knuckle\" />\n    <axis xyz=\"1 0 0\" />\n    <limit lower=\"0\" upper=\"0.8\" effort=\"5\" velocity=\"2\" />\n    <mimic joint=\"right_gripper_joint\" multiplier=\"1\" offset=\"0\" />\n  </joint>\n  <link name=\"right_gripper_left_outer_finger\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/outer_finger_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"right_gripper_left_outer_finger_joint\" type=\"fixed\">\n    <origin xyz=\"0 0.0315 -0.0041\" rpy=\"0 0 0\" />\n    <parent link=\"right_gripper_left_outer_knuckle\" />\n    <child link=\"right_gripper_left_outer_finger\" />\n  </joint>\n  <link name=\"right_gripper_left_inner_finger\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/inner_finger_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"right_gripper_left_inner_finger_joint\" type=\"fixed\">\n    <origin xyz=\"0 0.0061 0.0471\" rpy=\"0 0 0\" />\n    <parent link=\"right_gripper_left_outer_finger\" />\n    <child link=\"right_gripper_left_inner_finger\" />\n  </joint>\n  <link name=\"right_gripper_left_inner_knuckle\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/inner_knuckle_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"right_gripper_left_inner_knuckle_joint\" type=\"fixed\">\n    <origin xyz=\"0 -0.0127 0.06142\" rpy=\"0 0 3.14159\" />\n    <parent link=\"right_gripper_base\" />\n    <child link=\"right_gripper_left_inner_knuckle\" />\n  </joint>\n  <!-- \u53f3\u5939\u722a\u53f3\u4fa7\u624b\u6307\u94fe -->\n  <link name=\"right_gripper_right_outer_knuckle\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/outer_knuckle_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"right_gripper_joint\" type=\"revolute\">\n    <origin xyz=\"0 0.0306011 0.054904\" rpy=\"0 0 0\" />\n    <parent link=\"right_gripper_base\" />\n    <child link=\"right_gripper_right_outer_knuckle\" />\n    <axis xyz=\"1 0 0\" />\n    <limit lower=\"0\" upper=\"0.8\" effort=\"5\" velocity=\"2\" />\n  </joint>\n  <link name=\"right_gripper_right_outer_finger\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/outer_finger_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"right_gripper_right_outer_finger_joint\" type=\"fixed\">\n    <origin xyz=\"0 0.0315 -0.0041\" rpy=\"0 0 0\" />\n    <parent link=\"right_gripper_right_outer_knuckle\" />\n    <child link=\"right_gripper_right_outer_finger\" />\n  </joint>\n  <link name=\"right_gripper_right_inner_finger\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/inner_finger_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"right_gripper_right_inner_finger_joint\" type=\"fixed\">\n    <origin xyz=\"0 0.0061 0.0471\" rpy=\"0 0 0\" />\n    <parent link=\"right_gripper_right_outer_finger\" />\n    <child link=\"right_gripper_right_inner_finger\" />\n  </joint>\n  <link name=\"right_gripper_right_inner_knuckle\">\n    <visual>\n      <geometry>\n        <mesh filename=\"package://challenge_cup_simulator/models/biped_s52/meshes/2f85/inner_knuckle_fine_new.STL\"  />\n      </geometry>\n      <material name=\"\"><color rgba=\"0.149 0.149 0.149 1\" /></material>\n    </visual>\n  </link>\n  <joint name=\"right_gripper_right_inner_knuckle_joint\" type=\"fixed\">\n    <origin xyz=\"0 0.0127 0.06142\" rpy=\"0 0 0\" />\n    <parent link=\"right_gripper_base\" />\n    <child link=\"right_gripper_right_inner_knuckle\" />\n  </joint>\n    <link name=\"zarm_r7_end_effector\">\n  </link>\n  <joint name=\"zarm_r7_end_effector_joint\" type=\"fixed\">\n    <origin xyz=\"0 0.0 -0.17\" rpy=\"0 0 0\" />\n    <parent link=\"zarm_r7_link\" />\n    <child link=\"zarm_r7_end_effector\" />\n  </joint>\n  <link name=\"zhead_1_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( -0.00023727, -0.00370647, -0.03459039 ) -->\n      <origin xyz=\"-0.00023727 -0.00370647 -0.03459039\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff1a0.57249607 kg -->\n      <mass value=\"0.57250\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09- \u6765\u81eahead_yaw Lxx/Lxy/Lxz... -->\n      <inertia\n        ixx=\"0.00158340\"\n        ixy=\"0.00000121\"\n        ixz=\"-0.00000972\"\n        iyy=\"0.00149398\"\n        iyz=\"0.00007274\"\n        izz=\"0.00035213\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/head_yaw.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"zhead_1_joint\" type=\"revolute\">\n    <origin xyz=\"-0.003 0.0 0.49535\" rpy=\"0 0 0\" />\n    <parent link=\"waist_yaw_link\" />\n    <child link=\"zhead_1_link\" />\n    <axis xyz=\"0 0 1\" />\n    <limit lower=\"-1.5707963267949\" upper=\"1.5707963267949\" effort=\"1.5\" velocity=\"5.23\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n  <link name=\"zhead_2_link\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( 0.02805157, 0.00056300, 0.03552405 ) -->\n      <origin xyz=\"0.02805157 0.00056300 0.03552405\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff08\u7528\u6237\u8986\u76d6\uff09\uff1a0.73448153 kg -->\n      <mass value=\"0.73448\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09- \u6765\u81eahead_pitch Lxx/Lxy/Lxz... -->\n      <inertia\n        ixx=\"0.00411867\"\n        ixy=\"0.0\"\n        ixz=\"0.00042644\"\n        iyy=\"0.00457039\"\n        iyz=\"0.0\"\n        izz=\"0.00467067\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/head_pitch.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n    <collision>\n      <origin xyz=\"0.04 0 0.01\" rpy=\"0 0 0\" />\n      <geometry>\n        <sphere radius=\"0.1\"/>\n      </geometry>\n    </collision>\n  </link>\n  <joint name=\"zhead_2_joint\" type=\"revolute\">\n    <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n    <parent link=\"zhead_1_link\" />\n    <child link=\"zhead_2_link\" />\n    <axis xyz=\"0 1 0\" />\n    <limit lower=\"-0.523598775598299\" upper=\"0.523598775598299\" effort=\"12.0\" velocity=\"5.23\" />\n    <dynamics damping=\"0.02\" friction=\"0.0\" />\n  </joint>\n\n  <!-- ============ head_camera - \u5b8c\u5168\u6309\u7167txt\u6587\u4ef6 ============ -->\n  <link name=\"camera_base\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( 0.01583173, -0.04712613, -0.00019589 ) \u5b8c\u5168\u6309\u7167txt -->\n      <origin xyz=\"0.01583173 -0.04712613 -0.00019589\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff08\u7528\u6237\u8986\u76d6\uff09= 0.00000000 \u5343\u514b\uff0c\u5b8c\u5168\u6309\u7167txt -->\n      <mass value=\"0.00000000\" />\n      <!-- txt\u4e2d\u6ca1\u6709\u60ef\u6027\u5f20\u91cf\u6570\u636e\uff0c\u8bbe\u7f6e\u4e3a0 -->\n      <inertia\n        ixx=\"0.0\"\n        ixy=\"0.0\"\n        ixz=\"0.0\"\n        iyy=\"0.0\"\n        iyz=\"0.0\"\n        izz=\"0.0\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/head_camera.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint name=\"camera_base\" type=\"fixed\">\n    <origin xyz=\"0.093839 0.0475 0.050077\" rpy=\"0 0.3406 0\" />\n    <parent link=\"zhead_2_link\" />\n    <child link=\"camera_base\" />\n  </joint>\n\n  <link name=\"head_rader\">\n    <inertial>\n      <!-- \u8d28\u5fc3\uff1a( 0.00018505, -0.00000652, 0.01776962 ) -->\n      <origin xyz=\"0.00018505 -0.00000652 0.01776962\" rpy=\"0 0 0\" />\n      <!-- \u8d28\u91cf\uff08\u7528\u6237\u8986\u76d6\uff09\uff1a0.26500000 kg -->\n      <mass value=\"0.26500\" />\n      <!-- \u2705 \u7531\u91cd\u5fc3\u51b3\u5b9a\uff0c\u5e76\u4e14\u5bf9\u9f50\u8f93\u51fa\u7684\u5750\u6807\u7cfb\uff08\u4f7f\u7528\u8d1f\u5f20\u91cf\u8bb0\u6570\u6cd5\uff09- \u6765\u81eahead_radar Lxx/Lxy/Lxz... -->\n      <inertia\n        ixx=\"0.00012489\"\n        ixy=\"0.0\"\n        ixz=\"0.0\"\n        iyy=\"0.00013451\"\n        iyz=\"0.0\"\n        izz=\"0.00013326\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kuavo_assets/models/biped_s52/meshes/head_rader.STL\" />\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"0.61176 0.65882 0.67059 1\" />\n      </material>\n    </visual>\n  </link>\n  \n  <joint name=\"head_rader_joint\" type=\"fixed\">\n    <origin xyz=\"0 0 -0.078253\" rpy=\"0 0 0\" />\n    <parent link=\"zhead_1_link\" />\n    <child link=\"head_rader\" />\n    <axis xyz=\"0 0 0\" />\n  </joint>\n  <link\n    name=\"waist_camera\">\n    <inertial>\n      <origin\n        xyz=\"0.0048485 0.00025646 0.013977\"\n        rpy=\"0 0 0\" />\n      <mass\n        value=\"0.048238\" />\n      <inertia\n        ixx=\"5.9781E-05\"\n        ixy=\"-2.4765E-07\"\n        ixz=\"1.0778E-07\"\n        iyy=\"5.8328E-06\"\n        iyz=\"-1.0739E-07\"\n        izz=\"5.9293E-05\" />\n    </inertial>\n    <visual>\n      <origin\n        xyz=\"0 0 0\"\n        rpy=\"0 0 0\" />\n      <geometry>\n        <mesh\n          filename=\"package://kuavo_assets/models/biped_s52/meshes/waist_camera.STL\" />\n      </geometry>\n      <material\n        name=\"\">\n        <color\n          rgba=\"1 1 1 1\" />\n      </material>\n    </visual>\n  </link>\n  <joint\n    name=\"waist_camera\"\n    type=\"fixed\">\n    <origin\n      xyz=\"0.0787 0 -0.028449\"\n      rpy=\"0 0.59341 0\" />\n    <parent\n      link=\"waist_yaw_link\" />\n    <child\n      link=\"waist_camera\" />\n    <axis\n      xyz=\"0 0 0\" />\n  </joint>\n</robot>\n",
+  "config": {
+    "enabled": true,
+    "max_parcels": 4,
+    "visual_after_first_parcel": true,
+    "weighing_gain_scale": 0.4,
+    "first_weighing_lower_gain_scale": 1.0,
+    "first_weighing_roof_offset_m": 0.008,
+    "first_weighing_roof_axis": 0,
+    "weighing_posture_bias": false,
+    "weighing_posture_reserve": true,
+    "weighing_reserve_command_bound": true,
+    "settlement_spatial_components": true,
+    "pickup_level_grasp": true,
+    "pickup_center_grasp_height": true,
+    "pickup_grasp_z_tolerance_m": 0.005,
+    "pickup_grasp_gain_scale": 1.0,
+    "pickup_pitch_offset_degrees": 2.5,
+    "pickup_pitch_offsets_degrees": [
+      0.0,
+      2.5,
+      2.5,
+      5.0
+    ],
+    "weighing_pose_search": true,
+    "weighing_coupled_pose_request": true,
+    "weighing_live_support_height": true,
+    "weighing_prepare_tilt_degrees": 10.0,
+    "pickup_extra_insertion_m": 0.015,
+    "lift_m": 0.16,
+    "max_joint_step_rad": 0.012,
+    "stage_timeout_steps": 500,
+    "servo_gain": 0.18,
+    "bin_tool_rpy_degrees": [
+      80.0,
+      5.0,
+      -90.0
+    ],
+    "bin_lateral_offsets_m": [
+      -0.105,
+      -0.035,
+      0.035,
+      0.105
+    ],
+    "bin_depth_offsets_m": [
+      0.0,
+      0.0,
+      0.0,
+      -0.025
+    ]
+  },
+  "cases": [
+    {
+      "step": 12492,
+      "goal": [
+        [
+          [
+            -0.9926612016413285,
+            -0.06842159983863942,
+            0.09971069868130661,
+            0.2868281652630067
+          ],
+          [
+            0.09388452403888714,
+            0.08365354444203642,
+            0.9920623874778619,
+            0.03254044217350918
+          ],
+          [
+            -0.07621964905445859,
+            0.9941431331442192,
+            -0.07661589861255838,
+            0.24412219546000427
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        [
+          [
+            -0.9967352128324533,
+            0.07507877683547626,
+            -0.029700046611625397,
+            0.2760269465112514
+          ],
+          [
+            0.022571803950747094,
+            -0.09406963257786877,
+            -0.99530970953421,
+            -0.17789484217785356
+          ],
+          [
+            -0.0775205080366028,
+            -0.9927306187962337,
+            0.0920678518169805,
+            0.3258888267980497
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      ],
+      "previous_command": [
+        -0.7451038580692316,
+        0.6029532572105477,
+        -1.0272713591226543,
+        -1.9554077081779622,
+        -0.7423238737195539,
+        0.5407537387488031,
+        -0.4952414167307728,
+        0.98,
+        -0.6602128480685227,
+        -1.1363226304203082,
+        0.7809237303018574,
+        -2.1522294133200575,
+        0.2694860871403165,
+        -0.0415282343320104,
+        -0.698131700797732,
+        0.0
+      ],
+      "previous_measured": [
+        -0.769336998462677,
+        0.5987588167190552,
+        -1.0460842847824097,
+        -1.986854076385498,
+        -0.8419559001922607,
+        -0.43570658564567566,
+        -0.5689001083374023,
+        0.5067788362503052,
+        -0.6209047436714172,
+        -1.1397705078125,
+        0.7461564540863037,
+        -2.173583507537842,
+        0.6306968331336975,
+        -0.13210587203502655,
+        -0.6551998853683472,
+        0.0032520676031708717
+      ],
+      "measured": [
+        -0.7693353891372681,
+        0.5983747243881226,
+        -1.0446608066558838,
+        -1.9874300956726074,
+        -0.8396921157836914,
+        -0.43570324778556824,
+        -0.5689067244529724,
+        0.5068764090538025,
+        -0.6211199164390564,
+        -1.1406110525131226,
+        0.7526528835296631,
+        -2.169102907180786,
+        0.6241620182991028,
+        -0.12726186215877533,
+        -0.6551911234855652,
+        0.003252247581258416
+      ],
+      "after_measured": [
+        -0.7693336606025696,
+        0.597777247428894,
+        -1.043053388595581,
+        -1.9880515336990356,
+        -0.8371879458427429,
+        -0.43569493293762207,
+        -0.5689154863357544,
+        0.5069803595542908,
+        -0.6219111084938049,
+        -1.1419854164123535,
+        0.7603986263275146,
+        -2.1635942459106445,
+        0.6168112754821777,
+        -0.12120819836854935,
+        -0.6551867723464966,
+        0.0032523975241929293
+      ],
+      "sent_command": [
+        -0.7447587358758045,
+        0.6026629970115104,
+        -1.0259651968873449,
+        -1.9562067815957824,
+        -0.7406564306033665,
+        0.541470231567867,
+        -0.4950397322734534,
+        0.98,
+        -0.6620703582908596,
+        -1.1370152006588303,
+        0.7809424027937756,
+        -2.153581984980601,
+        0.2663837752847986,
+        -0.037971632227920896,
+        -0.698131700797732,
+        0.0
+      ],
+      "phase_steps": 100,
+      "pose_errors": [
+        {
+          "position_m": 0.018898752664938782,
+          "angle_rad": 0.3655505745339813
+        },
+        {
+          "position_m": 0.002674737642667547,
+          "angle_rad": 0.3254609153384505
+        }
+      ]
+    },
+    {
+      "step": 12592,
+      "goal": [
+        [
+          [
+            -0.9926612016413285,
+            -0.06842159983863942,
+            0.09971069868130661,
+            0.2868281652630067
+          ],
+          [
+            0.09388452403888714,
+            0.08365354444203642,
+            0.9920623874778619,
+            0.03254044217350918
+          ],
+          [
+            -0.07621964905445859,
+            0.9941431331442192,
+            -0.07661589861255838,
+            0.24412219546000427
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        [
+          [
+            -0.9967352128324533,
+            0.07507877683547626,
+            -0.029700046611625397,
+            0.2760269465112514
+          ],
+          [
+            0.022571803950747094,
+            -0.09406963257786877,
+            -0.99530970953421,
+            -0.17789484217785356
+          ],
+          [
+            -0.0775205080366028,
+            -0.9927306187962337,
+            0.0920678518169805,
+            0.3258888267980497
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      ],
+      "previous_command": [
+        -0.5874277164528845,
+        0.5317811778708699,
+        -0.8844972584585487,
+        -1.9378163250783424,
+        -0.7691508215560424,
+        0.698131700797732,
+        -0.5953092274747109,
+        0.98,
+        -0.8239101923624104,
+        -1.1749712152599328,
+        0.8948976039871955,
+        -2.163543522199486,
+        0.2813826571666696,
+        -0.051325996893248085,
+        -0.698131700797732,
+        0.0
+      ],
+      "previous_measured": [
+        -0.6227831244468689,
+        0.5431368350982666,
+        -0.8844501972198486,
+        -1.9864087104797363,
+        -0.7739667892456055,
+        -0.3927045166492462,
+        -0.5690935850143433,
+        0.5073725581169128,
+        -0.7976765632629395,
+        -1.1804730892181396,
+        0.8749092221260071,
+        -2.17651629447937,
+        0.28719812631607056,
+        0.2135743498802185,
+        -0.661900520324707,
+        0.0032636974938213825
+      ],
+      "measured": [
+        -0.6193791627883911,
+        0.5417869687080383,
+        -0.8813395500183105,
+        -1.9861948490142822,
+        -0.773965060710907,
+        -0.3927020728588104,
+        -0.5690981149673462,
+        0.5073670744895935,
+        -0.7981144785881042,
+        -1.1804741621017456,
+        0.8752760887145996,
+        -2.1764631271362305,
+        0.2871936559677124,
+        0.2135787010192871,
+        -0.6619067788124084,
+        0.003263709135353565
+      ],
+      "after_measured": [
+        -0.6167855858802795,
+        0.5407381057739258,
+        -0.879006028175354,
+        -1.9860328435897827,
+        -0.773963987827301,
+        -0.3927003741264343,
+        -0.5691016912460327,
+        0.5073618292808533,
+        -0.7984487414360046,
+        -1.180475115776062,
+        0.875558614730835,
+        -2.1764190196990967,
+        0.2871902883052826,
+        0.21358206868171692,
+        -0.6619116067886353,
+        0.0032637189142405987
+      ],
+      "sent_command": [
+        -0.5835409482508184,
+        0.5297121305780088,
+        -0.8809020850299544,
+        -1.9376843848653695,
+        -0.7728014155247033,
+        0.698131700797732,
+        -0.5990695914315624,
+        0.98,
+        -0.8244501926808789,
+        -1.1751172602618098,
+        0.8956269195900287,
+        -2.1634895608319296,
+        0.28327263046296436,
+        -0.05335677163132354,
+        -0.698131700797732,
+        0.0
+      ],
+      "phase_steps": 200,
+      "pose_errors": [
+        {
+          "position_m": 0.0053391682774188666,
+          "angle_rad": 0.19447561449681747
+        },
+        {
+          "position_m": 0.0015905450923417047,
+          "angle_rad": 0.10089997719207246
+        }
+      ]
+    },
+    {
+      "step": 12642,
+      "goal": [
+        [
+          [
+            -0.9926612016413285,
+            -0.06842159983863942,
+            0.09971069868130661,
+            0.2868281652630067
+          ],
+          [
+            0.09388452403888714,
+            0.08365354444203642,
+            0.9920623874778619,
+            0.03254044217350918
+          ],
+          [
+            -0.07621964905445859,
+            0.9941431331442192,
+            -0.07661589861255838,
+            0.24412219546000427
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        [
+          [
+            -0.9967352128324533,
+            0.07507877683547626,
+            -0.029700046611625397,
+            0.2760269465112514
+          ],
+          [
+            0.022571803950747094,
+            -0.09406963257786877,
+            -0.99530970953421,
+            -0.17789484217785356
+          ],
+          [
+            -0.0775205080366028,
+            -0.9927306187962337,
+            0.0920678518169805,
+            0.3258888267980497
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      ],
+      "previous_command": [
+        -0.49230645636307035,
+        0.48647153181331215,
+        -0.8113689003573991,
+        -1.9541826901317565,
+        -0.8925222020684827,
+        0.698131700797732,
+        -0.698131700797732,
+        0.98,
+        -0.8450667600796329,
+        -1.1806189291660638,
+        0.9258066858922934,
+        -2.1620606858758706,
+        0.37378023226901386,
+        -0.15556620467210183,
+        -0.698131700797732,
+        0.0
+      ],
+      "previous_measured": [
+        -0.4992927312850952,
+        0.488333135843277,
+        -0.7839740514755249,
+        -1.9939498901367188,
+        -0.780744194984436,
+        -0.3930521011352539,
+        -0.5770907998085022,
+        0.5073455572128296,
+        -0.8173140287399292,
+        -1.1845604181289673,
+        0.8941410779953003,
+        -2.1752798557281494,
+        0.287010133266449,
+        0.213674396276474,
+        -0.6622061133384705,
+        0.0032644523307681084
+      ],
+      "measured": [
+        -0.49910256266593933,
+        0.48837336897850037,
+        -0.7842977643013,
+        -1.994422197341919,
+        -0.7824735045433044,
+        -0.39311012625694275,
+        -0.5786412358283997,
+        0.5073460340499878,
+        -0.8178048729896545,
+        -1.1845643520355225,
+        0.8945937156677246,
+        -2.175267219543457,
+        0.2870062589645386,
+        0.21367137134075165,
+        -0.6622127890586853,
+        0.0032644651364535093
+      ],
+      "after_measured": [
+        -0.49908989667892456,
+        0.4883982539176941,
+        -0.7844825387001038,
+        -1.9945040941238403,
+        -0.7833795547485352,
+        -0.3931514322757721,
+        -0.5794199705123901,
+        0.5073463916778564,
+        -0.8180586099624634,
+        -1.1845667362213135,
+        0.8948262929916382,
+        -2.1752610206604004,
+        0.2870047390460968,
+        0.2136700451374054,
+        -0.6622159481048584,
+        0.0032644711900502443
+      ],
+      "sent_command": [
+        -0.49257616928465264,
+        0.48655272175711384,
+        -0.8116268569577033,
+        -1.954193432136399,
+        -0.8931405218257535,
+        0.698131700797732,
+        -0.698131700797732,
+        0.98,
+        -0.8453864914364256,
+        -1.1807283483723987,
+        0.9263723364860279,
+        -2.1620317282608266,
+        0.3756147330804838,
+        -0.15774140168821438,
+        -0.698131700797732,
+        0.0
+      ],
+      "phase_steps": 250,
+      "pose_errors": [
+        {
+          "position_m": 0.0026934965776969043,
+          "angle_rad": 0.18320297831568835
+        },
+        {
+          "position_m": 0.0014314447090476394,
+          "angle_rad": 0.10014141019832942
+        }
+      ]
+    },
+    {
+      "step": 12692,
+      "goal": [
+        [
+          [
+            -0.9926612016413285,
+            -0.06842159983863942,
+            0.09971069868130661,
+            0.2868281652630067
+          ],
+          [
+            0.09388452403888714,
+            0.08365354444203642,
+            0.9920623874778619,
+            0.03254044217350918
+          ],
+          [
+            -0.07621964905445859,
+            0.9941431331442192,
+            -0.07661589861255838,
+            0.24412219546000427
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        [
+          [
+            -0.9967352128324533,
+            0.07507877683547626,
+            -0.029700046611625397,
+            0.2760269465112514
+          ],
+          [
+            0.022571803950747094,
+            -0.09406963257786877,
+            -0.99530970953421,
+            -0.17789484217785356
+          ],
+          [
+            -0.0775205080366028,
+            -0.9927306187962337,
+            0.0920678518169805,
+            0.3258888267980497
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      ],
+      "previous_command": [
+        -0.508903944795153,
+        0.4785350636128617,
+        -0.8039684901671441,
+        -1.9409929495798766,
+        -0.8935789849360087,
+        0.698131700797732,
+        -0.698131700797732,
+        0.98,
+        -0.8584736701349012,
+        -1.1863049641353436,
+        0.9511606738405907,
+        -2.1607421008227443,
+        0.4630833433873366,
+        -0.2663760963255962,
+        -0.698131700797732,
+        0.0
+      ],
+      "previous_measured": [
+        -0.5157396793365479,
+        0.48596641421318054,
+        -0.790037214756012,
+        -1.9912315607070923,
+        -0.8542865514755249,
+        -0.40281111001968384,
+        -0.6448923349380493,
+        0.5073564648628235,
+        -0.832564651966095,
+        -1.1869359016418457,
+        0.9099841713905334,
+        -2.174527883529663,
+        0.28696408867836,
+        0.2133876234292984,
+        -0.662336528301239,
+        0.0032649890054017305
+      ],
+      "measured": [
+        -0.5162041783332825,
+        0.48564374446868896,
+        -0.7900276780128479,
+        -1.9907187223434448,
+        -0.8543417453765869,
+        -0.4028250277042389,
+        -0.6449054479598999,
+        0.507356584072113,
+        -0.8327060341835022,
+        -1.1870872974395752,
+        0.9102172255516052,
+        -2.174517869949341,
+        0.2869640588760376,
+        0.21337544918060303,
+        -0.6623378396034241,
+        0.003265002276748419
+      ],
+      "after_measured": [
+        -0.5164562463760376,
+        0.48547467589378357,
+        -0.7900209426879883,
+        -1.9904532432556152,
+        -0.8543506860733032,
+        -0.402832567691803,
+        -0.6449130177497864,
+        0.5073566436767578,
+        -0.83277827501297,
+        -1.1871765851974487,
+        0.9103339910507202,
+        -2.1745123863220215,
+        0.2869640290737152,
+        0.21336829662322998,
+        -0.6623386144638062,
+        0.0032650120556354523
+      ],
+      "sent_command": [
+        -0.5088181196330038,
+        0.4783494492630424,
+        -0.8034354102635248,
+        -1.9408987982801333,
+        -0.8933838779776538,
+        0.698131700797732,
+        -0.698131700797732,
+        0.98,
+        -0.8586946512016694,
+        -1.1863729185096061,
+        0.9515732681055413,
+        -2.1607295394232735,
+        0.46481418104415406,
+        -0.26857394077605357,
+        -0.698131700797732,
+        0.0
+      ],
+      "phase_steps": 300,
+      "pose_errors": [
+        {
+          "position_m": 0.003642754581583748,
+          "angle_rad": 0.1545535471977279
+        },
+        {
+          "position_m": 0.0016251612199076778,
+          "angle_rad": 0.10048114865563047
+        }
+      ]
+    },
+    {
+      "step": 12742,
+      "goal": [
+        [
+          [
+            -0.9926612016413285,
+            -0.06842159983863942,
+            0.09971069868130661,
+            0.2868281652630067
+          ],
+          [
+            0.09388452403888714,
+            0.08365354444203642,
+            0.9920623874778619,
+            0.03254044217350918
+          ],
+          [
+            -0.07621964905445859,
+            0.9941431331442192,
+            -0.07661589861255838,
+            0.24412219546000427
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        [
+          [
+            -0.9967352128324533,
+            0.07507877683547626,
+            -0.029700046611625397,
+            0.2760269465112514
+          ],
+          [
+            0.022571803950747094,
+            -0.09406963257786877,
+            -0.99530970953421,
+            -0.17789484217785356
+          ],
+          [
+            -0.0775205080366028,
+            -0.9927306187962337,
+            0.0920678518169805,
+            0.3258888267980497
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      ],
+      "previous_command": [
+        -0.49411593920781854,
+        0.4692977462829377,
+        -0.7824593991699158,
+        -1.9420165768858966,
+        -0.8947745105212361,
+        0.698131700797732,
+        -0.698131700797732,
+        0.98,
+        -0.8680244583837009,
+        -1.1884626263118472,
+        0.973181444036518,
+        -2.1599196480781244,
+        0.553821305771934,
+        -0.37603798266495403,
+        -0.698131700797732,
+        0.0
+      ],
+      "previous_measured": [
+        -0.508840024471283,
+        0.47715434432029724,
+        -0.7744572162628174,
+        -1.9873851537704468,
+        -0.8548622727394104,
+        -0.40327906608581543,
+        -0.6454544067382812,
+        0.5073586106300354,
+        -0.8345533013343811,
+        -1.189103126525879,
+        0.9150421023368835,
+        -2.1743531227111816,
+        0.28701648116111755,
+        0.19981889426708221,
+        -0.662376880645752,
+        0.003264648374170065
+      ],
+      "measured": [
+        -0.5081995129585266,
+        0.4767824411392212,
+        -0.7738456726074219,
+        -1.9873794317245483,
+        -0.8548822999000549,
+        -0.4032956659793854,
+        -0.6454769372940063,
+        0.5073586702346802,
+        -0.834825873374939,
+        -1.1893259286880493,
+        0.9159533381462097,
+        -2.174351215362549,
+        0.28702452778816223,
+        0.1977989673614502,
+        -0.6623779535293579,
+        0.0032645571045577526
+      ],
+      "after_measured": [
+        -0.5078767538070679,
+        0.4765986502170563,
+        -0.7735185027122498,
+        -1.9873768091201782,
+        -0.8548935055732727,
+        -0.40330493450164795,
+        -0.6454896926879883,
+        0.5073586702346802,
+        -0.8349900245666504,
+        -1.1894516944885254,
+        0.9164871573448181,
+        -2.1743500232696533,
+        0.28702929615974426,
+        0.19661873579025269,
+        -0.6623786091804504,
+        0.0032645107712596655
+      ],
+      "sent_command": [
+        -0.49382699297628657,
+        0.46917096578597506,
+        -0.7822009297993817,
+        -1.9421062732010959,
+        -0.8949200653556184,
+        0.698131700797732,
+        -0.698131700797732,
+        0.98,
+        -0.8682939077774403,
+        -1.1885122619730237,
+        0.973772422416913,
+        -2.1598351924664403,
+        0.5558856387148453,
+        -0.3781066821358236,
+        -0.698131700797732,
+        0.0
+      ],
+      "phase_steps": 350,
+      "pose_errors": [
+        {
+          "position_m": 0.0015604411053478002,
+          "angle_rad": 0.15118385023534867
+        },
+        {
+          "position_m": 0.0011383385912921127,
+          "angle_rad": 0.09256421686575549
+        }
+      ]
+    },
+    {
+      "step": 12842,
+      "goal": [
+        [
+          [
+            -0.9926612016413285,
+            -0.06842159983863942,
+            0.09971069868130661,
+            0.2868281652630067
+          ],
+          [
+            0.09388452403888714,
+            0.08365354444203642,
+            0.9920623874778619,
+            0.03254044217350918
+          ],
+          [
+            -0.07621964905445859,
+            0.9941431331442192,
+            -0.07661589861255838,
+            0.24412219546000427
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        [
+          [
+            -0.9967352128324533,
+            0.07507877683547626,
+            -0.029700046611625397,
+            0.2760269465112514
+          ],
+          [
+            0.022571803950747094,
+            -0.09406963257786877,
+            -0.99530970953421,
+            -0.17789484217785356
+          ],
+          [
+            -0.0775205080366028,
+            -0.9927306187962337,
+            0.0920678518169805,
+            0.3258888267980497
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      ],
+      "previous_command": [
+        -0.47796823623202284,
+        0.462288151132745,
+        -0.7687329280219642,
+        -1.948941561569732,
+        -0.9095144544384479,
+        0.698131700797732,
+        -0.698131700797732,
+        0.98,
+        -0.9002345381486134,
+        -1.1939392478784017,
+        1.026347498911603,
+        -2.1520119715370614,
+        0.7579544708026013,
+        -0.560019222597823,
+        -0.698131700797732,
+        0.0
+      ],
+      "previous_measured": [
+        -0.4923122525215149,
+        0.4685959219932556,
+        -0.759389340877533,
+        -1.9886144399642944,
+        -0.856076180934906,
+        -0.4041294455528259,
+        -0.6467571258544922,
+        0.5073592066764832,
+        -0.862348735332489,
+        -1.1970406770706177,
+        0.9617912173271179,
+        -2.17183256149292,
+        0.32794076204299927,
+        0.12912704050540924,
+        -0.6622961759567261,
+        0.0032632932998239994
+      ],
+      "measured": [
+        -0.4922703802585602,
+        0.4685521423816681,
+        -0.7592819333076477,
+        -1.988628625869751,
+        -0.8560965657234192,
+        -0.4041428864002228,
+        -0.6467774510383606,
+        0.5073592066764832,
+        -0.8631024360656738,
+        -1.197338342666626,
+        0.9631996154785156,
+        -2.1720521450042725,
+        0.3309781849384308,
+        0.1254420280456543,
+        -0.6623060703277588,
+        0.0032632569782435894
+      ],
+      "after_measured": [
+        -0.4922329783439636,
+        0.46851494908332825,
+        -0.7592036724090576,
+        -1.9886388778686523,
+        -0.856112003326416,
+        -0.40415307879447937,
+        -0.646792471408844,
+        0.5073592066764832,
+        -0.8636879920959473,
+        -1.1975786685943604,
+        0.9642947316169739,
+        -2.1722612380981445,
+        0.33328187465667725,
+        0.12261242419481277,
+        -0.6623138785362244,
+        0.0032632320653647184
+      ],
+      "sent_command": [
+        -0.477903596287772,
+        0.4622451659361025,
+        -0.76868968799965,
+        -1.9489591585993358,
+        -0.9096737140029529,
+        0.698131700797732,
+        -0.698131700797732,
+        0.98,
+        -0.9007310988856604,
+        -1.19403312429811,
+        1.0269132564461727,
+        -2.1518442383649043,
+        0.7584258617638483,
+        -0.5605870385794897,
+        -0.698131700797732,
+        0.0
+      ],
+      "phase_steps": 450,
+      "pose_errors": [
+        {
+          "position_m": 0.0018984180369859076,
+          "angle_rad": 0.14940351164960983
+        },
+        {
+          "position_m": 0.00087529341264601,
+          "angle_rad": 0.028299051699960283
+        }
+      ]
+    },
+    {
+      "step": 12892,
+      "goal": [
+        [
+          [
+            -0.9926612016413285,
+            -0.06842159983863942,
+            0.09971069868130661,
+            0.2868281652630067
+          ],
+          [
+            0.09388452403888714,
+            0.08365354444203642,
+            0.9920623874778619,
+            0.03254044217350918
+          ],
+          [
+            -0.07621964905445859,
+            0.9941431331442192,
+            -0.07661589861255838,
+            0.24412219546000427
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        [
+          [
+            -0.9967352128324533,
+            0.07507877683547626,
+            -0.029700046611625397,
+            0.2760269465112514
+          ],
+          [
+            0.022571803950747094,
+            -0.09406963257786877,
+            -0.99530970953421,
+            -0.17789484217785356
+          ],
+          [
+            -0.0775205080366028,
+            -0.9927306187962337,
+            0.0920678518169805,
+            0.3258888267980497
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      ],
+      "previous_command": [
+        -0.47590883337962325,
+        0.46124194865510276,
+        -0.7667243874439386,
+        -1.9492337980358327,
+        -0.9166330155876611,
+        0.698131700797732,
+        -0.698131700797732,
+        0.98,
+        -0.9262045716693265,
+        -1.1951902252689988,
+        1.0503625840521258,
+        -2.1387860012726043,
+        0.686313561590596,
+        -0.5081059447241235,
+        -0.698131700797732,
+        0.0
+      ],
+      "previous_measured": [
+        -0.49079805612564087,
+        0.46728554368019104,
+        -0.757844090461731,
+        -1.9889500141143799,
+        -0.856731116771698,
+        -0.4045623540878296,
+        -0.6473352909088135,
+        0.5073592066764832,
+        -0.890070378780365,
+        -1.2045146226882935,
+        1.0009970664978027,
+        -2.1701159477233887,
+        0.3907271921634674,
+        0.058062922209501266,
+        -0.6627618670463562,
+        0.003262845566496253
+      ],
+      "measured": [
+        -0.4907836616039276,
+        0.46728384494781494,
+        -0.7578098773956299,
+        -1.9889544248580933,
+        -0.8567436933517456,
+        -0.40457069873809814,
+        -0.6473450660705566,
+        0.5073592066764832,
+        -0.8904585242271423,
+        -1.2045153379440308,
+        1.0013827085494995,
+        -2.169865608215332,
+        0.39073607325553894,
+        0.05805305019021034,
+        -0.6627705097198486,
+        0.003262855811044574
+      ],
+      "after_measured": [
+        -0.4907463788986206,
+        0.4672778248786926,
+        -0.757754921913147,
+        -1.9889600276947021,
+        -0.8567611575126648,
+        -0.4045822322368622,
+        -0.6473585367202759,
+        0.5073592066764832,
+        -0.89100581407547,
+        -1.2045164108276367,
+        1.001924991607666,
+        -2.1695687770843506,
+        0.39074814319610596,
+        0.058039501309394836,
+        -0.6627824306488037,
+        0.0032628700137138367
+      ],
+      "sent_command": [
+        -0.47587434988981564,
+        0.46122540594194655,
+        -0.7666911548174032,
+        -1.9492330477299955,
+        -0.9167746240868071,
+        0.698131700797732,
+        -0.698131700797732,
+        0.98,
+        -0.9265650177943665,
+        -1.1952106808121874,
+        1.0506963936586542,
+        -2.1387131883996857,
+        0.6840945636359024,
+        -0.5066080414344716,
+        -0.698131700797732,
+        0.0
+      ],
+      "phase_steps": 500,
+      "pose_errors": [
+        {
+          "position_m": 0.0020918435443633104,
+          "angle_rad": 0.14884813913347428
+        },
+        {
+          "position_m": 0.0004391495325486386,
+          "angle_rad": 0.05227920200660411
+        }
+      ]
+    }
+  ],
+  "scope": "Public robot URDF and recorded joint feedback/commands only; fixed-bias models are not physical dynamics."
+}

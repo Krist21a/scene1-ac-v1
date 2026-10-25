@@ -1,0 +1,118 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -241,6 +241,7 @@
+   max_level_regrasp_steps: 900
+   regrasp_visible_v_fraction: 0.67
+   release_open_dwell_steps: 4
++  release_gripper_open_step: 0.08
+   release_retreat_direction: measured_tool_axis
+   release_retreat_preflight: executor_sweep
+   release_sweep_projection: true
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -803,6 +803,16 @@
+             raise RuntimeError('Release reference did not settle within original weighing budget; gripper kept closed')
+         return target.copy()
+ 
++    def _release_open_command(self):
++        step = self.wrist_config.get('release_gripper_open_step')
++        if step is None:
++            return 0.
++        if not np.isfinite(step) or not 0. < step <= 1.:
++            raise ValueError('Release gripper opening step must be finite in (0,1]')
++        if self.last_sent is None or not np.isfinite(self.last_sent[15]):
++            raise RuntimeError('Progressive release requires actual sent gripper reference')
++        return float(max(0., self.last_sent[15]-step))
++
+     def _pending_action(self, measured, snapshot):
+         p = self.pending; side = p['side']; grip = (7, 15)[side]
+         p['steps'] += 1
+@@ -810,7 +820,9 @@
+         info = dict(state='small_' + p['kind'], arm=side, phase_steps=p['steps'], strategy='act_residual')
+         if p['kind'] == 'short_retreat':
+             result = p['base'].copy()+self.offset; result[15] = 0.
+-            if p['steps'] <= self.wrist_config.get('release_open_dwell_steps', 12) or measured[15] > .1:
++            opening_command = self._release_open_command()
++            if (p['steps'] <= self.wrist_config.get('release_open_dwell_steps', 12)
++                    or measured[15] > .1 or opening_command > 0.):
+                 if p['steps'] >= 40:
+                     raise RuntimeError('Right gripper did not open before retreat')
+                 if self.wrist_config.get('release_cartesian_open_hold', False):
+@@ -836,6 +848,11 @@
+                         position_gain=float(position_gain),
+                         position_goal_m=p['release_hold_position'].tolist(),
+                         measured_gripper=float(measured[15]))
++                result[15] = opening_command
++                info['release_gripper_ramp'] = dict(command=opening_command,
++                    previous_command=None if self.last_sent is None else float(self.last_sent[15]),
++                    step=self.wrist_config.get('release_gripper_open_step'),
++                    original_open_timeout_steps=40)
+                 return result, info
+             if p.get('goal') is None:
+                 if self.wrist_config.get('release_geometry_reobserve', False):
+@@ -1221,7 +1238,8 @@
+                     if p['steps'] >= self.config['max_release_steps']:
+                         raise RuntimeError('Weighing camera lost before release; gripper kept closed')
+                     return p['base'].copy(), dict(info,state='waiting_release_view')
+-                result = p['base'].copy(); result[15] = p['requested_open']
++                result = p['base'].copy(); result[15] = (self._release_open_command()
++                    if self.wrist_config.get('release_gripper_open_step') is not None else p['requested_open'])
+                 if self.wrist_config.get('release_measured_reference_hold', False):
+                     # Unloading can expose a large pending tracking error even
+                     # while the visually supported TCP appears stationary.
+@@ -1324,6 +1342,10 @@
+                             release_hold_position=np.asarray(pose.pos_xyz).copy(),
+                             release_hold_rotation=Rotation.from_quat(pose.quat_xyzw))
+                 info['state'] = 'weighing_release'
++                info['release_gripper_ramp'] = dict(command=float(result[15]),
++                    previous_command=None if self.last_sent is None else float(self.last_sent[15]),
++                    step=self.wrist_config.get('release_gripper_open_step'),
++                    original_open_timeout_steps=40)
+                 return result, info
+             seen = self._observe_box(snapshot, poses)
+             if seen is not None:
+--- a/tests/test_release_soft_open.py
++++ b/tests/test_release_soft_open.py
+@@ -0,0 +1,42 @@
++import unittest
++import numpy as np
++import test_release_open_hold as opening
++
++class SoftOpenTests(unittest.TestCase):
++    setUp=opening.ReleaseOpenHoldTests.setUp
++    fixture=opening.ReleaseOpenHoldTests.fixture
++
++    def test_progressive_command_preserves_hold_and_waits_for_feedback(self):
++        self.fixture();self.a.wrist_config.update(release_gripper_open_step=.08,release_open_dwell_steps=4)
++        previous=self.raw.copy();previous[15]=.98;self.a.observe_command(previous)
++        self.measured[15]=.5
++        for i in range(13):
++            result,info=self.a._pending_action(self.measured,None)
++            self.assertAlmostEqual(result[15],max(0.,.98-.08*(i+1)))
++            self.assertIn('release_pose_hold',info)
++            self.assertIsNone(self.a.pending.get('goal'))
++            self.assertLessEqual(previous[15]-result[15],.08+1e-12)
++            np.testing.assert_array_equal(result[8:15],previous[8:15])
++            self.a.observe_command(result);previous=result.copy()
++        self.assertEqual(result[15],0.)
++        self.assertEqual(self.a.pending['steps'],13)
++
++    def test_measured_open_does_not_skip_command_ramp(self):
++        self.fixture();self.a.wrist_config.update(release_gripper_open_step=.08,release_open_dwell_steps=4)
++        previous=self.raw.copy();previous[15]=.5;self.a.observe_command(previous)
++        self.a.pending['steps']=5;self.measured[15]=.01
++        result,info=self.a._pending_action(self.measured,None)
++        self.assertAlmostEqual(result[15],.42)
++        self.assertIn('release_pose_hold',info)
++
++    def test_original_open_timeout_retained(self):
++        self.fixture();self.a.wrist_config['release_gripper_open_step']=.08
++        self.a.observe_command(self.raw);self.a.pending['steps']=39;self.measured[15]=.5
++        with self.assertRaisesRegex(RuntimeError,'gripper did not open'):
++            self.a._pending_action(self.measured,None)
++
++    def test_invalid_step_rejected(self):
++        for step in [0.,-1.,2.,float('nan')]:
++            self.fixture();self.a.wrist_config['release_gripper_open_step']=step
++            with self.assertRaisesRegex(ValueError,'finite'):
++                self.a._release_open_command()

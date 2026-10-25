@@ -1,0 +1,137 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -283,6 +283,7 @@
+   max_parcels: 4
+   visual_after_first_parcel: true
+   first_visual_transport: true
++  first_visual_pickup: true
+   weighing_gain_scale: 0.4
+   first_weighing_lower_gain_scale: 0.4
+   first_weighing_roof_offset_m: 0.008
+--- a/run_scene1.py
++++ b/run_scene1.py
+@@ -31,6 +31,7 @@
+ from scene1.visual_cycle import VisualCycle
+ from scene1.visual_pickup import VisualPickup, grasp_template, grasp_plan, restore_next_context
+ from scene1.first_transport import begin_first_transport
++from scene1.first_pickup import begin_first_pickup
+ from scene1.pickup_resume import write_pickup_checkpoint, restore_weighing_context
+ from scene1.placement_gain import PlacementGain
+ from scene1.placement_target import PlacementTarget
+@@ -521,6 +522,14 @@
+                 if config.get('visual_cycle', {}).get('visual_after_first_parcel') and first_grasp_plan is None:
+                     raise RuntimeError('No requested first grasp target was captured for visual continuation')
+                 pickup_template = grasp_template(aligner.geometry[1], first_grasp_plan)
++            if (config.get('visual_cycle', {}).get('first_visual_pickup', False)
++                    and visual_pickup is None and visual_cycle is not None
++                    and visual_cycle.completed == 0 and isinstance(aligner, ResidualAssist)
++                    and not aligner.first_grasp_complete and aligner.pending is None
++                    and aligner.approach[1] is not None and aligner.approach[1].get('aligned')):
++                visual_pickup, weighing_pad = begin_first_pickup(
++                    visual_cycle, aligner, rgbd_snapshot, measured, previous_sent)
++                print(f'FIRST_VISUAL_PICKUP step={steps+1}', flush=True)
+             if (config.get('visual_cycle', {}).get('first_visual_transport', False)
+                     and visual_pickup is None and visual_cycle is not None
+                     and visual_cycle.completed == 0 and isinstance(aligner, ResidualAssist)
+--- a/scene1/first_pickup.py
++++ b/scene1/first_pickup.py
+@@ -0,0 +1,49 @@
++"""Preserve confirmed pregrasp orientation through the existing visual approach."""
++import copy
++import numpy as np
++from .visual_pickup import VisualPickup, grasp_template, grasp_plan, table_hull
++from .table_reference import table_frame, table_boundary
++from .approach_edges import roof_edges
++
++
++def begin_first_pickup(cycle, assist, snapshot, measured, command):
++    context = assist.approach[1]
++    if (cycle.completed != 0 or cycle.active or cycle.done or assist.first_grasp_complete
++            or assist.regrasp_complete or assist.pending is not None
++            or context is None or not context.get('aligned')):
++        raise RuntimeError('First visual pickup requires confirmed initial pregrasp')
++    if snapshot is None:
++        raise RuntimeError('First visual pickup requires fresh RGB-D')
++    surfaces = [s for s in snapshot.get('surfaces', []) if not s.get('partial', True)
++                and s.get('points',0) >= 60 and min(s['extent_xy_m']) >= .145]
++    if len(surfaces) != 1:
++        raise RuntimeError('First visual pickup requires one unambiguous complete observed pad')
++    target, plane = copy.deepcopy(context['target']), context['plane']
++    pose = assist.kinematics.fk(np.asarray(measured)).right_pose
++    point = assist._grasp_goal(target,pose,plane)
++    # This template is a prospective approach only. Original contact confirmation
++    # still registers the actual held geometry before lift or weighing.
++    template = grasp_template(assist._geometry(target,pose,plane),grasp_plan(target,plane,point))
++    surface = copy.deepcopy(surfaces[0])
++    pickup = VisualPickup(cycle,template,surface['position_base_m'],measured,command)
++    pickup.motion.command = np.asarray(command).copy()
++    pickup.motion.config = copy.deepcopy(pickup.motion.config)
++    pickup.motion.config['pickup_extra_insertion_m'] = 0.  # Retain initial near-face position.
++    offsets = list(pickup.motion.config.get('pickup_pitch_offsets_degrees',[0.,2.5,2.5,5.]))
++    offsets[0] = assist.wrist_config['first_grasp_pitch_degrees']-assist.wrist_config['regrasp_pitch_degrees']
++    pickup.motion.config['pickup_pitch_offsets_degrees'] = offsets
++    pickup.target, pickup.plane = target, plane
++    pickup.grasp_goal = pickup._target_goal(measured,assist)
++    pickup.table_reference = table_frame(table_hull(snapshot),plane,table_boundary(snapshot))
++    pickup.approach_edge_reference = roof_edges(snapshot,pickup.target)
++    pickup.anchor_target = copy.deepcopy(pickup.target)
++    pickup.anchor_plane = plane
++    pickup.anchor_grasp_goal = pickup.grasp_goal.copy()
++    pickup.anchor_approach_goal = pickup.approach_goal.copy()
++    pickup.surface_reference = surface
++    pickup.motion.goal[1] = cycle.k.matrix(np.asarray(measured)[8:15],1)
++    pickup.motion.goal[1][2,3] = max(pickup.motion.goal[1][2,3],
++        max(c['top_z_base_m'] for c in snapshot['candidates'])+.12)
++    pickup._stage('clear')
++    pickup.first_visual_pickup = True
++    return pickup,np.asarray(surface['position_base_m']).copy()
+--- a/tests/test_first_pickup.py
++++ b/tests/test_first_pickup.py
+@@ -0,0 +1,47 @@
++import copy,json,unittest
++from pathlib import Path
++from unittest.mock import patch
++from types import SimpleNamespace
++import numpy as np
++import yaml
++from scene1.kinematics import UrdfArmKinematics
++from scene1.visual_cycle import VisualCycle
++from scene1.residual import ResidualAssist
++from scene1.first_pickup import begin_first_pickup
++
++class FirstPickupTests(unittest.TestCase):
++    def setUp(self):
++        p=Path(__file__).parent;self.f=json.loads((p/'fixtures/first_transport_20261024.json').read_text())
++        self.k=UrdfArmKinematics(description=(p/'fixtures/release_robot.urdf').read_text())
++        self.cfg=yaml.safe_load((p.parent/'configs/visual_cycle_four_parcels.yaml').read_text())
++        lo=np.r_[self.k.limits[0][:,0],0.,self.k.limits[1][:,0],0.];hi=np.r_[self.k.limits[0][:,1],1.,self.k.limits[1][:,1],1.]
++        self.measured=np.array(self.f['contact']['observation_state']);self.sent=np.array(self.f['contact']['sent_action']);self.measured[[7,15]]=0.;self.sent[[7,15]]=0.
++        self.cycle=VisualCycle(self.cfg['visual_cycle'],self.k,lo,hi,self.sent)
++        self.assist=ResidualAssist(self.cfg['visual_residual'],self.k,lo,hi);self.assist.wrist_config=self.cfg['wrist_assist']
++        self.assist.approach[1]=dict(target=self.f['grasp']['target'],plane=self.f['grasp']['plane'],aligned=True)
++        self.snapshot=dict(surfaces=self.f['contact']['rgbd_surfaces'],candidates=[self.f['grasp']['target']])
++    def begin(self):
++        with patch('scene1.first_pickup.table_hull',return_value=None),patch('scene1.first_pickup.table_boundary',return_value=None),patch('scene1.first_pickup.roof_edges',return_value=None):
++            return begin_first_pickup(self.cycle,self.assist,self.snapshot,self.measured,self.sent)
++    def test_transition_keeps_sent_reference_and_contact_is_not_yet_confirmed(self):
++        pickup,_=self.begin();np.testing.assert_array_equal(pickup.motion.command,self.sent)
++        self.assertEqual(pickup.stage,'clear');self.assertFalse(self.assist.first_grasp_complete)
++        self.assertIsNone(self.assist.geometry[1]);self.assertEqual(pickup.motion.config['stage_timeout_steps'],500)
++    def test_orientation_and_observed_height_with_no_extra_initial_insertion(self):
++        pickup,_=self.begin();g=pickup.grasp_goal
++        self.assertAlmostEqual(g[2,0],0.);self.assertAlmostEqual(np.rad2deg(np.arcsin(g[2,2])),15.)
++        self.assertAlmostEqual(g[2,3],(pickup.plane+pickup.target['top_z_base_m'])/2)
++        self.assertEqual(pickup.target['extra_insertion_m'],0.)
++    def test_first_overrides_do_not_mutate_later_pickup_config(self):
++        before=copy.deepcopy(self.cycle.config);pickup,_=self.begin()
++        self.assertEqual(self.cycle.config,before);self.assertEqual(self.cycle.config['pickup_pitch_offsets_degrees'][0],0.)
++        self.assertEqual(pickup.motion.config['pickup_grasp_gain_scale'],.35)
++    def test_unaligned_context_is_rejected(self):
++        self.assist.approach[1]['aligned']=False
++        with self.assertRaisesRegex(RuntimeError,'confirmed initial pregrasp'):self.begin()
++    def test_closed_gripper_is_rejected(self):
++        self.measured[15]=.5
++        with self.assertRaisesRegex(RuntimeError,'empty'):self.begin()
++    def test_missing_pad_is_rejected(self):
++        self.snapshot['surfaces']=[]
++        with self.assertRaisesRegex(RuntimeError,'unambiguous'):self.begin()

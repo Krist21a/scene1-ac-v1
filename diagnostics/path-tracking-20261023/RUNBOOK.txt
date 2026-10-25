@@ -1,0 +1,101 @@
+scene1 路径与控制研究候选：构建、验证及恢复
+
+本轮结论
+  完整四包门槛未通过，不部署研究候选；原控制库和原dynamic QR已恢复，final-verification.json为errors=[]。
+  最终路径+C两包通过；四包C完成2包后第三包预检失败，原控制器同路径完成1包后第二包预检失败。
+  五次空手及六次持物/任务试验全部保留。所有task_success=null；seed1、2未运行。完整结论见REPORT.txt。
+  以下执行命令用于复核和后续有新依据的候选，不意味着已验收，也不是要求原失败条件再跑一次。
+
+工作目录
+  cd /home/krist/kuavo_course/scene1_act_optimization
+  下面的命令都从这个目录执行。研究目录为 diagnostics/path-tracking-20261023。
+  大型证据和候选控制库保存在 /media/krist/KINGSTON/scene1-path-tracking-20261023；该盘必须已挂载。
+  所有动作回合必须使用新的标签。不要覆盖或重跑相同失败条件来筛选成功。
+
+路径文件
+  candidate-policy-axis：以归档 reobserve 为父，只改变 60 mm 工具轴退让并增加扫掠诊断。
+  candidate-policy-axis-sweep：独立增加待执行参考与 MotionFilter 输出的扫掠检查。
+  candidate-policy-axis-feasible：再独立修正可达性误拒绝。加权求解失败时，显式约束候选预检的8度姿态容差并最小化位置误差；保持14mm位置容差、原关节预算和原执行控制器。
+  8度是本次轴向路径候选新增的保守预检条件，不是生产执行控制器已有的硬限制；可达性补丁没有放宽它。
+  preflight-feasibility.patch、preflight-regression-replay.json 保留补丁与真实失败快照的回放证据；390项测试通过。
+  axis.patch 和 axis-sweep.patch 分开保留。70 mm 抬升及原包络、3 mm 余量、关节/力矩/纠偏/阶段预算不变。
+  axis-feasible-manifest.json 与 frozen-path-feasible.json 记录最终测试的路径版本；axis-sweep-manifest.json 与 frozen-path-axis-sweep.json 保留此前版本。检查器基于采样手指几何，不是全机器人连续碰撞证明。
+  新可达性候选的注册文件为 axis-feasible-manifest.json，使用时 --policy axis_feasible；不要把其结果归给早先的 axis_sweep。
+
+同步冻结上层（容器空闲时）
+  sudo -n docker cp diagnostics/path-tracking-20261023/candidate-policy-axis-feasible/. kuavo-ros-noetic-s12-ready:/root/scene1_path_tracking_20261023/candidate-policy-axis-feasible/
+  复核旧 axis_sweep 时，把源和目标末段都改成 candidate-policy-axis-sweep，保持单独目录。
+  不要复制整个研究目录：其中包含外置盘证据符号链接。不要覆盖 /root/scene1_act_optimization 生产目录。
+  full_experiment.py 启动前会核对宿主、算法容器候选及生产文件哈希。
+
+控制器身份及切换
+  baseline：原控制器 e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4
+  candidate：C，WBC 输出后的有界腕部 PD，ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba
+  velocity：D，正常 MPC 路径腕部速度参考，e2603ec0a306e8433eab849a8deb36fd132c9824650b5ec2c9ea16c6338ebae7
+  velocity_pd：D+C，dafa16a8946e90af6727ffe6937f0075955fbb74f217351b365049f29dff0634
+  mpc_q：E，保持 C 库，另将 dynamic_qr.info 的 Q_base_stance 八个近端位置权重 200→400。
+  E 的动态 QR SHA256 为 af1b24419d8b65e5c1d086e7efadf97bb1bd66053a6633e17f283621347f4e08；原版为 225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de。
+  mpc-arm-q.patch 独立于 C 库补丁；候选注册和原动态 QR 快照在 candidate-mpc-arm-q 与 baseline-config。
+  sudo -n python3 diagnostics/path-tracking-20261023/switch_wrist_pd.py baseline
+  选择其他版本时将 baseline 换成对应名称。脚本检查两个容器空闲、源文件/库/动态QR哈希及白名单，逐项原子替换库和动态QR，并追加 switches.jsonl；切回非E版本也会恢复原QR。
+  C 的参数为腕部 Kp=1、测量速度阻尼=0.05、附加力矩 ±0.5 Nm、总力矩 ±14.1 Nm；无积分或新增重力补偿。
+  D 仅在仿真、简化 MPC、正常外部手臂控制分支启用；用传感器时钟差分已经过滤的位置，采用已有 arm_interpolation_max_velocity 参数的 1 rad/s 上限；不改近端参考、增益、权重或位置。该参数不等同于正常路径的 arm_move_spd=1.2。
+  D+C 空手到位时间及超调退化，未通过该阶段验收，不应当作已验收控制器使用。
+  E未通过持物近端误差验收。C同冻结路径第一包腕部改善但近端退化，且完整四包失败；也不满足生产替换条件。
+
+重建隔离库（先确认两个容器空闲；以 D 为例）
+  sudo -n docker exec kuavo_challenge_container_GPU_046e4301 mkdir -p /tmp/scene1-rebuild-velocity
+  sudo -n docker cp diagnostics/path-tracking-20261023/candidate-velocity/. kuavo_challenge_container_GPU_046e4301:/tmp/scene1-rebuild-velocity/
+  sudo -n docker exec kuavo_challenge_container_GPU_046e4301 python3 /tmp/scene1-rebuild-velocity/build.py --directory /tmp/scene1-rebuild-velocity
+  build.py 使用现有 CMake 缓存的编译及链接参数，输出隔离对象、库和 build-manifest.json；不修改官方源文件。
+  若重建库哈希改变，应作为新工件保留并重新验证，不能直接伪装成上述已测库。
+  C 原始补丁、源文件及构建记录位于 diagnostics/mpc-wbc-tracking-20261022/candidate-wrist-pd。
+
+只读交付复核（不启动机器人）
+  python3 diagnostics/path-tracking-20261023/validate_delivery.py
+  此脚本在临时目录从归档父版依次应用3个路径补丁、分别应用4个控制/配置补丁，要求与已测源文件逐项哈希一致；另核对11个试验的实际控制库身份与归档记录。
+  最终记录 delivery-verification.json 必须 status=passed、errors=[]。
+  速度参考边界测试记录 velocity-unit-test.json；路径390项测试记录 tests-axis-feasible.log；时序分析2项回归记录 tests-reference-analysis.log。
+  失败目标多初值离线复核脚本 audit_preflight_multistart.py，输出 multistart-audit.json。16个固定初值均保留；不发送动作、不更改策略或阈值。
+
+官方复位及回合执行
+  每次 full_experiment.py / empty_experiment.py 都重新调用官方 challenge_task.py --scene scene1 --seed N --no-timer-gui。
+  不在持物场景重新初始化策略，不在两次试验之间复用场景。
+  图形授权失效时先刷新：
+  sudo -n env XAUTHORITY=/run/user/1000/gdm/Xauthority python3 diagnostics/path-tracking-20261023/prepare_display.py
+  两包（候选 C 示例；仅在对应阶段获准推进后使用）：
+  sudo -n python3 diagnostics/path-tracking-20261023/run_one.py candidate new-unique-label --policy axis_feasible --seed 0 --parcels 2
+  标签必须改成全小写、数字、下划线或连字符构成的唯一名称。
+  四包：把 --parcels 改为 4；run_one.py 自动采用 16800 步上限。开发 seed 0 通过后才进入冻结的 seed 1、2 对照。
+  run_one.py 依次执行库/QR切换、正式回合、分析、审计和哈希归档；回合失败仍保留分析，不自动重跑。原控制器对照使用 baseline。
+  空手（必须为新官方复位，不可持物）：
+  sudo -n python3 diagnostics/path-tracking-20261023/empty_experiment.py empty new-unique-label --version candidate --expected-controller-sha256 EXPECTED-SHA256
+  E 的 --version 使用 mpc_q，并保留 C 库的预期SHA；这样同一控制库下的两种QR配置不会混淆。
+  驱动记录官方 run_id、实际映射库哈希、运行时 task/reference/URDF 等；不只检查磁盘库文件。
+
+观察与分析
+  sudo -n python3 diagnostics/path-tracking-20261023/live_status.py RUN-LABEL
+  tail -n 5 diagnostics/path-tracking-20261023/RUN-LABEL/robot_guard.log
+  tail -n 5 diagnostics/path-tracking-20261023/RUN-LABEL/target_guard.log
+  两容器空闲后：
+  sudo -n python3 diagnostics/path-tracking-20261023/analyze_single.py RUN-LABEL
+  sudo -n python3 diagnostics/path-tracking-20261023/audit_run.py RUN-LABEL
+  python3 diagnostics/path-tracking-20261023/summarize_experiments.py
+  phase-metrics.csv 包含分阶段关节/FK 误差、纠偏变化、等待/暂停步数、约束指标及墙钟/仿真耗时。
+  外层 residual 变化含正常视觉轨迹变化，不能当作纯纠偏距离；URDF FK 差值不是独立光学 TCP 测量。
+  未带精确时间戳的 WBC 向量按回调到达对齐；QP 内部活动约束及执行器应用时间不可见。
+  图表位于 figures/empty-ablation.png(.pdf)、figures/full-attempts.png(.pdf)。N/R表示观察窗内未到位，不能当作0秒。
+
+归档与清理
+  sudo -n python3 diagnostics/path-tracking-20261023/archive_completed.py RUN-LABEL
+  空手回合使用 archive_empty.py RUN-LABEL。
+  清理前先对外置盘保留证据与容器副本做字节哈希核对，只删除重复的运行输出和 /tmp trace。
+  归档后 live_status.py 不再显示已删容器输出，应读取保留的 output/summary.json 和 experiment.json。
+  不删除失败、保护停止、null 官方结果或运行时生效证据。
+
+恢复（最终必须执行并验证）
+  sudo -n python3 diagnostics/path-tracking-20261023/switch_wrist_pd.py baseline
+  sudo -n python3 diagnostics/path-tracking-20261023/verify_environment.py /home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-20261023/final-verification.json
+  必须得到 errors=[]，生产宿主/容器、官方源文件和配置、原控制库、原 VR 参考库、v63 备份均匹配。
+  原生产上层和 v63 本次不被覆盖，恢复时无需将研究候选同步到生产目录。动态QR在E试验期间会临时切换，必须使用本研究目录的新切换脚本恢复，旧目录脚本不处理QR。
+  task_success=null 单列；视觉四包完成不能改写为官方判定成功。只有完整对照支持可靠性和提速才讨论生产替换。

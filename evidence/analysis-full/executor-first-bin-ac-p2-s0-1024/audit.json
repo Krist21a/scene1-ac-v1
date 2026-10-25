@@ -1,0 +1,918 @@
+{
+  "label": "executor-first-bin-ac-p2-s0-1024",
+  "steps": 736,
+  "step_sequence_contiguous": true,
+  "summary": {
+    "steps": 736,
+    "reason": "error",
+    "task_success": null,
+    "error": "Visual pickup timed out at observe_bin",
+    "handover_contract_stop": null,
+    "last_sensor_receipts": {
+      "/gripper/state": {
+        "receipt_monotonic_s": 35713.415757973,
+        "source_stamp_s": 1792837843.6734557,
+        "receipts": 102875
+      },
+      "/sensors_data_raw": {
+        "receipt_monotonic_s": 35713.415899634,
+        "source_stamp_s": 1792837843.6734152,
+        "receipts": 48328
+      },
+      "/cam_r/color/image_raw/compressed": {
+        "receipt_monotonic_s": 35713.397160296,
+        "source_stamp_s": 1792837843.6351237,
+        "receipts": 3433
+      },
+      "/cam_h/color/image_raw/compressed": {
+        "receipt_monotonic_s": 35713.409926214,
+        "source_stamp_s": 1792837843.6488976,
+        "receipts": 3504
+      },
+      "/cam_l/color/image_raw/compressed": {
+        "receipt_monotonic_s": 35713.397464903,
+        "source_stamp_s": 1792837843.630382,
+        "receipts": 3501
+      }
+    },
+    "trace_manifest_error": null,
+    "visual_confirmed_parcels": 0,
+    "note": "Original KuavoSimEnv returns reward=0 and does not judge scene1 success."
+  },
+  "ros_run_id": "a7acd410-cf95-11f1-af0c-c85ea94bd8c7",
+  "controller_sha": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+  "policy_sha": "ddb7bffec8f4edb3ee0185add4b8a501d4cbe7005b84dbf29ca1b68f5c94c535",
+  "requested_parcels": 2,
+  "bin_confirmations": [],
+  "complete_events": [],
+  "gripper_events": [],
+  "gripper_event_count": 0,
+  "unpaused_ACT_steps_after_first_complete": 0,
+  "target_clips": 0,
+  "velocity_limited_steps": 1,
+  "regrasp_sweep_block_steps": 0,
+  "regrasp_forward_gate_hold_steps": 0,
+  "pd_limits_50hz": {
+    "initialization": {
+      "samples": 1666,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.49906835776644054,
+      "added_peak_nm": 0.49906835776644054,
+      "wrist_command_peak_nm": 1.1799562640756205,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    },
+    "formal_policy": {
+      "samples": 4060,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.16159444321968736,
+      "added_peak_nm": 0.16159444321968736,
+      "wrist_command_peak_nm": 1.060885332415442,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    },
+    "after_policy": {
+      "samples": 126,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.04069349654560714,
+      "added_peak_nm": 0.040693496545607166,
+      "wrist_command_peak_nm": 0.9730815291730814,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    }
+  },
+  "task_success": null,
+  "limitations": "Gripper events are upper command threshold crossings (0.25/0.6 hysteresis), not proof of contact. Original visual checks and raw feedback evidence retained. 50Hz clipping can miss shorter events; online guard is separate. null is not an official verdict.",
+  "release_reference_transfers": [],
+  "release_preparation": [],
+  "release_reference_transfer_interpretation": "Physical bounds and MotionFilter checked separately. measured_physical intentionally replaces obsolete ACT anchoring with a new visual-phase reference; this is not measured tracking evidence.",
+  "post_level_geometry_refreshes": [],
+  "retreat_goal_certificates": [],
+  "retreat_projections": [],
+  "fresh_sweep_feedback": {
+    "samples": 163,
+    "max_captured_to_send_s": 0.03533795999828726,
+    "max_joint_change_from_planning_rad": 0.03063058853149414,
+    "records": [
+      {
+        "step": 74,
+        "captured_to_send_s": 0.031001286995888222,
+        "max_joint_change_from_planning_rad": 0.03063058853149414
+      },
+      {
+        "step": 75,
+        "captured_to_send_s": 0.013060504003078677,
+        "max_joint_change_from_planning_rad": 0.01554560661315918
+      },
+      {
+        "step": 76,
+        "captured_to_send_s": 0.03288648399757221,
+        "max_joint_change_from_planning_rad": 0.015267372131347656
+      },
+      {
+        "step": 77,
+        "captured_to_send_s": 0.007441808003932238,
+        "max_joint_change_from_planning_rad": 0.012442588806152344
+      },
+      {
+        "step": 78,
+        "captured_to_send_s": 0.014591965998988599,
+        "max_joint_change_from_planning_rad": 0.013142198324203491
+      },
+      {
+        "step": 79,
+        "captured_to_send_s": 0.00864921799802687,
+        "max_joint_change_from_planning_rad": 0.008187204599380493
+      },
+      {
+        "step": 80,
+        "captured_to_send_s": 0.024284402999910526,
+        "max_joint_change_from_planning_rad": 0.011437922716140747
+      },
+      {
+        "step": 81,
+        "captured_to_send_s": 0.011140774004161358,
+        "max_joint_change_from_planning_rad": 0.009731948375701904
+      },
+      {
+        "step": 82,
+        "captured_to_send_s": 0.006792268999561202,
+        "max_joint_change_from_planning_rad": 0.0031533539295196533
+      },
+      {
+        "step": 83,
+        "captured_to_send_s": 0.02081985300173983,
+        "max_joint_change_from_planning_rad": 0.007056474685668945
+      },
+      {
+        "step": 84,
+        "captured_to_send_s": 0.01662605999445077,
+        "max_joint_change_from_planning_rad": 0.006708621978759766
+      },
+      {
+        "step": 85,
+        "captured_to_send_s": 0.014937772997654974,
+        "max_joint_change_from_planning_rad": 0.007875680923461914
+      },
+      {
+        "step": 86,
+        "captured_to_send_s": 0.008469182001135778,
+        "max_joint_change_from_planning_rad": 0.004069089889526367
+      },
+      {
+        "step": 87,
+        "captured_to_send_s": 0.01599861100112321,
+        "max_joint_change_from_planning_rad": 0.008755922317504883
+      },
+      {
+        "step": 88,
+        "captured_to_send_s": 0.016232683999987785,
+        "max_joint_change_from_planning_rad": 0.0063037872314453125
+      },
+      {
+        "step": 89,
+        "captured_to_send_s": 0.010003383998991922,
+        "max_joint_change_from_planning_rad": 0.004415273666381836
+      },
+      {
+        "step": 90,
+        "captured_to_send_s": 0.013042779006354976,
+        "max_joint_change_from_planning_rad": 0.004736781120300293
+      },
+      {
+        "step": 91,
+        "captured_to_send_s": 0.023888126997917425,
+        "max_joint_change_from_planning_rad": 0.0060434043407440186
+      },
+      {
+        "step": 92,
+        "captured_to_send_s": 0.009277228004066274,
+        "max_joint_change_from_planning_rad": 0.0036724507808685303
+      },
+      {
+        "step": 93,
+        "captured_to_send_s": 0.011087728998973034,
+        "max_joint_change_from_planning_rad": 0.005579829216003418
+      },
+      {
+        "step": 94,
+        "captured_to_send_s": 0.011968655002419837,
+        "max_joint_change_from_planning_rad": 0.00789952278137207
+      },
+      {
+        "step": 95,
+        "captured_to_send_s": 0.01608921900333371,
+        "max_joint_change_from_planning_rad": 0.004332065582275391
+      },
+      {
+        "step": 96,
+        "captured_to_send_s": 0.0063214120018528774,
+        "max_joint_change_from_planning_rad": 0.009593009948730469
+      },
+      {
+        "step": 97,
+        "captured_to_send_s": 0.006088494003051892,
+        "max_joint_change_from_planning_rad": 0.005272507667541504
+      },
+      {
+        "step": 98,
+        "captured_to_send_s": 0.009652447995904367,
+        "max_joint_change_from_planning_rad": 0.006428878754377365
+      },
+      {
+        "step": 99,
+        "captured_to_send_s": 0.01606899299804354,
+        "max_joint_change_from_planning_rad": 0.005116332322359085
+      },
+      {
+        "step": 100,
+        "captured_to_send_s": 0.008722480000869837,
+        "max_joint_change_from_planning_rad": 0.002945631742477417
+      },
+      {
+        "step": 101,
+        "captured_to_send_s": 0.01727214800484944,
+        "max_joint_change_from_planning_rad": 0.004013814032077789
+      },
+      {
+        "step": 102,
+        "captured_to_send_s": 0.009488095005508512,
+        "max_joint_change_from_planning_rad": 0.0022207126021385193
+      },
+      {
+        "step": 103,
+        "captured_to_send_s": 0.018275766000442673,
+        "max_joint_change_from_planning_rad": 0.0022448748350143433
+      },
+      {
+        "step": 104,
+        "captured_to_send_s": 0.019806994001555722,
+        "max_joint_change_from_planning_rad": 0.001860976219177246
+      },
+      {
+        "step": 105,
+        "captured_to_send_s": 0.02051639399724081,
+        "max_joint_change_from_planning_rad": 0.002974271774291992
+      },
+      {
+        "step": 106,
+        "captured_to_send_s": 0.019447478996880818,
+        "max_joint_change_from_planning_rad": 0.002957940101623535
+      },
+      {
+        "step": 107,
+        "captured_to_send_s": 0.0170707549987128,
+        "max_joint_change_from_planning_rad": 0.002650044858455658
+      },
+      {
+        "step": 108,
+        "captured_to_send_s": 0.010746996005764231,
+        "max_joint_change_from_planning_rad": 0.0036472678184509277
+      },
+      {
+        "step": 109,
+        "captured_to_send_s": 0.010313746999599971,
+        "max_joint_change_from_planning_rad": 0.004627615213394165
+      },
+      {
+        "step": 110,
+        "captured_to_send_s": 0.02211485299631022,
+        "max_joint_change_from_planning_rad": 0.005362153053283691
+      },
+      {
+        "step": 111,
+        "captured_to_send_s": 0.014375408994965255,
+        "max_joint_change_from_planning_rad": 0.003929018974304199
+      },
+      {
+        "step": 112,
+        "captured_to_send_s": 0.01312450800469378,
+        "max_joint_change_from_planning_rad": 0.002196401357650757
+      },
+      {
+        "step": 113,
+        "captured_to_send_s": 0.010214975001872517,
+        "max_joint_change_from_planning_rad": 0.0041141510009765625
+      },
+      {
+        "step": 114,
+        "captured_to_send_s": 0.007706191005127039,
+        "max_joint_change_from_planning_rad": 0.001898258924484253
+      },
+      {
+        "step": 115,
+        "captured_to_send_s": 0.007750048003799748,
+        "max_joint_change_from_planning_rad": 0.0015575028955936432
+      },
+      {
+        "step": 116,
+        "captured_to_send_s": 0.008605641996837221,
+        "max_joint_change_from_planning_rad": 0.001409422606229782
+      },
+      {
+        "step": 117,
+        "captured_to_send_s": 0.013345955994736869,
+        "max_joint_change_from_planning_rad": 0.0013301372528076172
+      },
+      {
+        "step": 118,
+        "captured_to_send_s": 0.013119857001584023,
+        "max_joint_change_from_planning_rad": 0.00211334228515625
+      },
+      {
+        "step": 119,
+        "captured_to_send_s": 0.011970861000008881,
+        "max_joint_change_from_planning_rad": 0.001688241958618164
+      },
+      {
+        "step": 120,
+        "captured_to_send_s": 0.02120696200290695,
+        "max_joint_change_from_planning_rad": 0.002578258514404297
+      },
+      {
+        "step": 121,
+        "captured_to_send_s": 0.021112635993631557,
+        "max_joint_change_from_planning_rad": 0.005163431167602539
+      },
+      {
+        "step": 122,
+        "captured_to_send_s": 0.011716947999957483,
+        "max_joint_change_from_planning_rad": 0.0029772818088531494
+      },
+      {
+        "step": 123,
+        "captured_to_send_s": 0.01161704499827465,
+        "max_joint_change_from_planning_rad": 0.004800587892532349
+      },
+      {
+        "step": 124,
+        "captured_to_send_s": 0.00928260699583916,
+        "max_joint_change_from_planning_rad": 0.005135864019393921
+      },
+      {
+        "step": 125,
+        "captured_to_send_s": 0.014067313997657038,
+        "max_joint_change_from_planning_rad": 0.005273938179016113
+      },
+      {
+        "step": 126,
+        "captured_to_send_s": 0.017826264003815595,
+        "max_joint_change_from_planning_rad": 0.005860388278961182
+      },
+      {
+        "step": 127,
+        "captured_to_send_s": 0.01057905500056222,
+        "max_joint_change_from_planning_rad": 0.005137354135513306
+      },
+      {
+        "step": 128,
+        "captured_to_send_s": 0.016795800998806953,
+        "max_joint_change_from_planning_rad": 0.005733579397201538
+      },
+      {
+        "step": 129,
+        "captured_to_send_s": 0.007976656001119409,
+        "max_joint_change_from_planning_rad": 0.006679892539978027
+      },
+      {
+        "step": 130,
+        "captured_to_send_s": 0.010714680000091903,
+        "max_joint_change_from_planning_rad": 0.006100118160247803
+      },
+      {
+        "step": 131,
+        "captured_to_send_s": 0.008010092002223246,
+        "max_joint_change_from_planning_rad": 0.005447506904602051
+      },
+      {
+        "step": 132,
+        "captured_to_send_s": 0.005805457003589254,
+        "max_joint_change_from_planning_rad": 0.004823803901672363
+      },
+      {
+        "step": 133,
+        "captured_to_send_s": 0.00577124000119511,
+        "max_joint_change_from_planning_rad": 0.004619479179382324
+      },
+      {
+        "step": 134,
+        "captured_to_send_s": 0.015042150000226684,
+        "max_joint_change_from_planning_rad": 0.003127485513687134
+      },
+      {
+        "step": 135,
+        "captured_to_send_s": 0.01632226400397485,
+        "max_joint_change_from_planning_rad": 0.0038787126541137695
+      },
+      {
+        "step": 136,
+        "captured_to_send_s": 0.009066448001249228,
+        "max_joint_change_from_planning_rad": 0.0024503469467163086
+      },
+      {
+        "step": 137,
+        "captured_to_send_s": 0.017109922002418898,
+        "max_joint_change_from_planning_rad": 0.0024449825286865234
+      },
+      {
+        "step": 138,
+        "captured_to_send_s": 0.005183369001315441,
+        "max_joint_change_from_planning_rad": 0.001817941665649414
+      },
+      {
+        "step": 139,
+        "captured_to_send_s": 0.010130155002116226,
+        "max_joint_change_from_planning_rad": 0.0020580291748046875
+      },
+      {
+        "step": 140,
+        "captured_to_send_s": 0.008328418000019155,
+        "max_joint_change_from_planning_rad": 0.0013616085052490234
+      },
+      {
+        "step": 141,
+        "captured_to_send_s": 0.015181101000052877,
+        "max_joint_change_from_planning_rad": 0.0036919116973876953
+      },
+      {
+        "step": 142,
+        "captured_to_send_s": 0.012454509000235703,
+        "max_joint_change_from_planning_rad": 0.001287698745727539
+      },
+      {
+        "step": 143,
+        "captured_to_send_s": 0.010151151000172831,
+        "max_joint_change_from_planning_rad": 0.0017147064208984375
+      },
+      {
+        "step": 144,
+        "captured_to_send_s": 0.0054556760005652905,
+        "max_joint_change_from_planning_rad": 0.0020301342010498047
+      },
+      {
+        "step": 145,
+        "captured_to_send_s": 0.014498561999062076,
+        "max_joint_change_from_planning_rad": 0.0015006065368652344
+      },
+      {
+        "step": 146,
+        "captured_to_send_s": 0.01887560800241772,
+        "max_joint_change_from_planning_rad": 0.0020034313201904297
+      },
+      {
+        "step": 147,
+        "captured_to_send_s": 0.01886061600089306,
+        "max_joint_change_from_planning_rad": 0.0023856163024902344
+      },
+      {
+        "step": 148,
+        "captured_to_send_s": 0.01504263399692718,
+        "max_joint_change_from_planning_rad": 0.002491593360900879
+      },
+      {
+        "step": 149,
+        "captured_to_send_s": 0.011974480999924708,
+        "max_joint_change_from_planning_rad": 0.0037648677825927734
+      },
+      {
+        "step": 150,
+        "captured_to_send_s": 0.01635285199881764,
+        "max_joint_change_from_planning_rad": 0.0035060644149780273
+      },
+      {
+        "step": 151,
+        "captured_to_send_s": 0.033662731999356765,
+        "max_joint_change_from_planning_rad": 0.004881083965301514
+      },
+      {
+        "step": 152,
+        "captured_to_send_s": 0.0158966960007092,
+        "max_joint_change_from_planning_rad": 0.00545579195022583
+      },
+      {
+        "step": 153,
+        "captured_to_send_s": 0.016850635001901537,
+        "max_joint_change_from_planning_rad": 0.00601041316986084
+      },
+      {
+        "step": 154,
+        "captured_to_send_s": 0.013836456004355568,
+        "max_joint_change_from_planning_rad": 0.005802333354949951
+      },
+      {
+        "step": 155,
+        "captured_to_send_s": 0.007232083000417333,
+        "max_joint_change_from_planning_rad": 0.0045403242111206055
+      },
+      {
+        "step": 156,
+        "captured_to_send_s": 0.015619805002643261,
+        "max_joint_change_from_planning_rad": 0.005738615989685059
+      },
+      {
+        "step": 157,
+        "captured_to_send_s": 0.013353488000575453,
+        "max_joint_change_from_planning_rad": 0.005160391330718994
+      },
+      {
+        "step": 158,
+        "captured_to_send_s": 0.016473809999297373,
+        "max_joint_change_from_planning_rad": 0.0047454833984375
+      },
+      {
+        "step": 159,
+        "captured_to_send_s": 0.011586330998397898,
+        "max_joint_change_from_planning_rad": 0.0034705400466918945
+      },
+      {
+        "step": 160,
+        "captured_to_send_s": 0.007679861999349669,
+        "max_joint_change_from_planning_rad": 0.002850174903869629
+      },
+      {
+        "step": 161,
+        "captured_to_send_s": 0.019275822000054177,
+        "max_joint_change_from_planning_rad": 0.0035777688026428223
+      },
+      {
+        "step": 162,
+        "captured_to_send_s": 0.01108518399996683,
+        "max_joint_change_from_planning_rad": 0.0019443035125732422
+      },
+      {
+        "step": 163,
+        "captured_to_send_s": 0.011696192996168975,
+        "max_joint_change_from_planning_rad": 0.0007240772247314453
+      },
+      {
+        "step": 164,
+        "captured_to_send_s": 0.015081438999914099,
+        "max_joint_change_from_planning_rad": 0.0007421970367431641
+      },
+      {
+        "step": 165,
+        "captured_to_send_s": 0.005327689999830909,
+        "max_joint_change_from_planning_rad": 0.0005800724029541016
+      },
+      {
+        "step": 166,
+        "captured_to_send_s": 0.013904578998335637,
+        "max_joint_change_from_planning_rad": 0.0008687973022460938
+      },
+      {
+        "step": 167,
+        "captured_to_send_s": 0.01249205699423328,
+        "max_joint_change_from_planning_rad": 0.0008827447891235352
+      },
+      {
+        "step": 168,
+        "captured_to_send_s": 0.015465090997167863,
+        "max_joint_change_from_planning_rad": 0.001334846019744873
+      },
+      {
+        "step": 169,
+        "captured_to_send_s": 0.02135669899871573,
+        "max_joint_change_from_planning_rad": 0.0018060505390167236
+      },
+      {
+        "step": 170,
+        "captured_to_send_s": 0.013222727000538725,
+        "max_joint_change_from_planning_rad": 0.002255082130432129
+      },
+      {
+        "step": 171,
+        "captured_to_send_s": 0.008019050001166761,
+        "max_joint_change_from_planning_rad": 0.0019694268703460693
+      },
+      {
+        "step": 172,
+        "captured_to_send_s": 0.013330020003195386,
+        "max_joint_change_from_planning_rad": 0.0011998116970062256
+      },
+      {
+        "step": 173,
+        "captured_to_send_s": 0.007824099993740674,
+        "max_joint_change_from_planning_rad": 0.0021677911281585693
+      },
+      {
+        "step": 174,
+        "captured_to_send_s": 0.011605204002989922,
+        "max_joint_change_from_planning_rad": 0.002907663583755493
+      },
+      {
+        "step": 175,
+        "captured_to_send_s": 0.007643548000487499,
+        "max_joint_change_from_planning_rad": 0.0022767484188079834
+      },
+      {
+        "step": 176,
+        "captured_to_send_s": 0.011819942999863997,
+        "max_joint_change_from_planning_rad": 0.0037124454975128174
+      },
+      {
+        "step": 177,
+        "captured_to_send_s": 0.015339182995376177,
+        "max_joint_change_from_planning_rad": 0.0028134286403656006
+      },
+      {
+        "step": 178,
+        "captured_to_send_s": 0.012446484004613012,
+        "max_joint_change_from_planning_rad": 0.002632737159729004
+      },
+      {
+        "step": 179,
+        "captured_to_send_s": 0.01797476199863013,
+        "max_joint_change_from_planning_rad": 0.0017511248588562012
+      },
+      {
+        "step": 180,
+        "captured_to_send_s": 0.01844447299663443,
+        "max_joint_change_from_planning_rad": 0.001919865608215332
+      },
+      {
+        "step": 181,
+        "captured_to_send_s": 0.014797900003031828,
+        "max_joint_change_from_planning_rad": 0.0027246177196502686
+      },
+      {
+        "step": 182,
+        "captured_to_send_s": 0.015813406003871933,
+        "max_joint_change_from_planning_rad": 0.0019789040088653564
+      },
+      {
+        "step": 183,
+        "captured_to_send_s": 0.016226747997279745,
+        "max_joint_change_from_planning_rad": 0.0017637312412261963
+      },
+      {
+        "step": 184,
+        "captured_to_send_s": 0.008883816000889055,
+        "max_joint_change_from_planning_rad": 0.0017026662826538086
+      },
+      {
+        "step": 185,
+        "captured_to_send_s": 0.02520156699756626,
+        "max_joint_change_from_planning_rad": 0.0023564696311950684
+      },
+      {
+        "step": 186,
+        "captured_to_send_s": 0.010717710996686947,
+        "max_joint_change_from_planning_rad": 0.00212019681930542
+      },
+      {
+        "step": 187,
+        "captured_to_send_s": 0.020719017993542366,
+        "max_joint_change_from_planning_rad": 0.0023599863052368164
+      },
+      {
+        "step": 188,
+        "captured_to_send_s": 0.018208694003988057,
+        "max_joint_change_from_planning_rad": 0.0020987391471862793
+      },
+      {
+        "step": 189,
+        "captured_to_send_s": 0.015911809001408983,
+        "max_joint_change_from_planning_rad": 0.0026393532752990723
+      },
+      {
+        "step": 190,
+        "captured_to_send_s": 0.012262308999197558,
+        "max_joint_change_from_planning_rad": 0.002565324306488037
+      },
+      {
+        "step": 191,
+        "captured_to_send_s": 0.017438567003409844,
+        "max_joint_change_from_planning_rad": 0.0021918416023254395
+      },
+      {
+        "step": 192,
+        "captured_to_send_s": 0.020507535002252553,
+        "max_joint_change_from_planning_rad": 0.002682983875274658
+      },
+      {
+        "step": 193,
+        "captured_to_send_s": 0.016647033000481315,
+        "max_joint_change_from_planning_rad": 0.0025506019592285156
+      },
+      {
+        "step": 194,
+        "captured_to_send_s": 0.010138489000382833,
+        "max_joint_change_from_planning_rad": 0.0024353861808776855
+      },
+      {
+        "step": 195,
+        "captured_to_send_s": 0.022615584995946847,
+        "max_joint_change_from_planning_rad": 0.0031132400035858154
+      },
+      {
+        "step": 196,
+        "captured_to_send_s": 0.02379497000219999,
+        "max_joint_change_from_planning_rad": 0.002791285514831543
+      },
+      {
+        "step": 197,
+        "captured_to_send_s": 0.018336845001613256,
+        "max_joint_change_from_planning_rad": 0.001950085163116455
+      },
+      {
+        "step": 198,
+        "captured_to_send_s": 0.014227386003767606,
+        "max_joint_change_from_planning_rad": 0.002535581588745117
+      },
+      {
+        "step": 199,
+        "captured_to_send_s": 0.03533795999828726,
+        "max_joint_change_from_planning_rad": 0.0022454261779785156
+      },
+      {
+        "step": 200,
+        "captured_to_send_s": 0.020501776998571586,
+        "max_joint_change_from_planning_rad": 0.0021489858627319336
+      },
+      {
+        "step": 201,
+        "captured_to_send_s": 0.010334443999454379,
+        "max_joint_change_from_planning_rad": 0.003129303455352783
+      },
+      {
+        "step": 202,
+        "captured_to_send_s": 0.015273559001798276,
+        "max_joint_change_from_planning_rad": 0.0013339519500732422
+      },
+      {
+        "step": 203,
+        "captured_to_send_s": 0.015669451000576373,
+        "max_joint_change_from_planning_rad": 0.002652585506439209
+      },
+      {
+        "step": 204,
+        "captured_to_send_s": 0.02143154299847083,
+        "max_joint_change_from_planning_rad": 0.0016222596168518066
+      },
+      {
+        "step": 205,
+        "captured_to_send_s": 0.009592528993380256,
+        "max_joint_change_from_planning_rad": 0.0015233755111694336
+      },
+      {
+        "step": 206,
+        "captured_to_send_s": 0.009394979002536274,
+        "max_joint_change_from_planning_rad": 0.0013897418975830078
+      },
+      {
+        "step": 207,
+        "captured_to_send_s": 0.02234009800304193,
+        "max_joint_change_from_planning_rad": 0.0021343231201171875
+      },
+      {
+        "step": 208,
+        "captured_to_send_s": 0.010845565004274249,
+        "max_joint_change_from_planning_rad": 0.002272367477416992
+      },
+      {
+        "step": 209,
+        "captured_to_send_s": 0.015500711000640877,
+        "max_joint_change_from_planning_rad": 0.002948462963104248
+      },
+      {
+        "step": 210,
+        "captured_to_send_s": 0.019683867001731414,
+        "max_joint_change_from_planning_rad": 0.00200575590133667
+      },
+      {
+        "step": 211,
+        "captured_to_send_s": 0.00777582800219534,
+        "max_joint_change_from_planning_rad": 0.003464043140411377
+      },
+      {
+        "step": 212,
+        "captured_to_send_s": 0.01167620500200428,
+        "max_joint_change_from_planning_rad": 0.0021740198135375977
+      },
+      {
+        "step": 213,
+        "captured_to_send_s": 0.011536606994923204,
+        "max_joint_change_from_planning_rad": 0.0017424821853637695
+      },
+      {
+        "step": 214,
+        "captured_to_send_s": 0.013579433005361352,
+        "max_joint_change_from_planning_rad": 0.0036537647247314453
+      },
+      {
+        "step": 215,
+        "captured_to_send_s": 0.012871273000200745,
+        "max_joint_change_from_planning_rad": 0.002969682216644287
+      },
+      {
+        "step": 216,
+        "captured_to_send_s": 0.018950535995827522,
+        "max_joint_change_from_planning_rad": 0.002557814121246338
+      },
+      {
+        "step": 217,
+        "captured_to_send_s": 0.014612446997489315,
+        "max_joint_change_from_planning_rad": 0.0027536749839782715
+      },
+      {
+        "step": 218,
+        "captured_to_send_s": 0.02092651600105455,
+        "max_joint_change_from_planning_rad": 0.002535700798034668
+      },
+      {
+        "step": 219,
+        "captured_to_send_s": 0.013761139001871925,
+        "max_joint_change_from_planning_rad": 0.0013603568077087402
+      },
+      {
+        "step": 220,
+        "captured_to_send_s": 0.010593074999633245,
+        "max_joint_change_from_planning_rad": 0.0015873908996582031
+      },
+      {
+        "step": 221,
+        "captured_to_send_s": 0.016185666994715575,
+        "max_joint_change_from_planning_rad": 0.0033822059631347656
+      },
+      {
+        "step": 222,
+        "captured_to_send_s": 0.005964456999208778,
+        "max_joint_change_from_planning_rad": 0.001096963882446289
+      },
+      {
+        "step": 223,
+        "captured_to_send_s": 0.012483933998737484,
+        "max_joint_change_from_planning_rad": 0.0021643638610839844
+      },
+      {
+        "step": 224,
+        "captured_to_send_s": 0.0245541259937454,
+        "max_joint_change_from_planning_rad": 0.0024875998497009277
+      },
+      {
+        "step": 225,
+        "captured_to_send_s": 0.013122505006322172,
+        "max_joint_change_from_planning_rad": 0.0016071796417236328
+      },
+      {
+        "step": 226,
+        "captured_to_send_s": 0.021988904998579528,
+        "max_joint_change_from_planning_rad": 0.0016202330589294434
+      },
+      {
+        "step": 227,
+        "captured_to_send_s": 0.015534936996118631,
+        "max_joint_change_from_planning_rad": 0.002334296703338623
+      },
+      {
+        "step": 228,
+        "captured_to_send_s": 0.011511369004438166,
+        "max_joint_change_from_planning_rad": 0.0021793246269226074
+      },
+      {
+        "step": 229,
+        "captured_to_send_s": 0.013911902999097947,
+        "max_joint_change_from_planning_rad": 0.0021395087242126465
+      },
+      {
+        "step": 230,
+        "captured_to_send_s": 0.025767163002456073,
+        "max_joint_change_from_planning_rad": 0.002135038375854492
+      },
+      {
+        "step": 231,
+        "captured_to_send_s": 0.033208066000952385,
+        "max_joint_change_from_planning_rad": 0.0026060938835144043
+      },
+      {
+        "step": 232,
+        "captured_to_send_s": 0.01341159999719821,
+        "max_joint_change_from_planning_rad": 0.0026665329933166504
+      },
+      {
+        "step": 233,
+        "captured_to_send_s": 0.021145222999621183,
+        "max_joint_change_from_planning_rad": 0.0022680163383483887
+      },
+      {
+        "step": 234,
+        "captured_to_send_s": 0.01602273000025889,
+        "max_joint_change_from_planning_rad": 0.0024843215942382812
+      },
+      {
+        "step": 235,
+        "captured_to_send_s": 0.01746733999607386,
+        "max_joint_change_from_planning_rad": 0.0018660426139831543
+      },
+      {
+        "step": 236,
+        "captured_to_send_s": 0.026900066004600376,
+        "max_joint_change_from_planning_rad": 0.003141164779663086
+      }
+    ]
+  },
+  "rejected_retreat_certificate": null
+}

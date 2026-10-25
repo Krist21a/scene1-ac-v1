@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-23T20:10:02.048637+08:00",
+  "decision": "Reject F for integrated task; retain C for development full4 evaluation",
+  "fixed_policy": "executor_obb",
+  "empty_evidence": "extended-empty-comparison.json",
+  "contact_evidence": "obb-c-f-contact-comparison.json",
+  "comparison_scope": "first parcel complete weighing stage, same policy/seed; closed-loop references differ",
+  "C": {
+    "weighing_steps": 110,
+    "proximal_rmse_rad": 0.007532698167934169,
+    "wrist_rmse_rad": 0.081171125092944
+  },
+  "F": {
+    "weighing_steps": 207,
+    "proximal_rmse_rad": 0.009278208484846923,
+    "wrist_rmse_rad": 0.09741447819793275,
+    "complete_parcels": 0,
+    "release_hold_error_at_step4_m": 0.024468668364168215
+  },
+  "no_full_task_speed_claim": true,
+  "heldout_seeds_used": [],
+  "production_promoted": false
+}

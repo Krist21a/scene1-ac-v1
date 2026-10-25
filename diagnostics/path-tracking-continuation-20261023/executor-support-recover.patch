@@ -1,0 +1,94 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -259,6 +259,7 @@
+   release_prepare_adapt_settled: true
+   release_prepare_whole_arm: true
+   release_prepare_support_footprint: true
++  release_prepare_recover_support: true
+   regrasp_insert_pitch_weight: 0.3
+   release_cartesian_open_hold: true
+   release_open_hold_position_gain: 2.0
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -1432,6 +1432,32 @@
+                                      observation.get('heading_error_degrees', 0.) <= 18)
+                                 and observation.get('tilt_degrees', 0.) is not None
+                                 and observation.get('tilt_degrees', 0.) <= self.config['level_tolerance_degrees'])
++            if (self.wrist_config.get('release_prepare_recover_support',False)
++                    and 'release_prepare_target' in p):
++                lost = (not support_fit and seen is not None
++                        and seen.get('orientation_confirmed',False)
++                        and self._view_ready(snapshot,measured))
++                p['release_support_lost_frames'] = p.get('release_support_lost_frames',0)+1 if lost else 0
++                if p['release_support_lost_frames'] >= 3:
++                    if p['steps'] >= self.config['max_release_steps']:
++                        raise RuntimeError('Support recovery exceeds original weighing budget; gripper kept closed')
++                    if self.last_sent is None:
++                        raise RuntimeError('Support recovery requires actual sent reference')
++                    result = self.last_sent.copy(); result[15] = p['hold_grip']
++                    self.offset[8:15] = result[8:15]-p['base'][8:15]
++                    for key in list(p):
++                        if key.startswith('release_prepare_'):
++                            del p[key]
++                    p['stable'] = 0
++                    p['release_support_lost_frames'] = 0
++                    p['release_support_recoveries'] = p.get('release_support_recoveries',0)+1
++                    info.update(state='recovering_release_support',support_recovery=dict(
++                        reason='observed_footprint_outside_original_margin',
++                        original_margin_m=self.config['placement_margin_m'],
++                        count=p['release_support_recoveries'],phase_steps=p['steps'],
++                        original_budget_steps=self.config['max_release_steps'],
++                        continuous_arm_reference=True,gripper_kept_closed=True))
++                    return result,info
+             bottom_corners = rotation.apply([[x,y,-extent[2]/2]
+                 for x in (-extent[0]/2, extent[0]/2) for y in (-extent[1]/2, extent[1]/2)]) + center
+             bottom_spread = float(np.ptp(bottom_corners[:, 2]))
+--- a/tests/test_release_support_recovery.py
++++ b/tests/test_release_support_recovery.py
+@@ -0,0 +1,46 @@
++import unittest
++import numpy as np
++import test_support_heading as support
++
++class SupportRecoveryTests(unittest.TestCase):
++    setUp=support.SupportHeadingTests.setUp
++    weighing_fixture=support.SupportHeadingTests.weighing_fixture
++    aim_camera=support.SupportHeadingTests.aim_camera
++    begin=support.SupportHeadingTests.begin
++
++    def fixture(self,verified=True):
++        self.begin(position=[.46,-.5,0.],verified=verified)
++        self.a.wrist_config.update(release_prepare_before_open=True,release_prepare_recover_support=True)
++        target=self.raw.copy();target[15]=.98
++        self.a.pending.update(release_prepare_target=target,release_prepare_stable=0,release_prepare_quiet=2,steps=100)
++        self.a.observe_command(target)
++
++    def test_lost_footprint_returns_to_correction_without_jump_or_budget_reset(self):
++        self.fixture();before=self.a.last_sent.copy()
++        for _ in range(3):
++            self.aim_camera();result,info=self.a._pending_action(self.measured,self.snapshot)
++        self.assertEqual(info['state'],'recovering_release_support')
++        self.assertEqual(self.a.pending['steps'],103)
++        self.assertNotIn('release_prepare_target',self.a.pending)
++        np.testing.assert_array_equal(result[8:15],before[8:15])
++        self.assertGreater(result[15],.9)
++        self.assertAlmostEqual(info['support_recovery']['original_margin_m'],.025)
++        self.aim_camera();result,info=self.a._pending_action(self.measured,self.snapshot)
++        self.assertNotIn('release_preparation',info)
++        self.assertEqual(self.a.pending['steps'],104)
++        self.assertGreater(result[15],.9)
++
++    def test_unverified_view_cannot_start_recovery_motion(self):
++        self.fixture(verified=False)
++        for _ in range(5):
++            self.aim_camera();result,info=self.a._pending_action(self.measured,self.snapshot)
++        self.assertIn('release_prepare_target',self.a.pending)
++        self.assertNotIn('support_recovery',info)
++        self.assertGreater(result[15],.9)
++
++    def test_original_budget_cannot_be_extended_by_recovery(self):
++        self.fixture();self.a.pending['release_support_lost_frames']=2
++        self.a.pending['steps']=self.a.config['max_release_steps']-1
++        self.aim_camera()
++        with self.assertRaisesRegex(RuntimeError,'original weighing budget'):
++            self.a._pending_action(self.measured,self.snapshot)

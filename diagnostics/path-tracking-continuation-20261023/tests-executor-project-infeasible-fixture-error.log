@@ -1,0 +1,23 @@
+...............................................................................................................................................................................................................................................................................................................................E.......................................................................................................
+======================================================================
+ERROR: test_no_available_safe_step_is_rejected (test_retreat_projection.RetreatProjectionTests.test_no_available_safe_step_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-project/tests/test_retreat_projection.py", line 64, in test_no_available_safe_step_is_rejected
+    project_retreat_reference(**self.kw)
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-project/scene1/retreat_projection.py", line 55, in project_retreat_reference
+    original = checks(proposed)
+               ^^^^^^^^^^^^^^^^
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-project/scene1/retreat_projection.py", line 50, in checks
+    sent, limits = filtered(action)
+                   ^^^^^^^^^^^^^^^^
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-project/scene1/retreat_projection.py", line 46, in filtered
+    motion.reset(previous)
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-project/scene1/motion.py", line 71, in reset
+    raise ValueError("Measured joints are outside configured bounds")
+ValueError: Measured joints are outside configured bounds
+
+----------------------------------------------------------------------
+Ran 423 tests in 15.969s
+
+FAILED (errors=1)

@@ -1,0 +1,94 @@
+{
+  "at": "2026-10-24T17:35:58.162592+08:00",
+  "policy": "executor_first_transport",
+  "policy_manifest_sha256": "07702217378795656edd747032ad5b9831aae22d30b3870fcf1829216ae37f18",
+  "selected_controller": "origin_pd",
+  "controller_identities": {
+    "baseline": {
+      "source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/baseline/controller-library/libhumanoid_controllers.so",
+      "sha256": "e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4",
+      "factor": "original controller",
+      "expect_pd": false,
+      "expect_velocity": false,
+      "qr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-config/dynamic_qr.info",
+      "qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de",
+      "task_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-task/task.info",
+      "task_sha256": "3f32e8d8858a9352b674d15cdb6578fdf8e4b96429ccfe46fffd81a881d95d17",
+      "vr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/baseline/vr-reference/humanoid_VR_hand_control",
+      "vr_sha256": "155191dc393e6c92552e57a2c4af6d52833283bc22660e7d8788ba65424ce293"
+    },
+    "origin_pd": {
+      "source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/candidate-wrist-pd/libhumanoid_controllers.so",
+      "sha256": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+      "factor": "A+C: correct arm first-knot indexing before MPC plus unchanged bounded post-WBC wrist PD",
+      "expect_pd": true,
+      "expect_velocity": false,
+      "qr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-config/dynamic_qr.info",
+      "qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de",
+      "task_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-task/task.info",
+      "task_sha256": "3f32e8d8858a9352b674d15cdb6578fdf8e4b96429ccfe46fffd81a881d95d17",
+      "vr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/candidate-reference-origin/humanoid_VR_hand_control",
+      "vr_sha256": "84768f811b9c228d1a296a71644ede4ec44cd64656f76ad4bc42d77dce3ccf03"
+    }
+  },
+  "development_trial": "executor-first-transport-ac-p4-s0-1024",
+  "development_runtime_sha256": "355ec3e7ef1ff1f79773d73f2742c9727b21ca338d9bcef33a05328a0b3d218e",
+  "development_audits": {
+    "audit.json": "9efad11fcc70846ce22d9e20d4e92cda43e9a788f99987dc11c5dfb37a7d3f80",
+    "arm-preparation-audit.json": "83bc20e58b1a6dc71e4d54671c857d20b9165b614b5998c9d54aa3394d4794fc",
+    "soft-open-audit.json": "337753f4c040e9814cb5a2689df121a57cb5e8fc66f04a7752d9c4590edb1b7d",
+    "support-recovery-audit.json": "9cda9e7e5ac93e67594952e64eadb8ce322d80e0271527e9f95bf46c7baa408c"
+  },
+  "first_transport_audit_sha256": "f2237a9f465a7e30123d5148e504c3b6cfeb873573b831aae71559eb7e1fa195",
+  "development_steps": 12502,
+  "task_success": null,
+  "official_success_claimed": false,
+  "production_promoted": false,
+  "tests_passed": 496,
+  "patch_chain_count": 31,
+  "heldout_seeds": [
+    1,
+    2
+  ],
+  "heldout_seeds_used_at_freeze": [],
+  "planned_trials": [
+    {
+      "seed": 0,
+      "controller": "baseline",
+      "parcels": 4,
+      "label": "frozen-first-transport-base-p4-s0-1024"
+    },
+    {
+      "seed": 1,
+      "controller": "baseline",
+      "parcels": 4,
+      "label": "frozen-first-transport-base-p4-s1-1024"
+    },
+    {
+      "seed": 1,
+      "controller": "origin_pd",
+      "parcels": 4,
+      "label": "frozen-first-transport-ac-p4-s1-1024"
+    },
+    {
+      "seed": 2,
+      "controller": "baseline",
+      "parcels": 4,
+      "label": "frozen-first-transport-base-p4-s2-1024"
+    },
+    {
+      "seed": 2,
+      "controller": "origin_pd",
+      "parcels": 4,
+      "label": "frozen-first-transport-ac-p4-s2-1024"
+    }
+  ],
+  "rules": [
+    "No path/control tuning on heldout seeds",
+    "Every attempt retained, no success-selection retries",
+    "Null official verdict remains null",
+    "Timing gains only for successful matched full-four pairs",
+    "Wrist and proximal metrics separately",
+    "Restore original runtime on completion or remaining usage<=20%"
+  ]
+}

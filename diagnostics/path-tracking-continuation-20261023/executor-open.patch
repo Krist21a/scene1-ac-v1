@@ -1,0 +1,46 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -237,7 +237,7 @@
+   max_pregrasp_align_steps: 320
+   max_level_regrasp_steps: 900
+   regrasp_visible_v_fraction: 0.67
+-  release_open_dwell_steps: 12
++  release_open_dwell_steps: 4
+   release_retreat_direction: measured_tool_axis
+   release_retreat_preflight: executor_sweep
+   release_geometry_reobserve: true
+--- a/tests/test_release_open_hold.py
++++ b/tests/test_release_open_hold.py
+@@ -69,6 +69,32 @@
+             with self.assertRaisesRegex(ValueError, 'positive and finite'):
+                 self.a._pending_action(self.measured, None)
+ 
++    def test_shorter_minimum_dwell_does_not_override_measured_gripper_gate(self):
++        self.fixture()
++        self.a.wrist_config['release_open_dwell_steps'] = 4
++        self.a.pending['steps'] = 4
++        self.measured[15] = .11
++        result, info = self.a._pending_action(self.measured, None)
++        self.assertEqual(result[15], 0.)
++        self.assertIn('release_pose_hold', info)
++        self.assertIsNone(self.a.pending.get('goal'))
++
++    def test_ready_gripper_still_requires_current_parcel_observation(self):
++        self.fixture()
++        self.a.wrist_config.update(release_open_dwell_steps=4,
++            release_geometry_reobserve=True, max_release_geometry_wait_steps=20,
++            max_short_retreat_steps=140)
++        self.a.weighing_target = np.array([.31, -.2, -.08])
++        self.a.pending['steps'] = 4
++        self.measured[15] = .03
++        result, info = self.a._pending_action(self.measured, None)
++        self.assertEqual(info['state'], 'waiting_release_geometry')
++        self.assertIsNone(self.a.pending.get('goal'))
++        for _ in range(18):
++            self.a._pending_action(self.measured, None)
++        with self.assertRaisesRegex(RuntimeError, 'observation remained missing'):
++            self.a._pending_action(self.measured, None)
++
+ 
+ if __name__ == '__main__':
+     unittest.main()

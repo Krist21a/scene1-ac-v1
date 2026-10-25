@@ -1,0 +1,158 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -227,6 +227,7 @@
+   command_sweep_diagnostics: true
+   command_sweep_enforce: true
+   command_sweep_fresh_feedback: true
++  retreat_hold_safe_pending_reference: true
+   regrasp_aligned_error_px: 10
+   min_edge_support: 0.64
+   min_area_px: 600
+--- a/run_scene1.py
++++ b/run_scene1.py
+@@ -12,7 +12,7 @@
+ import yaml
+ 
+ from scene1.motion import MotionFilter, ActionPassthrough, action_vector, head_radians, reset_for_manipulation
+-from scene1.command_sweep import command_sweep_audit, fresh_command_sweep_audit
++from scene1.command_sweep import command_sweep_audit, fresh_command_sweep_audit, retreat_pending_hold_allowed
+ from scene1.grasp import GraspMonitor
+ from scene1.servo import VisualServo
+ from scene1.vision import ParcelDetector, rgb_image
+@@ -675,6 +675,29 @@
+                 else:
+                     cartesian_info['command_sweep'] = command_sweep_audit(
+                         kinematics, measured, residual, sent, previous_sent, aligner.command_sweep_context)
++                initial_sweep = cartesian_info['command_sweep']
++                if (args.mode == 'optimized'
++                        and config['wrist_assist'].get('retreat_hold_safe_pending_reference', False)
++                        and config['wrist_assist'].get('command_sweep_fresh_feedback', False)
++                        and retreat_pending_hold_allowed(initial_sweep)
++                        and aligner.pending is not None
++                        and aligner.pending['kind'] == 'short_retreat'):
++                    # No blocked proposal is sent. Hold only the complete
++                    # previous reference, and independently recheck it against
++                    # another fresh observation before allowing transmission.
++                    unsent_proposal = residual.copy()
++                    residual = aligner.hold_retreat_reference(previous_sent)
++                    motion.reset(previous_sent)
++                    filtered, motion_info = motion.apply(residual, dt)
++                    sent = filtered
++                    cartesian_info['retreat_fresh_hold'] = dict(
++                        discarded_proposal=unsent_proposal.tolist(),
++                        rejected_sweep=initial_sweep,
++                        phase_budget_unchanged=True)
++                    cartesian_info['command_sweep'] = fresh_command_sweep_audit(
++                        kinematics,
++                        lambda: env.get_obs()['observation.state'].detach().cpu().numpy(),
++                        measured, residual, sent, previous_sent, aligner.command_sweep_context)
+                 if (config['wrist_assist'].get('command_sweep_enforce', False)
+                         and not cartesian_info['command_sweep']['filtered']['clear']):
+                     (output/'rejected-command-sweep.json').write_text(json.dumps(dict(
+--- a/scene1/command_sweep.py
++++ b/scene1/command_sweep.py
+@@ -55,3 +55,10 @@
+         max_joint_change_from_planning_rad=float(np.max(np.abs(
+             measured[8:15]-np.asarray(planning_measured)[8:15]))))
+     return output
++
++
++def retreat_pending_hold_allowed(audit):
++    """Only a fresh, fully clear previous sweep can replace a blocked increment."""
++    return (audit.get('stage') == 'short_retreat'
++            and audit.get('feedback', {}).get('source') == 'fresh_sdk_get_obs_after_planning'
++            and not audit['filtered']['clear'] and audit['previous']['clear'])
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -352,6 +352,22 @@
+             raise
+         self.offset[8:15] = chosen[8:15]-base[8:15]
+         return chosen, audit
++
++    def hold_retreat_reference(self, previous):
++        """Discard an unsent increment while preserving the original phase clock."""
++        if self.pending is None or self.pending['kind'] != 'short_retreat':
++            raise RuntimeError('Safe pending hold is limited to active retreat')
++        previous = action_vector(previous)
++        if np.any(previous < self.low) or np.any(previous > self.high):
++            raise RuntimeError('Pending retreat hold is outside physical command bounds')
++        if hasattr(self.kinematics, 'limits'):
++            if (np.any(previous[8:15] < self.kinematics.limits[1][:,0])
++                    or np.any(previous[8:15] > self.kinematics.limits[1][:,1])):
++                raise RuntimeError('Pending retreat hold violates robot joint limits')
++        if previous[15] > .1:
++            raise RuntimeError('Pending retreat hold requires an open gripper')
++        self.offset[8:15] = previous[8:15]-self.pending['base'][8:15]
++        return previous.copy()
+ 
+     def camera_target(self, measured):
+         if self.pending is None or self.weighing_target is None:
+--- /dev/null
++++ b/tests/test_pending_hold.py
+@@ -0,0 +1,66 @@
++import copy
++import json
++from pathlib import Path
++import unittest
++import numpy as np
++import yaml
++from scene1.kinematics import UrdfArmKinematics
++from scene1.residual import ResidualAssist
++from scene1.command_sweep import fresh_command_sweep_audit, retreat_pending_hold_allowed
++
++
++class PendingHoldTests(unittest.TestCase):
++    def setUp(self):
++        p=Path(__file__).parent
++        self.f=json.loads((p/'fixtures/fresh_pending_hold_20261024.json').read_text())
++        self.k=UrdfArmKinematics(description=(p/'fixtures/release_robot.urdf').read_text())
++        lo=np.r_[self.k.limits[0][:,0],0.,self.k.limits[1][:,0],0.]
++        hi=np.r_[self.k.limits[0][:,1],1.,self.k.limits[1][:,1],1.]
++        config=yaml.safe_load((p.parent/'config.yaml').read_text())
++        self.a=ResidualAssist(config['visual_residual'],self.k,lo,hi)
++        self.previous=np.array(self.f['previous_sent_action'])
++        self.proposed=np.array(self.f['proposed_action'])
++        self.fresh=np.array(self.f['sweep']['feedback']['state'])
++        self.context=dict(stage='short_retreat',target=self.f['sweep']['target'],plane=self.f['sweep']['plane_m'])
++        self.a._begin('short_retreat',1,self.previous)
++        self.a.pending['steps']=23
++        self.a.offset[8:15]=self.proposed[8:15]-self.previous[8:15]
++
++    def audit(self, measured, proposed):
++        return fresh_command_sweep_audit(self.k,lambda:measured,
++            self.f['observation_state'],proposed,proposed,self.previous,self.context)
++
++    def test_recorded_new_reference_blocked_previous_clear_and_full_hold_rechecked(self):
++        audit=self.audit(self.fresh,self.proposed)
++        self.assertTrue(retreat_pending_hold_allowed(audit))
++        held=self.a.hold_retreat_reference(self.previous)
++        np.testing.assert_array_equal(held,self.previous)
++        np.testing.assert_allclose(self.a.offset[8:15],0.)
++        self.assertEqual(self.a.pending['steps'],23)
++        final=self.audit(self.fresh,held)
++        self.assertTrue(all(final[k]['clear'] for k in ['proposed','filtered','previous']))
++
++    def test_already_blocked_measured_pose_cannot_be_held(self):
++        blocked=self.fresh.copy()
++        blocked[8:15]+=.875*(self.proposed[8:15]-blocked[8:15])
++        audit=self.audit(blocked,self.proposed)
++        self.assertFalse(audit['previous']['clear'])
++        self.assertFalse(retreat_pending_hold_allowed(audit))
++
++    def test_stale_feedback_or_other_phase_does_not_authorize_hold(self):
++        for change in ['feedback','stage']:
++            audit=copy.deepcopy(self.f['sweep'])
++            if change=='feedback':audit.pop('feedback')
++            else:audit['stage']='grasp_yaw'
++            self.assertFalse(retreat_pending_hold_allowed(audit))
++
++    def test_bounds_and_phase_remain_enforced(self):
++        bad=self.previous.copy();bad[8]=self.a.high[8]+.001
++        with self.assertRaisesRegex(RuntimeError,'physical command bounds'):
++            self.a.hold_retreat_reference(bad)
++        self.a.pending['kind']='grasp'
++        with self.assertRaisesRegex(RuntimeError,'active retreat'):
++            self.a.hold_retreat_reference(self.previous)
++
++
++if __name__=='__main__':unittest.main()

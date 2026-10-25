@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-24T09:24:37.848786+08:00",
+  "parent": "executor-prepare-adapt",
+  "candidate": "executor-grasp-frame",
+  "manifest_sha256": "b190d5afd6a9cdbb3ffdf651c131ec02e368e978c79fd810f6106afb8875fef8",
+  "factor": "Initial grasp yaw and transverse centering in observed parcel PCA frame",
+  "evidence": "Measured release clearance3.10mm, drift produced3.28mm overlap; yaw alone failed geometry screen; frame alignment passes unchanged envelope and measured drift screen",
+  "unchanged": [
+    "Physical and torque limits",
+    "Original stage budgets",
+    "Original3mm parcel margin and full sweeps",
+    "C and original VR/task/QR",
+    "No visual model changes"
+  ],
+  "additional_alignment_gates": {
+    "yaw_degrees": 2,
+    "transverse_m": 0.002
+  },
+  "tests_passed": 453,
+  "next_trial": "executor-grasp-frame-c-p2-s0-1024",
+  "heldout_seeds_used": []
+}

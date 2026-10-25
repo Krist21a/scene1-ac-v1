@@ -1,0 +1,27 @@
+{
+  "recorded_at": "2026-10-23T18:08:37.045255+08:00",
+  "selected_for_next_gate": null,
+  "library_sha256": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+  "selection_is_not_production_promotion": true,
+  "implementation": "bounded compensation after WBC torque output, not an internal QP change",
+  "parameters": {
+    "kp_nm_per_rad": 1.0,
+    "damping_nm_per_rad_s": 0.05,
+    "extra_torque_limit_nm": 0.5,
+    "total_wrist_torque_limit_nm": 14.1,
+    "gravity_compensation_added": false
+  },
+  "original_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/candidate-wrist-pd/humanoidController.cpp",
+  "original_build_manifest": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/candidate-wrist-pd/build-manifest.json",
+  "patch_sha256": "38838a631bdaf37b68229aab33bd1863ffe6438b1f499de0e31ae945211e502e",
+  "rejected": {
+    "D": "Reference consistency repaired but static wrist error persists; insufficient standalone tracking improvement",
+    "DC": "Compared with C, wrist out/return settle time 0.515/0.312 to 1.366/2.595 s, overshoot 0.0148/0.00959 to 0.02195/0.01779 rad; no clipping or protective stop, but worse motion",
+    "E": "Empty proximal benefit did not transfer to contact; proximal WBC RMS worsened and second retreat was rejected. Original failed snapshot retained and used to independently fix preflight solver."
+  },
+  "limitations": "Five independent empty trials and six task/contact trials, all seed0; no full success pair, no heldout seeds, approximate alignment, no internal QP source.",
+  "deployed": "baseline",
+  "promoted": false,
+  "final_decision": "No candidate passes full reliability and proximal tracking acceptance; retain research, restore original controller and dynamic QR",
+  "C_research_only": "Same frozen path full seed0 completed 2/4 vs original controller 1/4, neither official success. Common first parcel wrist RMS -77.3%, proximal RMS +63.1%; not eligible for production."
+}

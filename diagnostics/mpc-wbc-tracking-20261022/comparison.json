@@ -1,0 +1,4234 @@
+{
+  "seed": 0,
+  "seed_role": "development",
+  "repeats_per_variant": 1,
+  "same_outer_run_settings": {
+    "mode": true,
+    "task": true,
+    "config": true,
+    "stop_after_parcels": true,
+    "original_model": true,
+    "base_config": true
+  },
+  "prefix": {
+    "baseline-first-parcel": {
+      "last_state": "visual_cycle_complete",
+      "through_regrasp_steps": 878,
+      "through_regrasp_wall_s": 145.23884264800017,
+      "first_clip_source": {
+        "act_action": -1.5751986503601074,
+        "proposed_action": -1.5751986503601074,
+        "filtered_action": -1.5707963267949,
+        "measured_state": -1.5708202123641968
+      }
+    },
+    "gains-first-parcel": {
+      "last_state": "visual_cycle_lift",
+      "through_regrasp_steps": 797,
+      "through_regrasp_wall_s": 130.33006660999945,
+      "first_clip_source": {
+        "act_action": -1.5742123126983643,
+        "proposed_action": -1.5742123126983643,
+        "filtered_action": -1.5707963267949,
+        "measured_state": -1.5708162784576416
+      }
+    }
+  },
+  "prefix_clocks": {
+    "baseline-first-parcel": {
+      "wall_s": 145.23884264800017,
+      "sensor_sim_elapsed_s": 41.680999994277954,
+      "pair_error_ms": [
+        8.490609000546101,
+        1.393110000208253
+      ]
+    },
+    "gains-first-parcel": {
+      "wall_s": 130.33006660999945,
+      "sensor_sim_elapsed_s": 38.97699999809265,
+      "pair_error_ms": [
+        9.5789959996182,
+        2.284780999616487
+      ]
+    }
+  },
+  "task": {
+    "baseline": {
+      "run": "baseline-first-parcel",
+      "steps": 2871,
+      "reason": "visual_cycle_target_reached",
+      "visual_confirmed_parcels": 1,
+      "official_task_success": null,
+      "independent_four_parcel_success": false,
+      "active_duration_s": 445.7763918030005,
+      "bounds_clipped_steps": 29,
+      "clip_runs": [
+        {
+          "first": 414,
+          "last": 425,
+          "length": 12
+        },
+        {
+          "first": 449,
+          "last": 453,
+          "length": 5
+        },
+        {
+          "first": 867,
+          "last": 878,
+          "length": 12
+        }
+      ],
+      "first_clipped_step": 414,
+      "sampled_actuator_limit_near": 0,
+      "sampled_requested_torque_above_range": 0,
+      "frozen_policy_steps": 2673,
+      "explicit_hold_steps": 12,
+      "velocity_limited_steps": 1
+    },
+    "wrist_gains": {
+      "run": "gains-first-parcel",
+      "steps": 894,
+      "reason": "user_stop",
+      "visual_confirmed_parcels": 0,
+      "official_task_success": null,
+      "independent_four_parcel_success": false,
+      "active_duration_s": 146.0485980839985,
+      "bounds_clipped_steps": 28,
+      "clip_runs": [
+        {
+          "first": 469,
+          "last": 480,
+          "length": 12
+        },
+        {
+          "first": 522,
+          "last": 527,
+          "length": 6
+        },
+        {
+          "first": 788,
+          "last": 797,
+          "length": 10
+        }
+      ],
+      "first_clipped_step": 469,
+      "sampled_actuator_limit_near": 0,
+      "sampled_requested_torque_above_range": 0,
+      "frozen_policy_steps": 660,
+      "explicit_hold_steps": 10,
+      "velocity_limited_steps": 3
+    }
+  },
+  "measurements": [
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "proximal_out",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.0013768555720280443
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "proximal_out",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.014209441205338208
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "proximal_out",
+      "metric": "static_position_std_rad",
+      "value": 9.521300411839062e-06
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "proximal_out",
+      "metric": "overshoot_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "proximal_out",
+      "metric": "settle_within_1deg_s",
+      "value": 0.4147160190004797
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "proximal_return",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.004053731222198983
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "proximal_return",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.011668344304555631
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "proximal_return",
+      "metric": "static_position_std_rad",
+      "value": 1.020465531154457e-05
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "proximal_return",
+      "metric": "overshoot_rad",
+      "value": 0.016492863695754117
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "proximal_return",
+      "metric": "settle_within_1deg_s",
+      "value": 0.005167581000023347
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "distal_out",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.08771518278546288
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "distal_out",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.09803639419033604
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "distal_out",
+      "metric": "static_position_std_rad",
+      "value": 5.221299072268983e-05
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "distal_out",
+      "metric": "overshoot_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "distal_out",
+      "metric": "settle_within_1deg_s",
+      "value": null
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "distal_return",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.06973274938245418
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "distal_return",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.017773414980721925
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "distal_return",
+      "metric": "static_position_std_rad",
+      "value": 4.5963882721499784e-05
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "distal_return",
+      "metric": "overshoot_rad",
+      "value": 0.004233076456943283
+    },
+    {
+      "scope": "empty",
+      "variant": "baseline",
+      "phase": "distal_return",
+      "metric": "settle_within_1deg_s",
+      "value": null
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "proximal_out",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.001517034759902136
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "proximal_out",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.014302766644873652
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "proximal_out",
+      "metric": "static_position_std_rad",
+      "value": 9.055233578256164e-06
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "proximal_out",
+      "metric": "overshoot_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "proximal_out",
+      "metric": "settle_within_1deg_s",
+      "value": 0.38020241300000635
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "proximal_return",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.0037642352532592255
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "proximal_return",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.011666554876482122
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "proximal_return",
+      "metric": "static_position_std_rad",
+      "value": 1.1596358884498229e-05
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "proximal_return",
+      "metric": "overshoot_rad",
+      "value": 0.01610062787602573
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "proximal_return",
+      "metric": "settle_within_1deg_s",
+      "value": 0.019830609000564436
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "distal_out",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.08732951051288905
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "distal_out",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.09793127214341797
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "distal_out",
+      "metric": "static_position_std_rad",
+      "value": 5.4158684045096336e-05
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "distal_out",
+      "metric": "overshoot_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "distal_out",
+      "metric": "settle_within_1deg_s",
+      "value": null
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "distal_return",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.06972238857265965
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "distal_return",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.017620384304409313
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "distal_return",
+      "metric": "static_position_std_rad",
+      "value": 4.607673022495096e-05
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "distal_return",
+      "metric": "overshoot_rad",
+      "value": 0.004061354346152593
+    },
+    {
+      "scope": "empty",
+      "variant": "reference_index",
+      "phase": "distal_return",
+      "metric": "settle_within_1deg_s",
+      "value": null
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "proximal_out",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.0012761430440429039
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "proximal_out",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.013893867666630557
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "proximal_out",
+      "metric": "static_position_std_rad",
+      "value": 1.0906504636147258e-05
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "proximal_out",
+      "metric": "overshoot_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "proximal_out",
+      "metric": "settle_within_1deg_s",
+      "value": 0.3722368099997766
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "proximal_return",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.0038730330324437748
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "proximal_return",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.011395499122478763
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "proximal_return",
+      "metric": "static_position_std_rad",
+      "value": 1.2183478255251914e-05
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "proximal_return",
+      "metric": "overshoot_rad",
+      "value": 0.016468206250171702
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "proximal_return",
+      "metric": "settle_within_1deg_s",
+      "value": 0.007432683999468281
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "distal_out",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.08110070274163478
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "distal_out",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.07335775207397846
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "distal_out",
+      "metric": "static_position_std_rad",
+      "value": 6.437990491331453e-05
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "distal_out",
+      "metric": "overshoot_rad",
+      "value": 0.0013927401605948742
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "distal_out",
+      "metric": "settle_within_1deg_s",
+      "value": null
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "distal_return",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.05867465625549791
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "distal_return",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.021519992832995757
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "distal_return",
+      "metric": "static_position_std_rad",
+      "value": 2.9113913126393214e-05
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "distal_return",
+      "metric": "overshoot_rad",
+      "value": 0.012267089792885147
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_gains",
+      "phase": "distal_return",
+      "metric": "settle_within_1deg_s",
+      "value": null
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "proximal_out",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.0012645611020015153
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "proximal_out",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.014182219911920358
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "proximal_out",
+      "metric": "static_position_std_rad",
+      "value": 8.736989894697644e-06
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "proximal_out",
+      "metric": "overshoot_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "proximal_out",
+      "metric": "settle_within_1deg_s",
+      "value": 0.33974880299956567
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "proximal_return",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.003920352298764136
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "proximal_return",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.01153233112207259
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "proximal_return",
+      "metric": "static_position_std_rad",
+      "value": 1.0645508126492597e-05
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "proximal_return",
+      "metric": "overshoot_rad",
+      "value": 0.016053814069288214
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "proximal_return",
+      "metric": "settle_within_1deg_s",
+      "value": 0.016538481000679894
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "distal_out",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.03892093967923526
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "distal_out",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.011709874667512422
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "distal_out",
+      "metric": "static_position_std_rad",
+      "value": 5.87963168007615e-05
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "distal_out",
+      "metric": "overshoot_rad",
+      "value": 0.01784294647237286
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "distal_out",
+      "metric": "settle_within_1deg_s",
+      "value": 1.4724075690000973
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "distal_return",
+      "metric": "ramp_wbc_rmse_rad",
+      "value": 0.0308975243347624
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "distal_return",
+      "metric": "static_abs_bias_mean_rad",
+      "value": 0.007643282531127608
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "distal_return",
+      "metric": "static_position_std_rad",
+      "value": 4.447570902225331e-05
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "distal_return",
+      "metric": "overshoot_rad",
+      "value": 0.013988020704121086
+    },
+    {
+      "scope": "empty",
+      "variant": "wrist_torque_pd",
+      "phase": "distal_return",
+      "metric": "settle_within_1deg_s",
+      "value": 0.2379977049995432
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "returning_policy_view",
+      "metric": "steps",
+      "value": 5
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "returning_policy_view",
+      "metric": "elapsed_s",
+      "value": 0.925040029000229
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "returning_policy_view",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.0400952520323246
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "returning_policy_view",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.06889277413110607
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "returning_policy_view",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.10512557191176859
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "returning_policy_view",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "returning_policy_view",
+      "metric": "frozen_policy_steps",
+      "value": 5
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "returning_policy_view",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "returning_policy_view",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "returning_policy_view",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.01056909509379489
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "returning_policy_view",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act",
+      "metric": "steps",
+      "value": 124
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act",
+      "metric": "elapsed_s",
+      "value": 18.469119596001292
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.16766132071939466
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.1601170873922781
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.24446606474628646
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act",
+      "metric": "frozen_policy_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.2843590950415329
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.034102099487502764
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.23614574261067833
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_pregrasp",
+      "metric": "steps",
+      "value": 434
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_pregrasp",
+      "metric": "elapsed_s",
+      "value": 73.12859780399867
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_pregrasp",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.09983447143644102
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_pregrasp",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.09760535488894652
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_pregrasp",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.14907012251463983
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_pregrasp",
+      "metric": "bounds_clipped_steps",
+      "value": 2
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_pregrasp",
+      "metric": "frozen_policy_steps",
+      "value": 433
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_pregrasp",
+      "metric": "explicit_hold_steps",
+      "value": 9
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_pregrasp",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 4.00284425177632
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_pregrasp",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.02259547662618894
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_pregrasp",
+      "metric": "visual_offset_variation_rad",
+      "value": 3.984908107305448
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "pregrasp_aligned",
+      "metric": "steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "pregrasp_aligned",
+      "metric": "elapsed_s",
+      "value": 0.16637104700021155
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "pregrasp_aligned",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.056166824317098775
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "pregrasp_aligned",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.05537905608040793
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "pregrasp_aligned",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.08457592646593529
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "pregrasp_aligned",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "pregrasp_aligned",
+      "metric": "frozen_policy_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "pregrasp_aligned",
+      "metric": "explicit_hold_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "pregrasp_aligned",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "pregrasp_aligned",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.02369380683544623
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "pregrasp_aligned",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "open_hand_visual_tracking",
+      "metric": "steps",
+      "value": 47
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "open_hand_visual_tracking",
+      "metric": "elapsed_s",
+      "value": 7.0383212560000175
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "open_hand_visual_tracking",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.1088211772907426
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "open_hand_visual_tracking",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.10072296598706691
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "open_hand_visual_tracking",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.15381915844485783
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "open_hand_visual_tracking",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "open_hand_visual_tracking",
+      "metric": "frozen_policy_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "open_hand_visual_tracking",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "open_hand_visual_tracking",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.22150962801379545
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "open_hand_visual_tracking",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.030463457827480785
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "open_hand_visual_tracking",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.22018552234362757
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_grasp",
+      "metric": "steps",
+      "value": 29
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_grasp",
+      "metric": "elapsed_s",
+      "value": 3.3315881299995453
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_grasp",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.07363898006208053
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_grasp",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.07183087860080094
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_grasp",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.10968086289079927
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_grasp",
+      "metric": "bounds_clipped_steps",
+      "value": 8
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_grasp",
+      "metric": "frozen_policy_steps",
+      "value": 28
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_grasp",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_grasp",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.20472469598530982
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_grasp",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.023964502939092535
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_grasp",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "grasp_contact_confirmed",
+      "metric": "steps",
+      "value": 2
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "grasp_contact_confirmed",
+      "metric": "elapsed_s",
+      "value": 0.38982025099994644
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "grasp_contact_confirmed",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.06926651008454737
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "grasp_contact_confirmed",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.06830504703362433
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "grasp_contact_confirmed",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.10431651805241197
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "grasp_contact_confirmed",
+      "metric": "bounds_clipped_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "grasp_contact_confirmed",
+      "metric": "frozen_policy_steps",
+      "value": 2
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "grasp_contact_confirmed",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "grasp_contact_confirmed",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "grasp_contact_confirmed",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.025185740447871023
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "grasp_contact_confirmed",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act_transport_leveling",
+      "metric": "steps",
+      "value": 24
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act_transport_leveling",
+      "metric": "elapsed_s",
+      "value": 5.1927080919995205
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act_transport_leveling",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.20958886767935977
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act_transport_leveling",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.20469349618969512
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act_transport_leveling",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.31258867059978984
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act_transport_leveling",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act_transport_leveling",
+      "metric": "frozen_policy_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act_transport_leveling",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act_transport_leveling",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.23625509137566147
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act_transport_leveling",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.06407889439119231
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "act_transport_leveling",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.2362512823294834
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_weighing",
+      "metric": "steps",
+      "value": 170
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_weighing",
+      "metric": "elapsed_s",
+      "value": 29.770142659000157
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_weighing",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.24865419951280138
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_weighing",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.2474408598977124
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_weighing",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.3779540858961881
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_weighing",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_weighing",
+      "metric": "frozen_policy_steps",
+      "value": 169
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_weighing",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_weighing",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 1.5375519181200177
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_weighing",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.07312282176238218
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_weighing",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "weighing_release",
+      "metric": "steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "weighing_release",
+      "metric": "elapsed_s",
+      "value": 0.16103281299911032
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "weighing_release",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.2526473419280039
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "weighing_release",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.2517628845870634
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "weighing_release",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.3845531177865055
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "weighing_release",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "weighing_release",
+      "metric": "frozen_policy_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "weighing_release",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "weighing_release",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "weighing_release",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.07728766579664761
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "weighing_release",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_short_retreat",
+      "metric": "steps",
+      "value": 34
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_short_retreat",
+      "metric": "elapsed_s",
+      "value": 4.8986576560000685
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_short_retreat",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.1548694816513004
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_short_retreat",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.15290963535725124
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_short_retreat",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.23351486137052213
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_short_retreat",
+      "metric": "bounds_clipped_steps",
+      "value": 12
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_short_retreat",
+      "metric": "frozen_policy_steps",
+      "value": 34
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_short_retreat",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_short_retreat",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.23286776301812095
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_short_retreat",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.04236435875508558
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_short_retreat",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "short_retreat_complete",
+      "metric": "steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "short_retreat_complete",
+      "metric": "elapsed_s",
+      "value": 0.3061010860001261
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "short_retreat_complete",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.03690848706047126
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "short_retreat_complete",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.02526943039344938
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "short_retreat_complete",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.038327260105833684
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "short_retreat_complete",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "short_retreat_complete",
+      "metric": "frozen_policy_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "short_retreat_complete",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "short_retreat_complete",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "short_retreat_complete",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.00845346023190017
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "short_retreat_complete",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_settle",
+      "metric": "steps",
+      "value": 4
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_settle",
+      "metric": "elapsed_s",
+      "value": 1.0779872399998567
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_settle",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.03324147435288827
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_settle",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.02369029300614043
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_settle",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.035983217091544444
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_settle",
+      "metric": "bounds_clipped_steps",
+      "value": 4
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_settle",
+      "metric": "frozen_policy_steps",
+      "value": 4
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_settle",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_settle",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_settle",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.008233654141595924
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "small_settle",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "placement_stable",
+      "metric": "steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "placement_stable",
+      "metric": "elapsed_s",
+      "value": 0.2147215930008315
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "placement_stable",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.030971096278033173
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "placement_stable",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.02258675181490758
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "placement_stable",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.03432566065884762
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "placement_stable",
+      "metric": "bounds_clipped_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "placement_stable",
+      "metric": "frozen_policy_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "placement_stable",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "placement_stable",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "placement_stable",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.008395199722473497
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "placement_stable",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "regrasp_pose_verified",
+      "metric": "steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "regrasp_pose_verified",
+      "metric": "elapsed_s",
+      "value": 0.1686333960005868
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "regrasp_pose_verified",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.09040514474237
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "regrasp_pose_verified",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.08896312963749739
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "regrasp_pose_verified",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.1358732295412437
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "regrasp_pose_verified",
+      "metric": "bounds_clipped_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "regrasp_pose_verified",
+      "metric": "frozen_policy_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "regrasp_pose_verified",
+      "metric": "explicit_hold_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "regrasp_pose_verified",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "regrasp_pose_verified",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.028190856644010654
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "regrasp_pose_verified",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_lift",
+      "metric": "steps",
+      "value": 172
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_lift",
+      "metric": "elapsed_s",
+      "value": 28.488411663999614
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_lift",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.21571529038633336
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_lift",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.21472263437915473
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_lift",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.3279730186856141
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_lift",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_lift",
+      "metric": "frozen_policy_steps",
+      "value": 172
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_lift",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_lift",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.07984202173241225
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_lift",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.06202198608881207
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_lift",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_transport",
+      "metric": "steps",
+      "value": 293
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_transport",
+      "metric": "elapsed_s",
+      "value": 42.67043590100002
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_transport",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.24879970643408642
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_transport",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.2484240864319603
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_transport",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.3794522623125256
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_transport",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_transport",
+      "metric": "frozen_policy_steps",
+      "value": 293
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_transport",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_transport",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.052062414903842134
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_transport",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.07197801800558366
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_transport",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_approach",
+      "metric": "steps",
+      "value": 259
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_approach",
+      "metric": "elapsed_s",
+      "value": 39.0965725670012
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_approach",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.27783633731794427
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_approach",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.2767280781028395
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_approach",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.4226969341848675
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_approach",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_approach",
+      "metric": "frozen_policy_steps",
+      "value": 259
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_approach",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_approach",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.16439996400625745
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_approach",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.08775614148853093
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_approach",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_sensor_hold",
+      "metric": "steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_sensor_hold",
+      "metric": "elapsed_s",
+      "value": 0.13876380099918606
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_sensor_hold",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.2973820922136785
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_sensor_hold",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.2962245761103073
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_sensor_hold",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.45248303932488937
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_sensor_hold",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_sensor_hold",
+      "metric": "frozen_policy_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_sensor_hold",
+      "metric": "explicit_hold_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_sensor_hold",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_sensor_hold",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.10288318433541385
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_sensor_hold",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_insert",
+      "metric": "steps",
+      "value": 269
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_insert",
+      "metric": "elapsed_s",
+      "value": 47.03598014999989
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_insert",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.3093493352856232
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_insert",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.308725339133291
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_insert",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.47157091801951906
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_insert",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_insert",
+      "metric": "frozen_policy_steps",
+      "value": 269
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_insert",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_insert",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.03526889511930667
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_insert",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.09173034323488115
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_insert",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_close_left",
+      "metric": "steps",
+      "value": 8
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_close_left",
+      "metric": "elapsed_s",
+      "value": 1.1408390719998351
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_close_left",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.3016573799505154
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_close_left",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.30098054955009185
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_close_left",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.4597364555927907
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_close_left",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_close_left",
+      "metric": "frozen_policy_steps",
+      "value": 8
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_close_left",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_close_left",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_close_left",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.08742829032725245
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_close_left",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_right",
+      "metric": "steps",
+      "value": 7
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_right",
+      "metric": "elapsed_s",
+      "value": 1.052041238000129
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_right",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.2866362771204597
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_right",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.28559823036453036
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_right",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.43617830863222196
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_right",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_right",
+      "metric": "frozen_policy_steps",
+      "value": 7
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_right",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_right",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.004775171290202464
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_right",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.08717060519513976
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_right",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_right_retreat",
+      "metric": "steps",
+      "value": 272
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_right_retreat",
+      "metric": "elapsed_s",
+      "value": 40.9185984679998
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_right_retreat",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.23931588929440387
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_right_retreat",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.23798794918086358
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_right_retreat",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.3635173658010682
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_right_retreat",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_right_retreat",
+      "metric": "frozen_policy_steps",
+      "value": 272
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_right_retreat",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_right_retreat",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.12728505390618267
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_right_retreat",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.07827136678690882
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_right_retreat",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_clear",
+      "metric": "steps",
+      "value": 158
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_clear",
+      "metric": "elapsed_s",
+      "value": 22.659246394000547
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_clear",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.2498179773064909
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_clear",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.24991930474048407
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_clear",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.3817522748576765
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_clear",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_clear",
+      "metric": "frozen_policy_steps",
+      "value": 158
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_clear",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_clear",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.047236644096551754
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_clear",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.07928852222116078
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_clear",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_bin_transport",
+      "metric": "steps",
+      "value": 249
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_bin_transport",
+      "metric": "elapsed_s",
+      "value": 35.91624485600005
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_bin_transport",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.2439232094813097
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_bin_transport",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.24257471558357913
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_bin_transport",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.3705301469395442
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_bin_transport",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_bin_transport",
+      "metric": "frozen_policy_steps",
+      "value": 249
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_bin_transport",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_bin_transport",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0367638857953811
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_bin_transport",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.0818233829076001
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_bin_transport",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_left",
+      "metric": "steps",
+      "value": 7
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_left",
+      "metric": "elapsed_s",
+      "value": 0.958393748999697
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_left",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.2246631137460806
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_left",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.22371840262127068
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_left",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.3416990854653803
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_left",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_left",
+      "metric": "frozen_policy_steps",
+      "value": 7
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_left",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_left",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_left",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.07812283071203985
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_release_left",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_retreat",
+      "metric": "steps",
+      "value": 72
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_retreat",
+      "metric": "elapsed_s",
+      "value": 10.383426180999777
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_retreat",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.12971091324589112
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_retreat",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.12212891587100831
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_retreat",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.18647462227468983
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_retreat",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_retreat",
+      "metric": "frozen_policy_steps",
+      "value": 72
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_retreat",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_retreat",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0525388734586576
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_retreat",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.03751511842415849
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_left_retreat",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_verify_bin",
+      "metric": "steps",
+      "value": 7
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_verify_bin",
+      "metric": "elapsed_s",
+      "value": 1.3563034940007128
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_verify_bin",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.15415974248337538
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_verify_bin",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.1518121616953751
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_verify_bin",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.23182933332964067
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_verify_bin",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_verify_bin",
+      "metric": "frozen_policy_steps",
+      "value": 7
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_verify_bin",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_verify_bin",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_verify_bin",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.032611457176744116
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_verify_bin",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_return_home",
+      "metric": "steps",
+      "value": 218
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_return_home",
+      "metric": "elapsed_s",
+      "value": 28.60512057699998
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_return_home",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.13408819558114543
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_return_home",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.12810650891350753
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_return_home",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.19563476902122495
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_return_home",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_return_home",
+      "metric": "frozen_policy_steps",
+      "value": 218
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_return_home",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_return_home",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.10381625339564252
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_return_home",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.03532849203916436
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_return_home",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_complete",
+      "metric": "steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_complete",
+      "metric": "elapsed_s",
+      "value": 0.11717104299987113
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_complete",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.14240577154576534
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_complete",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.14218177065406984
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_complete",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.21717668214569513
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_complete",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_complete",
+      "metric": "frozen_policy_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_complete",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_complete",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_complete",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.023736661645971803
+    },
+    {
+      "scope": "task_phase",
+      "variant": "baseline",
+      "phase": "visual_cycle_complete",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "returning_policy_view",
+      "metric": "steps",
+      "value": 3
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "returning_policy_view",
+      "metric": "elapsed_s",
+      "value": 0.7227143000000069
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "returning_policy_view",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.0317650211568668
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "returning_policy_view",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.06844575237781754
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "returning_policy_view",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.10448544814345645
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "returning_policy_view",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "returning_policy_view",
+      "metric": "frozen_policy_steps",
+      "value": 3
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "returning_policy_view",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "returning_policy_view",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "returning_policy_view",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.0033825335136513945
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "returning_policy_view",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act",
+      "metric": "steps",
+      "value": 159
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act",
+      "metric": "elapsed_s",
+      "value": 23.06539158099895
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.14315491226555815
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.13526691814554642
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.2065143942554068
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act",
+      "metric": "frozen_policy_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.1363810847662848
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.02339446337213968
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.10931334460998379
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_pregrasp",
+      "metric": "steps",
+      "value": 280
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_pregrasp",
+      "metric": "elapsed_s",
+      "value": 46.8375869829988
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_pregrasp",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.07258961436820636
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_pregrasp",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.06939153455422752
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_pregrasp",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.10595760782330267
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_pregrasp",
+      "metric": "bounds_clipped_steps",
+      "value": 2
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_pregrasp",
+      "metric": "frozen_policy_steps",
+      "value": 279
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_pregrasp",
+      "metric": "explicit_hold_steps",
+      "value": 8
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_pregrasp",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 2.7521814363594146
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_pregrasp",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.016419581139325526
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_pregrasp",
+      "metric": "visual_offset_variation_rad",
+      "value": 2.7380460211453808
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "pregrasp_aligned",
+      "metric": "steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "pregrasp_aligned",
+      "metric": "elapsed_s",
+      "value": 0.19093244500072615
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "pregrasp_aligned",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.04544470588215621
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "pregrasp_aligned",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.04407113405533682
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "pregrasp_aligned",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.06727550032053639
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "pregrasp_aligned",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "pregrasp_aligned",
+      "metric": "frozen_policy_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "pregrasp_aligned",
+      "metric": "explicit_hold_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "pregrasp_aligned",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "pregrasp_aligned",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.01720403166266556
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "pregrasp_aligned",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "open_hand_visual_tracking",
+      "metric": "steps",
+      "value": 51
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "open_hand_visual_tracking",
+      "metric": "elapsed_s",
+      "value": 7.717292649999763
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "open_hand_visual_tracking",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.07852303912943491
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "open_hand_visual_tracking",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.0704028929463019
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "open_hand_visual_tracking",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.10748564207189235
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "open_hand_visual_tracking",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "open_hand_visual_tracking",
+      "metric": "frozen_policy_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "open_hand_visual_tracking",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "open_hand_visual_tracking",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.2075950683350633
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "open_hand_visual_tracking",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.022594696982262956
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "open_hand_visual_tracking",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.2070373561676
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_grasp",
+      "metric": "steps",
+      "value": 22
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_grasp",
+      "metric": "elapsed_s",
+      "value": 2.4245761680003852
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_grasp",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.05310358348033279
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_grasp",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.050354907195722214
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_grasp",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.07687813525044587
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_grasp",
+      "metric": "bounds_clipped_steps",
+      "value": 6
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_grasp",
+      "metric": "frozen_policy_steps",
+      "value": 21
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_grasp",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_grasp",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.11076845771462017
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_grasp",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.018013121482518615
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_grasp",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "grasp_contact_confirmed",
+      "metric": "steps",
+      "value": 2
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "grasp_contact_confirmed",
+      "metric": "elapsed_s",
+      "value": 0.4061431589998392
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "grasp_contact_confirmed",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.04807353110024351
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "grasp_contact_confirmed",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.0464279209996677
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "grasp_contact_confirmed",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.07089200120823382
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "grasp_contact_confirmed",
+      "metric": "bounds_clipped_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "grasp_contact_confirmed",
+      "metric": "frozen_policy_steps",
+      "value": 2
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "grasp_contact_confirmed",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "grasp_contact_confirmed",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "grasp_contact_confirmed",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.016199262117045095
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "grasp_contact_confirmed",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act_transport_leveling",
+      "metric": "steps",
+      "value": 21
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act_transport_leveling",
+      "metric": "elapsed_s",
+      "value": 4.468166032001136
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act_transport_leveling",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.17920987743909325
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act_transport_leveling",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.17414194316965853
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act_transport_leveling",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.2659563433188958
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act_transport_leveling",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act_transport_leveling",
+      "metric": "frozen_policy_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act_transport_leveling",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act_transport_leveling",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.18688171204360224
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act_transport_leveling",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.05149144539450326
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "act_transport_leveling",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.18687980077385571
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_weighing",
+      "metric": "steps",
+      "value": 197
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_weighing",
+      "metric": "elapsed_s",
+      "value": 34.93798315599997
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_weighing",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.177406981540358
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_weighing",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.175278946855757
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_weighing",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.26770136063756184
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_weighing",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_weighing",
+      "metric": "frozen_policy_steps",
+      "value": 196
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_weighing",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_weighing",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 1.8119551318545573
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_weighing",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.05377006953853886
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_weighing",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "weighing_release",
+      "metric": "steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "weighing_release",
+      "metric": "elapsed_s",
+      "value": 0.15688422600032936
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "weighing_release",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.16960940256458018
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "weighing_release",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.16746520189245792
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "weighing_release",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.2557558633785382
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "weighing_release",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "weighing_release",
+      "metric": "frozen_policy_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "weighing_release",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "weighing_release",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "weighing_release",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.05355244449667082
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "weighing_release",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_short_retreat",
+      "metric": "steps",
+      "value": 52
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_short_retreat",
+      "metric": "elapsed_s",
+      "value": 7.353394472999753
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_short_retreat",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.08524532634839523
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_short_retreat",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.07714853388347402
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_short_retreat",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.11768582743207172
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_short_retreat",
+      "metric": "bounds_clipped_steps",
+      "value": 12
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_short_retreat",
+      "metric": "frozen_policy_steps",
+      "value": 52
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_short_retreat",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_short_retreat",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.4588937587749346
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_short_retreat",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.02226671869536038
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_short_retreat",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "short_retreat_complete",
+      "metric": "steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "short_retreat_complete",
+      "metric": "elapsed_s",
+      "value": 0.3403260879995287
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "short_retreat_complete",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.03864243967711399
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "short_retreat_complete",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.03390249469149346
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "short_retreat_complete",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.051723834315761066
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "short_retreat_complete",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "short_retreat_complete",
+      "metric": "frozen_policy_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "short_retreat_complete",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "short_retreat_complete",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "short_retreat_complete",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.01222662489309685
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "short_retreat_complete",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_settle",
+      "metric": "steps",
+      "value": 5
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_settle",
+      "metric": "elapsed_s",
+      "value": 1.2862439410000661
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_settle",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.03868283091186066
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_settle",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.0356375931524631
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_settle",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.054375753128613744
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_settle",
+      "metric": "bounds_clipped_steps",
+      "value": 5
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_settle",
+      "metric": "frozen_policy_steps",
+      "value": 5
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_settle",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_settle",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_settle",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.011890164219073783
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "small_settle",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "placement_stable",
+      "metric": "steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "placement_stable",
+      "metric": "elapsed_s",
+      "value": 0.2209958130006271
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "placement_stable",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.042039725304607256
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "placement_stable",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.03974294724456263
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "placement_stable",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.06064004385941142
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "placement_stable",
+      "metric": "bounds_clipped_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "placement_stable",
+      "metric": "frozen_policy_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "placement_stable",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "placement_stable",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "placement_stable",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.012658796844952896
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "placement_stable",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "regrasp_pose_verified",
+      "metric": "steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "regrasp_pose_verified",
+      "metric": "elapsed_s",
+      "value": 0.2014355949995661
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "regrasp_pose_verified",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.06417942197602117
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "regrasp_pose_verified",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.06269611356192646
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "regrasp_pose_verified",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.09574348770465654
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "regrasp_pose_verified",
+      "metric": "bounds_clipped_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "regrasp_pose_verified",
+      "metric": "frozen_policy_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "regrasp_pose_verified",
+      "metric": "explicit_hold_steps",
+      "value": 1
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "regrasp_pose_verified",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "regrasp_pose_verified",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.02074745456572996
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "regrasp_pose_verified",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "visual_cycle_lift",
+      "metric": "steps",
+      "value": 97
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "visual_cycle_lift",
+      "metric": "elapsed_s",
+      "value": 15.718531473999064
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "visual_cycle_lift",
+      "metric": "command_tracking_rmse_rad",
+      "value": 0.13768812963086385
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "visual_cycle_lift",
+      "metric": "wbc_tracking_rmse_rad",
+      "value": 0.13636014464459956
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "visual_cycle_lift",
+      "metric": "wrist_wbc_rmse_rad",
+      "value": 0.208238100441368
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "visual_cycle_lift",
+      "metric": "bounds_clipped_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "visual_cycle_lift",
+      "metric": "frozen_policy_steps",
+      "value": 97
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "visual_cycle_lift",
+      "metric": "explicit_hold_steps",
+      "value": 0
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "visual_cycle_lift",
+      "metric": "within_phase_outer_residual_variation_rad",
+      "value": 0.059147689944648286
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "visual_cycle_lift",
+      "metric": "mean_fk_wbc_error_m",
+      "value": 0.04254312280035149
+    },
+    {
+      "scope": "task_phase",
+      "variant": "wrist_gains",
+      "phase": "visual_cycle_lift",
+      "metric": "visual_offset_variation_rad",
+      "value": 0.0
+    }
+  ],
+  "caveats": [
+    "asymmetric stopping: baseline clipping was discovered retrospectively",
+    "different stage coverage; full task durations and success rates are not comparable",
+    "FK is derived robot kinematics, not independent TCP truth",
+    "visual offset variation is not vision computation cost",
+    "one development seed; no new seed or full four-parcel test"
+  ]
+}

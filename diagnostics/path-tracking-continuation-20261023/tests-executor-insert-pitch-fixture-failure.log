@@ -1,0 +1,20 @@
+.....................................................................................................................................................................................................................................E...........................................................................................................................................................................................................................................................
+======================================================================
+ERROR: test_only_insert_inside_original_orientation_gate_uses_pitch_weight (test_regrasp_insert_pitch.InsertPitchTests.test_only_insert_inside_original_orientation_gate_uses_pitch_weight)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-insert-pitch/tests/test_regrasp_insert_pitch.py", line 20, in test_only_insert_inside_original_orientation_gate_uses_pitch_weight
+    result,info=self.a._pending_action(self.measured,self.snapshot)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-insert-pitch/scene1/residual.py", line 969, in _pending_action
+    return self._regrasp_action(measured,snapshot,poses,info)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-insert-pitch/scene1/residual.py", line 592, in _regrasp_action
+    goal[:2] = p['stand_off_position'][:2]
+               ~^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'stand_off_position'
+
+----------------------------------------------------------------------
+Ran 481 tests in 19.142s
+
+FAILED (errors=1)

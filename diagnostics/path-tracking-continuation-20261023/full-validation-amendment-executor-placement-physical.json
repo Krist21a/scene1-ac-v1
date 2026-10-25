@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-24T15:19:29.004529+08:00",
+  "parent": "executor-support-recover",
+  "candidate": "executor-placement-physical",
+  "factor": "Only placement reference-offset cap30deg to2pi(nonbinding inside physical joint ranges); retain actual joint/step/torque/collision/time bounds",
+  "authorization": "User explicitly no longer requires proximity to original ACT action",
+  "evidence": "Frozen baseline seed0 second recovery step525 physical command valid but wrist offset.5341829658 exceeds.5235987756 by.010584>step.006; legacy error mislabels all constraint infeasibility as physical",
+  "unchanged": [
+    "A+C controller",
+    "URDF joint limits",
+    "motion step and velocity limits",
+    "collision envelopes and margins",
+    "450step weighing budget",
+    "vision and success gates"
+  ],
+  "heldout_seeds_used": [],
+  "tests_passed": 487,
+  "patch_chain_count": 29
+}

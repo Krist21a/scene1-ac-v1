@@ -1,0 +1,46 @@
+--- a/src/humanoid-control/humanoid_controllers/src/humanoidController.cpp
++++ b/src/humanoid-control/humanoid_controllers/src/humanoidController.cpp
+@@ -2979,12 +2979,42 @@
+         jointCmdMsg.joint_kd[11] = 0.0;
+       }
+ 
++      // Isolated scene1 simulation experiment: bounded wrist torque PD.
++      // Original WBC and filtered references remain active. No real hardware.
++      vector_t scene1_wrist_pd_trace = vector_t::Zero(4 * armNumReal_ + 1);
++      const bool scene1_wrist_pd_enabled = !is_real_ && armNumReal_ == 14 &&
++          enable_wbc && !isPullUp_ && !is_torso_interpolation_active_ &&
++          resetting_mpc_state_ == ResettingMpcState::NOMAL &&
++          mpcArmControlMode_desired_ == ArmControlMode::EXTERN_CONTROL &&
++          mpcArmControlMode_ == ArmControlMode::EXTERN_CONTROL;
++      scene1_wrist_pd_trace(4 * armNumReal_) = scene1_wrist_pd_enabled ? 1.0 : 0.0;
+       // 补全手臂的Cmd维度
+       for(int i2 = 0; i2 < armNumReal_; ++i2)
+       {
+         jointCmdMsg.joint_q.push_back(output_pos_(waistNum_+jointNum_+i2));
+         jointCmdMsg.joint_v.push_back(output_vel_(waistNum_+jointNum_+i2));
+-        jointCmdMsg.tau.push_back(output_tau_(waistNum_+jointNum_+i2));
++        const int scene1_joint_index = waistNum_ + jointNum_ + i2;
++        const double scene1_base_tau = output_tau_(scene1_joint_index);
++        double scene1_raw_pd = 0.0;
++        double scene1_command_tau = scene1_base_tau;
++        if (scene1_wrist_pd_enabled && i2 % 7 >= 4)
++        {
++          const double scene1_error = optimizedState2WBC_mrt_.tail(armNumReal_)(i2) -
++              measuredRbdStateReal_(6 + scene1_joint_index);
++          const double scene1_velocity = measuredRbdStateReal_.tail(infoWBC.actuatedDofNum)(scene1_joint_index);
++          // Kp [Nm/rad], Kd [Nm*s/rad]; no integral or added gravity term.
++          scene1_raw_pd = 1.0 * scene1_error - 0.05 * scene1_velocity;
++          const double scene1_pd = std::clamp(scene1_raw_pd, -0.5, 0.5);
++          // Existing v52 simulator wrist range, gear=1; never raise this bound.
++          scene1_command_tau = std::clamp(scene1_base_tau + scene1_pd, -14.1, 14.1);
++        }
++        jointCmdMsg.tau.push_back(scene1_command_tau);
++        scene1_wrist_pd_trace(i2) = scene1_base_tau;
++        scene1_wrist_pd_trace(armNumReal_ + i2) = scene1_raw_pd;
++        scene1_wrist_pd_trace(2 * armNumReal_ + i2) = scene1_command_tau - scene1_base_tau;
++        scene1_wrist_pd_trace(3 * armNumReal_ + i2) = scene1_command_tau;
++        if (i2 == armNumReal_ - 1)
++          ros_logger_->publishVector("/scene1_tracking/wrist_pd", scene1_wrist_pd_trace);
+         jointCmdMsg.tau_ratio.push_back(1);
+         jointCmdMsg.tau_max.push_back(kuavo_settings_.hardware_settings.max_current[waistNum_+jointNum_+i2]);
+         jointCmdMsg.control_modes.push_back(joint_control_modes_[waistNum_+jointNum_+i2]);

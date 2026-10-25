@@ -1,0 +1,86 @@
+{
+  "at": "2026-10-22T19:33:03.386712+08:00",
+  "scope": "Finite official independent full resets; no real robot",
+  "candidate": "C wrist output PD plus visual regrasp forward centering gate; original visual precision gain",
+  "evidence_gate": {
+    "original_p1_steps": 2765,
+    "original_p1_wall_s": 384.270184502,
+    "C_only_p1_steps": 2378,
+    "C_only_p1_wall_s": 328.448,
+    "combined_p1_steps": 2510,
+    "combined_p1_wall_s": 350.134912992,
+    "combined_visual_confirmed": 1,
+    "combined_clipping_steps": 0,
+    "combined_sweep_block_steps": 0,
+    "combined_formal_PD_limit_samples": 0,
+    "combined_gripper_events": 6,
+    "limitations": "One successful run per tested completed configuration; precision attempt failed in unchanged regrasp before gain branch active; same seed is not bitwise deterministic"
+  },
+  "cases": [
+    {
+      "label": "full-original-p4-s0",
+      "version": "baseline",
+      "policy": "hold",
+      "seed": 0,
+      "parcels": 4,
+      "max_steps": 16800,
+      "role": "development baseline"
+    },
+    {
+      "label": "full-centered-pd-p4-s0",
+      "version": "candidate",
+      "policy": "centered",
+      "seed": 0,
+      "parcels": 4,
+      "max_steps": 16800,
+      "role": "development combined"
+    },
+    {
+      "label": "newseed-centered-pd-p1-s1",
+      "version": "candidate",
+      "policy": "centered",
+      "seed": 1,
+      "parcels": 1,
+      "max_steps": 5000,
+      "role": "new to this controller campaign; not used for tuning"
+    },
+    {
+      "label": "newseed-original-p1-s1",
+      "version": "baseline",
+      "policy": "hold",
+      "seed": 1,
+      "parcels": 1,
+      "max_steps": 5000,
+      "role": "matched new-seed baseline, reversed order"
+    }
+  ],
+  "gates": "Analyze every failure before further motion; no automatic repeats. Seed1 pair only after satisfactory seed0 full4. New-seed one-parcel is not full-four-parcel validation. No claim of statistical significance or official success from null.",
+  "manifest_sha": {
+    "hold": "45fbc63972ba72d5c1a2ccd51a60d4b3539c0c6f78bad97e001b90303f5956be",
+    "centered": "d43310133743f003ac820f483c0d0bba15545d83283e2e56869cdacb6f269160"
+  },
+  "control_sha": {
+    "baseline": "e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4",
+    "candidate": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba"
+  },
+  "comparison": "Both sides share the inactive reference ownership fix. This differs from pristine original; its historical inactive sent commands were exactly matched in replay and its benefit is not credited. Only candidate adds bounded PD and wrist-centering gate.",
+  "preservation": "Trace and policy output stay on container SSD during motion; host supervisory logs and final copies on external disk for both sides. Same 50Hz recorder and online protection. No live heavy analysis. Full checks, raw geometry and failed evidence retained.",
+  "key_metrics": [
+    "complete visual parcel count and ordered checks",
+    "wall and sensor-time elapsed per phase/full",
+    "time-aligned wrist/proximal WBC error and same-base FK difference",
+    "eligible stationary bias only",
+    "actual offset variation with field coverage, waits and insertion gate count",
+    "target clip and observed force/PD limit events",
+    "monitor calculation times in ms; pure vision compute unavailable"
+  ],
+  "unchanged": [
+    "MPC costs",
+    "WBC QP tasks,weights,filters",
+    "limits",
+    "physical scene",
+    "official reset/seed interface",
+    "success checks",
+    "production and v63"
+  ]
+}

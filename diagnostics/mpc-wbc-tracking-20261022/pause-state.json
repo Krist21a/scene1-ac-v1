@@ -1,0 +1,26 @@
+{
+  "at": "2026-10-22T17:38:24.397618+08:00",
+  "status": "paused",
+  "reason": "explicit_user_request_after_current_round",
+  "user_instruction": "本论工作后先暂停，待我下达继续工作后再继续",
+  "scope": "scene1 MPC/WBC tracking work; no automatic simulation or deployment",
+  "resume_requires": "explicit user instruction to continue",
+  "production_restored": true,
+  "active_control_or_simulation_processes": false,
+  "verification": "final-verification.json",
+  "report": "REPORT.txt",
+  "commands": "REPRODUCE.txt",
+  "next_unverified": [
+    "C loaded hold/transport",
+    "C weighing/handover/bin contacts and base stability",
+    "symmetric clipping guard online validation",
+    "new seed",
+    "independent four-parcel validation"
+  ],
+  "next_preconditions": [
+    "recheck current processes/config hashes; history is not live state",
+    "preserve production/v63 and all failures",
+    "do not resume held scene via go_run; use official full reset for independent runs",
+    "keep one strategy and separate lower-control/outer-policy changes"
+  ]
+}

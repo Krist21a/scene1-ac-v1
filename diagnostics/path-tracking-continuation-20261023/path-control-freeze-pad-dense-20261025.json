@@ -1,0 +1,122 @@
+{
+  "at": "2026-10-25T15:20:59.002360+08:00",
+  "policy": "executor_pad_dense",
+  "policy_manifest_sha256": "0cb5ebffceba00c8c230d71458e88dd46556d85e886364f65d2a3925c3a6fb81",
+  "selected_controller": "origin_pd",
+  "controller_identities": {
+    "baseline": {
+      "source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/baseline/controller-library/libhumanoid_controllers.so",
+      "sha256": "e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4",
+      "factor": "original controller",
+      "expect_pd": false,
+      "expect_velocity": false,
+      "qr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-config/dynamic_qr.info",
+      "qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de",
+      "task_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-task/task.info",
+      "task_sha256": "3f32e8d8858a9352b674d15cdb6578fdf8e4b96429ccfe46fffd81a881d95d17",
+      "vr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/baseline/vr-reference/humanoid_VR_hand_control",
+      "vr_sha256": "155191dc393e6c92552e57a2c4af6d52833283bc22660e7d8788ba65424ce293"
+    },
+    "origin_pd": {
+      "source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/candidate-wrist-pd/libhumanoid_controllers.so",
+      "sha256": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+      "factor": "A+C: correct arm first-knot indexing before MPC plus unchanged bounded post-WBC wrist PD",
+      "expect_pd": true,
+      "expect_velocity": false,
+      "qr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-config/dynamic_qr.info",
+      "qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de",
+      "task_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-task/task.info",
+      "task_sha256": "3f32e8d8858a9352b674d15cdb6578fdf8e4b96429ccfe46fffd81a881d95d17",
+      "vr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/candidate-reference-origin/humanoid_VR_hand_control",
+      "vr_sha256": "84768f811b9c228d1a296a71644ede4ec44cd64656f76ad4bc42d77dce3ccf03"
+    }
+  },
+  "development_trials": [
+    {
+      "label": "executor-pad-dense-ac-p4-s0-1025",
+      "seed": 0,
+      "steps": 12679,
+      "runtime_sha256": "c80951a1d3414e25b2aa59afbde120186d358d3c08cf49a45818e0188b0a6c0c",
+      "audits": {
+        "audit.json": "f5669bd7a77c7de155daeb652f7ca5eb4a24c76a466e941006d4496636831952",
+        "arm-preparation-audit.json": "8b407fdbaf11779df8e1b1b2e7d3714aafe018b15994761e9d84282add69e445",
+        "soft-open-audit.json": "fd903ac351b46682e0108ce83c2b45b59c244311554b5708d60c1355c5ff5a8c",
+        "support-recovery-audit.json": "a13acd9464e3a593232843dd324459a2cdcab92c3aaa77c41b02ebe6079930cd",
+        "first-pickup-audit.json": "da9eda4b81e0aaa610341547a8ee73c9886e99fd702930772ac4906f460aafc8"
+      },
+      "task_success": null
+    },
+    {
+      "label": "executor-pad-dense-ac-p4-s2-regression-1025",
+      "seed": 2,
+      "steps": 12727,
+      "runtime_sha256": "e08d9c19a791ed5e40fc8401c0410205ea45abf60676025caac426d771f20f38",
+      "audits": {
+        "audit.json": "75fc96ca362df3dde3acaae30601ecfee8a06b2b91bcc2ebb7976112af11c900",
+        "arm-preparation-audit.json": "eff510efc9a0630e10135970311386e83c95a7f42095657f86b9b0e5854c5f49",
+        "soft-open-audit.json": "f5f834d694a94ce4fd2008dff9c2231bcea5e07c5a70f914409a504b3875e66c",
+        "support-recovery-audit.json": "b6dade7ed76a7f162bc12b847ea49d62ae77733e6bed8051b4713f0dd8fdb6e3",
+        "first-pickup-audit.json": "bad34a0f34378649a2049fbddbe1bba0440edb343e81ba68d1258940b491b917"
+      },
+      "task_success": null
+    }
+  ],
+  "used_development_seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "fresh_heldout_seeds": [
+    4,
+    5
+  ],
+  "planned_trials": [
+    {
+      "seed": 0,
+      "controller": "baseline",
+      "parcels": 4,
+      "label": "frozen-executor-pad-dense-base-p4-s0-1025"
+    },
+    {
+      "seed": 2,
+      "controller": "baseline",
+      "parcels": 4,
+      "label": "frozen-executor-pad-dense-base-p4-s2-1025"
+    },
+    {
+      "seed": 4,
+      "controller": "baseline",
+      "parcels": 4,
+      "label": "frozen-executor-pad-dense-base-p4-s4-1025"
+    },
+    {
+      "seed": 4,
+      "controller": "origin_pd",
+      "parcels": 4,
+      "label": "frozen-executor-pad-dense-ac-p4-s4-1025"
+    },
+    {
+      "seed": 5,
+      "controller": "baseline",
+      "parcels": 4,
+      "label": "frozen-executor-pad-dense-base-p4-s5-1025"
+    },
+    {
+      "seed": 5,
+      "controller": "origin_pd",
+      "parcels": 4,
+      "label": "frozen-executor-pad-dense-ac-p4-s5-1025"
+    }
+  ],
+  "official_success_claimed": false,
+  "production_promoted": false,
+  "rules": [
+    "No path/control tuning on fresh4,5",
+    "Retain every failed attempt",
+    "Timing only for successful samecondition full4pairs",
+    "Separate proximal/wrist static/dynamic metrics",
+    "Null official verdict is not official success",
+    "User resumed20261025 to complete acceptance; previous quota stop retained; restore original runtime after study"
+  ]
+}

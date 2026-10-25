@@ -1,0 +1,358 @@
+{
+  "label": "executor-first-select-k-p2-s0-1024",
+  "steps": 622,
+  "step_sequence_contiguous": true,
+  "summary": {
+    "steps": 622,
+    "reason": "error",
+    "task_success": null,
+    "error": "Table reference could not be verified during visual approach",
+    "handover_contract_stop": null,
+    "last_sensor_receipts": {
+      "/cam_h/color/image_raw/compressed": {
+        "receipt_monotonic_s": 34702.560617054,
+        "source_stamp_s": 1792836832.7973397,
+        "receipts": 3930
+      },
+      "/cam_l/color/image_raw/compressed": {
+        "receipt_monotonic_s": 34702.548034101,
+        "source_stamp_s": 1792836832.7605913,
+        "receipts": 3851
+      },
+      "/sensors_data_raw": {
+        "receipt_monotonic_s": 34702.565844245,
+        "source_stamp_s": 1792836832.8236299,
+        "receipts": 54089
+      },
+      "/gripper/state": {
+        "receipt_monotonic_s": 34702.57079414,
+        "source_stamp_s": 1792836832.8284702,
+        "receipts": 117510
+      },
+      "/cam_r/color/image_raw/compressed": {
+        "receipt_monotonic_s": 34702.556930221,
+        "source_stamp_s": 1792836832.765108,
+        "receipts": 3737
+      }
+    },
+    "trace_manifest_error": null,
+    "visual_confirmed_parcels": 0,
+    "note": "Original KuavoSimEnv returns reward=0 and does not judge scene1 success."
+  },
+  "ros_run_id": "441eee80-cf93-11f1-8791-c85ea94bd8c7",
+  "controller_sha": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+  "policy_sha": "ccda57b644fff378cdbe199621c163c44b3d8ad594f12b25129986168fe5ab07",
+  "requested_parcels": 2,
+  "bin_confirmations": [],
+  "complete_events": [],
+  "gripper_events": [],
+  "gripper_event_count": 0,
+  "unpaused_ACT_steps_after_first_complete": 0,
+  "target_clips": 0,
+  "velocity_limited_steps": 1,
+  "regrasp_sweep_block_steps": 0,
+  "regrasp_forward_gate_hold_steps": 0,
+  "pd_limits_50hz": {
+    "initialization": {
+      "samples": 1698,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.49282060749192935,
+      "added_peak_nm": 0.4928206074919293,
+      "wrist_command_peak_nm": 1.2913865334454728,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    },
+    "formal_policy": {
+      "samples": 4764,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.15191463153181056,
+      "added_peak_nm": 0.15191463153181056,
+      "wrist_command_peak_nm": 1.0681293212116756,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    },
+    "after_policy": {
+      "samples": 136,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.13552585566225014,
+      "added_peak_nm": 0.13552585566225014,
+      "wrist_command_peak_nm": 0.9491882453788572,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    }
+  },
+  "task_success": null,
+  "limitations": "Gripper events are upper command threshold crossings (0.25/0.6 hysteresis), not proof of contact. Original visual checks and raw feedback evidence retained. 50Hz clipping can miss shorter events; online guard is separate. null is not an official verdict.",
+  "release_reference_transfers": [],
+  "release_preparation": [],
+  "release_reference_transfer_interpretation": "Physical bounds and MotionFilter checked separately. measured_physical intentionally replaces obsolete ACT anchoring with a new visual-phase reference; this is not measured tracking evidence.",
+  "post_level_geometry_refreshes": [],
+  "retreat_goal_certificates": [],
+  "retreat_projections": [],
+  "fresh_sweep_feedback": {
+    "samples": 51,
+    "max_captured_to_send_s": 0.03003674100182252,
+    "max_joint_change_from_planning_rad": 0.023187637329101562,
+    "records": [
+      {
+        "step": 76,
+        "captured_to_send_s": 0.016239964999840595,
+        "max_joint_change_from_planning_rad": 0.023187637329101562
+      },
+      {
+        "step": 77,
+        "captured_to_send_s": 0.013186977004806977,
+        "max_joint_change_from_planning_rad": 0.011770248413085938
+      },
+      {
+        "step": 78,
+        "captured_to_send_s": 0.010577318993455265,
+        "max_joint_change_from_planning_rad": 0.012768030166625977
+      },
+      {
+        "step": 79,
+        "captured_to_send_s": 0.01689169799647061,
+        "max_joint_change_from_planning_rad": 0.009371280670166016
+      },
+      {
+        "step": 80,
+        "captured_to_send_s": 0.008499329996993765,
+        "max_joint_change_from_planning_rad": 0.008126258850097656
+      },
+      {
+        "step": 81,
+        "captured_to_send_s": 0.007931448002636898,
+        "max_joint_change_from_planning_rad": 0.009860903024673462
+      },
+      {
+        "step": 82,
+        "captured_to_send_s": 0.010875965999730397,
+        "max_joint_change_from_planning_rad": 0.002843230962753296
+      },
+      {
+        "step": 83,
+        "captured_to_send_s": 0.02074993000132963,
+        "max_joint_change_from_planning_rad": 0.004040420055389404
+      },
+      {
+        "step": 84,
+        "captured_to_send_s": 0.022175771999172866,
+        "max_joint_change_from_planning_rad": 0.005613088607788086
+      },
+      {
+        "step": 85,
+        "captured_to_send_s": 0.009152629994787276,
+        "max_joint_change_from_planning_rad": 0.011599540710449219
+      },
+      {
+        "step": 86,
+        "captured_to_send_s": 0.01372506999905454,
+        "max_joint_change_from_planning_rad": 0.007160186767578125
+      },
+      {
+        "step": 87,
+        "captured_to_send_s": 0.013309102003404405,
+        "max_joint_change_from_planning_rad": 0.008913516998291016
+      },
+      {
+        "step": 88,
+        "captured_to_send_s": 0.0183260199992219,
+        "max_joint_change_from_planning_rad": 0.0080108642578125
+      },
+      {
+        "step": 89,
+        "captured_to_send_s": 0.011321104000671767,
+        "max_joint_change_from_planning_rad": 0.005484580993652344
+      },
+      {
+        "step": 90,
+        "captured_to_send_s": 0.018989971998962574,
+        "max_joint_change_from_planning_rad": 0.005591154098510742
+      },
+      {
+        "step": 91,
+        "captured_to_send_s": 0.03003674100182252,
+        "max_joint_change_from_planning_rad": 0.007690489292144775
+      },
+      {
+        "step": 92,
+        "captured_to_send_s": 0.005649393999192398,
+        "max_joint_change_from_planning_rad": 0.0066492557525634766
+      },
+      {
+        "step": 93,
+        "captured_to_send_s": 0.011052535999624524,
+        "max_joint_change_from_planning_rad": 0.00732383131980896
+      },
+      {
+        "step": 94,
+        "captured_to_send_s": 0.007883894999395125,
+        "max_joint_change_from_planning_rad": 0.006513148546218872
+      },
+      {
+        "step": 95,
+        "captured_to_send_s": 0.010045457005617209,
+        "max_joint_change_from_planning_rad": 0.009826511144638062
+      },
+      {
+        "step": 96,
+        "captured_to_send_s": 0.007263400999363512,
+        "max_joint_change_from_planning_rad": 0.006556779146194458
+      },
+      {
+        "step": 97,
+        "captured_to_send_s": 0.007281780999619514,
+        "max_joint_change_from_planning_rad": 0.005662769079208374
+      },
+      {
+        "step": 98,
+        "captured_to_send_s": 0.0075275359995430335,
+        "max_joint_change_from_planning_rad": 0.007709145545959473
+      },
+      {
+        "step": 99,
+        "captured_to_send_s": 0.007841412996640429,
+        "max_joint_change_from_planning_rad": 0.006329566240310669
+      },
+      {
+        "step": 100,
+        "captured_to_send_s": 0.014209834997018334,
+        "max_joint_change_from_planning_rad": 0.0054368674755096436
+      },
+      {
+        "step": 101,
+        "captured_to_send_s": 0.015494781997404061,
+        "max_joint_change_from_planning_rad": 0.00704558938741684
+      },
+      {
+        "step": 102,
+        "captured_to_send_s": 0.018567056002211757,
+        "max_joint_change_from_planning_rad": 0.0022909119725227356
+      },
+      {
+        "step": 103,
+        "captured_to_send_s": 0.01647836500342237,
+        "max_joint_change_from_planning_rad": 0.0025373101234436035
+      },
+      {
+        "step": 104,
+        "captured_to_send_s": 0.00959645400143927,
+        "max_joint_change_from_planning_rad": 0.0025404132902622223
+      },
+      {
+        "step": 105,
+        "captured_to_send_s": 0.02410673599661095,
+        "max_joint_change_from_planning_rad": 0.0032548829913139343
+      },
+      {
+        "step": 106,
+        "captured_to_send_s": 0.018681517998629715,
+        "max_joint_change_from_planning_rad": 0.0052413418889045715
+      },
+      {
+        "step": 107,
+        "captured_to_send_s": 0.021365707005315926,
+        "max_joint_change_from_planning_rad": 0.005423620343208313
+      },
+      {
+        "step": 108,
+        "captured_to_send_s": 0.009322179001173936,
+        "max_joint_change_from_planning_rad": 0.005369901657104492
+      },
+      {
+        "step": 109,
+        "captured_to_send_s": 0.01870213200163562,
+        "max_joint_change_from_planning_rad": 0.003533691167831421
+      },
+      {
+        "step": 110,
+        "captured_to_send_s": 0.011587086999497842,
+        "max_joint_change_from_planning_rad": 0.003911197185516357
+      },
+      {
+        "step": 111,
+        "captured_to_send_s": 0.012626329000340775,
+        "max_joint_change_from_planning_rad": 0.0029173195362091064
+      },
+      {
+        "step": 112,
+        "captured_to_send_s": 0.01898477900249418,
+        "max_joint_change_from_planning_rad": 0.0029181241989135742
+      },
+      {
+        "step": 113,
+        "captured_to_send_s": 0.011982901000010315,
+        "max_joint_change_from_planning_rad": 0.004443764686584473
+      },
+      {
+        "step": 114,
+        "captured_to_send_s": 0.023712693000561558,
+        "max_joint_change_from_planning_rad": 0.0030527710914611816
+      },
+      {
+        "step": 115,
+        "captured_to_send_s": 0.01959307600191096,
+        "max_joint_change_from_planning_rad": 0.0035651028156280518
+      },
+      {
+        "step": 116,
+        "captured_to_send_s": 0.01816686100210063,
+        "max_joint_change_from_planning_rad": 0.003345698118209839
+      },
+      {
+        "step": 117,
+        "captured_to_send_s": 0.007648311999219004,
+        "max_joint_change_from_planning_rad": 0.0033776164054870605
+      },
+      {
+        "step": 118,
+        "captured_to_send_s": 0.004510332997597288,
+        "max_joint_change_from_planning_rad": 0.003117591142654419
+      },
+      {
+        "step": 119,
+        "captured_to_send_s": 0.015375688002677634,
+        "max_joint_change_from_planning_rad": 0.0017871856689453125
+      },
+      {
+        "step": 120,
+        "captured_to_send_s": 0.01747750800132053,
+        "max_joint_change_from_planning_rad": 0.0016098320484161377
+      },
+      {
+        "step": 121,
+        "captured_to_send_s": 0.005900707001273986,
+        "max_joint_change_from_planning_rad": 0.0019231215119361877
+      },
+      {
+        "step": 122,
+        "captured_to_send_s": 0.006953482996323146,
+        "max_joint_change_from_planning_rad": 0.0013137608766555786
+      },
+      {
+        "step": 123,
+        "captured_to_send_s": 0.014998230995843187,
+        "max_joint_change_from_planning_rad": 0.0014439225196838379
+      },
+      {
+        "step": 124,
+        "captured_to_send_s": 0.0068657579977298155,
+        "max_joint_change_from_planning_rad": 0.0015148967504501343
+      },
+      {
+        "step": 125,
+        "captured_to_send_s": 0.016340706002665684,
+        "max_joint_change_from_planning_rad": 0.0012429729104042053
+      },
+      {
+        "step": 126,
+        "captured_to_send_s": 0.012310498001170345,
+        "max_joint_change_from_planning_rad": 0.0009275525808334351
+      }
+    ]
+  },
+  "rejected_retreat_certificate": null
+}

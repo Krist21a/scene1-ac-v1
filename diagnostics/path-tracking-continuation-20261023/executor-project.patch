@@ -1,0 +1,278 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -240,6 +240,7 @@
+   release_open_dwell_steps: 4
+   release_retreat_direction: measured_tool_axis
+   release_retreat_preflight: executor_sweep
++  release_sweep_projection: true
+   release_geometry_reobserve: true
+   release_spatial_components: true
+   max_release_geometry_wait_steps: 20
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -14,6 +14,7 @@
+ from .release_retreat import axis_retreat_goal
+ from .retreat_certificate import certify_retreat_execution
+ from .command_sweep import sampled_sweep
++from .retreat_projection import project_retreat_reference
+ 
+ 
+ class ResidualAssist:
+@@ -317,6 +318,29 @@
+         result = base.copy()
+         result[start:start + 7] += self.offset[start:start + 7]
+         return np.clip(result, self.low, self.high)
++
++    def _retreat_correct(self, base, measured, error, target, plane, motion_config):
++        before = self.offset.copy()
++        proposed = self._correct(base, measured, 1, error, step_scale=.5)
++        proposed[15] = 0.
++        if not self.wrist_config.get('release_sweep_projection', False):
++            return proposed, None
++        if motion_config is None or self.last_sent is None:
++            self.offset = before
++            raise RuntimeError('Retreat projection requires actual command/filter context')
++        cap = self.wrist_config.get('max_regrasp_joint_offset_rad', self.config['max_joint_offset_rad'])
++        lower, upper = self.low.copy(), self.high.copy()
++        lower[8:15] = np.maximum(lower[8:15], base[8:15]-cap)
++        upper[8:15] = np.minimum(upper[8:15], base[8:15]+cap)
++        try:
++            chosen, audit = project_retreat_reference(self.kinematics, measured, proposed,
++                base+before, self.last_sent, lower, upper, self.config['max_joint_step_rad']*.5,
++                target, plane, motion_config)
++        except Exception:
++            self.offset = before
++            raise
++        self.offset[8:15] = chosen[8:15]-base[8:15]
++        return chosen, audit
+ 
+     def camera_target(self, measured):
+         if self.pending is None or self.weighing_target is None:
+@@ -759,7 +783,13 @@
+             error = p['goal'] - np.asarray(pose.pos_xyz)
+             velocity = (np.zeros(3) if p.get('last_position') is None else
+                         np.asarray(pose.pos_xyz)-p['last_position'])
+-            result = self._correct(p['base'], measured, side, error-1.5*velocity, step_scale=.5)
++            if self.wrist_config.get('release_sweep_projection', False):
++                result, projection = self._retreat_correct(p['base'], measured, error-1.5*velocity,
++                    p['retreat_sweep_target'], p['retreat_sweep_plane'], self.retreat_motion_config)
++                if projection and projection['applied']:
++                    info['retreat_projection'] = projection
++            else:
++                result = self._correct(p['base'], measured, side, error-1.5*velocity, step_scale=.5)
+             result[15] = 0.
+             if self.wrist_config.get('release_retreat_preflight') == 'executor_sweep':
+                 self.command_sweep_context = dict(target=p['retreat_sweep_target'],
+--- a/scene1/retreat_certificate.py
++++ b/scene1/retreat_certificate.py
+@@ -37,7 +37,8 @@
+         error = goal - position
+         velocity = np.zeros(3) if previous_position is None else position - previous_position
+         movement = np.inf if previous_position is None else float(np.linalg.norm(velocity))
+-        proposed = shadow._correct(base, measured, 1, error - 1.5 * velocity, step_scale=.5)
++        proposed, projection = shadow._retreat_correct(base, measured, error - 1.5 * velocity,
++                                                       target, plane, motion_config)
+         proposed[15] = 0.
+         sent, motion_info = motion.apply(proposed, period)
+         complete = sampled_sweep(assist.kinematics, measured[8:15], proposed[8:15], target, plane)
+@@ -47,12 +48,14 @@
+         stable = stable + 1 if np.linalg.norm(error) <= tolerance and movement <= .004 else 0
+         records.append(dict(index=index, error_m=float(np.linalg.norm(error)),
+                             cumulative_rotation_degrees=rotation, proposed_sweep=complete,
+-                            filtered_sweep=filtered, motion=motion_info, stable_steps=stable))
++                            filtered_sweep=filtered, motion=motion_info, stable_steps=stable,
++                            projection=projection if projection and projection['applied'] else None))
+         if motion_info['bounds_clipped'] or not complete['clear'] or not filtered['clear']:
+             reason = 'nominal executor sweep or physical command bounds rejected'
+             break
+         previous_position = position.copy()
+         measured = sent.copy()
++        shadow.observe_command(sent)
+         if stable >= 3:
+             certified = True
+             reason = 'nominal bounded executor reached original position and dwell criteria'
+--- a/scene1/retreat_projection.py
++++ b/scene1/retreat_projection.py
+@@ -0,0 +1,97 @@
++"""Find a nearby bounded reference outside the unchanged finger/parcel boxes."""
++import numpy as np
++from scipy.optimize import minimize
++from .command_sweep import sampled_sweep
++from .motion import MotionFilter
++
++
++class FingerSeparation:
++    """Signed SAT separating gap; positive matches the original box clearance."""
++    def __init__(self, target, plane):
++        major = np.array(target.get('major_axis_xy', [1., 0.]), dtype=float)
++        major /= np.linalg.norm(major)
++        self.rotation = np.column_stack(([*major, 0.], [-major[1], major[0], 0.], [0., 0., 1.]))
++        height = target['top_z_base_m']-plane
++        self.center = np.array(target['position_base_m'], dtype=float)
++        self.center[2] = plane+height/2
++        self.half = np.r_[target.get('oriented_extent_m', target['extent_xy_m']), height]/2+.003
++        self.finger_half = np.array([.015852, .011, .028258])
++
++    def gaps(self, pose):
++        rotation = pose[:3, :3]
++        axes = np.vstack((rotation.T, self.rotation.T,
++            np.cross(rotation.T[:, None, :], self.rotation.T[None, :, :]).reshape(-1, 3)))
++        norm = np.linalg.norm(axes, axis=1)
++        axes = axes[norm >= 1e-8]/norm[norm >= 1e-8, None]
++        radius = abs(axes@rotation)@self.finger_half + abs(axes@self.rotation)@self.half
++        centers = np.array([pose[:3, 3]+rotation@np.array([sign*.056252, 0., .025857])
++                            for sign in (-1, 1)])
++        return np.max(abs((self.center-centers)@axes.T)-radius, axis=1)
++
++
++def project_retreat_reference(kinematics, measured, proposed, reference, previous,
++                              lower, upper, step, target, plane, motion_config):
++    """Change only a blocked proposal; all accepted outputs are rechecked.
++
++    The signed distance is only an optimization constraint. The independent
++    original boolean sweep remains the acceptance test, including filtering.
++    """
++    measured, proposed, reference, previous = map(lambda x: np.asarray(x, float),
++                                                (measured, proposed, reference, previous))
++    q = measured[8:15]
++    motion = MotionFilter(np.asarray(lower), np.asarray(upper),
++                          motion_config['alpha'], motion_config['max_velocity'])
++
++    def filtered(action):
++        motion.reset(previous)
++        return motion.apply(action, motion_config['period'])
++
++    def checks(action):
++        sent, limits = filtered(action)
++        return dict(proposed=sampled_sweep(kinematics, q, action[8:15], target, plane),
++                    filtered=sampled_sweep(kinematics, q, sent[8:15], target, plane),
++                    bounds_clipped=limits['bounds_clipped'])
++
++    original = checks(proposed)
++    if original['proposed']['clear'] and original['filtered']['clear'] and not original['bounds_clipped']:
++        return proposed.copy(), dict(applied=False, original=original)
++    if not sampled_sweep(kinematics, q, q, target, plane)['clear']:
++        raise RuntimeError('Retreat projection cannot repair an already blocked measured pose')
++    low = np.maximum(lower[8:15], reference[8:15]-step)
++    high = np.minimum(upper[8:15], reference[8:15]+step)
++    if np.any(low > high):
++        raise RuntimeError('Retreat projection has no physically bounded step')
++    separation = FingerSeparation(target, plane)
++    intervals = max(2, int(np.ceil(np.max(np.abs(np.r_[low-q, high-q]))/.012)))
++    intervals += intervals % 2
++    fractions = np.linspace(0., 1., intervals+1)
++
++    def action_from(x):
++        action = proposed.copy()
++        action[8:15] = reference[8:15]+step*x
++        return action
++
++    def constraints(x):
++        action = action_from(x)
++        sent, _ = filtered(action)
++        # Positive numerical separation is stricter than the original margin.
++        return np.concatenate([separation.gaps(kinematics.matrix(q+a*(endpoint-q), 1))
++            for endpoint in [action[8:15], sent[8:15]] for a in fractions])/.01-1e-4
++
++    desired = (proposed[8:15]-reference[8:15])/step
++    bounds = list(zip((low-reference[8:15])/step, (high-reference[8:15])/step))
++    solution = minimize(lambda x: float(np.sum((x-desired)**2)), np.zeros(7),
++        jac=lambda x: 2*(x-desired), bounds=bounds,
++        constraints=[dict(type='ineq', fun=constraints)], method='SLSQP',
++        options=dict(maxiter=40, ftol=1e-9))
++    chosen = action_from(solution.x)
++    final = checks(chosen)
++    if (not np.isfinite(chosen).all() or np.any(chosen[8:15] < low-1e-10)
++            or np.any(chosen[8:15] > high+1e-10)
++            or not final['proposed']['clear'] or not final['filtered']['clear']
++            or final['bounds_clipped']):
++        raise RuntimeError('No swept-clear retreat correction within original step and physical bounds')
++    return chosen, dict(applied=True, original=original, final=final,
++        solver_success=bool(solution.success), solver_message=str(solution.message),
++        iterations=int(solution.nit), max_step_rad=float(np.max(abs(chosen[8:15]-reference[8:15]))),
++        proposal_adjustment_rad=(chosen[8:15]-proposed[8:15]).tolist(), margin_m=.003)
+--- a/tests/test_retreat_projection.py
++++ b/tests/test_retreat_projection.py
+@@ -0,0 +1,82 @@
++import json
++from pathlib import Path
++import unittest
++import numpy as np
++from scene1.kinematics import UrdfArmKinematics
++from scene1.clearance import open_fingers_clear
++from scene1.retreat_projection import FingerSeparation, project_retreat_reference
++
++
++class RetreatProjectionTests(unittest.TestCase):
++    def setUp(self):
++        fixture = Path(__file__).resolve().parent/'fixtures'
++        self.data = json.loads((fixture/'retreat_blocked_reference_20261023.json').read_text())
++        self.kin = UrdfArmKinematics(description=(fixture/'release_robot.urdf').read_text())
++        f = self.data
++        self.low = np.r_[self.kin.limits[0][:, 0], 0., self.kin.limits[1][:, 0], 0.]
++        self.high = np.r_[self.kin.limits[0][:, 1], 1., self.kin.limits[1][:, 1], 1.]
++        self.kw = dict(kinematics=self.kin, measured=np.array(f['measured']),
++            proposed=np.array(f['proposed']), reference=np.array(f['previous']),
++            previous=np.array(f['previous']), lower=self.low, upper=self.high,
++            step=.006, target=f['target'], plane=f['plane'],
++            motion_config=dict(alpha=1., max_velocity=.6, period=.1))
++
++    def test_actual_rejected_endpoint_has_clear_progressing_step_in_same_bounds(self):
++        chosen, audit = project_retreat_reference(**self.kw)
++        self.assertFalse(audit['original']['filtered']['clear'])
++        self.assertTrue(audit['final']['filtered']['clear'])
++        self.assertTrue(audit['final']['proposed']['clear'])
++        self.assertFalse(audit['final']['bounds_clipped'])
++        self.assertLessEqual(max(abs(chosen[8:15]-self.kw['reference'][8:15])), .0060000001)
++        self.assertTrue(np.all(chosen >= self.low) and np.all(chosen <= self.high))
++        goal = np.array(self.data['goal'])
++        error = lambda q: np.linalg.norm(self.kin.matrix(q[8:15], 1)[:3, 3]-goal)
++        self.assertLess(error(chosen), error(self.kw['previous']))
++        np.testing.assert_array_equal(chosen[:8], self.kw['proposed'][:8])
++
++    def test_original_clear_command_is_unchanged(self):
++        self.kw['proposed'] = self.kw['previous'].copy()
++        chosen, audit = project_retreat_reference(**self.kw)
++        self.assertFalse(audit['applied'])
++        np.testing.assert_array_equal(chosen, self.kw['proposed'])
++
++    def test_already_blocked_measured_pose_is_never_projected_into_acceptance(self):
++        self.kw['measured'] = self.kw['proposed'].copy()
++        with self.assertRaisesRegex(RuntimeError, 'already blocked measured pose'):
++            project_retreat_reference(**self.kw)
++
++    def test_constraint_sign_agrees_with_original_geometry_near_failure(self):
++        separation = FingerSeparation(self.data['target'], self.data['plane'])
++        rng = np.random.RandomState(13)
++        q = self.kw['measured'][8:15]
++        for sample in np.vstack((q, self.kw['proposed'][8:15],
++                                 q+rng.uniform(-.2, .2, (200, 7)))):
++            pose = self.kin.matrix(sample, 1)
++            self.assertEqual(bool(np.all(separation.gaps(pose) > 0.)),
++                open_fingers_clear(pose, self.data['target'], self.data['plane']))
++
++    def test_no_available_safe_step_is_rejected(self):
++        blocked = self.kw['proposed'].copy()
++        self.kw.update(reference=blocked, step=1e-8)
++        with self.assertRaisesRegex(RuntimeError, 'No swept-clear retreat correction'):
++            project_retreat_reference(**self.kw)
++
++    def test_failed_projection_does_not_accumulate_unsent_correction(self):
++        from scene1.residual import ResidualAssist
++        assist = ResidualAssist(dict(max_translation_m=.02, max_joint_step_rad=.012,
++            max_joint_offset_rad=.5235987756, gain=.2), self.kin, self.low, self.high)
++        assist.wrist_config = dict(release_sweep_projection=True,
++                                   max_regrasp_joint_offset_rad=2*np.pi)
++        assist.weighing_target = np.array(self.data['target']['position_base_m'])
++        base = np.array(self.data['base'])
++        assist.offset = self.kw['reference']-base
++        before = assist.offset.copy()
++        assist.observe_command(self.kw['previous'])
++        with self.assertRaisesRegex(RuntimeError, 'already blocked measured pose'):
++            assist._retreat_correct(base, self.kw['proposed'], [.0, .0, .02],
++                self.data['target'], self.data['plane'], self.kw['motion_config'])
++        np.testing.assert_array_equal(assist.offset, before)
++
++
++if __name__ == '__main__':
++    unittest.main()

@@ -1,0 +1,95 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -250,6 +250,7 @@
+   release_measured_reference_hold: true
+   release_reference_mode: mpc_continuous
+   release_prepare_before_open: true
++  release_prepare_adapt_settled: true
+   release_cartesian_open_hold: true
+   release_open_hold_position_gain: 2.0
+   release_retreat_ready_m: 0.014
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -724,6 +724,19 @@
+         previous = p.get('release_prepare_previous_wrist')
+         wrist_movement = np.inf if previous is None else float(np.max(abs(measured[12:15]-previous)))
+         p['release_prepare_previous_wrist'] = measured[12:15].copy()
++        quiet = support_ok and sent_error <= .005 and wrist_movement <= .003
++        p['release_prepare_quiet'] = p.get('release_prepare_quiet',0)+1 if quiet else 0
++        adjustment = np.zeros(3)
++        if (self.wrist_config.get('release_prepare_adapt_settled',False)
++                and p['release_prepare_quiet'] >= 3 and wrist_error > .015):
++            step = self.config['max_joint_step_rad']
++            adjustment = np.clip(measured[12:15]-target[12:15],-step,step)
++            updated = np.clip(target[12:15]+adjustment,self.low[12:15],self.high[12:15])
++            adjustment = updated-target[12:15]
++            target[12:15] = updated
++            p['release_prepare_quiet'] = 0
++            sent_error = float(np.max(abs(self.last_sent[8:15]-target[8:15])))
++            wrist_error = float(np.max(abs(measured[12:15]-target[12:15])))
+         ready = support_ok and sent_error <= .005 and wrist_error <= .015 and wrist_movement <= .003
+         p['release_prepare_stable'] = p['release_prepare_stable']+1 if ready else 0
+         self.offset[8:15] = target[8:15]-p['base'][8:15]
+@@ -731,6 +744,7 @@
+             target_rad=target[8:15].tolist(), sent_error_rad=sent_error,
+             wrist_error_rad=wrist_error, wrist_movement_rad=wrist_movement,
+             original_support_checks_passed=bool(support_ok), stable_steps=p['release_prepare_stable'],
++            settled_target_adjustment_rad=adjustment.tolist(),
+             gripper_kept_closed=True, shared_weighing_step_budget=self.config['max_release_steps']))
+         if p['release_prepare_stable'] >= 3:
+             p['reference_prepared'] = True
+--- /dev/null
++++ b/tests/test_release_preparation_adapt.py
+@@ -0,0 +1,52 @@
++import unittest
++import numpy as np
++import test_release_preparation as preparation
++
++
++class SettledPreparationTests(unittest.TestCase):
++    setUp=preparation.PreparationTests.setUp
++    fixture=preparation.PreparationTests.fixture
++    setup_preparation=preparation.PreparationTests.setup_preparation
++
++    def test_static_contact_shift_is_aligned_in_original_steps_before_opening(self):
++        accepted=self.setup_preparation()
++        self.a.wrist_config['release_prepare_adapt_settled']=True
++        result=self.a._prepare_release_reference(self.measured,True,accepted,{})
++        self.a.observe_command(result)
++        # The measured settled wrist shifted by the recorded 0.048rad while
++        # the previous snapshot stayed fixed. No plant prediction is implied.
++        self.measured[12]+=.048
++        adjusted=0
++        for _ in range(30):
++            self.a.pending['steps']+=1
++            info={};result=self.a._prepare_release_reference(self.measured,True,accepted,info)
++            delta=np.array(info['release_preparation']['settled_target_adjustment_rad'])
++            self.assertLessEqual(max(abs(delta)),self.a.config['max_joint_step_rad']+1e-12)
++            adjusted+=bool(np.any(delta))
++            self.assertEqual(result[15],.98)
++            self.a.observe_command(result)
++            if self.a.pending.get('reference_prepared'):break
++        self.assertGreaterEqual(adjusted,3)
++        self.assertTrue(self.a.pending['reference_prepared'])
++        self.assertLessEqual(max(abs(result[12:15]-self.measured[12:15])),.015)
++
++    def test_target_does_not_chase_unsettled_wrist_or_lost_support(self):
++        for support,movement in [(False,0.),(True,.01)]:
++            self.setUp();accepted=self.setup_preparation()
++            self.a.wrist_config['release_prepare_adapt_settled']=True
++            result=self.a._prepare_release_reference(self.measured,True,accepted,{})
++            before=result.copy();self.a.observe_command(result);self.measured[12]+=.048
++            for _ in range(10):
++                self.measured[13]+=movement
++                info={};result=self.a._prepare_release_reference(self.measured,support,accepted,info)
++                np.testing.assert_array_equal(result,before)
++            self.assertFalse(self.a.pending.get('reference_prepared',False))
++
++    def test_adaptation_cannot_extend_weighing_timeout(self):
++        accepted=self.setup_preparation();self.a.wrist_config['release_prepare_adapt_settled']=True
++        self.a.pending['steps']=self.a.config['max_release_steps']
++        with self.assertRaisesRegex(RuntimeError,'original weighing budget'):
++            self.a._prepare_release_reference(self.measured,False,accepted,{})
++
++
++if __name__=='__main__':unittest.main()

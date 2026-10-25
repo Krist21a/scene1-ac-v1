@@ -1,0 +1,13 @@
+--- a/src/humanoid-control/humanoid_interface_ros/src/HumanoidVRHandCommandNode.cpp
++++ b/src/humanoid-control/humanoid_interface_ros/src/HumanoidVRHandCommandNode.cpp
+@@ -254,7 +254,9 @@
+     TargetTrajectories goalHandPoseToTargetTrajectories(const vector_t& armJointState, const SystemObservation& observation) {
+       
+       const vector_t currentPose = observation.state.segment<6>(6);
+-      vector_t currentArmPose = observation_.state.segment(12+12,num_arm_joints_);
++      // WBC state ends with all arm joints. v52 also has a waist joint,
++      // so a fixed 12+12 offset includes the waist and drops the last wrist.
++      vector_t currentArmPose = observation.state.tail(num_arm_joints_);
+       vector_t targetPose = currentPose;
+       // targetPose(0) = headBodyPose_.body_x;
+       // targetPose(1) = headBodyPose_.body_y;

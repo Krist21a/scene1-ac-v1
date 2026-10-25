@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/audit_joint_bounds.py", line 42, in <module>
+    assert samples > 1000, 'Missing sensor samples; no zero-count success claim'
+AssertionError: Missing sensor samples; no zero-count success claim
+Traceback (most recent call last):
+  File "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/analyze_single.py", line 59, in <module>
+    subprocess.run(['python3',str(e.HERE/'audit_joint_bounds.py'),a.label],check=True)
+  File "/usr/lib/python3.10/subprocess.py", line 526, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['python3', '/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/audit_joint_bounds.py', 'frozen-first-transport-base-p4-s0-1024']' returned non-zero exit status 1.

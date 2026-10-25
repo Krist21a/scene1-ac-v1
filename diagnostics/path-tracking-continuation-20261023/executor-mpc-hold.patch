@@ -1,0 +1,136 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -248,7 +248,7 @@
+   release_short_retreat_m: 0.06
+   release_clearance_rise_m: 0.07
+   release_measured_reference_hold: true
+-  release_reference_mode: measured_physical
++  release_reference_mode: mpc_continuous
+   release_cartesian_open_hold: true
+   release_open_hold_position_gain: 2.0
+   release_retreat_ready_m: 0.014
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -1095,9 +1095,9 @@
+                             np.any(observed > joint_high + 5e-4)):
+                         raise RuntimeError('Measured release pose is outside physical bounds')
+                     reference_mode = self.wrist_config.get('release_reference_mode', 'original_act_budget')
+-                    if reference_mode not in ('original_act_budget', 'measured_physical'):
++                    if reference_mode not in ('original_act_budget', 'measured_physical', 'mpc_continuous'):
+                         raise ValueError('Unknown release reference mode')
+-                    cap = (None if reference_mode == 'measured_physical' else self.config.get(
++                    cap = (None if reference_mode in ('measured_physical','mpc_continuous') else self.config.get(
+                         'max_placement_joint_offset_rad', self.config['max_joint_offset_rad']))
+                     original_reference = p['reference_base'][8:15]
+                     lower = joint_low if cap is None else np.maximum(joint_low, original_reference - cap)
+@@ -1106,17 +1106,34 @@
+                         raise RuntimeError('Release reference has no feasible original correction budget')
+                     prior = result[8:15].copy()
+                     bounded = np.minimum(np.maximum(observed, lower), upper)
++                    physical_bound_active = bounded != observed
++                    if reference_mode == 'mpc_continuous':
++                        if self.last_sent is None:
++                            raise RuntimeError('MPC release continuity requires the actual previous sent command')
++                        prior = self.last_sent[8:15].copy()
++                        if (not np.isfinite(prior[:4]).all() or np.any(prior[:4]<joint_low[:4])
++                                or np.any(prior[:4]>joint_high[:4])):
++                            raise RuntimeError('Previous MPC release reference is outside physical bounds')
++                        # The proximal upper reference and current MPC state
++                        # have distinct steady values. Preserve the actually
++                        # issued proximal reference through unloading; only
++                        # the directly referenced wrists transfer to feedback.
++                        bounded[:4] = prior[:4]
+                     result[8:15] = bounded
+                     info['release_reference_transfer'] = dict(
+                         previous_command_rad=prior.tolist(), measured_target_rad=observed.tolist(),
+                         bounded_target_rad=bounded.tolist(), original_reference_rad=original_reference.tolist(),
+                         correction_cap_rad=cap, reference_mode=reference_mode,
+                         physical_lower_joint_rad=joint_low.tolist(), physical_upper_joint_rad=joint_high.tolist(),
+-                        bound_active=(bounded != observed).tolist(),
++                        bound_active=physical_bound_active.tolist(),
+                         remaining_target_error_rad=(bounded-observed).tolist(),
+                         requested_change_rad=(bounded-prior).tolist(),
+-                        interpretation='Physical measured hold with a new visual phase reference' if cap is None else
++                        interpretation='Continuous proximal MPC input with measured wrist reference' if reference_mode=='mpc_continuous' else
++                            'Physical measured hold with a new visual phase reference' if cap is None else
+                             'Original ACT-budget reference construction; both modes use unchanged MotionFilter')
++                    if reference_mode == 'mpc_continuous':
++                        info['release_reference_transfer']['preserved_action_indices'] = [8,9,10,11]
++                        info['release_reference_transfer']['previous_sent_command_rad'] = prior.tolist()
+                 extent = self.geometry[1]['extent'].copy()
+                 self.opening[1] = True
+                 self.closed[1] = False; self.geometry[1] = None
+@@ -1129,7 +1146,7 @@
+                     raise RuntimeError('Verified release command is outside configured bounds')
+                 old_inactive_reference = reference[:8].copy()
+                 reference[:8] = result[:8] - self.offset[:8]
+-                visual_reference = (self.wrist_config.get('release_reference_mode') == 'measured_physical'
++                visual_reference = (self.wrist_config.get('release_reference_mode') in ('measured_physical','mpc_continuous')
+                                     and self.wrist_config.get('release_measured_reference_hold', False))
+                 if visual_reference:
+                     # A visual release starts its next phase at the accepted
+@@ -1144,7 +1161,9 @@
+                     retained_inactive_offset=self.offset[:8].tolist(),
+                     discarded_reference_delta=(old_inactive_reference-reference[:8]).tolist(),
+                     active_arm_reference_unchanged=not visual_reference,
+-                    active_reference_source='measured_physical_release' if visual_reference else 'original_act')
++                    active_reference_source=('continuous_mpc_measured_wrist_release'
++                        if self.wrist_config.get('release_reference_mode')=='mpc_continuous'
++                        else 'measured_physical_release') if visual_reference else 'original_act')
+                 self.offset[8:15] = result[8:15]-reference[8:15]
+                 self.unwinding_placement = bool(np.max(np.abs(self.offset[8:15])) > self.config['max_joint_offset_rad'])
+                 self._begin('short_retreat', 1, reference, surface=copy.deepcopy(p['surface']), extent=extent,
+--- a/tests/test_mpc_release_continuity.py
++++ b/tests/test_mpc_release_continuity.py
+@@ -0,0 +1,51 @@
++import unittest
++import numpy as np
++import test_residual as original
++import test_release_reference_transfer as transfer_tests
++from scene1.motion import MotionFilter
++
++
++class MpcReleaseContinuityTests(unittest.TestCase):
++    setUp=original.ResidualTests.setUp
++    fixture=transfer_tests.ReleaseReferenceTests.fixture
++
++    def test_preserves_actual_sent_mpc_joints_and_transfers_only_wrists(self):
++        reference,accepted=self.fixture()
++        self.a.wrist_config['release_reference_mode']='mpc_continuous'
++        sent=accepted.copy();sent[8:12]-=.04
++        self.a.observe_command(sent)
++        self.measured[8:15]=reference[8:15]+.05
++        result,info=self.a._pending_action(self.measured,self.snapshot)
++        np.testing.assert_array_equal(result[8:12],sent[8:12])
++        np.testing.assert_array_equal(result[12:15],self.measured[12:15])
++        np.testing.assert_array_equal(self.a.pending['base'][8:15],result[8:15])
++        np.testing.assert_array_equal(self.a.offset[8:15],np.zeros(7))
++        transfer=info['release_reference_transfer']
++        self.assertEqual(transfer['preserved_action_indices'],[8,9,10,11])
++        np.testing.assert_array_equal(transfer['requested_change_rad'][:4],np.zeros(4))
++        self.assertFalse(any(transfer['bound_active']))
++        self.assertIsNone(transfer['correction_cap_rad'])
++
++    def test_missing_previous_command_is_rejected_before_release(self):
++        self.fixture();self.a.wrist_config['release_reference_mode']='mpc_continuous'
++        self.a.last_sent=None
++        with self.assertRaisesRegex(RuntimeError,'actual previous sent'):
++            self.a._pending_action(self.measured,self.snapshot)
++        self.assertEqual(self.a.pending['kind'],'weighing')
++
++    def test_original_rate_and_physical_limits_still_apply(self):
++        reference,accepted=self.fixture();self.a.wrist_config['release_reference_mode']='mpc_continuous'
++        self.a.observe_command(accepted);self.measured[13]=reference[13]+.7
++        result,_=self.a._pending_action(self.measured,self.snapshot)
++        motion=MotionFilter(self.a.low,self.a.high,1.,.6);motion.reset(accepted)
++        sent,audit=motion.apply(result,.1)
++        np.testing.assert_array_equal(sent[8:12],accepted[8:12])
++        self.assertTrue(audit['velocity_limited'])
++        self.assertFalse(audit['bounds_clipped'])
++        self.assertLessEqual(np.max(abs(sent[8:15]-accepted[8:15])),.0600000001)
++
++    def test_out_of_bounds_previous_reference_is_rejected(self):
++        self.fixture();self.a.wrist_config['release_reference_mode']='mpc_continuous'
++        self.a.last_sent=self.raw.copy();self.a.last_sent[8]=self.a.high[8]+.01
++        with self.assertRaisesRegex(RuntimeError,'Previous MPC release reference'):
++            self.a._pending_action(self.measured,self.snapshot)

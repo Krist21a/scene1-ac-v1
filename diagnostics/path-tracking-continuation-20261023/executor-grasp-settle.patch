@@ -1,0 +1,98 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -250,6 +250,7 @@
+   release_measured_reference_hold: true
+   release_reference_mode: mpc_continuous
+   grasp_align_parcel_yaw: true
++  grasp_motion_settle: true
+   release_prepare_before_open: true
+   release_prepare_adapt_settled: true
+   release_cartesian_open_hold: true
+@@ -283,7 +284,7 @@
+   pickup_level_grasp: true
+   pickup_center_grasp_height: true
+   pickup_grasp_z_tolerance_m: 0.005
+-  pickup_grasp_gain_scale: 0.35
++  pickup_grasp_gain_scale: 1.0
+   pickup_pitch_offset_degrees: 2.5
+   pickup_pitch_offsets_degrees: [0.0, 2.5, 2.5, 5.0]
+   weighing_pose_search: true
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -1102,10 +1102,24 @@
+                 info.update(grasp_yaw_error_degrees=float(np.rad2deg(yaw)),
+                             grasp_transverse_error_m=transverse_error,grasp_yaw_sweep_required=True)
+                 self.command_sweep_context=dict(target=p['target'],plane=p['plane'],stage='grasp_yaw')
+-            result = self._correct(p['base'], measured, side, error if orientation_ok else np.zeros(3),
+-                                   angular_error)
++            correction = error if orientation_ok else np.zeros(3)
++            motion_ready = True
++            if (side == 1 and self.wrist_config.get('grasp_motion_settle', False)
++                    and 'support_z_base_m' not in p['target']):
++                position = np.asarray(pose.pos_xyz)
++                previous = p.get('grasp_last_position')
++                velocity = np.zeros(3) if previous is None else position-previous
++                movement = float(np.linalg.norm(velocity)) if previous is not None else np.inf
++                p['grasp_last_position'] = position.copy()
++                # The incremental target otherwise keeps accumulating while
++                # the MPC/WBC response is still approaching the grasp point.
++                correction = correction-2.*velocity
++                motion_ready = movement <= .0015
++                info.update(grasp_movement_m=movement, grasp_motion_ready=motion_ready,
++                            grasp_velocity_brake_m=(-2.*velocity).tolist())
++            result = self._correct(p['base'], measured, side, correction, angular_error)
+             result[grip] = 0
+-            arrived = (orientation_ok and np.linalg.norm(error[:2]) <= self.config['grasp_tolerance_m']
++            arrived = (motion_ready and orientation_ok and np.linalg.norm(error[:2]) <= self.config['grasp_tolerance_m']
+                        and abs(error[2]) <= self.config['grasp_z_tolerance_m']
+                        and (not p.get('wrist_verified') or (wrist is not None
+                             and abs(wrist['centering_error_px']) <= self.wrist_config['aligned_error_px'])))
+--- /dev/null
++++ b/tests/test_grasp_motion.py
+@@ -0,0 +1,46 @@
++import unittest
++import numpy as np
++import test_residual as original
++
++
++class GraspMotionTests(unittest.TestCase):
++    setUp = original.ResidualTests.setUp
++
++    def begin(self):
++        self.a.wrist_config['grasp_motion_settle'] = True
++        target = self.snapshot['candidates'][0]
++        target['grasp_goal_xy'] = self.measured[8:10].tolist()
++        self.a._begin('grasp', 1, self.raw, target=target, plane=-.08,
++                      grasp_z=0., wrist_verified=False)
++
++    def test_close_waits_for_motion_to_settle(self):
++        self.begin()
++        action, info = self.a._pending_action(self.measured, self.snapshot)
++        self.assertEqual(action[15], 0.)
++        self.measured[10] -= .0028
++        action, info = self.a._pending_action(self.measured, self.snapshot)
++        self.assertFalse(info['grasp_motion_ready'])
++        self.assertEqual(action[15], 0.)
++        np.testing.assert_allclose(info['grasp_velocity_brake_m'], [0.,0.,.0056])
++        for _ in range(2):
++            action, info = self.a._pending_action(self.measured, self.snapshot)
++        self.assertTrue(info['grasp_motion_ready'])
++        self.assertEqual(action[15], .98)
++
++    def test_brake_opposes_motion_with_original_increment_bound(self):
++        self.begin()
++        self.a.pending['grasp_last_position'] = self.measured[8:11]-[0.,0.,.004]
++        before = self.a.offset.copy()
++        action, info = self.a._pending_action(self.measured, self.snapshot)
++        self.assertLess(action[10], self.raw[10])
++        self.assertLessEqual(max(abs(self.a.offset-before)), self.a.config['max_joint_step_rad'])
++        self.assertEqual(action[15], 0.)
++
++    def test_motion_gate_does_not_extend_original_budget(self):
++        self.begin()
++        self.a.pending['steps'] = self.a.config['max_grasp_steps']-1
++        with self.assertRaisesRegex(RuntimeError, 'gripper kept open'):
++            self.a._pending_action(self.measured, self.snapshot)
++
++
++if __name__ == '__main__': unittest.main()

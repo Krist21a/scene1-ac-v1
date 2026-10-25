@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-24T08:42:27.882632+08:00",
+  "parent": "executor-numerics",
+  "candidate": "executor-prepare",
+  "manifest_sha256": "d9a2b82023f45e55bdef839b5f9d71c4f510b6081debac1f9d1ea6875ef94510",
+  "factor": "Prepare wrist reference before opening, preserve proximal references and revalidate original support gates",
+  "same_weighing_step_budget": 450,
+  "settle": {
+    "sent_error_rad": 0.005,
+    "wrist_error_rad": 0.015,
+    "wrist_step_movement_rad": 0.003,
+    "stable_frames": 3
+  },
+  "unchanged": [
+    "C/VR/task/QR",
+    "all physical/torque/rate/sweep bounds",
+    "all visual support and success checks",
+    "60mm/70mm retreat and phase budgets"
+  ],
+  "tests_passed": 444,
+  "initial_trial": "executor-prepare-c-p2-s0-1024",
+  "heldout_seeds_used": []
+}

@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-23T19:30:12.874546+08:00",
+  "candidate": "executor-open",
+  "parent": "executor-hold",
+  "manifest_sha256": "96cb14ac889cf29bd57366b900ee84b092bcab43373c51a43ac84b0190f35281",
+  "factor": "Minimum open dwell12to4; retain measured gripper<=0.1 gate, fresh unambiguous RGB-D geometry and original full-sweep checks",
+  "evidence": "Retained hold failure: at earlier step389 gripper0.03345, drift5.62mm, full nominal certificate clear; at397 dwell12 start blocked. Geometry from later frame is a limitation, not actual early perception validation.",
+  "tests": {
+    "count": 417,
+    "passed": true,
+    "log": "tests-executor-open.log"
+  },
+  "unchanged": [
+    "40step gripper timeout",
+    "140step total retreat budget",
+    "20step geometry wait cap",
+    "60mm axis horizontal/70mm rise",
+    "physical limits and MotionFilter",
+    "original collision envelope and3mm margin",
+    "grasp/weigh/handover/bin checks"
+  ],
+  "controller": "unchanged C",
+  "next_trial": "executor-open-c-p2-s0",
+  "production_promoted": false
+}

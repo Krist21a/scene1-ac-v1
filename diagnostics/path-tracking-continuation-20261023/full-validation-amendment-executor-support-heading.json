@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-24T10:02:57.460036+08:00",
+  "parent": "executor-grasp-settle",
+  "candidate": "executor-support-heading",
+  "factor": "Use original observed support footprint fit instead of ACT/cardinal yaw gates for weighing descent/release",
+  "evidence": "Full4 seed0 failed748steps0complete;249/419 lower-phase observations had heading>15deg and repeatedly demanded lift. User explicitly removed ACT similarity requirement.",
+  "unchanged": [
+    "Original25mm support polygon margin",
+    "Original observed tilt/bottom spread/height/camera/settlement checks",
+    "Original450step weighing budget",
+    "Original physical/torque/sweep bounds and3mm parcel margin",
+    "C library, original VR/task/QR"
+  ],
+  "tests_passed": 460,
+  "next_trial": "executor-support-heading-c-p2-s0-1024",
+  "heldout_seeds_used": []
+}

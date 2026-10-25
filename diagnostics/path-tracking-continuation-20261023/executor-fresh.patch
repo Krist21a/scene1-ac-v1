@@ -1,0 +1,136 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -225,6 +225,7 @@
+   regrasp_reobserve_after_level: true
+   command_sweep_diagnostics: true
+   command_sweep_enforce: true
++  command_sweep_fresh_feedback: true
+   regrasp_aligned_error_px: 10
+   min_edge_support: 0.64
+   min_area_px: 600
+--- a/run_scene1.py
++++ b/run_scene1.py
+@@ -12,7 +12,7 @@
+ import yaml
+ 
+ from scene1.motion import MotionFilter, ActionPassthrough, action_vector, head_radians, reset_for_manipulation
+-from scene1.command_sweep import command_sweep_audit
++from scene1.command_sweep import command_sweep_audit, fresh_command_sweep_audit
+ from scene1.grasp import GraspMonitor
+ from scene1.servo import VisualServo
+ from scene1.vision import ParcelDetector, rgb_image
+@@ -666,8 +666,14 @@
+                     and (cartesian_info.get('regrasp_stage') is not None
+                          or cartesian_info.get('retreat_sweep_required', False))
+                     and getattr(aligner, 'command_sweep_context', None) is not None):
+-                cartesian_info['command_sweep'] = command_sweep_audit(
+-                    kinematics, measured, residual, sent, previous_sent, aligner.command_sweep_context)
++                if config['wrist_assist'].get('command_sweep_fresh_feedback', False):
++                    cartesian_info['command_sweep'] = fresh_command_sweep_audit(
++                        kinematics,
++                        lambda: env.get_obs()['observation.state'].detach().cpu().numpy(),
++                        measured, residual, sent, previous_sent, aligner.command_sweep_context)
++                else:
++                    cartesian_info['command_sweep'] = command_sweep_audit(
++                        kinematics, measured, residual, sent, previous_sent, aligner.command_sweep_context)
+                 if (config['wrist_assist'].get('command_sweep_enforce', False)
+                         and not cartesian_info['command_sweep']['filtered']['clear']):
+                     (output/'rejected-command-sweep.json').write_text(json.dumps(dict(
+--- a/scene1/command_sweep.py
++++ b/scene1/command_sweep.py
+@@ -1,5 +1,6 @@
+ """Audit pending and filtered references against the unchanged parcel envelope."""
+ import numpy as np
++import time
+ from .clearance import open_fingers_clear
+ 
+ 
+@@ -33,3 +34,24 @@
+         output['legacy_increment'] = dict(clear=all(open_fingers_clear(
+             kinematics.matrix(q+a*(endpoint-q), 1), target, plane) for a in (0., .5, 1.)))
+     return output
++
++
++def fresh_command_sweep_audit(kinematics, read_feedback, planning_measured,
++                              proposed, sent, previous, context):
++    """Refresh SDK feedback after planning, immediately before the final guard.
++
++    A recent background ROS callback does not refresh an observation already
++    copied by the planner. Retain the distinct planning and guard states.
++    """
++    capture_started = time.monotonic()
++    measured = np.array(read_feedback(), dtype=float, copy=True).reshape(-1)
++    captured = time.monotonic()
++    if measured.shape != (16,) or not np.isfinite(measured).all():
++        raise ValueError('Fresh sweep requires finite complete joint/gripper feedback')
++    output = command_sweep_audit(kinematics, measured, proposed, sent, previous, context)
++    output['feedback'] = dict(source='fresh_sdk_get_obs_after_planning',
++        state=measured.tolist(), capture_started_monotonic_s=capture_started,
++        captured_monotonic_s=captured, checked_monotonic_s=time.monotonic(),
++        max_joint_change_from_planning_rad=float(np.max(np.abs(
++            measured[8:15]-np.asarray(planning_measured)[8:15]))))
++    return output
+--- a/tests/test_fresh_command_sweep.py
++++ b/tests/test_fresh_command_sweep.py
+@@ -0,0 +1,61 @@
++import json
++from pathlib import Path
++import numpy as np
++import unittest
++from scene1.command_sweep import command_sweep_audit, fresh_command_sweep_audit
++from scene1.kinematics import UrdfArmKinematics
++
++FIXTURES = Path(__file__).parent/'fixtures'
++
++
++def setup_case():
++    x = json.loads((FIXTURES/'stale_retreat_20261023.json').read_text())
++    k = UrdfArmKinematics(description=(FIXTURES/'release_robot.urdf').read_text())
++    context = dict(target=x['target'], plane=x['plane'], stage='short_retreat')
++    return x, k, context
++
++
++def real_old_state_passes_but_send_time_feedback_blocks():
++    x, k, context = setup_case()
++    old = command_sweep_audit(k,x['planning_observation'],x['proposed'],x['filtered'],x['previous'],context)
++    assert old['filtered']['clear']
++    calls = []
++    def refresh():
++        calls.append(True)
++        return x['latest_feedback']
++    fresh = fresh_command_sweep_audit(k,refresh,x['planning_observation'],x['proposed'],x['filtered'],x['previous'],context)
++    assert calls == [True]
++    assert not fresh['filtered']['clear']
++    assert fresh['filtered']['first_blocked_fraction'] == 0.
++    assert fresh['margin_m'] == old['margin_m'] == .003
++    assert fresh['feedback']['max_joint_change_from_planning_rad'] > .06
++    assert fresh['feedback']['state'] == x['latest_feedback']
++
++
++def same_fresh_state_preserves_original_decision_and_command():
++    x, k, context = setup_case()
++    sent = np.array(x['filtered'])
++    before = sent.copy()
++    fresh = fresh_command_sweep_audit(k,lambda:x['planning_observation'],x['planning_observation'],x['proposed'],sent,x['previous'],context)
++    assert fresh['filtered']['clear']
++    assert fresh['feedback']['max_joint_change_from_planning_rad'] == 0.
++    np.testing.assert_array_equal(sent,before)
++
++
++class FreshSweepTest(unittest.TestCase):
++    def test_real_stale_feedback_regression(self):
++        real_old_state_passes_but_send_time_feedback_blocks()
++
++    def test_unchanged_fresh_feedback(self):
++        same_fresh_state_preserves_original_decision_and_command()
++
++    def check_invalid(self, invalid):
++        x, k, context = setup_case()
++        with self.assertRaisesRegex(ValueError, 'finite complete'):
++            fresh_command_sweep_audit(k,lambda:invalid,x['planning_observation'],x['proposed'],x['filtered'],x['previous'],context)
++
++    def test_incomplete_feedback(self):
++        self.check_invalid([0.]*15)
++
++    def test_nonfinite_feedback(self):
++        self.check_invalid([float('nan')]*16)

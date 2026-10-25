@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-24T15:43:24.615940+08:00",
+  "name": "H",
+  "base": "A corrected first knot plus unchanged C bounded wrist output PD",
+  "factor": "Only WBC accArm task weight9to18 in stance/walk; no gain/damping/torque/trajectory change",
+  "candidate_sha256": "e425dfaf817a14f7317333f8dd63e4553b1d95cd07c2e7f052d4a341d62b59e9",
+  "baseline_sha256": "3f32e8d8858a9352b674d15cdb6578fdf8e4b96429ccfe46fffd81a881d95d17",
+  "evidence": "placementphysical A+Cfull4 failed461steps after unload: r6velocity+.323rad/s while WBCrequestedacc-4.305rad/s2, then error-.079rad with requestedacc-7.482; no torque clipping. Requested task acceleration need not equal optimized QP acceleration.",
+  "parameters": {
+    "accArm_weight": 18.0,
+    "arm_kp": 80.0,
+    "arm_kd": 10.2,
+    "C_kp": 1.0,
+    "C_kd": 0.05,
+    "C_limit_nm": 0.5
+  },
+  "scope": "Configured WBC task weight experiment; precompiled QP internals unavailable, no claim of internal source optimization",
+  "gate": [
+    "Identical extended empty probe against existing A+C",
+    "Fixed placementphysical path two parcels then full4",
+    "Reject sustained clipping/oscillation/proximal or wrist degradation; retain failures"
+  ],
+  "heldout_seeds_used": []
+}

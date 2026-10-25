@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-23T18:52:13.811738+08:00",
+  "candidate": "executor-physical",
+  "parent": "executor-release",
+  "manifest_sha256": "0f372c214fb91240ec948b1d87fb10538de0f7b9a9bc1e5b86a53e8004ada057",
+  "factor": "Make obsolete open-hand regrasp offset cap nonbinding at2pi; physical URDF/action limits and all per-step, velocity, collision and phase limits remain",
+  "user_authorization": "User explicitly removes closeness to oldACT as requirement",
+  "evidence": "executor-release-c-p2-s0 retreat74steps succeeded; level900step timeout with r4 offset=-0.5235987756rad and orientation11.006deg, all sweeps clear",
+  "offline_replay": "Same level executor: old cap fails900steps; physical bounds reaches original8deg criterion in30steps, or26with frozen measured bias; sensitivity only, actual failed run is not resumed",
+  "tests": {
+    "count": 407,
+    "passed": true,
+    "log": "tests-executor-physical.log"
+  },
+  "next_trial": "executor-physical-c-p2-s0",
+  "controller": "C unchanged",
+  "production_promoted": false
+}

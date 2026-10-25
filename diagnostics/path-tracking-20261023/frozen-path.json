@@ -1,0 +1,31 @@
+{
+  "frozen_at": "2026-10-23T17:29:38.710015+08:00",
+  "policy": "axis_feasible",
+  "manifest": "axis-feasible-manifest.json",
+  "manifest_sha256": "a32fefc8cd398e7a544495f0b2a57483c0c3779dcd6632cf50e049d6d007dd37",
+  "gate": "feasible-c-p2-s0",
+  "path_gate_passed": true,
+  "visual_confirmed_parcels": 2,
+  "official_task_success": null,
+  "complete_four_parcel_success": false,
+  "live_fallback_used": false,
+  "fallback_validation": [
+    "390 tests",
+    "real failed E observation replay: unchanged bounds/tolerances, 8.2175 mm and 7.999943 deg"
+  ],
+  "controller": "C bounded post-WBC compensation",
+  "controller_sha256": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+  "dynamic_qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de",
+  "full_development_order": [
+    "C seed0",
+    "original seed0"
+  ],
+  "held_out_order_if_development_passes": [
+    "original seed1",
+    "C seed1",
+    "C seed2",
+    "original seed2"
+  ],
+  "promotion_blocker": "Contact proximal tracking regression remains; complete timing cannot override separate joint acceptance",
+  "no_retuning_on_held_out": true
+}

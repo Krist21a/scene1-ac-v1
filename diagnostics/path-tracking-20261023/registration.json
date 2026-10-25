@@ -1,0 +1,47 @@
+{
+  "parent": "reobserve",
+  "path_factor": "Measured tool +Z horizontal projection 60mm; retain 70mm rise",
+  "sweep_factor": "Separate fix after historical 12 legacy-clear / filtered-blocked samples; preserve margin and legacy checker",
+  "controller": "C frozen for path probe; original vs C on frozen path after path gate",
+  "limits": "Original joint/torque/velocity/offset/stability/contact/bin checks and phase budgets unchanged",
+  "matrix": [
+    {
+      "phase": "path_probe",
+      "seed": 0,
+      "parcels": 2,
+      "controller": "C"
+    },
+    {
+      "phase": "empty_and_contact",
+      "seed": 0,
+      "controllers": [
+        "original",
+        "C"
+      ]
+    },
+    {
+      "phase": "development_full",
+      "seed": 0,
+      "parcels": 4,
+      "controllers": [
+        "original",
+        "combined"
+      ]
+    },
+    {
+      "phase": "held_out_full",
+      "seeds": [
+        1,
+        2
+      ],
+      "parcels": 4,
+      "controllers": [
+        "original",
+        "combined"
+      ]
+    }
+  ],
+  "promotion": "No production replacement until complete successful runs show speed and tracking improvement without proximal regression",
+  "failure_policy": "Retain all attempts. Do not rerun unchanged failures to select successes. Null task_success is not official success.",
+  "yolo": "Discussed only; user confirmed path/control first, no new visual model or training"
+}

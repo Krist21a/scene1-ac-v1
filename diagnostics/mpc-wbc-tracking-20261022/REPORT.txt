@@ -1,0 +1,181 @@
+scene1 MPC/WBC 手臂跟踪诊断与有限仿真对照
+日期：2026-10-22；所有新回合使用开发 seed=0。
+目录：/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022
+
+本轮结论
+
+完成了实际控制链核查、原始 ROS 观测、三个独立候选的实现/构建，以及官方完整复位后的有限仿真。最有价值的新线索是腕部在 WBC 已有反馈的情况下仍存在显著残差；小幅的输出力矩 PD 在空手测试中明显改善它。不能把问题归结为“腕部没有参考”“完全由重力决定”或“MPC 权重不足”。
+
+候选 A（参考起点索引修正）修复了已证实的错误，但空手性能收益不足1%。候选 B（WBC 腕部加速度增益）降低部分误差，称重耗时却增加，且回程静态误差/超调有退化。候选 C（参考用户截图的限幅输出力矩 PD）空手外伸静态误差降低88.1%，动态 WBC 参考跟踪 RMSE 降低55.6%；接触、持物与任务收益均未验证。三个候选均隔离保留，未推广到生产。
+
+当前生产文件、原 task.info、VR 参考节点可执行文件、humanoid_controllers 动态库均已恢复；官方 Git 工作区干净。宿主/容器/生产快照各124个文件、v63备份115个文件最终 SHA 核验一致。两容器保留 running，但均无策略、ROS、机器人控制器或仿真进程。准确时间和完整核验见 final-verification.json。
+
+1. 现场、版本与日志
+
+宿主策略 ROOT=/home/krist/kuavo_course/scene1_act_optimization，冻结生产为 v69；该目录不是 Git 仓库。
+官方 WS=/home/krist/kuavo_course/workspace/leju-kuavo-challenge-cup-2026，Git HEAD=51b3defaf8c032957647c7aa193d1fa20daef1f3。
+ALGO=kuavo-ros-noetic-s12-ready，项目 /root/scene1_act_optimization。
+SIM=kuavo_challenge_container_GPU_046e4301，WS bind mount 为 /root/kuavo_ws。
+生产四包配置 SHA256=d7833ce6fc1805e41c79aa8435727fe8ca18ccf1fa12de04d2759d215bf9f254。
+初始根盘空闲8647581696字节；最终空闲及容器镜像ID、挂载点见 final-verification.json。没有清理历史失败、生产输出或外置盘证据。
+
+开始时检查了父目录和项目内适用的 AGENTS.md，未找到。阅读了项目 HANDOFF.md 和当前相关记录；结束前又核查了16:44的新交接条目。另一个研究分支的旧暂停/现场快照不作为本次运行事实；本次明确授权的 MPC/WBC 仿真独立执行，没有继续其训练/标签工作。当前进程、参数、映射库和 SHA 以本轮现场回执为准。
+
+生产124文件快照：baseline/production；清单 initial-manifest.json。
+v63未动：ROOT/backups/full_visual_v63_initial_close_height；核验 v63-verification.json 和最终回执。
+任务原输出仍在 ALGO:/root/scene1_act_optimization/outputs/20261022-085047、20261022-090354，本目录各任务 run/output 是副本。新 ROS 原始观测为各 run/chain.jsonl；controller.log 为上层，simulation.log 为完整官方启动/控制日志。ROS 自身日志仍在 SIM:/root/.ros/log/<run_id>。各 run/experiment.json、runtime.json 及 baseline-first-parcel/runtime-full.json 保存运行身份。
+
+2. 实际控制链和生效参数
+
+v69 ACT/视觉目标与 MotionFilter（rad，16维：左7+夹爪、右7+夹爪）
+  → KuavoBaseRosEnv.exec_action/safe_control_arm
+  → SDK control_arm_joint_positions
+  → /kuavo_arm_traj（14关节，degree；name=arm_joint_0…13；没有速度字段）
+  → humanoid_VR_hand_control（degree→rad，构造两节点、10ms的手臂目标）
+  → /humanoid_mpc_target_arm
+  → 参考管理器和 /humanoid_mpc_arm_commanded
+  → 外部 humanoid_sqp_mpc / MRT
+  → 简化模型映射回完整 WBC 状态，补回腕部位置参考
+  → 手臂位置/速度10Hz滤波
+  → WeightedWbc：armAccelTask 与其他任务/动力学约束联合求解
+  → /joint_cmd.tau
+  → MuJoCo jointCmdCallback / actuator control
+  → /sensors_data_raw：关节位置、速度和仿真执行器广义力。
+
+运行实证：robot_version=52，use_external_mpc=true，is_rl_start=false，only_half_up_body=false；mpcArmsDof=8、armRealDof=14。MPC状态33维；完整WBC状态39维=12质心/基座+12腿+1腰+14臂。手臂命令为外部控制模式；direct_to_wbc=false。各策略 run.json 的有效配置完全相同。
+
+当前正常路径：MPC优化每臂前4关节；humanoidController.cpp:2571起把完整参考的每臂末3关节位置补到 WBC。对应速度在这个简化映射中留为0，记录到的 WBC 速度参考亦为0。这个发现来自实际普通路径，不能用另一个直接分支的 computed_vel=Zero 推断它。
+direct_to_wbc 的 SDK 1Hz低通/插值分支没有运行；use_ros_arm_joint_trajectory_ 的快速/超快分支亦不能替代当前链路。没有切换到直接 WBC。
+
+运行加载的 /taskFile：src/humanoid-control/humanoid_controllers/config/kuavo_v52/mpc/task.info。
+运行加载的 /referenceFile：同版本 command/reference.info；arm_joint_pos_filter_cutoff_freq=10、arm_joint_vel_filter_cutoff_freq=10。源码构造时的20Hz默认值不是本轮实际值。
+原 armAccelTask：14关节 kp=80、kd=10.2；WeightedWbc stance/walk 的 accArm=9。空手平台段的“计划加速度/误差”斜率79.93…79.99，为这组增益实际生效的旁证；它不是实测加速度，也不是完整系统辨识。
+MPC配置：50Hz、1秒预测范围、离散步长0.015秒。task.info 的全模型 Q/P 手臂位置对角项写200；不能据14项配置认定实际优化包含14个手臂自由度。预编译模型内部的完整权重裁剪过程未直接观测，本轮没有修改 MPC 代价。
+名义 WBC/sensor_frequency=1000Hz；实际计算耗时明显高于名义预算，见第5节。没有把名义频率当作测得周期。
+
+WBC实现源文件在本地缺失；实际进程加载 installed/lib/libhumanoid_wbc.so，SHA=f9e9ff8445676f36f18092b65ab0cc7a8c9acc562f46cc9b7e97f3d67916c5fe。可用头文件/符号包含手臂加速度、力矩限制、浮动基动力学和 Pinocchio 非线性项。不能声称已逐行审计其QP内部，也不能据此另叠一份重力补偿。本轮没有增加重力或负载补偿。
+
+手臂 joint_cmd.joint_kp/joint_kd 为0，但这表示电机接口没有再加位置PD，不能说全链路没有位置反馈：WBC已包含 armAccelTask。当前 MuJoCo ROS回调使用 tau；tau_max 源自 hardware_settings.max_current，不能直接当作Nm饱和阈值。WBC任务里手臂力矩边界60Nm；仿真腕部实际motor ctrlrange/actuatorfrcrange为±14.1Nm、gear=1，前4臂关节范围为66/75/57/75Nm。原所有边界保留，未改场景重力、质量、摩擦、随机布局或裁判。
+
+来源：baseline-runtime.json；各运行 runtime.json 与 /proc/<pid>/maps SHA；source-evidence/；源文件 humanoidController.cpp:2571、2688、2752、2775、2982，HumanoidVRHandCommandNode.cpp:254，task.info:688、752、763，reference.info:358。
+
+3. 观测语义与诊断边界
+
+旧 v69 seed0 的13146步上层日志有阶段/发布目标/反馈，却没有同步的MPC/WBC内部参考和可信执行器量，不能单独定位控制收益；historical-log-audit.json 记录了审计。没有把历史离线预测精度或同一行“新指令减旧反馈”当作静态误差。
+
+record_chain.py 保存发布目标、MPC目标、MRT/WBC位置/速度、WBC计划加速度、请求力矩、原始关节反馈、控制耗时与夹爪；上层 steps.jsonl 提供阶段、视觉修正和发布时刻。腕部 PD 额外输出同一控制周期的基准力矩、未限幅PD、实际附加力矩、总命令和启用状态。
+每路常规观测最多50Hz，手臂目标三路事件不降采样；各有效回合写入队列 dropped=0。订阅队列/ROS传输是否丢失不能由此证明；短暂饱和或高频振荡可能漏采。候选C额外诊断和停止订阅带来小量开销，未独立标定。
+
+关节顺序：原始 sensors_data_raw 与 joint_cmd 的手臂为[13:27]，前面12腿+1腰，后面是头；WBC向量末14项为左7、右7。q rad，v rad/s，joint_vd rad/s²。publisher 源码 mujoco_node.cc:753–754 明确 joint_vd=qacc、joint_torque=qfrc_actuator。后者是仿真执行器广义力，腕motor gear=1时可按Nm报告，不是实机扭矩传感器。
+实际安装的 SDK state.py:307–311 把 torque 赋为 joint_vd、acceleration 赋为 joint_current/torque。本轮没有使用这个 SDK “torque”别名，也没有修改 SDK；保留原始字段。该问题单列为接口语义缺陷。
+
+/use_sim_time 未设置。sensor header 是墙钟，sensor_time 为随仿真进度推进的时钟；用后者的差值报告仿真耗时。上层和采集器的 monotonic 为同一宿主容器环境下的时钟。无header的WBC向量按最近callback接收时刻匹配，阈值25ms，任务匹配P95约11ms，空手约10ms；不是精确控制周期同步。没有把ROS回调接收时刻叫执行器应用时刻。
+
+静态空手：每段2秒斜坡+5秒保持，统计第5–7秒的真实关节相对最终发布目标的均值偏差，独立报告速度和位置标准差。动态RMSE只统计斜坡0.2–2秒的反馈与已滤波WBC参考。到位定义为斜坡结束后，所有受测关节首次连续0.5秒进入1°带；不是单帧命中。超调是整段沿目标方向超过终点的最大值。
+任务阶段RMSE包含动态滞后，不能统称静态误差。任务平台段另要求前1秒命令/WBC参考变化小于3mrad、当前关节速度小于0.03rad/s；这是有限平台判据。末端误差是同基座坐标系下 URDF FK(参考)-FK(反馈)，不是独立光学TCP测量，也没有物体真值。
+未取得：QP活跃约束标志、可靠逐周期截止超时计数、精确WBC采样/执行器应用时间、独立TCP位姿、纯视觉计算耗时。没有用估计值填补这些量。
+
+已证实：空手腕部在参考静止、实测速度接近0且远离限位时仍有大残差；这不是仅由动态延迟造成。空手外伸末段平均位置标准差约5.22e-5rad，不支持“持续振荡是该平台误差主因”。接触中的目标越限来自固定上层ACT目标，见第5节。采样到的力矩没有靠近执行器边界。
+待验证：残差中未建模摩擦/惯量/负载的各自贡献。公开机器人XML默认 armature=.05、frictionloss=.02，而URDF写 friction=0，存在模型差异线索，但没有用这点直接认定重力或摩擦为唯一根因，也未改物理。视觉目标和标定误差仍可能贡献任务误差；本轮不能排除。
+
+4. 三个候选：先登记假设，再单因素修改
+
+A：candidate-reference-origin/HumanoidVRHandCommandNode.cpp、change.patch。
+原 goalHandPoseToTargetTrajectories 用 observation_.state.segment(12+12,14)，v52含腰，起点包含腰并漏最后一个右腕；改为 observation.state.tail(14)。只更改参考起点索引。
+证据：原轨迹第一节点对正确手臂顺序RMSE=.220552rad，对错误腰偏移顺序=.000129rad；修改后对正确顺序=.000133rad。运行可执行文件SHA由155191dc…变为84768f81…；703/704条事件验证，候选进程 /proc/exe 哈希匹配。
+预期减少每次10ms轨迹的起点扰动；副作用可能改变接触瞬态。空手动态/静态收益不足1%，未继续做接触。保留为正确性补丁，不宣称提速。
+
+B：candidate-wrist-gains/task.info、change.patch。
+仅左右腕末3关节（14臂索引4,5,6,11,12,13）armAccelTask kp80→120，kd10.2→12.4924，按sqrt(1.5)保持名义阻尼比例。原参考可执行文件已恢复，没有组合A；近端、WBC权重、MPC、滤波、上层和边界均未改。
+依据是静止大残差与计划加速度有效、未观察到力矩饱和；假设有效反馈刚度不足。风险为超调/接触刚性增加，不假定理论1/1.5误差缩放必然实现。
+运行 taskFile SHA变为8b3c885a…；平台计划加速度/误差斜率119.93…120.05，证明改动实际进入控制。空手外伸误差下降，但回程偏差/超调变差；有限任务结果见后。研究保留，不推广。
+
+C：candidate-wrist-pd/humanoidController.cpp、change.patch。
+用户补充的团队截图提出在WBC力矩后增加腕PID；已查看原图，逐点核查见 external-reference/interpretation.txt。截图“8个MPC自由度”与现场一致，但“腕部没有任何参考、完全由重力决定”不符合本工作区；“最低优先级造成下垂”也未由现有证据证实。
+本候选独立恢复原A/B状态，仅在现有WBC力矩之后，对六个腕关节增加
+  delta_tau = clip(1.0*(q_WBC_filtered-q_measured) - 0.05*qdot_measured, -0.5, 0.5) Nm
+  tau_cmd = clip(tau_WBC + delta_tau, -14.1, 14.1) Nm。
+没有积分、额外重力项或直接WBC模式切换；没有提高任何原边界。显式 !is_real_，并只在正常外部手臂控制、无reset/躯干插值等条件下启用。位置/速度来自当前真实完整WBC状态，已核对腰偏移和速度段。
+风险是附加力矩不再由QP联合协调，接触/基座稳定性不能由空手结果保证。故只做一次新的完整复位空手对照；不把它算作任务成功。使用同一动作时序，新增诊断/持续限幅0.3秒停止检查；原探针v2保留。
+隔离编译库SHA=ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba；运行 nodelet 的maps核验匹配。1810条同周期诊断、1753条启用，附加/总力矩限幅样本均0；总命令与基准+附加的恒等误差0；近端附加力矩0；最大附加0.364114Nm，最大腕命令0.417855Nm。
+截图红字自述正式比赛使用主办方构建，不采用其核心控制改动；本轮未核验现行比赛规则，不能据截图或本地仿真宣称正式提交收益。
+
+5. 对照结果（每种配置一个有效回合，开发seed0，非统计显著性证明）
+
+空手，所有列以rad为单位；静态为六腕平均绝对均值偏差：
+指标                         原版          A索引修正      B腕增益        C输出PD
+外伸动态WBC RMSE              0.087715      0.087330       0.081101       0.038921
+外伸静态平均绝对偏差           0.098036      0.097931       0.073358       0.011710
+回程动态WBC RMSE              0.069733      0.069722       0.058675       0.030898
+回程静态平均绝对偏差           0.017773      0.017620       0.021520       0.007643
+外伸最大超调                 0             0              0.001393       0.017843
+回程最大超调                 0.004233      0.004061       0.012267       0.013988
+外伸到位时间s（1°连续0.5s）    未达到        未达到         未达到         1.4724
+回程到位时间s（同口径）        未达到        未达到         未达到         0.2380
+
+C外伸最大超调约1.02°；末段最大单关节均值偏差0.967°，回程0.776°。C末段位置标准差5.88e-5/4.45e-5rad，未见持续振荡；50Hz观察不能排除更高频事件。C的保持显著改善但有动态超调代价。关节逐条数据/力矩峰值/近端对照见各metrics.json，曲线见 empty-comparison-with-pd.png。近端外伸原版 WBC RMSE=.001377rad，而相对上层目标=.042626rad，说明这一段的主要瞬态误差在参考形成/延迟中，不能把所有手臂误差都归为腕部静态问题。
+
+固定v69上层的一包阶段对照，仅原版与B：
+阶段                       原版步数/秒       B步数/秒         六腕WBC RMSE原版→B
+small_pregrasp（两次合计）   434 / 73.129      280 / 46.838      .149070 → .105958
+small_weighing              170 / 29.770      197 / 34.938      .377954 → .267701
+small_short_retreat          34 / 4.899        52 / 7.353       .233515 → .117686
+small_settle                  4 / 1.078         5 / 1.286       .035983 → .054376
+
+称重14臂WBC RMSE .247441→.175279rad；六腕下降29.2%，FK参考/反馈均值距离73.12→53.77mm。称重用了更多27步，表明“跟踪误差变小”不等于“该阶段提速”。平台末端的右腕第6关节偏差仍约.7665→.6060rad，此为所选平台样本均值，不是独立负载辨识。
+small_pregrasp 的已记录视觉 offset_rad 累计相邻变化范数3.98491→2.73805rad（434/280条覆盖，下降31.3%）；ACT阶段.23615→.10931rad。称重没有同样的offset字段，不能把缺失当零；其总外层残差变化1.53755→1.81196rad，且包含计划轨迹变化，不能都叫纠偏。
+ACT因视觉对齐暂停的步数：pregrasp433→279、weighing169→196；明确pose_hold pregrasp9→8。暂停步不等于机器人不动，更不等于未计算视觉。纯视觉计算耗时未测，因此不宣称降低视觉计算量。
+
+共同完成到复抓结束、尚未进入 visual_cycle_lift 的前缀：
+                         原版             B                  变化
+步数                     878              797                -9.2%
+墙钟主动执行秒            145.2388         130.3301           -10.3%
+传感器仿真时钟秒          41.6810          38.9770            -6.5%
+端点callback匹配误差ms    8.49 / 1.39      9.58 / 2.28
+
+以上是匹配已完成阶段的描述性结果，不是完整任务收益；同seed没有保证每步ACT输出完全相同，闭环状态和非实时调度都会改变后续轨迹。墙钟主动执行从首条策略发布到阶段边界，不含加载、go/init和官方复位。
+
+回合结果与停止：
+baseline-first-parcel：2871步，主动执行445.776秒，视觉确认1包；独立完整复位、go_run，无中途续跑；抓取、称重、交接、入箱视觉确认链完成。summary reason=visual_cycle_target_reached，task_success=null。
+gains-first-parcel：894步，主动执行146.049秒，视觉完成0包；经过首次抓取、持物搬运、称重释放/稳定、复抓，进入lift后由本助手因持续目标裁剪停止。summary reason=user_stop 只是runner收到SIGINT的标签，不是用户叫停，也不是保护停机；task_success=null。不能将146秒与445秒直接比较。
+C只有空手；A只有空手。未进行新seed、四包完整回合；未用分段或中途恢复冒充独立成功。官方成功率本轮不可得，null不解释为官方成功或失败。
+
+必须说明的实验执行局限：我当时仅检查了原版局部阶段的裁剪计数，漏掉其他阶段的连续裁剪，原版继续完成了一包。B发现持续裁剪后被停止。事后完整审计确认原版也有相同问题：原版29步，连续段414–425(12)、449–453(5)、867–878(12)；B28步，469–480(12)、522–527(6)、788–797(10)。因此两者停止条件执行不对称，不能据此比较成功率或断言“B造成了新失败”。
+首个裁剪源：原版 ACT/proposed 左腕joint5=-1.57519865，B=-1.57421231，二者均超原下界-pi/2=-1.57079633；MotionFilter保留原边界，实际sent被夹回。最大超界量约.004402/.003416rad。测得关节也在边界附近。这是上层目标越限，不是证实的力矩饱和；没有放宽边界掩盖它。bounds_clipped也可能包含夹爪分量，以上腕部越限是逐字段核实的事实。
+因此未继续四包或重复候选任务。未来脚本补了可选 --clip-stop-steps 5；实际旧日志逐条离线回放会分别在418/473步触发。在线轮询最多约2秒再加策略退出延迟，尚未实跑验证；不是实时保护。原始未对称停止的实验不会因增加此功能而被改写。
+
+在已记录任务样本中，接近仿真电机99%边界的执行器力、请求力矩超电机范围均0；不能排除未采到的瞬态。未取得QP约束激活计数。原版启动日志有1条qpOASES working-set recalculation报错；B未见该条。B有3个启动时未使用的底盘/足步话题连接超时，未作为手臂保护停机。没有可靠的运行逐周期超时计数。
+整段记录的监控计算耗时ms（覆盖不同阶段，仅描述）：
+                        原版 mean / P95 / max        B mean / P95 / max
+controller_loop          4.572 / 9.565 / 27.954       4.082 / 8.674 / 21.110
+WBC                      2.859 / 6.278 / 15.434       2.614 / 5.808 / 14.210
+MPC                     35.496 /57.245 / 98.868      31.949 /54.561 / 81.193
+这些是topic报告的计算耗时，不能当成完整控制周期。原版/B整段仿真/墙钟比约.262/.294，说明墙钟提速受非实时仿真影响；不同阶段覆盖不能据此宣布B降低计算量。采集本身影响没有独立A/B量化。
+
+6. 失败与无效尝试均保留
+
+baseline-simulation.log：旧Xauthority导致GLFW启动失败。
+baseline-simulation-02.log：旧ROS master尚未完全退出就重启，启动竞态/显示失败；后续增加等待完全idle，用当前会话Xauthority。
+invalid-mode-empty-*：首版探针漏JointState.name，参考节点拒收；当时也调整了SDK级模式服务调用。该探针不构成跟踪误差证据，不纳入对照。修正后正式完整复位baseline-empty-v2。
+candidate-wrist-pd/preparation-notes.txt、build-setup-failure.log：候选准备的两次非唯一文本锚点断言失败及后续缺源文件复制失败，未改共享源文件。
+pd-empty：共享库宿主写入因root权限失败后，调用流程错误地继续启动原版。发现哈希仍为原版后SIGINT终止，日志、trace、probe和invalid-reason.json保留，完全排除C对照。修复为容器内原子切换，新增启动 expected-controller-sha256 硬校验；pd-empty-v2才是有效C。
+B的中止任务完整保存，未为凑成功率重跑。没有实机运动，没有读取包裹位置等物体真值获得收益。
+
+7. 交付与建议
+
+建议保留C作为下一步重点研究候选，当前不替换生产。下一阶段应先用相同、自动执行的裁剪/接触停止口径，单独验证持物保持、称重、交接和基座稳定性；C尚不能宣称减少任务纠偏或缩短任务总时长。固定上层存在越限这一已知问题必须单独处理/记录，不能靠增强下层或放宽限位掩盖。是否适用于赛事正式构建需要核验实际规则。
+A可保留为确定的索引修正；其任务级回归仍未完成。B保留研究证据，不推荐当前参数用于四包；局部耗时/回程性能退化已出现。没有证据支持此时扩大MPC手臂权重或同时调整视觉外环。
+
+文件索引：
+REPRODUCE.txt：环境、构建、同步/切换、启动、日志、离线重算、停止与恢复的可复制命令。
+comparison.json / comparison.csv：机器可读全指标；build_comparison.py从保留的指标合成。
+compute_prefix.py / prefix-recomputed.json：从原trace与steps重算共同前缀时钟。
+empty-comparison-with-pd.png：三个候选与原版的六腕原始轨迹图。
+candidate-*/registration.json、change.patch、build-manifest.json：修改依据、精确编译与SHA。
+switches.jsonl：共享文件切换前后SHA、时刻、恢复位置。
+final-verification.json：生产、备份、Git、共享库和进程最终核验。
+source-evidence/manifest.json：实际安装SDK/环境和机器人publisher/模型来源快照。
+
+主要瓶颈的证据等级：已证实的控制端问题是腕部静止残差和参考起点索引错误；后者不是本次主要性能收益来源。输出PD的空手结果进一步支持“执行端有效反馈/模型残差值得优先处理”，但具体动力学根因仍未分离。固定ACT目标越限是独立的上层问题；非实时计算/调度也限制墙钟评价。现有数据不足以给这些因素分配完整任务耗时占比，更不足以排除视觉目标/标定贡献。
+
+用户在本轮收尾时明确要求“本论工作后先暂停，待我下达继续工作后再继续”。本轮结束后已暂停；pause-state.json记录了恢复条件，主HANDOFF.md已备份并前置交接。本轮结束状态以 final-verification.json 为准，不自动继续仿真、持物验证或部署任何候选。

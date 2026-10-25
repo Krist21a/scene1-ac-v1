@@ -1,0 +1,65 @@
+In file included from /opt/ros/noetic/lib/pkgconfig/../../include/ros/assert.h:35,
+                 from /opt/ros/noetic/lib/pkgconfig/../../include/ros/common.h:36,
+                 from /opt/ros/noetic/lib/pkgconfig/../../include/ros/spinner.h:32,
+                 from /opt/ros/noetic/lib/pkgconfig/../../include/ros/init.h:39,
+                 from /tmp/reference-origin-build/HumanoidVRHandCommandNode.cpp:1:
+/tmp/reference-origin-build/HumanoidVRHandCommandNode.cpp: In member function ‘void VRHandCommandNode::vrCmdCallback(const ConstPtr&)’:
+/tmp/reference-origin-build/HumanoidVRHandCommandNode.cpp:366:19: warning: format ‘%d’ expects argument of type ‘int’, but argument 8 has type ‘std::vector<std::__cxx11::basic_string<char> >::size_type’ {aka ‘long unsigned int’} [-Wformat=]
+  366 |         ROS_ERROR("[VRHandCommandNode]:Received joint state target size: %d, number of arm joints: %d", msg->name.size(), num_arm_joints_);
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  ~~~~~~~~~~~~~~~~
+      |                                                                                                                       |
+      |                                                                                                                       std::vector<std::__cxx11::basic_string<char> >::size_type {aka long unsigned int}
+/opt/ros/noetic/lib/pkgconfig/../../include/ros/console.h:351:165: note: in definition of macro ‘ROSCONSOLE_PRINT_AT_LOCATION_WITH_FILTER’
+  351 |     ::ros::console::print(filter, __rosconsole_define_location__loc.logger_, __rosconsole_define_location__loc.level_, __FILE__, __LINE__, __ROSCONSOLE_FUNCTION__, __VA_ARGS__)
+      |                                                                                                                                                                     ^~~~~~~~~~~
+/opt/ros/noetic/lib/pkgconfig/../../include/ros/console.h:390:7: note: in expansion of macro ‘ROSCONSOLE_PRINT_AT_LOCATION’
+  390 |       ROSCONSOLE_PRINT_AT_LOCATION(__VA_ARGS__); \
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/opt/ros/noetic/lib/pkgconfig/../../include/ros/console.h:575:35: note: in expansion of macro ‘ROS_LOG_COND’
+  575 | #define ROS_LOG(level, name, ...) ROS_LOG_COND(true, level, name, __VA_ARGS__)
+      |                                   ^~~~~~~~~~~~
+/opt/ros/noetic/lib/pkgconfig/../../include/rosconsole/macros_generated.h:214:24: note: in expansion of macro ‘ROS_LOG’
+  214 | #define ROS_ERROR(...) ROS_LOG(::ros::console::levels::Error, ROSCONSOLE_DEFAULT_NAME, __VA_ARGS__)
+      |                        ^~~~~~~
+/tmp/reference-origin-build/HumanoidVRHandCommandNode.cpp:366:9: note: in expansion of macro ‘ROS_ERROR’
+  366 |         ROS_ERROR("[VRHandCommandNode]:Received joint state target size: %d, number of arm joints: %d", msg->name.size(), num_arm_joints_);
+      |         ^~~~~~~~~
+/tmp/reference-origin-build/HumanoidVRHandCommandNode.cpp:366:75: note: format string is defined here
+  366 |         ROS_ERROR("[VRHandCommandNode]:Received joint state target size: %d, number of arm joints: %d", msg->name.size(), num_arm_joints_);
+      |                                                                          ~^
+      |                                                                           |
+      |                                                                           int
+      |                                                                          %ld
+In file included from /opt/ros/noetic/lib/pkgconfig/../../include/ros/assert.h:35,
+                 from /opt/ros/noetic/lib/pkgconfig/../../include/ros/common.h:36,
+                 from /opt/ros/noetic/lib/pkgconfig/../../include/ros/spinner.h:32,
+                 from /opt/ros/noetic/lib/pkgconfig/../../include/ros/init.h:39,
+                 from /tmp/reference-origin-build/HumanoidVRHandCommandNode.cpp:1:
+/tmp/reference-origin-build/HumanoidVRHandCommandNode.cpp: In member function ‘void VRHandCommandNode::backArmPoseToZero()’:
+/tmp/reference-origin-build/HumanoidVRHandCommandNode.cpp:427:19: warning: format ‘%d’ expects argument of type ‘int’, but argument 8 has type ‘Eigen::EigenBase<Eigen::Matrix<double, -1, 1> >::Index’ {aka ‘long int’} [-Wformat=]
+  427 |         ROS_ERROR("[VRHandCommandNode]: init_arm_pos_ size: %d, num_arm_joints_: %d", init_arm_pos_.size(), num_arm_joints_);
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  ~~~~~~~~~~~~~~~~~~~~
+      |                                                                                                         |
+      |                                                                                                         Eigen::EigenBase<Eigen::Matrix<double, -1, 1> >::Index {aka long int}
+/opt/ros/noetic/lib/pkgconfig/../../include/ros/console.h:351:165: note: in definition of macro ‘ROSCONSOLE_PRINT_AT_LOCATION_WITH_FILTER’
+  351 |     ::ros::console::print(filter, __rosconsole_define_location__loc.logger_, __rosconsole_define_location__loc.level_, __FILE__, __LINE__, __ROSCONSOLE_FUNCTION__, __VA_ARGS__)
+      |                                                                                                                                                                     ^~~~~~~~~~~
+/opt/ros/noetic/lib/pkgconfig/../../include/ros/console.h:390:7: note: in expansion of macro ‘ROSCONSOLE_PRINT_AT_LOCATION’
+  390 |       ROSCONSOLE_PRINT_AT_LOCATION(__VA_ARGS__); \
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/opt/ros/noetic/lib/pkgconfig/../../include/ros/console.h:575:35: note: in expansion of macro ‘ROS_LOG_COND’
+  575 | #define ROS_LOG(level, name, ...) ROS_LOG_COND(true, level, name, __VA_ARGS__)
+      |                                   ^~~~~~~~~~~~
+/opt/ros/noetic/lib/pkgconfig/../../include/rosconsole/macros_generated.h:214:24: note: in expansion of macro ‘ROS_LOG’
+  214 | #define ROS_ERROR(...) ROS_LOG(::ros::console::levels::Error, ROSCONSOLE_DEFAULT_NAME, __VA_ARGS__)
+      |                        ^~~~~~~
+/tmp/reference-origin-build/HumanoidVRHandCommandNode.cpp:427:9: note: in expansion of macro ‘ROS_ERROR’
+  427 |         ROS_ERROR("[VRHandCommandNode]: init_arm_pos_ size: %d, num_arm_joints_: %d", init_arm_pos_.size(), num_arm_joints_);
+      |         ^~~~~~~~~
+/tmp/reference-origin-build/HumanoidVRHandCommandNode.cpp:427:62: note: format string is defined here
+  427 |         ROS_ERROR("[VRHandCommandNode]: init_arm_pos_ size: %d, num_arm_joints_: %d", init_arm_pos_.size(), num_arm_joints_);
+      |                                                             ~^
+      |                                                              |
+      |                                                              int
+      |                                                             %ld
+{"cwd": "/root/kuavo_ws/build/humanoid_interface_ros", "source_sha256": "3dd05dbcbdcdb611cb1d0ac12408280ba9fe8e83af3c41d3cff441cfe6f201d2", "executable_sha256": "84768f811b9c228d1a296a71644ede4ec44cd64656f76ad4bc42d77dce3ccf03"}

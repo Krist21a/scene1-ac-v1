@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-24T08:43:23.388176+08:00",
+  "user_request": "继续解决问题，直到彻底完成稳定的四包及多seed验收或usage达到20%再停止",
+  "threshold_used_percent": 20.0,
+  "initial_used_percent": 0.0,
+  "source": "usage_guard.py current session rate_limits",
+  "guard_interval_s": 5.0,
+  "action": "Stop policy, preserve partial outcome, clean up simulator, then restore baseline before returning; do not start another candidate",
+  "limitations": "Quota updates are supplied by session events; no promise of exact billing precision between updates."
+}

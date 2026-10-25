@@ -1,0 +1,93 @@
+{
+  "all": {
+    "samples": 1196,
+    "upper_to_timed_arm_proximal_rmse_rad": 0.0034368786919020703,
+    "upper_to_timed_arm_wrist_rmse_rad": 0.00642105959989185,
+    "timed_arm_to_mpc_proximal_rmse_rad": 0.019144180136941826,
+    "mpc_to_wbc_proximal_rmse_rad": 0.0018986899665962233,
+    "wbc_to_measured_proximal_rmse_rad": 0.0031783686163407428,
+    "wbc_to_measured_wrist_rmse_rad": 0.030440883833243206
+  },
+  "per_parcel": {
+    "1": {
+      "all": {
+        "samples": 1196,
+        "upper_to_timed_arm_proximal_rmse_rad": 0.0034368786919020703,
+        "upper_to_timed_arm_wrist_rmse_rad": 0.00642105959989185,
+        "timed_arm_to_mpc_proximal_rmse_rad": 0.019144180136941826,
+        "mpc_to_wbc_proximal_rmse_rad": 0.0018986899665962233,
+        "wbc_to_measured_proximal_rmse_rad": 0.0031783686163407428,
+        "wbc_to_measured_wrist_rmse_rad": 0.030440883833243206
+      },
+      "phases": {
+        "returning_policy_view": {
+          "samples": 34,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0060098097559714465,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.026183776417494548,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.007878158641326068,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0012229218251453818,
+          "wbc_to_measured_proximal_rmse_rad": 0.0027132198205282697,
+          "wbc_to_measured_wrist_rmse_rad": 0.03721729809678911
+        },
+        "act": {
+          "samples": 417,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0033247353720577094,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.005559913744978484,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.018005536247711184,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0016063352880051208,
+          "wbc_to_measured_proximal_rmse_rad": 0.0027784253057945053,
+          "wbc_to_measured_wrist_rmse_rad": 0.028614044931527725
+        },
+        "small_pregrasp": {
+          "samples": 185,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0013565825463564257,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.001225931647431903,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.019496533491952496,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0014379909211649318,
+          "wbc_to_measured_proximal_rmse_rad": 0.002982351109178673,
+          "wbc_to_measured_wrist_rmse_rad": 0.022181722309682093
+        },
+        "pregrasp_aligned": {
+          "samples": 9,
+          "upper_to_timed_arm_proximal_rmse_rad": 3.148744763591084e-08,
+          "upper_to_timed_arm_wrist_rmse_rad": 1.0428374999902558e-08,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.015956436038558293,
+          "mpc_to_wbc_proximal_rmse_rad": 0.00031352917380789993,
+          "wbc_to_measured_proximal_rmse_rad": 0.0024440060034204,
+          "wbc_to_measured_wrist_rmse_rad": 0.023577769303797458
+        },
+        "open_hand_visual_tracking": {
+          "samples": 308,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.004687128054725022,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.006291436415488833,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.019811120108168694,
+          "mpc_to_wbc_proximal_rmse_rad": 0.0027616913185159672,
+          "wbc_to_measured_proximal_rmse_rad": 0.0039157504356879,
+          "wbc_to_measured_wrist_rmse_rad": 0.04007969532968457
+        },
+        "small_grasp": {
+          "samples": 243,
+          "upper_to_timed_arm_proximal_rmse_rad": 0.0022063166680820574,
+          "upper_to_timed_arm_wrist_rmse_rad": 0.0016242811695763078,
+          "timed_arm_to_mpc_proximal_rmse_rad": 0.021036467981126333,
+          "mpc_to_wbc_proximal_rmse_rad": 0.001364212151995204,
+          "wbc_to_measured_proximal_rmse_rad": 0.0030026170289349408,
+          "wbc_to_measured_wrist_rmse_rad": 0.023036684535985584
+        }
+      }
+    }
+  },
+  "clock_note": "Absolute sensor epoch is mapped through observed MPC relative time before evaluating trajectory knot times",
+  "sensor_epoch_minus_mpc_time_spread_ms": 0.7777012371764331,
+  "alignment_age_p95_ms": {
+    "upper": 135.128864500075,
+    "arm": 150.4217107499244,
+    "mpc": 10.192784500077323,
+    "wbc": 10.127744000101302
+  },
+  "limitations": [
+    "Reference vectors lack controller-cycle timestamps; arrival alignment is approximate",
+    "Advertised arm trajectory is evaluated at its knot times, not mistaken for its future endpoint",
+    "This observes solver output, not internal active constraints or cost matrices"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-24T10:12:30.784369+08:00",
+  "parent": "executor-support-heading",
+  "candidate": "executor-support-gain",
+  "factor": "Visual local grasp gain scale1.0 to0.35 with existing damping unchanged",
+  "evidence": "Support-heading first parcel passed, second height oscillated about8mm through45step budget despite yaw/lateral convergence",
+  "unchanged": [
+    "All arrival/closure/physical/torque/sweep checks",
+    "Original45step local grasp budget",
+    "C library and MPC/WBC configs",
+    "Original3mm parcel and25mm support margins"
+  ],
+  "next_trial": "executor-support-gain-c-p2-s0-1024",
+  "heldout_seeds_used": []
+}

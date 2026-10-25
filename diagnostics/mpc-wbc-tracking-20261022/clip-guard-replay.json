@@ -1,0 +1,16 @@
+{
+  "baseline-first-parcel": {
+    "step": 418,
+    "consecutive": 5,
+    "threshold": 5,
+    "incremental_reader_chunks_to_trigger": 4
+  },
+  "gains-first-parcel": {
+    "step": 473,
+    "consecutive": 5,
+    "threshold": 5,
+    "incremental_reader_chunks_to_trigger": 5
+  },
+  "scope": "offline chronological replay of actual historical logs only; future guarded runs stop earlier and cannot reproduce the old full prefix. Live polling/stop latency is not validated; up to 2s poll plus strategy shutdown. No extra simulation was run.",
+  "incremental_reader_verified": true
+}

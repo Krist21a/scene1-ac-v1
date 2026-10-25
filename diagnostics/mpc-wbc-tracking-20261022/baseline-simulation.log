@@ -1,0 +1,606 @@
+[INFO] challenge_sim_launcher: 场景源文件校验通过。
+[INFO] challenge_sim_launcher: 生成场景: /usr/bin/python3 /root/kuavo_ws/src/challenge_cup_simulator/utils/scene_builder.py /root/kuavo_ws/src/challenge_cup_simulator/config/scenes/scene1.yaml --seed 0 --no-randomize -o /root/kuavo_ws/src/challenge_cup_simulator/models/biped_s52/xml/_scene_scene1_active.xml
+Scene saved to: /root/kuavo_ws/src/challenge_cup_simulator/models/biped_s52/xml/_scene_scene1_active.xml
+[INFO] challenge_sim_launcher: 场景 XML -> /root/kuavo_ws/src/challenge_cup_simulator/models/biped_s52/xml/_scene_scene1_active.xml
+[INFO] challenge_sim_launcher: 启动仿真: roslaunch challenge_cup_simulator load_kuavo_mujoco_challenge.launch scene_name:=scene1 sceneFile:=/root/kuavo_ws/src/challenge_cup_simulator/models/biped_s52/xml/_scene_scene1_active.xml robot_version:=52 with_estimation:=true wbc_frequency:=1000 sensor_frequency:=1000
+... logging to /root/.ros/log/67faf7d6-cdf4-11f1-98d9-c85ea94bd8c7/roslaunch-krist-pc-180.log
+Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+[31mWARNING: disk usage in log directory [/root/.ros/log] is over 1GB.
+It's recommended that you use the 'rosclean' command.[0m
+]2;/root/kuavo_ws/src/challenge_cup_simulator/launch/load_kuavo_mujoco_challenge.launch
+[1mstarted roslaunch server http://krist-pc:41869/[0m
+
+SUMMARY
+========
+
+CLEAR PARAMETERS
+ * /nodelet_manager/
+
+PARAMETERS
+ * /arm_move_spd: 1.2
+ * /build_cppad_state: 0
+ * /control_hand_side: 2
+ * /dynamicQrFile: /root/kuavo_ws/sr...
+ * /ekf_se/acceleration_gains: [0.8, 0.0, 0.0, 0...
+ * /ekf_se/acceleration_limits: [1.3, 0.0, 0.0, 0...
+ * /ekf_se/base_link_frame: dummy_link
+ * /ekf_se/control_config: [True, False, Fal...
+ * /ekf_se/control_timeout: 0.2
+ * /ekf_se/debug: False
+ * /ekf_se/deceleration_gains: [1.0, 0.0, 0.0, 0...
+ * /ekf_se/deceleration_limits: [1.3, 0.0, 0.0, 0...
+ * /ekf_se/frequency: 100
+ * /ekf_se/imu0: imu_data
+ * /ekf_se/imu0_config: [False, False, Fa...
+ * /ekf_se/imu0_differential: False
+ * /ekf_se/imu0_linear_acceleration_rejection_threshold: 0.5
+ * /ekf_se/imu0_nodelay: False
+ * /ekf_se/imu0_pose_rejection_threshold: 0.5
+ * /ekf_se/imu0_queue_size: 10
+ * /ekf_se/imu0_relative: True
+ * /ekf_se/imu0_remove_gravitational_acceleration: True
+ * /ekf_se/imu0_twist_rejection_threshold: 0.5
+ * /ekf_se/initial_estimate_covariance: ['1e-9', 0, 0, 0,...
+ * /ekf_se/initial_state: [0.0, 0.0, 0.8, 0...
+ * /ekf_se/map_frame: map
+ * /ekf_se/odom0: kinematic_data
+ * /ekf_se/odom0_config: [True, True, True...
+ * /ekf_se/odom0_differential: False
+ * /ekf_se/odom0_queue_size: 10
+ * /ekf_se/odom0_relative: False
+ * /ekf_se/odom_frame: odom
+ * /ekf_se/permit_corrected_publication: False
+ * /ekf_se/print_diagnostics: True
+ * /ekf_se/process_noise_covariance: [0.05, 0, 0, 0, 0...
+ * /ekf_se/publish_acceleration: False
+ * /ekf_se/publish_tf: False
+ * /ekf_se/sensor_timeout: 0.01
+ * /ekf_se/silent_tf_failure: False
+ * /ekf_se/stamped_control: False
+ * /ekf_se/transform_time_offset: 0.0
+ * /ekf_se/transform_timeout: 0.0
+ * /ekf_se/two_d_mode: False
+ * /ekf_se/use_control: False
+ * /ekf_se/world_frame: odom
+ * /enable_pull_up_protect: True
+ * /estimator_type: 1
+ * /gaitCommandFile: /root/kuavo_ws/sr...
+ * /humanoid_description: <?xml version='1....
+ * /init_fall_down_state: False
+ * /is_rl_start: False
+ * /isolated_cpus: [2, 3]
+ * /joy_execute_action: True
+ * /kuavo_configuration: <...>
+ * /legged_robot_scene_param: /root/kuavo_ws/sr...
+ * /lidar_mid360/backend: cpu
+ * /lidar_mid360/cutoff_dist: 50.0
+ * /lidar_mid360/lidar_frame: base_link
+ * /lidar_mid360/output_type: pointcloud2
+ * /lidar_mid360/pc2_time_mode: last_nonzero
+ * /lidar_mid360/pc2_topic: /lidar/points
+ * /lidar_mid360/rate: 10.0
+ * /lidar_mid360/use_geomgroup: True
+ * /modelPath: /root/kuavo_ws/sr...
+ * /model_path: /root/kuavo_ws/sr...
+ * /mpc/schedule/enable: False
+ * /mpc/schedule/start_time: -1.0
+ * /mujoco_vsync: True
+ * /multiplot: False
+ * /network_model_file: /root/kuavo_ws/sr...
+ * /nodelet_manager/log_delete_limit_gb: 1.0
+ * /nodelet_manager/max_log_size_gb: 2.0
+ * /nodelet_manager/num_worker_threads: 10
+ * /nodelet_robot_type: 2
+ * /only_half_up_body: False
+ * /play_back: False
+ * /print_ik_info: False
+ * /pull_up_force_threshold: 0.7
+ * /referenceFile: /root/kuavo_ws/sr...
+ * /repo_root_path: /root/kuavo_ws/de...
+ * /rl_param: /root/kuavo_ws/sr...
+ * /robot_init_state_param: [-0.65, 0.0, 0.92...
+ * /robot_type: 2
+ * /robot_version: 52
+ * /rosdistro: noetic
+ * /rosversion: 1.17.0
+ * /sensor_frequency: 1000
+ * /start_way: manual
+ * /taskFile: /root/kuavo_ws/sr...
+ * /teach_pendant: 0
+ * /timeout_warning_ms: 20
+ * /torso_interpolation_max_velocity: 0.06
+ * /urdfFile: /root/kuavo_ws/sr...
+ * /use_estimator_contact: False
+ * /use_external_mpc: True
+ * /use_joint_filter: False
+ * /visualize_humanoid: True
+ * /wbc_frequency: 1000
+ * /wbc_only: False
+ * /with_estimation: True
+
+NODES
+  /
+    arms_ik_node (motion_capture_ik/arms_ik_node)
+    camera_base_to_head_camera_view (tf2_ros/static_transform_publisher)
+    collect_launch_info (humanoid_controllers/collect_launch_info.sh)
+    ekf_se (nodelet/nodelet)
+    gripper_tf_publisher (challenge_cup_simulator/gripper_tf_publisher.py)
+    humanoid_Arm_time_target_control (humanoid_interface_ros/humanoid_Arm_time_target_control)
+    humanoid_VR_hand_control (humanoid_interface_ros/humanoid_VR_hand_control)
+    humanoid_gait_command (humanoid_interface_ros/humanoid_gait_command)
+    humanoid_gait_switch_by_name (humanoid_interface_ros/humanoid_gait_switch_by_name)
+    humanoid_hand_control (humanoid_interface_ros/humanoid_hand_control)
+    humanoid_quest_control_with_arm (humanoid_interface_ros/humanoid_quest_control_with_arm)
+    humanoid_sqp_mpc (humanoid_interface_ros/humanoid_sqp_mpc)
+    kuavo_monitor_node (kuavo_monitor/kuavo_monitor_node)
+    left_wrist_camera_link_to_left_wrist_camera_view (tf2_ros/static_transform_publisher)
+    lidar_mid360 (challenge_cup_simulator/lidar_mid360_node.py)
+    nodelet_controller (nodelet/nodelet)
+    nodelet_manager (nodelet/nodelet)
+    nodelet_mujoco (nodelet/nodelet)
+    right_wrist_camera_link_to_right_wrist_camera_view (tf2_ros/static_transform_publisher)
+    sim_camera_info_publisher (challenge_cup_simulator/cam_info_pub.py)
+    sim_leju_claw_interface (challenge_cup_simulator/sim_leju_claw_interface.py)
+    system_info_publisher (humanoid_controllers/system_info_publisher.py)
+
+auto-starting new master
+[1mprocess[master]: started with pid [207][0m
+[1mROS_MASTER_URI=http://localhost:11311[0m
+]2;/root/kuavo_ws/src/challenge_cup_simulator/launch/load_kuavo_mujoco_challenge.launch http://localhost:11311
+[1msetting /run_id to 67faf7d6-cdf4-11f1-98d9-c85ea94bd8c7[0m
+[1mprocess[rosout-1]: started with pid [236][0m
+started core service [/rosout]
+[1mprocess[collect_launch_info-2]: started with pid [244][0m
+[1mprocess[humanoid_sqp_mpc-3]: started with pid [247][0m
+[1mprocess[humanoid_gait_command-4]: started with pid [251][0m
+nohup: ignoring input and redirecting stderr to stdout
+[1mprocess[humanoid_hand_control-5]: started with pid [259][0m
+[1mprocess[humanoid_VR_hand_control-6]: started with pid [264][0m
+[1mprocess[humanoid_quest_control_with_arm-7]: started with pid [274][0m
+[1mprocess[humanoid_Arm_time_target_control-8]: started with pid [281][0m
+find: ‘/root/.ros/coredumps/’: No such file or directory
+[1mprocess[humanoid_gait_switch_by_name-9]: started with pid [292][0m
+[1mprocess[nodelet_manager-10]: started with pid [299][0m
+[1mprocess[nodelet_controller-11]: started with pid [304][0m
+[1mprocess[ekf_se-12]: started with pid [308][0m
+[1mprocess[nodelet_mujoco-13]: started with pid [314][0m
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_controller]: Loading nodelet /nodelet_controller of type HumanoidControllerNodelet to manager nodelet_manager with the following remappings:[0m
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_controller]: waitForService: Service [/nodelet_manager/load_nodelet] has not been advertised, waiting...[0m
+[1mprocess[lidar_mid360-14]: started with pid [320][0m
+[1mprocess[sim_camera_info_publisher-15]: started with pid [322][0m
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_mujoco]: Loading nodelet /nodelet_mujoco of type MujocoNodelet to manager nodelet_manager with the following remappings:[0m
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_mujoco]: waitForService: Service [/nodelet_manager/load_nodelet] has not been advertised, waiting...[0m
+[1mprocess[camera_base_to_head_camera_view-16]: started with pid [327][0m
+[1mprocess[left_wrist_camera_link_to_left_wrist_camera_view-17]: started with pid [329][0m
+[0m[ INFO ][2026-10-22-08:41:43][/ekf_se]: Loading nodelet /ekf_se of type RobotLocalization/EkfNodelet to manager nodelet_manager with the following remappings:[0m
+[1mprocess[right_wrist_camera_link_to_right_wrist_camera_view-18]: started with pid [338][0m
+[0m[ INFO ][2026-10-22-08:41:43][/ekf_se]: waitForService: Service [/nodelet_manager/load_nodelet] has not been advertised, waiting...[0m
+[0m[ INFO ][2026-10-22-08:41:43][/camera_base_to_head_camera_view]: Spinning until killed publishing camera_base to Head Camera View[0m
+[0m[ INFO ][2026-10-22-08:41:43][/left_wrist_camera_link_to_left_wrist_camera_view]: Spinning until killed publishing left_wrist_camera_link to Left Wrist Camera View[0m
+[0m[ INFO ][2026-10-22-08:41:43][/right_wrist_camera_link_to_right_wrist_camera_view]: Spinning until killed publishing right_wrist_camera_link to Right wrist Camera View[0m
+[1mprocess[gripper_tf_publisher-19]: started with pid [346][0m
+[1m[collect_launch_info-2] process has finished cleanly
+log file: /root/.ros/log/67faf7d6-cdf4-11f1-98d9-c85ea94bd8c7/collect_launch_info-2*.log[0m
+[1mprocess[sim_leju_claw_interface-20]: started with pid [363][0m
+[0m[ INFO ][2026-10-22-08:41:43][/humanoid_quest_control_with_arm]: The TargetTrajectories is publishing on humanoid_mpc_target topic.[0m
+>>>>>>>>>>>>>>>>>>>> Creating new instance of HumanoidInterfaceDrake <<<<<<<<<<
+Created JSONConfigReader
+Will try to load config from: /root/kuavo_ws/src/kuavo_assets/config/kuavo_v52/kuavo.json
+Loaded config file
+>>>>>>>>>>>>>>>>>>>> Creating new instance of HumanoidInterfaceDrake <<<<<<<<<<
+Created JSONConfigReader
+Will try to load config from: /root/kuavo_ws/src/kuavo_assets/config/kuavo_v52/kuavo.json
+Loaded kuavo settings
+Loaded config file
+Loaded kuavo settings
+get referenceFile: /root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/command/reference.info
+Robot type: 2 (1 for wheel robot, 0 for biped)
+>>>>>>>>>>>>>>>>>>>> Creating new instance of HumanoidInterfaceDrake <<<<<<<<<<
+Created JSONConfigReader
+Will try to load config from: /root/kuavo_ws/src/kuavo_assets/config/kuavo_v52/kuavo.json
+Loaded config file
+Loaded kuavo settings
+[1mprocess[system_info_publisher-21]: started with pid [367][0m
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: Initializing nodelet with 10 worker threads.[0m
+[1mprocess[kuavo_monitor_node-22]: started with pid [372][0m
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_mujoco]: waitForService: Service [/nodelet_manager/load_nodelet] is now available.[0m
+[1mprocess[arms_ik_node-23]: started with pid [389][0m
+foot width: 0.19015
+foot width: 0.19015
+foot width: 0.19015
+squat joint state solve successfull!!! 
+squat state is     0.999657 -6.50636e-08    0.0261767  3.28282e-07   -0.0536031  0.000434763     0.706379   0.00771993  0.000404194     -1.25269      1.84554    -0.645212  -0.00772991  -0.00921409  -0.00048355     -1.25265       1.8455    -0.645208   0.00922596
+squat_z should be bigger than 0.72
+foot width: 0.19015
+squat joint state solve successfull!!! 
+squat state is     0.999657 -6.50636e-08    0.0261767  3.28282e-07   -0.0536031  0.000434763     0.706379   0.00771993  0.000404194     -1.25269      1.84554    -0.645212  -0.00772991  -0.00921409  -0.00048355     -1.25265       1.8455    -0.645208   0.00922596
+squat_z should be bigger than 0.72
+foot width: 0.19015
+[0m[ INFO ][2026-10-22-08:41:43][/ekf_se]: waitForService: Service [/nodelet_manager/load_nodelet] is now available.[0m
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_controller]: waitForService: Service [/nodelet_manager/load_nodelet] is now available.[0m
+Loading gait file: /root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/command/gait.info
+q_initial_: 
+0.999657, -4.17339e-07, 0.0261772, -2.28138e-07, -0.0343811, 0.000434559, 0.920532, 0.00564142, 0.000296007, -0.507622, 0.771092, -0.31583, -0.00564674, -0.00672973, -0.000349385, -0.507587, 0.771033, -0.315802, 0.00673998, 
+>>>>>>>>>>>>>>>>>>>> HumanoidInterfaceDrake INFO <<<<<<<<<<<<<<<<<<<<<<<<<
+Robot version: RobotVersion(52)
+Real: 1
+Time step: 0.002
+Total mass: 66.3384
+Total mass (with arm): 66.3384
+>>>>>>>>>>>>>>>>>>>> HumanoidInterfaceDrake INFO <<<<<<<<<<<<<<<<<<<<<<<<<
+only_half_up_body: 0
+q_initial_: 
+0.999657, -4.17339e-07, 0.0261772, -2.28138e-07, -0.0343811, 0.000434559, 0.920532, 0.00564142, 0.000296007, -0.507622, 0.771092, -0.31583, -0.00564674, -0.00672973, -0.000349385, -0.507587, 0.771033, -0.315802, 0.00673998, 
+>>>>>>>>>>>>>>>>>>>> HumanoidInterfaceDrake INFO <<<<<<<<<<<<<<<<<<<<<<<<<
+Robot version: RobotVersion(52)
+Real: 1
+Time step: 0.002
+Total mass: 66.3384
+Total mass (with arm): 66.3384
+>>>>>>>>>>>>>>>>>>>> HumanoidInterfaceDrake INFO <<<<<<<<<<<<<<<<<<<<<<<<<
+[0m[ INFO ][2026-10-22-08:41:43][/humanoid_gait_switch_by_name]: humanoid_mpc_gait_switch_by_name node is setting up ...[0m
+squat joint state solve successfull!!! 
+squat state is     0.999657 -6.50636e-08    0.0261767  3.28282e-07   -0.0536031  0.000434763     0.706379   0.00771993  0.000404194     -1.25269      1.84554    -0.645212  -0.00772991  -0.00921409  -0.00048355     -1.25265       1.8455    -0.645208   0.00922596
+squat_z should be bigger than 0.72
+foot width: 0.19015
+q_initial_: 
+0.999657, -4.17339e-07, 0.0261772, -2.28138e-07, -0.0343811, 0.000434559, 0.920532, 0.00564142, 0.000296007, -0.507622, 0.771092, -0.31583, -0.00564674, -0.00672973, -0.000349385, -0.507587, 0.771033, -0.315802, 0.00673998, 
+>>>>>>>>>>>>>>>>>>>> HumanoidInterfaceDrake INFO <<<<<<<<<<<<<<<<<<<<<<<<<
+Robot version: RobotVersion(52)
+Real: 1
+Time step: 0.002
+Total mass: 66.3384
+Total mass (with arm): 66.3384
+>>>>>>>>>>>>>>>>>>>> HumanoidInterfaceDrake INFO <<<<<<<<<<<<<<<<<<<<<<<<<
+Loading turn zones from: /root/kuavo_ws/src/humanoid-control/humanoid_interface_ros/config/step_turn.yaml
+[0m[ INFO ][2026-10-22-08:41:43][/humanoid_gait_switch_by_name]: humanoid_mpc_gait_switch_by_name command node is ready.[0m
+[0m[ INFO ][2026-10-22-08:41:43][/humanoid_hand_control]: The TargetTrajectories is publishing on humanoid_mpc_target topic.[0m
+[HumanoidInterface] Loading task file: "/root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/mpc/task.info"
+[HumanoidInterface] Loading Pinocchio model from: "/root/kuavo_ws/src/challenge_cup_simulator/models/biped_s52/urdf/biped_s52.urdf"
+[HumanoidInterface] Loading target command settings from: "/root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/command/reference.info"
+Loading Model Settings from file: /root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/mpc/task.info
+[0m[ INFO ][2026-10-22-08:41:43][/humanoid_hand_control]: The TargetTrajectories is publishing on humanoid_mpc_target topic.[0m
+[ModelSettings]:Cppad Model folder: /var/ocs2/kuavo_v52/md5_fb879958/0/21dof
+[ModelSettings]:URDF hash: fb879958
+[ModelSettings::loadModelSettings] Warning: jointNames size is not equal to mpcArmsDof + mpcLegsDof + mpcWaistDof, scaling with mpcArmsDof
+Adjusted jointNames size: 21
+model_path: /root/kuavo_ws/src/challenge_cup_simulator/models/biped_s52/urdf/drake/biped_v3_arm.urdf
+control_hand_side: 2
+cppad building start in this node. please wait some minutes...
+>>>>>>>>>>>>>>>>>>>> Creating new instance of HumanoidInterfaceDrake <<<<<<<<<<
+Created JSONConfigReader
+Will try to load config from: /root/kuavo_ws/src/kuavo_assets/config/kuavo_v52/kuavo.json
+Loaded config file
+Loaded kuavo settings
+model_config_file: /root/kuavo_ws/src/kuavo_assets/config/kuavo_v52/kuavo.json
+single_arm_num: 7
+[2026-10-22 16:41:43.315] [console] [warning] /root/kuavo_ws/src/challenge_cup_simulator/models/biped_s52/urdf/drake/biped_v3_arm.urdf:347: warning: While parsing inertia matrix: MakeFromMomentsAndProductsOfInertia(): The rotational inertia
+[0.00013001    -7.7e-05    -4.5e-05]
+[  -7.7e-05  0.00012773    -4.8e-05]
+[  -4.5e-05    -4.8e-05  0.00014597]
+did not pass the test CouldBePhysicallyValid().
+The associated principal moments of inertia:
+1.8039894379643393e-05  0.00017970796390663981  0.00020596214171371654
+do not satisfy the triangle inequality.
+original frame_name: 
+ base_link
+ zarm_l7_end_effector
+ zarm_r7_end_effector
+ zarm_l4_link
+ zarm_r4_link
+new frame_name: 
+  base_link
+  eef_left
+  eef_right
+  zarm_l4_link
+  zarm_r4_link
+plant nq: 14, nv: 14
+foot width: 0.19015
+print_ik_info: 1
+Work space radius: 0.658883
+squat joint state solve successfull!!! 
+squat state is     0.999657 -6.50636e-08    0.0261767  3.28282e-07   -0.0536031  0.000434763     0.706379   0.00771993  0.000404194     -1.25269      1.84554    -0.645212  -0.00772991  -0.00921409  -0.00048355     -1.25265       1.8455    -0.645208   0.00922596
+squat_z should be bigger than 0.72
+foot width: 0.19015
+Loading 4 turn zones from YAML file...
+Loaded left turn zone 0: min=-0.15, max=0, pose=[-0.01, 0.01, 0, 10]
+Loaded left turn zone 1: min=-0.45, max=-0.15, pose=[-0.03, 0.03, 0, 20]
+Loaded left turn zone 2: min=-0.75, max=-0.451, pose=[-0.04, 0.04, 0, 30]
+Loaded left turn zone 3: min=-1, max=-0.751, pose=[-0.06, 0.06, 0, 45]
+[0m[ INFO ][2026-10-22-08:41:43][/humanoid_quest_control_with_arm]: [Info] Left foot[1] is in collision, switch to right foot[0m
+Generated right turn zone 0: min=0.751, max=1, pose=[-0.06, -0.06, 0, -45]
+[0m[ INFO ][2026-10-22-08:41:43][/humanoid_quest_control_with_arm]: [Info] Left foot[1] is in collision, switch to right foot[0m
+Generated right turn zone 1: min=0.451, max=0.75, pose=[-0.04, -0.04, 0, -30]
+Generated right turn zone 2: min=0.15, max=0.45, pose=[-0.03, -0.03, 0, -20]
+Generated right turn zone 3: min=-0, max=0.15, pose=[-0.01, -0.01, 0, -10]
+[0m[ INFO ][2026-10-22-08:41:43][/humanoid_quest_control_with_arm]: [Info] Right foot[1] is in collision, switch to left foot[0m
+[0m[ INFO ][2026-10-22-08:41:43][/humanoid_quest_control_with_arm]: [Info] Right foot[1] is in collision, switch to left foot[0m
+Total turn zones loaded: 8
+[0m[ INFO ][2026-10-22-08:41:43][/humanoid_quest_control_with_arm]: humanoid_mpc_mode_schedule node is setting up ...[0m
+q_initial_: 
+0.999657, -4.17339e-07, 0.0261772, -2.28138e-07, -0.0343811, 0.000434559, 0.920532, 0.00564142, 0.000296007, -0.507622, 0.771092, -0.31583, -0.00564674, -0.00672973, -0.000349385, -0.507587, 0.771033, -0.315802, 0.00673998, 
+>>>>>>>>>>>>>>>>>>>> HumanoidInterfaceDrake INFO <<<<<<<<<<<<<<<<<<<<<<<<<
+Robot version: RobotVersion(52)
+Real: 1
+Time step: 0.002
+Total mass: 66.3384
+Total mass (with arm): 66.3384
+>>>>>>>>>>>>>>>>>>>> HumanoidInterfaceDrake INFO <<<<<<<<<<<<<<<<<<<<<<<<<
+feetXYOffset_ [0]:  0.122003 0.150002        0
+feetXYOffset_ [1]:   0.122003 0.0500016         0
+feetXYOffset_ [2]:  -0.122001  0.150002         0
+feetXYOffset_ [3]:  -0.122001 0.0500015         0
+feetXYOffset_ [4]:    0.122003 -0.0499981          0
+feetXYOffset_ [5]:   0.122004 -0.149998         0
+feetXYOffset_ [6]:   -0.122001 -0.0499989          0
+feetXYOffset_ [7]:  [0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: Initializing Mujoco nodelet...[0m
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: HumanoidControllerNodelet nodelet initialized.[0m
+MuJoCo version 3.0.1
+   -0.122 -0.149999         0
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: Mujoco Frequency: 1000.000000 Hz[0m
+gaitFile:/root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/command/gait.info
+loading gait: stance
+ #### 'stance.switchingTimes': {0.5, }
+ #### 'stance.modeSequence': {SS, }
+loading gait: trot
+ #### 'trot.switchingTimes': {0.16, 0.35, 0.16, 0.35, }
+ #### 'trot.modeSequence': {SS, SF, SS, FS, }
+loading gait: jump
+ #### 'jump.switchingTimes': {0.2, 0.3, }
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: Only half up body mode: false[0m
+ #### 'jump.modeSequence': {SS, FF, }
+loading gait: sl
+ #### 'sl.switchingTimes': {0.4, }
+ #### 'sl.modeSequence': {SF, }
+loading gait: walk
+ #### 'walk.switchingTimes': {0.05, 0.07, 0.35, 0.04, 0.05, 0.07, 0.35, 0.04, }
+ #### 'walk.modeSequence': {SS, ST, SF, SH, SS, TS, FS, HS, }
+[mujoco_node] robot_type param: 2
+loading gait: walk2
+ #### 'walk2.switchingTimes': {0.1, 0.15, 0.3, 0.15, 0.1, 0.15, 0.3, 0.15, }
+ #### 'walk2.modeSequence': {SS, ST, SF, SH, SS, TS, FS, HS, }
+loading gait: trot2
+ #### 'trot2.switchingTimes': {0.3, 1, 0.3, 1, }
+ #### 'trot2.modeSequence': {SF, SS, FS, SS, }
+info_.stateDim:33
+armJointNums_:8
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: [32mEnd effector type: qiangnao[0m[0m
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: [32mLeft arm end joint: zarm_l7_joint[0m[0m
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: [32mRight arm end joint: zarm_r7_joint[0m[0m
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: [32mNUM_JOINT from config: 29[0m[0m
+Invalid MIT-MAGIC-COOKIE-1 key[33mWARNING: Loaded at least one default value in matrix: "Q_base_stance"[0m
+ERROR: could not initialize GLFW
+
+Press Enter to exit ...[33mWARNING: Loaded at least one default value in matrix: "Q_base_stance_VRwaist"[0m
+[33mWARNING: Loaded at least one default value in matrix: "Q_base_walk"[0m
+[33mWARNING: Loaded at least one default value in matrix: "Q_base_jump"[0m
+Loaded dynamic Q matrices with dimension adjustments - Stance: 33x33, StanceVRwaist: 33x33, Walk: 33x33, Jump: 33x33
+[33mWARNING: Loaded at least one default value in matrix: "R_base_stance"[0m
+[33mWARNING: Loaded at least one default value in matrix: "R_base_walk"[0m
+Loaded dynamic R matrices with dimension adjustments - Stance: 57x57, Walk: 57x57
+[loadDynamicQRMap] Total loaded 0 dynamic QR pairs.
+dynamic_qr_file: /root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/mpc/dynamic_qr.info
+[SwingTrajectoryPlanner] num_arm_joints_ = 8
+build cppad model complete...
+[33mWARNING: Loaded at least one default value in matrix: "Q"[0m
+[33mWARNING: Loaded at least one default value in matrix: "R"[0m
+[HumanoidInterface] Center of Mass constraint created with contact points: ll_foot_toe lr_foot_toe ll_foot_heel lr_foot_heel rl_foot_toe rr_foot_toe rl_foot_heel rr_foot_heel 
+[0m[ INFO ][2026-10-22-08:41:43][/humanoid_sqp_mpc]: MPC node is setting up ...[0m
+[0m[ INFO ][2026-10-22-08:41:43][/humanoid_sqp_mpc]: Publishing SLQ-MPC messages on a separate thread.[0m
+[0m[ INFO ][2026-10-22-08:41:43][/humanoid_sqp_mpc]: MPC node is ready.[0m
+[0m[ INFO ][2026-10-22-08:41:43][/humanoid_sqp_mpc]: Start spinning now ...[0m
+[INFO] [1792658503.642962]: challenge_sim_launcher: 等待仿真就绪...
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: Initializing HumanoidControllerNodelet nodelet...[0m
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: HumanoidControllerNodelet nodelet initialized.[0m
+[controllerNodelet] Found /nodelet_robot_type parameter: 2
+Using nomal estimator
+>>>>>>>>>>>>>>>>>>>> Creating new instance of HumanoidInterfaceDrake <<<<<<<<<<
+Created JSONConfigReader
+Will try to load config from: /root/kuavo_ws/src/kuavo_assets/config/kuavo_v52/kuavo.json
+Loaded config file
+Loaded kuavo settings
+[INFO ][2026-10-22-16:41:43][/lidar_mid360]: lidar_mid360: 加载场景 /root/kuavo_ws/src/challenge_cup_simulator/models/biped_s52/xml/_scene_scene1_active.xml
+foot width: 0.19015
+squat joint state solve successfull!!! 
+squat state is     0.999657 -6.50636e-08    0.0261767  3.28282e-07   -0.0536031  0.000434763     0.706379   0.00771993  0.000404194     -1.25269      1.84554    -0.645212  -0.00772991  -0.00921409  -0.00048355     -1.25265       1.8455    -0.645208   0.00922596
+squat_z should be bigger than 0.72
+foot width: 0.19015
+q_initial_: 
+0.999657, -4.17339e-07, 0.0261772, -2.28138e-07, -0.0343811, 0.000434559, 0.920532, 0.00564142, 0.000296007, -0.507622, 0.771092, -0.31583, -0.00564674, -0.00672973, -0.000349385, -0.507587, 0.771033, -0.315802, 0.00673998, 
+>>>>>>>>>>>>>>>>>>>> HumanoidInterfaceDrake INFO <<<<<<<<<<<<<<<<<<<<<<<<<
+Robot version: RobotVersion(52)
+Real: 1
+Time step: 0.002
+Total mass: 66.3384
+Total mass (with arm): 66.3384
+>>>>>>>>>>>>>>>>>>>> HumanoidInterfaceDrake INFO <<<<<<<<<<<<<<<<<<<<<<<<<
+pull_up_force_threshold: 0.7
+enable_pull_up_protect: 1
+torso_interpolation_max_velocity: 0.06 m/s
+networkModelPath_/root/kuavo_ws/src/humanoid-control/humanoid_controllers/model/networks[0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: [humanoidController] WBC rate initialized at 1000 Hz[0m
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: [humanoidController] Sensor frequency: 1000 Hz, sensor_dt: 0.001 s[0m
+[33m[ WARN ][2026-10-22-08:41:43][/nodelet_manager]: No input sensitivity parameter found, using default joystick sensitivity.[0m
+LowPassFilter2nd: Invalid parameters, disabling filter.
+LowPassFilter2nd: Invalid parameters, disabling filter.
+DARE solver converged in 1000 iterations.
+[HumanoidInterface] Loading task file: "/root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/mpc/task.info"
+[HumanoidInterface] Loading Pinocchio model from: "/root/kuavo_ws/src/challenge_cup_simulator/models/biped_s52/urdf/biped_s52.urdf"
+[HumanoidInterface] Loading target command settings from: "/root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/command/reference.info"
+Loading Model Settings from file: /root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/mpc/task.info
+[ModelSettings]:Cppad Model folder: /var/ocs2/kuavo_v52/md5_fb879958/0/21dof
+[ModelSettings]:URDF hash: fb879958
+[ModelSettings::loadModelSettings] Warning: jointNames size is not equal to mpcArmsDof + mpcLegsDof + mpcWaistDof, scaling with mpcArmsDof
+Adjusted jointNames size: 21
+feetXYOffset_ [0]:  0.122003 0.150002        0
+feetXYOffset_ [1]:   0.122003 0.0500016         0
+feetXYOffset_ [2]:  -0.122001  0.150002         0
+feetXYOffset_ [3]:  -0.122001 0.0500015         0
+feetXYOffset_ [4]:    0.122003 -0.0499981          0
+feetXYOffset_ [5]:   0.122004 -0.149998         0
+feetXYOffset_ [6]:   -0.122001 -0.0499989          0
+feetXYOffset_ [7]:     -0.122 -0.149999         0
+gaitFile:/root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/command/gait.info
+loading gait: stance
+ #### 'stance.switchingTimes': {0.5, }
+ #### 'stance.modeSequence': {SS, }
+loading gait: trot
+ #### 'trot.switchingTimes': {0.16, 0.35, 0.16, 0.35, }
+ #### 'trot.modeSequence': {SS, SF, SS, FS, }
+loading gait: jump
+ #### 'jump.switchingTimes': {0.2, 0.3, }
+ #### 'jump.modeSequence': {SS, FF, }
+loading gait: sl
+ #### 'sl.switchingTimes': {0.4, }
+ #### 'sl.modeSequence': {SF, }
+loading gait: walk
+ #### 'walk.switchingTimes': {0.05, 0.07, 0.35, 0.04, 0.05, 0.07, 0.35, 0.04, }
+ #### 'walk.modeSequence': {SS, ST, SF, SH, SS, TS, FS, HS, }
+loading gait: walk2
+ #### 'walk2.switchingTimes': {0.1, 0.15, 0.3, 0.15, 0.1, 0.15, 0.3, 0.15, }
+ #### 'walk2.modeSequence': {SS, ST, SF, SH, SS, TS, FS, HS, }
+loading gait: trot2
+ #### 'trot2.switchingTimes': {0.3, 1, 0.3, 1, }
+ #### 'trot2.modeSequence': {SF, SS, FS, SS, }
+info_.stateDim:33
+armJointNums_:8
+[SwitchedModelReferenceManager]: Get armRealDof: 14
+[33mWARNING: Loaded at least one default value in matrix: "Q_base_stance"[0m
+[33mWARNING: Loaded at least one default value in matrix: "Q_base_stance_VRwaist"[0m
+[33mWARNING: Loaded at least one default value in matrix: "Q_base_walk"[0m
+[33mWARNING: Loaded at least one default value in matrix: "Q_base_jump"[0m
+Loaded dynamic Q matrices with dimension adjustments - Stance: 33x33, StanceVRwaist: 33x33, Walk: 33x33, Jump: 33x33
+[33mWARNING: Loaded at least one default value in matrix: "R_base_stance"[0m
+[33mWARNING: Loaded at least one default value in matrix: "R_base_walk"[0m
+Loaded dynamic R matrices with dimension adjustments - Stance: 57x57, Walk: 57x57
+[loadDynamicQRMap] Total loaded 0 dynamic QR pairs.
+dynamic_qr_file: /root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/mpc/dynamic_qr.info
+[SwingTrajectoryPlanner] num_arm_joints_ = 8
+build cppad model complete...
+[33mWARNING: Loaded at least one default value in matrix: "Q"[0m
+[33mWARNING: Loaded at least one default value in matrix: "R"[0m
+[INFO ][2026-10-22-16:41:43][/lidar_mid360]: lidar_mid360: geomgroup 过滤，检测 group=0/2/3
+[INFO ][2026-10-22-16:41:43][/lidar_mid360]: lidar_mid360: mid360，site=lidar_site，10 Hz，output=pointcloud2，pc2_topic=/lidar/points，livox_topic=/livox/lidar，frame=base_link，raw_imu_topic=/lidar_imu，pc2_time_mode=last_nonzero，stamp_mode=wall_time
+[HumanoidInterface] Center of Mass constraint created with contact points: ll_foot_toe lr_foot_toe ll_foot_heel lr_foot_heel rl_foot_toe rr_foot_toe rl_foot_heel rr_foot_heel 
+use_external_mpc_:1
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: MRT node is setting up ...[0m
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: Publishing MRT messages on a separate thread.[0m
+[0m[ INFO ][2026-10-22-08:41:43][/nodelet_manager]: MRT node is ready.[0m
+HumanoidInterface_->getCentroidalModelInfo().robotMass:66.3384
+Loading Model Settings from file: /root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/mpc/task.info
+[ModelSettings]:Cppad Model folder: /var/ocs2/kuavo_v52/md5_default/0/21dof
+[ModelSettings]:URDF hash: default
+[ModelSettings::loadModelSettings] Warning: jointNames size is not equal to mpcArmsDof + mpcLegsDof + mpcWaistDof, scaling with mpcArmsDof
+Adjusted jointNames size: 21
+ankle_solver_type: 2
+[AnkleSolver] ankle_solver_type: 2
+controller initial_state_:           0            0            0            0            0            0   -0.0343811  0.000434559     0.920532            0    0.0523599            0   0.00564142  0.000296007    -0.507622     0.771092     -0.31583  -0.00564674  -0.00672973 -0.000349385    -0.507587     0.771033    -0.315802   0.00673998
+controller squat_initial_state_:          0           0           0           0           0           0  -0.0536031 0.000434763    0.706379           0   0.0523599           0  0.00771993 0.000404194    -1.25269     1.84554   -0.645212 -0.00772991 -0.00921409 -0.00048355    -1.25265      1.8455   -0.645208  0.00922596
+gait_map size: 7
+[33mWARNING: Loaded at least one default value in matrix: "joint_kp_"[0m
+[33mWARNING: Loaded at least one default value in matrix: "joint_kd_"[0m
+[33mWARNING: Loaded at least one default value in matrix: "joint_kp_walking_"[0m
+[33mWARNING: Loaded at least one default value in matrix: "joint_kd_walking_"[0m
+defalutArmPosMPC_: 0.15    0   -0 -0.4   -0   -0   -0 0.15    0   -0 -0.4   -0   -0   -0
+Head joint zhead_1_joint lower_limit: -90 upper_limit: 90
+Head joint zhead_2_joint lower_limit: -30 upper_limit: 30
+[33mWARNING: Loaded at least one default value in matrix: "jointStateLimit"[0m
+[33mWARNING: Loaded at least one default value in matrix: "defaultCotrolMode"[0m
+DDS communication disabled (compile with -DUSE_DDS or -DUSE_LEJU_DDS to enable)
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [RLControllerManager] ROS services initialized[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [HumanoidController] Loading RL controllers from config file: /root/kuavo_ws/src/humanoid-control/humanoid_controllers/config/kuavo_v52/rl_controllers.yaml[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] Services initialized at namespace: /humanoid_controllers/amp_controller[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] RL variables initialized: jointNum_=12, jointArmNum_=14, waistNum_=1, headNum_=2, num_actions_=27[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] controlFrequency not in config, using /wbc_frequency: 1000.0 Hz[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] Control frequency: 1000.0 Hz, dt: 0.001000 s[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] Loaded motor_pdo_kp and motor_pdo_kd from config file[0m
+ #### 'use_jointcmd_filter'....................................................1
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] Arm command replacement enabled: true[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] Arm control parameters loaded: max_velocity=2.500 rad/s, error_threshold=0.100 rad, mode_interpolation_velocity=1.000 rad/s[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] Waist command replacement enabled: true[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] Waist control parameters loaded: mode_interpolation_velocity=1.000 rad/s, mode2_cutoff_freq=0.8 Hz, kp=10.0, kd=5.0[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] Waist zero tracking in walking enabled: false[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] Stance-to-walk hip roll bias parameters: bias=0.8000 rad, duration=0.2000 s[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] YAW compensation loaded: enabled=false, xBias=-0.1000, threshold=0.0000, xVelThreshold=0.1000, separate=false[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] loadConfig done. num_actions_=27, numSingleObs_=91, frameStack_=1[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [RlGaitReceiver] Initialized with smart stop detection enabled[0m
+[RlGaitReceiver] inPlaceStepVelocity loaded (simulation mode):
+  linearX: 0
+  linearY: 0
+  angularZ: 0
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [RlGaitReceiver] Mixed motion limits loaded: enableMixedMode=true, maxLinearVelWithAngular=0.20, maxAngularVelWithLinear=0.40[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] AnkleSolver type loaded from ROS params: 2[0m
+ankle_solver_type: 2
+[AnkleSolver] ankle_solver_type: 2
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] AnkleSolver initialized with type: 2[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] Using URDF path from ROS param /urdfFile: /root/kuavo_ws/src/challenge_cup_simulator/models/biped_s52/urdf/biped_s52.urdf[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [ArmController] Initialized: leg_joints=12, waist_joints=1, arm_joints=14, arm_start_idx=13[0m
+[ArmTorqueController] 构造函数
+[ArmTorqueController] urdf_path: /root/kuavo_ws/src/challenge_cup_simulator/models/biped_s52/urdf/biped_s52.urdf
+[ArmTorqueController] kp: 15 30 15 20 15 15 15 15 30 15 20 15 15 15
+[ArmTorqueController] kd: 6 3 3 6 3 3 3 6 3 3 6 3 3 3
+[ArmTorqueController] model.nq: 33
+[ArmTorqueController] model.nv: 33
+[ArmTorqueController] 在URDF中找到的手臂关节数量: 14
+[ArmTorqueController] 左手臂关节起始索引 (q/v): 13/13
+[ArmTorqueController] 右手臂关节起始索引 (q/v): 22/22
+[ArmTorqueController] 手臂关节数量: 14
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [ArmController] Torque controller initialized successfully[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [ArmController] Initialization successful[0m
+[ArmController] Default arm position: 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [ArmController] Loaded settings: mode1_max_velocity=2.500 rad/s, error_threshold=0.100 rad, mode_interpolation_velocity=1.000 rad/s[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] Arm controller initialized (arm_command_replacement_enabled=true, urdf_path=/root/kuavo_ws/src/challenge_cup_simulator/models/biped_s52/urdf/biped_s52.urdf)[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [WaistController] Subscribed to /humanoid_controller/enable_waist_control (is_real=0)[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [WaistController] Switching to Mode 2: external control (cutoff=0.8 Hz, target_received=0)[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] Waist controller initialized (default mode=1 RL control, waist_joints=1)[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] AmpWalkController initialized[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [amp_controller] Inference thread created[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [RLControllerManager] Added controller 'amp_controller' (type: 1) in paused state[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [RLControllerManager] Successfully loaded controller 'amp_controller' (type: AMP_CONTROLLER)[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [RLControllerManager] Loaded 1 controllers from config file (1 enabled)[0m
+[0m[ INFO ][2026-10-22-08:41:44][/nodelet_manager]: [HumanoidController] Successfully loaded controllers from config, total 2 controllers[0m
+wait for humanoid_sensors_data_buffer to be ready
+[0m[ INFO ][2026-10-22-08:41:44][/humanoid_Arm_time_target_control]: The TargetTrajectories is publishing on humanoid_mpc_target topic.[0m
+[0m[ INFO ][2026-10-22-08:41:44][/humanoid_Arm_time_target_control]: [ArmTrajNode]: Waiting for first observation...[0m
+[0m[ INFO ][2026-10-22-08:41:44][/humanoid_VR_hand_control]: The TargetTrajectories is publishing on humanoid_mpc_target topic.[0m
+[0m[ INFO ][2026-10-22-08:41:44][/humanoid_VR_hand_control]: [VRHandCommandNode]: Waiting for first observation...[0m
+[INFO] [1792658561.004908]: challenge_sim_launcher: 仿真环境就绪。
+[31m[FATAL] [1792658561.036354]: challenge_sim_launcher: 场景初始化服务不可用（场景 scene1 初始化失败，禁止启动）
+[0m[INFO] challenge_sim_launcher: 关闭仿真环境...
+[arms_ik_node-23] killing on exit
+[system_info_publisher-21] killing on exit
+[kuavo_monitor_node-22] killing on exit
+[gripper_tf_publisher-19] killing on exit
+[sim_leju_claw_interface-20] killing on exit
+[right_wrist_camera_link_to_right_wrist_camera_view-18] killing on exit
+[left_wrist_camera_link_to_left_wrist_camera_view-17] killing on exit
+[camera_base_to_head_camera_view-16] killing on exit
+[sim_camera_info_publisher-15] killing on exit
+[lidar_mid360-14] killing on exit
+[nodelet_mujoco-13] killing on exit
+[0m[ INFO ][2026-10-22-08:42:41][/nodelet_mujoco]: Unloading nodelet /nodelet_mujoco from manager nodelet_manager[0m
+[ekf_se-12] killing on exit
+[0m[ INFO ][2026-10-22-08:42:41][/ekf_se]: Unloading nodelet /ekf_se from manager nodelet_manager[0m
+[nodelet_controller-11] killing on exit
+[0m[ INFO ][2026-10-22-08:42:41][/nodelet_controller]: Unloading nodelet /nodelet_controller from manager nodelet_manager[0m
+[nodelet_manager-10] killing on exit
+terminate called without an active exception
+[humanoid_gait_switch_by_name-9] killing on exit
+[humanoid_Arm_time_target_control-8] killing on exit
+[humanoid_quest_control_with_arm-7] killing on exit
+[humanoid_VR_hand_control-6] killing on exit
+[humanoid_hand_control-5] killing on exit
+[humanoid_gait_command-4] killing on exit
+[humanoid_sqp_mpc-3] killing on exit
+HumanoidInterfaceDrake is being destroyed.
+HumanoidInterfaceDrake is being destroyed.
+HumanoidInterfaceDrake is being destroyed.
+!!!!!!!!!!!!!!!!!!!end!!!!!!!!!!!!!!
+MPC_ROS_Interface::publisherWorker: Terminating thread.
+[SqpSolver] Log written to '/tmp/ocs2/sqp_log/log_Thu_Oct_22_16:42:42_2026.txt'
+HumanoidInterfaceDrake is being destroyed.
+[rosout-1] killing on exit
+[master] killing on exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+[1mdone[0m

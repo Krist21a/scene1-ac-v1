@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-24T15:49:15.455159+08:00",
+  "parent": "executor-placement-physical",
+  "candidate": "executor-release-quiet",
+  "factor": "Only final release-ready motion gate .003to.0003rad per observed update; adaptive preparation quiet gate unchanged",
+  "evidence": "Recorded preparation passes3frames while wrist6speed.063rad/s; full4fails actualmeshcollision afterunload. Successalsoobservedat.062, so causal sufficiency not claimed; genuine stationary-release validation needed",
+  "unchanged": [
+    "A+C controller; H task weight reverted9 before live",
+    "450weighingbudget",
+    "all original physical step torque and collision boundaries",
+    "support and arrival checks",
+    "target adaptation mechanism"
+  ],
+  "heldout_seeds_used": [],
+  "tests_passed": 490,
+  "patch_chain_count": 30
+}

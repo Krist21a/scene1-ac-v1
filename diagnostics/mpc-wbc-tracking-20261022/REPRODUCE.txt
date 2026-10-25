@@ -1,0 +1,195 @@
+scene1 跟踪实验的复现与恢复命令（本地仿真；不适用于实机）
+
+所有结果口径见 REPORT.txt。下面各代码段按用途选择执行，不需要把三个候选组合。
+实验标签目录必须不存在；换新标签会保留旧失败。空手探针和任务均由官方入口完整复位。
+历史原始结果可完全离线重算；不要为复现历史失败而跳过新的停止条件。
+
+一、统一变量与当前状态核验（宿主 bash）
+
+set -euo pipefail
+ROOT=/home/krist/kuavo_course/scene1_act_optimization
+D="$ROOT/diagnostics/mpc-wbc-tracking-20261022"
+SIM=kuavo_challenge_container_GPU_046e4301
+ALGO=kuavo-ros-noetic-s12-ready
+cd "$D"
+docker start "$ALGO" "$SIM"
+python3 final_verify.py
+
+final_verify.py 是只读核验，仅当所有原版已经恢复且两容器无工作进程时通过。
+它写 final-verification.json；非零退出时先查看 errors，不继续启动。所有切换脚本也要求完全idle。
+本轮临时启动过容器，结束后保留running但idle，没有恢复成初始stopped。
+
+二、显示授权（只在新桌面会话/显示认证失效时需要）
+
+python3 prepare_display.py
+
+该脚本从当前XAUTHORITY、~/.Xauthority或/run/user/<uid>/gdm/Xauthority读取:0票据，
+私密临时文件中改为通配主机族后复制到SIM:/tmp/scene1-current-display.Xauthority，不输出cookie。
+首次启动失败用的是过期/tmp/scene1-display.Xauthority；不要重新使用它。
+
+三、隔离重建A（原工作区源文件、目标文件、已测二进制均不覆盖）
+
+docker exec "$SIM" mkdir -p /tmp/reference-origin-build
+docker cp "$D/candidate-reference-origin/HumanoidVRHandCommandNode.cpp" "$SIM:/tmp/reference-origin-build/HumanoidVRHandCommandNode.cpp"
+docker cp "$D/build_candidate.py" "$SIM:/tmp/build_candidate.py"
+docker exec "$SIM" python3 /tmp/build_candidate.py --directory /tmp/reference-origin-build
+docker exec "$SIM" sha256sum /tmp/reference-origin-build/humanoid_VR_hand_control
+
+已测A可执行文件SHA：84768f811b9c228d1a296a71644ede4ec44cd64656f76ad4bc42d77dce3ccf03。
+build-manifest.json保存原CMake缓存的完整compile/link参数。编译使用当前环境依赖；若重建hash不同，
+保留为新的构建待核查，不覆盖本目录已经运行过的candidate文件。切换脚本默认使用已测的本地副本。
+
+四、隔离重建C（只重编一个对象，复用原CMake链接的其他对象与依赖）
+
+docker exec "$SIM" mkdir -p /tmp/wrist-pd-build
+docker cp "$D/candidate-wrist-pd/humanoidController.cpp" "$SIM:/tmp/wrist-pd-build/humanoidController.cpp"
+docker cp "$D/build_wrist_pd.py" "$SIM:/tmp/build_wrist_pd.py"
+docker exec "$SIM" python3 /tmp/build_wrist_pd.py --directory /tmp/wrist-pd-build
+docker exec "$SIM" sha256sum /tmp/wrist-pd-build/libhumanoid_controllers.so
+
+已测C库SHA：ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba。
+B只改运行读取的task.info，不需编译。没有重新构建缺失源码的libhumanoid_wbc.so。
+
+五、切换与官方复位空手探针（每个代码段单独选择）
+
+原版：
+python3 switch_controller.py baseline
+python3 switch_gains.py baseline
+python3 switch_wrist_pd.py baseline
+python3 experiment.py empty replay-baseline-empty --seed 0 --expected-controller-sha256 e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4
+
+A，仅索引修正：
+python3 switch_gains.py baseline
+python3 switch_wrist_pd.py baseline
+python3 switch_controller.py candidate
+python3 experiment.py empty replay-index-empty --seed 0 --expected-controller-sha256 e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4
+
+B，仅WBC腕增益：
+python3 switch_controller.py baseline
+python3 switch_wrist_pd.py baseline
+python3 switch_gains.py candidate
+python3 experiment.py empty replay-gains-empty --seed 0 --expected-controller-sha256 e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4
+
+C，仅输出力矩PD：
+python3 switch_controller.py baseline
+python3 switch_gains.py baseline
+python3 switch_wrist_pd.py candidate
+python3 experiment.py empty replay-pd-empty --seed 0 --expected-controller-sha256 ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba
+
+三种切换都先停止所有旧进程、要求当前文件hash属于已知原版/候选，再原子替换；每次写switches.jsonl。
+修改的共享文件只有以下三项，各自可独立恢复：
+A: SIM:/root/kuavo_ws/devel/.private/humanoid_interface_ros/lib/humanoid_interface_ros/humanoid_VR_hand_control
+B: WS/src/humanoid-control/humanoid_controllers/config/kuavo_v52/mpc/task.info
+C: SIM:/root/kuavo_ws/devel/.private/humanoid_controllers/lib/libhumanoid_controllers.so
+WS绑定宿主官方工作区。A/C工作区cpp始终未改。探针与采集器自动复制到SIM:/tmp，无上层生产代码同步。
+
+原版A可执行SHA：155191dc393e6c92552e57a2c4af6d52833283bc22660e7d8788ba65424ce293。
+原版B配置SHA：3f32e8d8858a9352b674d15cdb6578fdf8e4b96429ccfe46fffd81a881d95d17。
+原版C库SHA：e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4。
+
+experiment.py内部的官方场景启动等价于（由脚本负责生命周期，通常无需手工另起）：
+docker exec -t -e DISPLAY=:0 -e XAUTHORITY=/tmp/scene1-current-display.Xauthority "$SIM" zsh -lc '
+cd /root/kuavo_ws
+source installed/setup.zsh
+source devel/setup.zsh
+export LD_LIBRARY_PATH=/opt/drake/lib:$LD_LIBRARY_PATH
+exec rosrun challenge_cup_task_template challenge_task.py --scene scene1 --seed 0 --no-timer-gui
+'
+
+不要同时再手工启动第二份策略；脚本等待官方初始化、读取真实运行身份、启动唯一探针/策略，最后停掉该回合。
+新空手探针动作与原v2相同，多了C的持续力矩限幅检查。原始empty_probe-v2.py、record_chain-v1.py保留。
+
+六、有限任务命令及停止口径
+
+原版/B历史任务的参数都是：task <label> --seed 0 --parcels 1 --max-steps 5000。
+它们各自从官方完整复位调用原v69 run.sh --task go_run --mode optimized --stop-after-parcels 1。
+历史采用人工巡检，已发现停止执行不对称；不建议原样无监控重演。
+未来有限任务使用相同自动裁剪规则，例如在已选择的原版或B上执行：
+
+python3 experiment.py task replay-guarded-one-parcel --seed 0 --parcels 1 --max-steps 5000 --clip-stop-steps 5 --expected-controller-sha256 e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4
+
+--clip-stop-steps 是本轮结果之后添加的停止功能，实际旧日志回放已核验，尚未新仿真在线验收。
+它读完整新增日志行，在5个连续bounds_clipped后SIGINT唯一策略；轮询最多约2秒加退出延迟。
+不替代机器人原保护，也不检测所有接触异常/高频振荡，运行者仍需观察。它可能更早中止，不能预期复现历史878步前缀。
+C只验证空手，以上任务命令故意要求原版控制库SHA；不要把C空手收益当作已通过接触准入。
+没有给出四包自动运行矩阵：本轮没有满足扩大验证的条件。
+
+七、查看日志与实际加载版本
+
+cat "$D/pd-empty-v2/experiment.json"
+cat "$D/pd-empty-v2/runtime.json"
+cat "$D/pd-empty-v2/pd-audit.json"
+cat "$D/baseline-first-parcel/output/summary.json"
+cat "$D/gains-first-parcel/assessment.json"
+tail -n 40 "$D/gains-first-parcel/controller.log"
+tail -n 40 "$D/gains-first-parcel/simulation.log"
+
+对正在运行的某回合，可只读重新采集进程/maps/参数（不发控制指令）：
+docker cp "$D/runtime_receipt.py" "$SIM:/tmp/runtime_receipt.py"
+docker exec "$SIM" bash -lc '
+source /root/kuavo_ws/devel/setup.bash
+python3 /tmp/runtime_receipt.py --output /tmp/current-tracking-runtime.json
+'
+docker cp "$SIM:/tmp/current-tracking-runtime.json" "$D/current-tracking-runtime.json"
+
+runtime_receipt读取正在运行的exe与映射.so的内容hash；不是仅看磁盘文件名。停止后ROS参数不可读属于预期。
+
+八、完全离线重算（只读已保存数据；分析器不启动ROS/控制器）
+
+python3 build_comparison.py
+python3 compute_prefix.py
+
+重算空手原始trace，示例C；输出/tmp或新文件，不覆盖原始回执：
+docker cp "$D/analyze_empty.py" "$SIM:/tmp/analyze_empty.py"
+docker cp "$D/analyze_pd.py" "$SIM:/tmp/analyze_pd.py"
+docker cp "$D/pd-empty-v2/chain.jsonl" "$SIM:/tmp/replay-chain.jsonl"
+docker cp "$D/pd-empty-v2/probe.jsonl" "$SIM:/tmp/replay-probe.jsonl"
+docker exec "$SIM" python3 /tmp/analyze_empty.py --trace /tmp/replay-chain.jsonl --probe /tmp/replay-probe.jsonl --output /tmp/replay-empty-metrics.json
+docker exec "$SIM" python3 /tmp/analyze_pd.py --trace /tmp/replay-chain.jsonl --output /tmp/replay-pd-audit.json
+docker cp "$SIM:/tmp/replay-empty-metrics.json" "$D/replay-empty-metrics.json"
+docker cp "$SIM:/tmp/replay-pd-audit.json" "$D/replay-pd-audit.json"
+
+重算任务阶段误差，示例原版（SIM已安装numpy/scipy；没有新增依赖）：
+docker exec "$SIM" mkdir -p /tmp/tracking-replay-project
+docker cp "$D/baseline/production/scene1" "$SIM:/tmp/tracking-replay-project/scene1"
+docker cp "$D/analyze_task.py" "$SIM:/tmp/analyze_task.py"
+docker cp "$D/source-evidence/biped_s52.urdf" "$SIM:/tmp/tracking-replay-robot.urdf"
+docker cp "$D/baseline-first-parcel/chain.jsonl" "$SIM:/tmp/replay-task-chain.jsonl"
+docker cp "$D/baseline-first-parcel/output/steps.jsonl" "$SIM:/tmp/replay-task-steps.jsonl"
+docker exec "$SIM" python3 /tmp/analyze_task.py --trace /tmp/replay-task-chain.jsonl --steps /tmp/replay-task-steps.jsonl --project /tmp/tracking-replay-project --urdf /tmp/tracking-replay-robot.urdf --output /tmp/replay-task-metrics.json
+docker cp "$SIM:/tmp/replay-task-metrics.json" "$D/replay-task-metrics.json"
+python3 summarize_visual.py "$D/baseline-first-parcel/output/steps.jsonl" --output "$D/replay-visual-metrics.json"
+
+将baseline-first-parcel换成gains-first-parcel可重算B；不混比完整时长。
+参考起点核查：audit_origin.py --trace <trace> --output <json>；平台增益旁证：
+check_effective_gains.py --trace <trace> --probe <probe> --output <json>（在SIM python3中运行）。
+plot_empty.py --include-pd --output <png>读取SIM:/tmp/<run>-chain.jsonl和<run>-probe.jsonl，
+run为baseline-empty-v2、candidate-empty、gains-empty、pd-empty-v2；需要时从本目录分别docker cp到对应路径。
+
+九、结束当前实验与恢复原版
+
+如果experiment.py还在运行，先让它正常结束/收到中断后完成finally清理；不要切共享库。
+需要停止时，下面按精确脚本名向唯一相关进程发SIGINT，不使用宽泛pkill：
+
+python3 - <<'PY'
+import time
+import experiment as e
+e.stop(e.ALGO, '/run_scene1.py')
+e.stop(e.SIM, '/empty_probe.py')
+time.sleep(2)
+e.stop(e.SIM, '/record_chain.py')
+e.stop(e.SIM, '/challenge_task.py')
+e.wait_idle(e.ALGO)
+e.wait_idle(e.SIM)
+PY
+
+持物时不调用go_run来“恢复”；停止后保留证据，下一独立回合由官方完整复位重新创建场景。
+确认驱动已退出且没有待复制日志后，执行：
+
+python3 switch_controller.py baseline
+python3 switch_gains.py baseline
+python3 switch_wrist_pd.py baseline
+python3 final_verify.py
+
+恢复使用baseline/vr-reference、baseline/.../task.info、baseline/controller-library的精确备份。
+v63生产历史备份始终没有参与覆盖或切换；本轮也没有修改上层生产文件，因此无需覆盖算法容器项目。

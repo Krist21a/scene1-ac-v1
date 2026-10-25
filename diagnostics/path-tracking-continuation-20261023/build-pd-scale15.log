@@ -1,0 +1,29 @@
+In file included from /opt/ros/noetic/include/ros/assert.h:35,
+                 from /opt/ros/noetic/include/ros/common.h:36,
+                 from /opt/ros/noetic/include/ros/this_node.h:31,
+                 from /tmp/candidate-pd-scale15/humanoidController.cpp:8:
+/tmp/candidate-pd-scale15/humanoidController.cpp: In lambda function:
+/tmp/candidate-pd-scale15/humanoidController.cpp:952:22: warning: format ‘%d’ expects a matching ‘int’ argument [-Wformat=]
+  952 |             ROS_INFO("[HumanoidController] Reset pullup filter due to mode switch (from %d to %d)",
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/opt/ros/noetic/include/ros/console.h:351:165: note: in definition of macro ‘ROSCONSOLE_PRINT_AT_LOCATION_WITH_FILTER’
+  351 |     ::ros::console::print(filter, __rosconsole_define_location__loc.logger_, __rosconsole_define_location__loc.level_, __FILE__, __LINE__, __ROSCONSOLE_FUNCTION__, __VA_ARGS__)
+      |                                                                                                                                                                     ^~~~~~~~~~~
+/opt/ros/noetic/include/ros/console.h:390:7: note: in expansion of macro ‘ROSCONSOLE_PRINT_AT_LOCATION’
+  390 |       ROSCONSOLE_PRINT_AT_LOCATION(__VA_ARGS__); \
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/opt/ros/noetic/include/ros/console.h:575:35: note: in expansion of macro ‘ROS_LOG_COND’
+  575 | #define ROS_LOG(level, name, ...) ROS_LOG_COND(true, level, name, __VA_ARGS__)
+      |                                   ^~~~~~~~~~~~
+/opt/ros/noetic/include/rosconsole/macros_generated.h:110:23: note: in expansion of macro ‘ROS_LOG’
+  110 | #define ROS_INFO(...) ROS_LOG(::ros::console::levels::Info, ROSCONSOLE_DEFAULT_NAME, __VA_ARGS__)
+      |                       ^~~~~~~
+/tmp/candidate-pd-scale15/humanoidController.cpp:952:13: note: in expansion of macro ‘ROS_INFO’
+  952 |             ROS_INFO("[HumanoidController] Reset pullup filter due to mode switch (from %d to %d)",
+      |             ^~~~~~~~
+/tmp/candidate-pd-scale15/humanoidController.cpp:952:96: note: format string is defined here
+  952 |             ROS_INFO("[HumanoidController] Reset pullup filter due to mode switch (from %d to %d)",
+      |                                                                                               ~^
+      |                                                                                                |
+      |                                                                                                int
+{"cwd": "/root/kuavo_ws/build/humanoid_controllers", "source_sha256": "a64e2f32328191b2f128a345dca58c0e8e7db7a98ec1b477ad159e4f21439ad9", "library_sha256": "32a57b363dda2644fd3581dd4d080371732f0be787721d0f86ac50bba7c9657f"}

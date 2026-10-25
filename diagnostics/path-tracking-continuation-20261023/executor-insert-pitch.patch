@@ -1,0 +1,97 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -259,6 +259,7 @@
+   release_prepare_adapt_settled: true
+   release_prepare_whole_arm: true
+   release_prepare_support_footprint: true
++  regrasp_insert_pitch_weight: 0.3
+   release_cartesian_open_hold: true
+   release_open_hold_position_gain: 2.0
+   release_retreat_ready_m: 0.014
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -244,7 +244,7 @@
+         return min(distances) if distances else None
+ 
+     def _correct(self, base, measured, side, xyz_error, angular_error=None, level_axis=None,
+-                 step_scale=1., offset_cap_rad=None, translation_limit_m=None, view_target=None, gain_scale=1.):
++                 step_scale=1., offset_cap_rad=None, translation_limit_m=None, view_target=None, gain_scale=1., level_axis_weight=.1):
+         """Damped local correction, with optional bottom-leveling rotation."""
+         start = (0, 8)[side]
+         error = np.asarray(xyz_error, float).copy()
+@@ -289,7 +289,9 @@
+             axis = np.asarray(level_axis,float).copy(); axis /= np.linalg.norm(axis)
+             # Leveling constrains two rotation directions. A weak spin cost
+             # permits a small yaw change when it helps respect joint limits.
+-            projection = np.eye(3) - .9*np.outer(axis,axis)
++            if not np.isfinite(level_axis_weight) or not 0. < level_axis_weight <= 1.:
++                raise ValueError('Axis weight must be finite in (0,1]')
++            projection = np.eye(3) - (1.-level_axis_weight)*np.outer(axis,axis)
+             jacobian[3:] = projection @ rotation.as_matrix() @ jacobian[3:]
+             requested = np.r_[error,.15*projection@angular]
+         offset = self.offset[start:start+7]
+@@ -658,7 +660,16 @@
+                 raise RuntimeError('Right wrist lost parcel edges during insertion; gripper kept open')
+         previous_offset = self.offset.copy()
+         step_scale = .6 if stage == 'descend' and orientation_ok and np.linalg.norm(error[:2]) <= .008 else .4
+-        result = self._correct(p['base'],measured,1,correction,angular_error-4.*angular_velocity,step_scale=step_scale)
++        pitch_weight = self.wrist_config.get('regrasp_insert_pitch_weight',1.)
++        if not np.isfinite(pitch_weight) or not 0. < pitch_weight <= 1.:
++            raise ValueError('Insertion pitch weight must be finite in (0,1]')
++        pitch_relaxed = stage == 'insert' and orientation_ok and pitch_weight < 1.
++        pitch_axis = p['grasp_rotation'].as_matrix()[:,0] if pitch_relaxed else None
++        result = self._correct(p['base'],measured,1,correction,angular_error-4.*angular_velocity,
++            step_scale=step_scale,level_axis=pitch_axis,level_axis_weight=pitch_weight)
++        info['insert_pitch_task'] = dict(relaxed=bool(pitch_relaxed),
++            weight=float(pitch_weight) if pitch_relaxed else 1.,
++            original_orientation_gate_passed=bool(orientation_ok))
+         delta = self.offset[8:15]-previous_offset[8:15]
+         self.command_sweep_context['increment_end_rad'] = (measured[8:15]+delta).tolist()
+         clear = all(open_fingers_clear(self.kinematics.matrix(measured[8:15]+a*delta,1),target,p['plane'])
+--- a/tests/test_regrasp_insert_pitch.py
++++ b/tests/test_regrasp_insert_pitch.py
+@@ -0,0 +1,44 @@
++import unittest
++from unittest.mock import patch
++import numpy as np
++from scipy.spatial.transform import Rotation
++import test_regrasp_forward_gate as gates
++
++class InsertPitchTests(unittest.TestCase):
++    setUp=gates.ForwardGateTests.setUp
++    _insert_fixture=gates.ForwardGateTests._insert_fixture
++    fixture=gates.ForwardGateTests.fixture
++
++    def test_only_insert_inside_original_orientation_gate_uses_pitch_weight(self):
++        self.fixture(0);self.a.wrist_config['regrasp_insert_pitch_weight']=.3
++        result,info=self.a._pending_action(self.measured,self.snapshot)
++        self.assertTrue(info['insert_pitch_task']['relaxed'])
++        self.assertEqual(info['insert_pitch_task']['weight'],.3)
++        self.assertLessEqual(max(abs(result[8:15]-self.raw[8:15])),.0048+1e-12)
++        self.assertEqual(result[15],0.)
++        self.a.pending['regrasp_stage']='align'
++        self.a.pending['stand_off_position']=self.measured[8:11].copy()
++        result,info=self.a._pending_action(self.measured,self.snapshot)
++        self.assertFalse(info['insert_pitch_task']['relaxed'])
++
++    def test_outside_orientation_gate_restores_full_task_and_withholds_close(self):
++        self.fixture(0);self.a.wrist_config['regrasp_insert_pitch_weight']=.3
++        self.a.pending['grasp_rotation']=Rotation.from_rotvec([.2,0,0])*self.a.pending['grasp_rotation']
++        result,info=self.a._pending_action(self.measured,self.snapshot)
++        self.assertFalse(info['insert_pitch_task']['relaxed'])
++        self.assertEqual(result[15],0.)
++        self.assertEqual(info['stable_steps'],0)
++
++    def test_original_view_and_sweep_gates_still_apply(self):
++        self.fixture(15);self.a.wrist_config['regrasp_insert_pitch_weight']=.3
++        result,info=self.a._pending_action(self.measured,self.snapshot)
++        self.assertFalse(info['regrasp_forward_gate']['centered'])
++        with patch('scene1.residual.open_fingers_clear',return_value=False):
++            with self.assertRaisesRegex(RuntimeError,'Open finger sweep intersects'):
++                for _ in range(20):self.a._pending_action(self.measured,self.snapshot)
++
++    def test_invalid_weight_rejected(self):
++        for weight in [0.,-1.,1.1,float('nan')]:
++            self.fixture(0);self.a.wrist_config['regrasp_insert_pitch_weight']=weight
++            with self.assertRaisesRegex(ValueError,'finite'):
++                self.a._pending_action(self.measured,self.snapshot)

@@ -1,0 +1,102 @@
+--- a/scene1/clearance.py
++++ b/scene1/clearance.py
+@@ -3,17 +3,18 @@
+ 
+ 
+ def boxes_overlap(center_a, rotation_a, half_a, center_b, rotation_b, half_b):
+-    axes = [*rotation_a.T, *rotation_b.T]
+-    axes += [np.cross(a,b) for a in rotation_a.T for b in rotation_b.T]
++    axes = np.vstack((rotation_a.T, rotation_b.T,
++        np.cross(rotation_a.T[:,None,:],rotation_b.T[None,:,:]).reshape(-1,3)))
++    axes = axes[np.linalg.norm(axes,axis=1) >= 1e-8]
+     delta = np.asarray(center_b)-center_a
+-    for axis in axes:
+-        if np.linalg.norm(axis) < 1e-8:
+-            continue
+-        radius_a = np.abs(axis@rotation_a)@half_a
+-        radius_b = np.abs(axis@rotation_b)@half_b
+-        if abs(axis@delta) > radius_a+radius_b:
+-            return False
+-    return True
++    radii = np.abs(axes@rotation_a)@half_a + np.abs(axes@rotation_b)@half_b
++    separation = np.abs(axes@delta)-radii
++    if np.any(np.abs(separation) <= 1e-12):
++        # Preserve the original scalar operation order near exact contact;
++        # this is a numerical fallback, not a different collision margin.
++        return not any(abs(axis@delta) > np.abs(axis@rotation_a)@half_a
++                       + np.abs(axis@rotation_b)@half_b for axis in axes)
++    return not bool(np.any(separation > 0.))
+ 
+ 
+ def open_fingers_clear(tool_matrix, target, plane, margin=.003):
+--- a/scene1/retreat_certificate.py
++++ b/scene1/retreat_certificate.py
+@@ -41,8 +41,14 @@
+                                                        target, plane, motion_config)
+         proposed[15] = 0.
+         sent, motion_info = motion.apply(proposed, period)
+-        complete = sampled_sweep(assist.kinematics, measured[8:15], proposed[8:15], target, plane)
+-        filtered = sampled_sweep(assist.kinematics, measured[8:15], sent[8:15], target, plane)
++        if projection is not None:
++            # _retreat_correct already checked these exact endpoints using
++            # the same measured state and filter reset to shadow.last_sent.
++            checked = projection['final' if projection['applied'] else 'original']
++            complete, filtered = checked['proposed'], checked['filtered']
++        else:
++            complete = sampled_sweep(assist.kinematics, measured[8:15], proposed[8:15], target, plane)
++            filtered = sampled_sweep(assist.kinematics, measured[8:15], sent[8:15], target, plane)
+         rotation = float(np.rad2deg((start_rotation.inv() * Rotation.from_matrix(pose[:3, :3])).magnitude()))
+         max_rotation = max(max_rotation, rotation)
+         stable = stable + 1 if np.linalg.norm(error) <= tolerance and movement <= .004 else 0
+--- a/scene1/retreat_projection.py
++++ b/scene1/retreat_projection.py
+@@ -48,8 +48,10 @@
+ 
+     def checks(action):
+         sent, limits = filtered(action)
+-        return dict(proposed=sampled_sweep(kinematics, q, action[8:15], target, plane),
+-                    filtered=sampled_sweep(kinematics, q, sent[8:15], target, plane),
++        proposed = sampled_sweep(kinematics, q, action[8:15], target, plane)
++        filtered_sweep = (dict(proposed) if np.array_equal(action[8:15],sent[8:15])
++                          else sampled_sweep(kinematics, q, sent[8:15], target, plane))
++        return dict(proposed=proposed, filtered=filtered_sweep,
+                     bounds_clipped=limits['bounds_clipped'])
+ 
+     original = checks(proposed)
+--- a/tests/test_fast_clearance.py
++++ b/tests/test_fast_clearance.py
+@@ -0,0 +1,34 @@
++import unittest
++import numpy as np
++from scipy.spatial.transform import Rotation
++from scene1.clearance import boxes_overlap
++
++
++def original(center_a, rotation_a, half_a, center_b, rotation_b, half_b):
++    axes = [*rotation_a.T, *rotation_b.T]
++    axes += [np.cross(a,b) for a in rotation_a.T for b in rotation_b.T]
++    delta = np.asarray(center_b)-center_a
++    for axis in axes:
++        if np.linalg.norm(axis)<1e-8:
++            continue
++        if abs(axis@delta)>np.abs(axis@rotation_a)@half_a+np.abs(axis@rotation_b)@half_b:
++            return False
++    return True
++
++
++class FastClearanceTest(unittest.TestCase):
++    def test_equivalence_with_original_over_rotations_and_scales(self):
++        rng=np.random.default_rng(7461)
++        for _ in range(2000):
++            args=(rng.uniform(-.1,.1,3),Rotation.random(random_state=rng).as_matrix(),
++                  rng.uniform(.005,.08,3),rng.uniform(-.1,.1,3),
++                  Rotation.random(random_state=rng).as_matrix(),rng.uniform(.005,.08,3))
++            self.assertEqual(boxes_overlap(*args),original(*args))
++
++    def test_contact_and_nearly_parallel_axes_keep_original_semantics(self):
++        for angle in [0.,1e-10,1e-8,1e-6]:
++            rot=Rotation.from_rotvec([0,0,angle]).as_matrix()
++            for offset in [-1e-10,-1e-14,0.,1e-14,1e-10]:
++                args=(np.zeros(3),np.eye(3),np.full(3,.02),
++                      np.array([.04+offset,0,0]),rot,np.full(3,.02))
++                self.assertEqual(boxes_overlap(*args),original(*args))

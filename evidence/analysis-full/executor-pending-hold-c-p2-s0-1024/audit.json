@@ -1,0 +1,503 @@
+{
+  "label": "executor-pending-hold-c-p2-s0-1024",
+  "steps": 201,
+  "step_sequence_contiguous": true,
+  "summary": {
+    "steps": 201,
+    "reason": "error",
+    "task_success": null,
+    "error": "ACT grasp needs more than the allowed small correction; gripper kept open",
+    "handover_contract_stop": null,
+    "last_sensor_receipts": {
+      "/cam_l/color/image_raw/compressed": {
+        "receipt_monotonic_s": 7722.843126032,
+        "source_stamp_s": 1792809853.0831702,
+        "receipts": 1629
+      },
+      "/gripper/state": {
+        "receipt_monotonic_s": 7722.844824034,
+        "source_stamp_s": 1792809853.1025407,
+        "receipts": 52589
+      },
+      "/sensors_data_raw": {
+        "receipt_monotonic_s": 7722.837168622,
+        "source_stamp_s": 1792809853.09456,
+        "receipts": 33981
+      },
+      "/cam_r/color/image_raw/compressed": {
+        "receipt_monotonic_s": 7722.802033076,
+        "source_stamp_s": 1792809853.0418599,
+        "receipts": 1562
+      },
+      "/cam_h/color/image_raw/compressed": {
+        "receipt_monotonic_s": 7722.836752181,
+        "source_stamp_s": 1792809853.0808625,
+        "receipts": 1674
+      }
+    },
+    "trace_manifest_error": null,
+    "visual_confirmed_parcels": 0,
+    "note": "Original KuavoSimEnv returns reward=0 and does not judge scene1 success."
+  },
+  "ros_run_id": "a319fdc4-cf54-11f1-9f44-c85ea94bd8c7",
+  "controller_sha": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+  "policy_sha": "99860875f0a916a5272341760e8505d5919ed47632dadaf4e7595080b5d38ea8",
+  "requested_parcels": 2,
+  "bin_confirmations": [],
+  "complete_events": [],
+  "gripper_events": [],
+  "gripper_event_count": 0,
+  "unpaused_ACT_steps_after_first_complete": 0,
+  "target_clips": 0,
+  "velocity_limited_steps": 1,
+  "regrasp_sweep_block_steps": 0,
+  "regrasp_forward_gate_hold_steps": 0,
+  "pd_limits_50hz": {
+    "initialization": {
+      "samples": 1713,
+      "raw_clipped_samples": 6,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.5786975586375596,
+      "added_peak_nm": 0.5,
+      "wrist_command_peak_nm": 1.1855525980646033,
+      "longest_observed_clip_s": 0.08384913499958202,
+      "available": true
+    },
+    "formal_policy": {
+      "samples": 1167,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.13917476242502283,
+      "added_peak_nm": 0.1391747624250228,
+      "wrist_command_peak_nm": 1.0831284554771299,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    },
+    "after_policy": {
+      "samples": 119,
+      "raw_clipped_samples": 0,
+      "total_clipped_samples": 0,
+      "raw_peak_nm": 0.06735624948882203,
+      "added_peak_nm": 0.06735624948882202,
+      "wrist_command_peak_nm": 1.030446041351194,
+      "longest_observed_clip_s": 0.0,
+      "available": true
+    }
+  },
+  "task_success": null,
+  "limitations": "Gripper events are upper command threshold crossings (0.25/0.6 hysteresis), not proof of contact. Original visual checks and raw feedback evidence retained. 50Hz clipping can miss shorter events; online guard is separate. null is not an official verdict.",
+  "release_reference_transfers": [],
+  "release_preparation": [],
+  "release_reference_transfer_interpretation": "Physical bounds and MotionFilter checked separately. measured_physical intentionally replaces obsolete ACT anchoring with a new visual-phase reference; this is not measured tracking evidence.",
+  "post_level_geometry_refreshes": [],
+  "retreat_goal_certificates": [],
+  "retreat_projections": [],
+  "fresh_sweep_feedback": {
+    "samples": 80,
+    "max_captured_to_send_s": 0.027319394000187458,
+    "max_joint_change_from_planning_rad": 0.023869752883911133,
+    "records": [
+      {
+        "step": 73,
+        "captured_to_send_s": 0.011201688000255672,
+        "max_joint_change_from_planning_rad": 0.023869752883911133
+      },
+      {
+        "step": 74,
+        "captured_to_send_s": 0.012689125000179047,
+        "max_joint_change_from_planning_rad": 0.011583566665649414
+      },
+      {
+        "step": 75,
+        "captured_to_send_s": 0.018131030999938957,
+        "max_joint_change_from_planning_rad": 0.01901388168334961
+      },
+      {
+        "step": 76,
+        "captured_to_send_s": 0.013775445000646869,
+        "max_joint_change_from_planning_rad": 0.009605169296264648
+      },
+      {
+        "step": 77,
+        "captured_to_send_s": 0.014503354000225954,
+        "max_joint_change_from_planning_rad": 0.009556472301483154
+      },
+      {
+        "step": 78,
+        "captured_to_send_s": 0.010466267000083462,
+        "max_joint_change_from_planning_rad": 0.008900225162506104
+      },
+      {
+        "step": 79,
+        "captured_to_send_s": 0.012900882999929308,
+        "max_joint_change_from_planning_rad": 0.0050618648529052734
+      },
+      {
+        "step": 80,
+        "captured_to_send_s": 0.017118048000156705,
+        "max_joint_change_from_planning_rad": 0.003447204828262329
+      },
+      {
+        "step": 81,
+        "captured_to_send_s": 0.01732125100079429,
+        "max_joint_change_from_planning_rad": 0.005750179290771484
+      },
+      {
+        "step": 82,
+        "captured_to_send_s": 0.01660375200026465,
+        "max_joint_change_from_planning_rad": 0.002930164337158203
+      },
+      {
+        "step": 83,
+        "captured_to_send_s": 0.022480996999547642,
+        "max_joint_change_from_planning_rad": 0.005199909210205078
+      },
+      {
+        "step": 84,
+        "captured_to_send_s": 0.02271191199997702,
+        "max_joint_change_from_planning_rad": 0.0068972110748291016
+      },
+      {
+        "step": 85,
+        "captured_to_send_s": 0.013790003999929468,
+        "max_joint_change_from_planning_rad": 0.005349397659301758
+      },
+      {
+        "step": 86,
+        "captured_to_send_s": 0.017998543999965477,
+        "max_joint_change_from_planning_rad": 0.008200645446777344
+      },
+      {
+        "step": 87,
+        "captured_to_send_s": 0.005888288000278408,
+        "max_joint_change_from_planning_rad": 0.004525899887084961
+      },
+      {
+        "step": 88,
+        "captured_to_send_s": 0.010621530000207713,
+        "max_joint_change_from_planning_rad": 0.005591154098510742
+      },
+      {
+        "step": 89,
+        "captured_to_send_s": 0.00891891800074518,
+        "max_joint_change_from_planning_rad": 0.0034176120534539223
+      },
+      {
+        "step": 90,
+        "captured_to_send_s": 0.012236490000759659,
+        "max_joint_change_from_planning_rad": 0.007198329083621502
+      },
+      {
+        "step": 91,
+        "captured_to_send_s": 0.016137431000061042,
+        "max_joint_change_from_planning_rad": 0.004387358203530312
+      },
+      {
+        "step": 92,
+        "captured_to_send_s": 0.00797158000023046,
+        "max_joint_change_from_planning_rad": 0.004788313992321491
+      },
+      {
+        "step": 93,
+        "captured_to_send_s": 0.011698926999997639,
+        "max_joint_change_from_planning_rad": 0.0059253256767988205
+      },
+      {
+        "step": 94,
+        "captured_to_send_s": 0.01216709899927082,
+        "max_joint_change_from_planning_rad": 0.006162520498037338
+      },
+      {
+        "step": 95,
+        "captured_to_send_s": 0.010436656999445404,
+        "max_joint_change_from_planning_rad": 0.005896851420402527
+      },
+      {
+        "step": 96,
+        "captured_to_send_s": 0.014603206000174396,
+        "max_joint_change_from_planning_rad": 0.007786151021718979
+      },
+      {
+        "step": 97,
+        "captured_to_send_s": 0.007688517999667965,
+        "max_joint_change_from_planning_rad": 0.005102105438709259
+      },
+      {
+        "step": 98,
+        "captured_to_send_s": 0.014491263999843795,
+        "max_joint_change_from_planning_rad": 0.0032601505517959595
+      },
+      {
+        "step": 99,
+        "captured_to_send_s": 0.009234662000380922,
+        "max_joint_change_from_planning_rad": 0.004604637622833252
+      },
+      {
+        "step": 100,
+        "captured_to_send_s": 0.008138717000292672,
+        "max_joint_change_from_planning_rad": 0.0031123459339141846
+      },
+      {
+        "step": 101,
+        "captured_to_send_s": 0.011715139000443742,
+        "max_joint_change_from_planning_rad": 0.003810882568359375
+      },
+      {
+        "step": 102,
+        "captured_to_send_s": 0.00918423100029031,
+        "max_joint_change_from_planning_rad": 0.0024100542068481445
+      },
+      {
+        "step": 103,
+        "captured_to_send_s": 0.012156366999988677,
+        "max_joint_change_from_planning_rad": 0.003309488296508789
+      },
+      {
+        "step": 104,
+        "captured_to_send_s": 0.011484749999908672,
+        "max_joint_change_from_planning_rad": 0.0026679039001464844
+      },
+      {
+        "step": 105,
+        "captured_to_send_s": 0.014290245999291074,
+        "max_joint_change_from_planning_rad": 0.0016782209277153015
+      },
+      {
+        "step": 106,
+        "captured_to_send_s": 0.013480477000484825,
+        "max_joint_change_from_planning_rad": 0.001609954982995987
+      },
+      {
+        "step": 107,
+        "captured_to_send_s": 0.004400834000080067,
+        "max_joint_change_from_planning_rad": 0.001583971083164215
+      },
+      {
+        "step": 108,
+        "captured_to_send_s": 0.012281254999834346,
+        "max_joint_change_from_planning_rad": 0.0014143139123916626
+      },
+      {
+        "step": 158,
+        "captured_to_send_s": 0.016729197999666212,
+        "max_joint_change_from_planning_rad": 0.0010769367218017578
+      },
+      {
+        "step": 159,
+        "captured_to_send_s": 0.016299183000228368,
+        "max_joint_change_from_planning_rad": 0.001589655876159668
+      },
+      {
+        "step": 160,
+        "captured_to_send_s": 0.009234258999640588,
+        "max_joint_change_from_planning_rad": 0.0013659000396728516
+      },
+      {
+        "step": 161,
+        "captured_to_send_s": 0.01623206099975505,
+        "max_joint_change_from_planning_rad": 0.0018074214458465576
+      },
+      {
+        "step": 162,
+        "captured_to_send_s": 0.01767560499956744,
+        "max_joint_change_from_planning_rad": 0.0009001195430755615
+      },
+      {
+        "step": 163,
+        "captured_to_send_s": 0.009182057000543864,
+        "max_joint_change_from_planning_rad": 0.0008026659488677979
+      },
+      {
+        "step": 164,
+        "captured_to_send_s": 0.010643421000168019,
+        "max_joint_change_from_planning_rad": 0.0034155845642089844
+      },
+      {
+        "step": 165,
+        "captured_to_send_s": 0.007920090999505192,
+        "max_joint_change_from_planning_rad": 0.0053272247314453125
+      },
+      {
+        "step": 166,
+        "captured_to_send_s": 0.01127093800005241,
+        "max_joint_change_from_planning_rad": 0.007271766662597656
+      },
+      {
+        "step": 167,
+        "captured_to_send_s": 0.0198736469992582,
+        "max_joint_change_from_planning_rad": 0.009726881980895996
+      },
+      {
+        "step": 168,
+        "captured_to_send_s": 0.018175840000367316,
+        "max_joint_change_from_planning_rad": 0.008162140846252441
+      },
+      {
+        "step": 169,
+        "captured_to_send_s": 0.0180691730001854,
+        "max_joint_change_from_planning_rad": 0.009753823280334473
+      },
+      {
+        "step": 170,
+        "captured_to_send_s": 0.012885510999694816,
+        "max_joint_change_from_planning_rad": 0.0066471099853515625
+      },
+      {
+        "step": 171,
+        "captured_to_send_s": 0.02363437999974849,
+        "max_joint_change_from_planning_rad": 0.005381107330322266
+      },
+      {
+        "step": 172,
+        "captured_to_send_s": 0.022290335000434425,
+        "max_joint_change_from_planning_rad": 0.0022526979446411133
+      },
+      {
+        "step": 173,
+        "captured_to_send_s": 0.025447271000302862,
+        "max_joint_change_from_planning_rad": 0.0014352798461914062
+      },
+      {
+        "step": 174,
+        "captured_to_send_s": 0.014390549999916402,
+        "max_joint_change_from_planning_rad": 0.001718282699584961
+      },
+      {
+        "step": 175,
+        "captured_to_send_s": 0.022332772000481782,
+        "max_joint_change_from_planning_rad": 0.0022711753845214844
+      },
+      {
+        "step": 176,
+        "captured_to_send_s": 0.017222094000317156,
+        "max_joint_change_from_planning_rad": 0.005579233169555664
+      },
+      {
+        "step": 177,
+        "captured_to_send_s": 0.007773088000249118,
+        "max_joint_change_from_planning_rad": 0.008398771286010742
+      },
+      {
+        "step": 178,
+        "captured_to_send_s": 0.007849290999729419,
+        "max_joint_change_from_planning_rad": 0.00856316089630127
+      },
+      {
+        "step": 179,
+        "captured_to_send_s": 0.027319394000187458,
+        "max_joint_change_from_planning_rad": 0.00857245922088623
+      },
+      {
+        "step": 180,
+        "captured_to_send_s": 0.00931006900009379,
+        "max_joint_change_from_planning_rad": 0.009005069732666016
+      },
+      {
+        "step": 181,
+        "captured_to_send_s": 0.01938078300008783,
+        "max_joint_change_from_planning_rad": 0.007102608680725098
+      },
+      {
+        "step": 182,
+        "captured_to_send_s": 0.01799672500055749,
+        "max_joint_change_from_planning_rad": 0.001951456069946289
+      },
+      {
+        "step": 183,
+        "captured_to_send_s": 0.011512195000250358,
+        "max_joint_change_from_planning_rad": 0.0013013482093811035
+      },
+      {
+        "step": 184,
+        "captured_to_send_s": 0.008164020000549499,
+        "max_joint_change_from_planning_rad": 0.0019450187683105469
+      },
+      {
+        "step": 185,
+        "captured_to_send_s": 0.017898062000313075,
+        "max_joint_change_from_planning_rad": 0.00515592098236084
+      },
+      {
+        "step": 186,
+        "captured_to_send_s": 0.01571501700072986,
+        "max_joint_change_from_planning_rad": 0.006628870964050293
+      },
+      {
+        "step": 187,
+        "captured_to_send_s": 0.017221336999682535,
+        "max_joint_change_from_planning_rad": 0.00868535041809082
+      },
+      {
+        "step": 188,
+        "captured_to_send_s": 0.01691342899994197,
+        "max_joint_change_from_planning_rad": 0.0099409818649292
+      },
+      {
+        "step": 189,
+        "captured_to_send_s": 0.019313702999170346,
+        "max_joint_change_from_planning_rad": 0.009755849838256836
+      },
+      {
+        "step": 190,
+        "captured_to_send_s": 0.01675038599933032,
+        "max_joint_change_from_planning_rad": 0.0074759721755981445
+      },
+      {
+        "step": 191,
+        "captured_to_send_s": 0.026752275999569974,
+        "max_joint_change_from_planning_rad": 0.006327152252197266
+      },
+      {
+        "step": 192,
+        "captured_to_send_s": 0.021513220999622717,
+        "max_joint_change_from_planning_rad": 0.0033293068408966064
+      },
+      {
+        "step": 193,
+        "captured_to_send_s": 0.027100573999632616,
+        "max_joint_change_from_planning_rad": 0.0025703907012939453
+      },
+      {
+        "step": 194,
+        "captured_to_send_s": 0.022746918999473564,
+        "max_joint_change_from_planning_rad": 0.0032721757888793945
+      },
+      {
+        "step": 195,
+        "captured_to_send_s": 0.025590387999727682,
+        "max_joint_change_from_planning_rad": 0.005711078643798828
+      },
+      {
+        "step": 196,
+        "captured_to_send_s": 0.02188072100034333,
+        "max_joint_change_from_planning_rad": 0.00686192512512207
+      },
+      {
+        "step": 197,
+        "captured_to_send_s": 0.01639892100047291,
+        "max_joint_change_from_planning_rad": 0.006948113441467285
+      },
+      {
+        "step": 198,
+        "captured_to_send_s": 0.00882523400014179,
+        "max_joint_change_from_planning_rad": 0.009224176406860352
+      },
+      {
+        "step": 199,
+        "captured_to_send_s": 0.01091425699996762,
+        "max_joint_change_from_planning_rad": 0.008418440818786621
+      },
+      {
+        "step": 200,
+        "captured_to_send_s": 0.006210601999555365,
+        "max_joint_change_from_planning_rad": 0.006659150123596191
+      },
+      {
+        "step": 201,
+        "captured_to_send_s": 0.011294492000160972,
+        "max_joint_change_from_planning_rad": 0.004811406135559082
+      }
+    ]
+  },
+  "rejected_retreat_certificate": null
+}

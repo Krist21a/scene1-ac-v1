@@ -1,0 +1,176 @@
+{
+  "at": "2026-10-24T15:14:47.911919+08:00",
+  "policy": "executor_support_recover",
+  "policy_manifest_sha256": "aed2babb39ca36b0ebde82544cc7b0191043a672b138930da1655975e5305a3d",
+  "selected_controller": "origin_pd",
+  "controller_identities": {
+    "baseline": {
+      "source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/baseline/controller-library/libhumanoid_controllers.so",
+      "sha256": "e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4",
+      "factor": "original controller",
+      "expect_pd": false,
+      "expect_velocity": false,
+      "qr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-config/dynamic_qr.info",
+      "qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de",
+      "task_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-task/task.info",
+      "task_sha256": "3f32e8d8858a9352b674d15cdb6578fdf8e4b96429ccfe46fffd81a881d95d17",
+      "vr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/baseline/vr-reference/humanoid_VR_hand_control",
+      "vr_sha256": "155191dc393e6c92552e57a2c4af6d52833283bc22660e7d8788ba65424ce293"
+    },
+    "candidate": {
+      "source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/candidate-wrist-pd/libhumanoid_controllers.so",
+      "sha256": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+      "factor": "C: bounded post-WBC wrist torque PD",
+      "expect_pd": true,
+      "expect_velocity": false,
+      "qr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-config/dynamic_qr.info",
+      "qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de",
+      "task_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-task/task.info",
+      "task_sha256": "3f32e8d8858a9352b674d15cdb6578fdf8e4b96429ccfe46fffd81a881d95d17",
+      "vr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/baseline/vr-reference/humanoid_VR_hand_control",
+      "vr_sha256": "155191dc393e6c92552e57a2c4af6d52833283bc22660e7d8788ba65424ce293"
+    },
+    "velocity": {
+      "source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/candidate-velocity/libhumanoid_controllers.so",
+      "sha256": "e2603ec0a306e8433eab849a8deb36fd132c9824650b5ec2c9ea16c6338ebae7",
+      "factor": "D: normal-route wrist velocity reference",
+      "expect_pd": false,
+      "expect_velocity": true,
+      "qr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-config/dynamic_qr.info",
+      "qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de",
+      "task_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-task/task.info",
+      "task_sha256": "3f32e8d8858a9352b674d15cdb6578fdf8e4b96429ccfe46fffd81a881d95d17",
+      "vr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/baseline/vr-reference/humanoid_VR_hand_control",
+      "vr_sha256": "155191dc393e6c92552e57a2c4af6d52833283bc22660e7d8788ba65424ce293"
+    },
+    "velocity_pd": {
+      "source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/candidate-velocity-pd/libhumanoid_controllers.so",
+      "sha256": "dafa16a8946e90af6727ffe6937f0075955fbb74f217351b365049f29dff0634",
+      "factor": "D: normal-route wrist velocity reference plus unchanged C",
+      "expect_pd": true,
+      "expect_velocity": true,
+      "qr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-config/dynamic_qr.info",
+      "qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de",
+      "task_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-task/task.info",
+      "task_sha256": "3f32e8d8858a9352b674d15cdb6578fdf8e4b96429ccfe46fffd81a881d95d17",
+      "vr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/baseline/vr-reference/humanoid_VR_hand_control",
+      "vr_sha256": "155191dc393e6c92552e57a2c4af6d52833283bc22660e7d8788ba65424ce293"
+    },
+    "mpc_q": {
+      "source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/candidate-wrist-pd/libhumanoid_controllers.so",
+      "sha256": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+      "factor": "E: C plus active stance MPC proximal arm Q x2",
+      "expect_pd": true,
+      "expect_velocity": false,
+      "qr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/candidate-mpc-arm-q/dynamic_qr.info",
+      "qr_sha256": "af1b24419d8b65e5c1d086e7efadf97bb1bd66053a6633e17f283621347f4e08",
+      "task_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-task/task.info",
+      "task_sha256": "3f32e8d8858a9352b674d15cdb6578fdf8e4b96429ccfe46fffd81a881d95d17",
+      "vr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/baseline/vr-reference/humanoid_VR_hand_control",
+      "vr_sha256": "155191dc393e6c92552e57a2c4af6d52833283bc22660e7d8788ba65424ce293"
+    },
+    "proximal_kp": {
+      "source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/candidate-wrist-pd/libhumanoid_controllers.so",
+      "sha256": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+      "factor": "F: unchanged C plus WBC proximal arm task Kp80to100; wrist gains, damping and MPC unchanged",
+      "expect_pd": true,
+      "expect_velocity": false,
+      "qr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-config/dynamic_qr.info",
+      "qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de",
+      "task_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/candidate-proximal-kp/task.info",
+      "task_sha256": "ecb78264f94c7c31f1a7e549b5e34ff8e9978183e0e6ce7b68270ea673fcaabf",
+      "vr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/baseline/vr-reference/humanoid_VR_hand_control",
+      "vr_sha256": "155191dc393e6c92552e57a2c4af6d52833283bc22660e7d8788ba65424ce293"
+    },
+    "origin_pd": {
+      "source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/candidate-wrist-pd/libhumanoid_controllers.so",
+      "sha256": "ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba",
+      "factor": "A+C: correct arm first-knot indexing before MPC plus unchanged bounded post-WBC wrist PD",
+      "expect_pd": true,
+      "expect_velocity": false,
+      "qr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-config/dynamic_qr.info",
+      "qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de",
+      "task_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-task/task.info",
+      "task_sha256": "3f32e8d8858a9352b674d15cdb6578fdf8e4b96429ccfe46fffd81a881d95d17",
+      "vr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/candidate-reference-origin/humanoid_VR_hand_control",
+      "vr_sha256": "84768f811b9c228d1a296a71644ede4ec44cd64656f76ad4bc42d77dce3ccf03"
+    },
+    "wrist_damping": {
+      "source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/candidate-wrist-damping/libhumanoid_controllers.so",
+      "sha256": "8b079456eabfcc7fa7a99980172b5c650c8879ca3f1510fb49b591317d552c8a",
+      "factor": "G: C post-WBC wrist damping0.05to0.20; all bounds unchanged",
+      "expect_pd": true,
+      "expect_velocity": false,
+      "qr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-config/dynamic_qr.info",
+      "qr_sha256": "225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de",
+      "task_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/baseline-task/task.info",
+      "task_sha256": "3f32e8d8858a9352b674d15cdb6578fdf8e4b96429ccfe46fffd81a881d95d17",
+      "vr_source": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/mpc-wbc-tracking-20261022/baseline/vr-reference/humanoid_VR_hand_control",
+      "vr_sha256": "155191dc393e6c92552e57a2c4af6d52833283bc22660e7d8788ba65424ce293"
+    }
+  },
+  "development_trial": "executor-support-recover-ac-p4-s0-1024",
+  "development_runtime_sha256": "c84352a1fd6709f768c9dcfed78aace2a15e412e725c09491e9b78f2122cf487",
+  "development_audits": {
+    "audit.json": "87e3a2e63afc430f0085536a6ab233a038c90d409f05c69e4d991e75add2106e",
+    "arm-preparation-audit.json": "040eedf8878de932e7276aedc7617988eb2eee2866a92753f29fb6e18057b241",
+    "soft-open-audit.json": "be27bcb1bd8bfbe3ed0186e2bce88d824b0d0de5613387f6d08ef77b191d739d",
+    "support-recovery-audit.json": "ac1fcc6578c1e9c160693a1d62763bc34808dff589bbc4e199cb2a3a7368c7e2",
+    "metrics-full.json": "43f1ed1949a4fc7c4dec75bf28dec886eb015330d725ede9c970d0d329d28e45",
+    "reference-analysis.json": "e9d08c07510f9f2b3a8ddaf38ad4b539384da23187009682ac4f12b408c56757",
+    "joint-bound-audit.json": "7c81659bb7eddcabfe38b8222ca4081c69ffdebe74c06d83f41e17274b0eb082"
+  },
+  "development_steps": 11986,
+  "task_success": null,
+  "official_success_claimed": false,
+  "production_promoted": false,
+  "tests_passed": 484,
+  "patch_chain_count": 28,
+  "support_recovery_live_exercised": false,
+  "heldout_seeds": [
+    1,
+    2
+  ],
+  "heldout_seeds_used_at_freeze": [],
+  "planned_trials": [
+    {
+      "seed": 0,
+      "controller": "baseline",
+      "parcels": 4,
+      "label": "frozen-support-recover-base-p4-s0-1024"
+    },
+    {
+      "seed": 1,
+      "controller": "baseline",
+      "parcels": 4,
+      "label": "frozen-support-recover-base-p4-s1-1024"
+    },
+    {
+      "seed": 1,
+      "controller": "origin_pd",
+      "parcels": 4,
+      "label": "frozen-support-recover-ac-p4-s1-1024"
+    },
+    {
+      "seed": 2,
+      "controller": "baseline",
+      "parcels": 4,
+      "label": "frozen-support-recover-base-p4-s2-1024"
+    },
+    {
+      "seed": 2,
+      "controller": "origin_pd",
+      "parcels": 4,
+      "label": "frozen-support-recover-ac-p4-s2-1024"
+    }
+  ],
+  "rules": [
+    "No policy or control tuning on seed1 or2",
+    "Every attempt retained; no retry success selection",
+    "Null official success remains null",
+    "Only same-condition successful full4 pairs eligible for timing gains",
+    "Compare proximal and wrist groups separately",
+    "Restore original runtime on completion or usage remaining<=20%"
+  ],
+  "registration_note": "Initial JSON serialization rejected PosixPath before file write; normalized path strings here. Baseline seed0 started in same shell after failure; no policy or parameter changes. Heldout seeds untouched."
+}

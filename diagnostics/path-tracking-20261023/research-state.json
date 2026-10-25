@@ -1,0 +1,64 @@
+{
+  "updated_at": "2026-10-23T18:08:37.045255+08:00",
+  "status": "research_validation_complete_not_promoted",
+  "experiment": null,
+  "controller_library": "original e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4",
+  "dynamic_qr_variant": "original restored 225d217d47741f088830d0a7c038e8a76c465d9948f4a56f194b3524f58677de",
+  "path_gate": "feasible-c-p2-s0 completed two parcels",
+  "path_manifest": "axis-feasible-manifest.json",
+  "tests_passed": 390,
+  "sam2_removed": true,
+  "empty_completed": [
+    "original-empty-s0",
+    "c-empty-s0",
+    "d-empty-s0",
+    "dc-empty-s0",
+    "e-empty-s0"
+  ],
+  "contact_completed": [
+    "axis-sweep-original-contact-s0",
+    "axis-sweep-pd-p2-s0"
+  ],
+  "production_upper_and_v63_changed": false,
+  "official_controller_source_changed": false,
+  "shared_library_and_dynamic_qr_temporarily_selected": true,
+  "full_task_improvement_verified": false,
+  "next_gate": null,
+  "path_variant": "axis_feasible",
+  "rejected_controller_candidates": {
+    "D": "insufficient standalone static improvement",
+    "D+C": "settling and overshoot regression in empty probe",
+    "E": "contact proximal regression; second retreat preflight rejection retained"
+  },
+  "latest_failure": {
+    "run": "feasible-original-p4-s0",
+    "completed_parcels": 1,
+    "reason": "second retreat not certified: 50.164 mm within candidate 8 degree orientation gate; goal not sent"
+  },
+  "implementation_verification_complete": true,
+  "target_improvement_achieved": false,
+  "production_promoted": false,
+  "heldout_seeds_used": [],
+  "final_verification": "final-verification.json",
+  "delivery_verification": "delivery-verification.json",
+  "report": "REPORT.txt",
+  "runbook": "RUNBOOK.txt",
+  "current_shared_library_and_dynamic_qr_original": true,
+  "full_trials": [
+    {
+      "run": "feasible-c-p4-s0",
+      "completed_parcels": 2,
+      "requested": 4,
+      "official_task_success": null,
+      "failure": "third retreat not certified at 14.900 mm"
+    },
+    {
+      "run": "feasible-original-p4-s0",
+      "completed_parcels": 1,
+      "requested": 4,
+      "official_task_success": null,
+      "failure": "second retreat not certified at 50.164 mm"
+    }
+  ],
+  "preflight_orientation_gate_note": "8 degrees is a new conservative candidate preflight gate, not an original production execution hard limit"
+}

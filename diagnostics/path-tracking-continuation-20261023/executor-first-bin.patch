@@ -1,0 +1,114 @@
+--- a/run_scene1.py
++++ b/run_scene1.py
+@@ -542,6 +542,9 @@
+             if weighing_pad is None and isinstance(aligner, ResidualAssist) and aligner.weighing_target is not None:
+                 weighing_pad = aligner.weighing_target.copy()
+             if visual_cycle is not None:
++                if (visual_cycle.rim is None and visual_pickup is not None
++                        and visual_pickup.rim is not None):
++                    visual_cycle.rim = copy.deepcopy(visual_pickup.rim)
+                 if step % 10 == 0 or visual_cycle.active:
+                     visual_cycle.observe_scene(rgbd_snapshot)
+                 if not visual_cycle.active and aligner.regrasp_complete and aligner.pending is None:
+--- a/scene1/visual_pickup.py
++++ b/scene1/visual_pickup.py
+@@ -13,7 +13,7 @@
+ from scipy.optimize import least_squares
+ 
+ from .motion import action_vector, JOINTS
+-from .visual_cycle import VisualCycle, cloud
++from .visual_cycle import VisualCycle, cloud, bin_rim
+ from .weighing_pose import alternate_weighing_pose, regrasp_posture_reserve
+ from .table_reference import table_frame, table_motion, move_target, table_boundary
+ from .receiver import NearFaceProjector
+@@ -242,6 +242,8 @@
+         self.limit_frames = 0
+ 
+     def camera_target(self, measured, assist):
++        if self.stage == 'observe_bin':
++            return self.bin_view_goal
+         if self.stage == 'local_weighing':
+             return assist.camera_target(measured)
+         if self.stage == 'observe_pad':
+@@ -474,6 +476,21 @@
+                 motion.goal[1] = motion.k.matrix(measured[8:15], 1)
+                 motion.goal[1][2, 3] = max(motion.goal[1][2, 3], max(c['top_z_base_m'] for c in candidates)+.12)
+                 self._stage('clear')
++        elif self.stage == 'observe_bin':
++            ready = self._selection_view_ready(snapshot, head_info, fresh)
++            observed = bin_rim(snapshot)
++            if fresh:
++                previous = self.bin_previous
++                consistent = (observed is not None and previous is not None
++                    and np.linalg.norm(observed['center']-previous['center']) < .012
++                    and abs(observed['rim_z']-previous['rim_z']) < .005)
++                self.bin_frames = (self.bin_frames+1 if consistent else 1) if ready and observed is not None else 0
++                self.bin_previous = observed
++            info.update(bin_full_boundary_observed=observed is not None,
++                bin_stable_frames=self.bin_frames, bin_view_ready=ready)
++            if self.bin_frames >= 3:
++                self.rim = copy.deepcopy(observed)
++                self._stage('select')
+         elif self.stage == 'observe_pad':
+             observed = visible_pad(self.surface_reference, snapshot)
+             if fresh:
+@@ -700,7 +717,21 @@
+                     self._stage('first_back')
+                 elif self.stage == 'first_back':
+                     motion.goal[1] = None
+-                    self._stage('select')
++                    points, hsv = cloud(snapshot)
++                    plane = snapshot['table_z_base_m']
++                    elevated = ((hsv[:,0] >= 40) & (hsv[:,0] <= 90) & (hsv[:,1] >= 80)
++                        & (points[:,2] > plane+.12) & (points[:,2] < plane+.5)
++                        & (points[:,0] > .15) & (points[:,0] < 1.2) & (abs(points[:,1]) < .8))
++                    visible = points[elevated]
++                    if len(visible) < 150:
++                        raise RuntimeError('No observed elevated bin surface for camera reobservation')
++                    # A partial wall only guides the camera. It never supplies
++                    # the bin boundary used for arm motion or successful release.
++                    self.bin_view_goal = np.r_[np.median(visible[:,:2],axis=0),
++                        np.percentile(visible[:,2],95)-.03]
++                    self.bin_frames = 0
++                    self.bin_previous = None
++                    self._stage('observe_bin')
+                 elif self.stage == 'clear':
+                     motion.goal[1] = self.approach_goal.copy()
+                     motion.goal[1][2, 3] = self.target['top_z_base_m']+.10
+--- a/tests/test_first_pickup.py
++++ b/tests/test_first_pickup.py
+@@ -101,9 +101,9 @@
+         self.assertGreater((goal[:2,3]-pose[:2,3])@(pose[:2,3]-np.asarray(pickup.target['position_base_m'])[:2]),0.)
+     def test_reobservation_finishes_before_selection_and_has_full_sweep(self):
+         pickup,_=self.begin();pickup._stage('first_back');snapshot=dict(self.snapshot,stamp=1.,table_z_base_m=self.f['grasp']['plane'])
+-        with patch.object(pickup.motion,'_arrived',return_value=(True,[])):
++        with patch.object(pickup.motion,'_arrived',return_value=(True,[])),patch('scene1.visual_pickup.cloud',return_value=(np.tile([.6,.3,.2],(160,1)),np.tile([60,150,150],(160,1)))):
+             _,info=pickup.update(self.measured,snapshot,self.assist,None)
+-        self.assertEqual(pickup.stage,'select');self.assertEqual(self.assist.command_sweep_context['stage'],'visual_pickup_first_back')
++        self.assertEqual(pickup.stage,'observe_bin');self.assertEqual(self.assist.command_sweep_context['stage'],'visual_pickup_first_back')
+         self.assertTrue(info['visual_pickup_sweep_required'])
+ 
+     def test_sensor_hold_still_checks_inflight_reference(self):
+@@ -118,3 +118,22 @@
+             command,info=pickup.update(self.measured,snapshot,self.assist,None)
+         self.assertTrue(info['table_reference_hold']);self.assertTrue(info['visual_pickup_sweep_required'])
+         np.testing.assert_array_equal(command,self.sent)
++
++    def test_bin_observation_holds_arms_and_does_not_accept_partial_wall(self):
++        pickup,_=self.begin();pickup._stage('observe_bin');pickup.bin_view_goal=np.array([.6,.3,.2]);pickup.bin_frames=0;pickup.bin_previous=None
++        snapshot=dict(self.snapshot,stamp=1.,table_z_base_m=self.f['grasp']['plane'])
++        with patch('scene1.visual_pickup.bin_rim',return_value=None),patch.object(pickup,'_selection_view_ready',return_value=True):
++            command,info=pickup.update(self.measured,snapshot,self.assist,None)
++        np.testing.assert_array_equal(command,self.sent);self.assertIsNone(pickup.rim)
++        self.assertFalse(info['bin_full_boundary_observed']);self.assertEqual(pickup.stage,'observe_bin')
++        np.testing.assert_array_equal(pickup.camera_target(self.measured,self.assist),pickup.bin_view_goal)
++    def test_bin_requires_three_fresh_stable_full_boundaries(self):
++        pickup,_=self.begin();pickup._stage('observe_bin');pickup.bin_frames=0;pickup.bin_previous=None
++        rim=dict(center=np.array([.6,.3]),rim_z=.2,corners=np.array([[.4,.1],[.8,.1],[.8,.5],[.4,.5]]),stamp=1.,plane_z=-.08)
++        snapshot=dict(self.snapshot,table_z_base_m=self.f['grasp']['plane'])
++        with patch('scene1.visual_pickup.bin_rim',return_value=rim),patch.object(pickup,'_selection_view_ready',return_value=True):
++            for stamp in [1.,1.,2.]:
++                snapshot['stamp']=stamp;pickup.update(self.measured,snapshot,self.assist,None)
++                self.assertEqual(pickup.stage,'observe_bin');self.assertIsNone(pickup.rim)
++            snapshot['stamp']=3.;pickup.update(self.measured,snapshot,self.assist,None)
++        self.assertEqual(pickup.stage,'select');self.assertIsNot(pickup.rim,rim)

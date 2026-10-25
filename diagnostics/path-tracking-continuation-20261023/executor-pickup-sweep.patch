@@ -1,0 +1,43 @@
+--- a/run_scene1.py
++++ b/run_scene1.py
+@@ -687,7 +687,8 @@
+             if (config['wrist_assist'].get('command_sweep_diagnostics', False)
+                     and (cartesian_info.get('regrasp_stage') is not None
+                          or cartesian_info.get('retreat_sweep_required', False)
+-                         or cartesian_info.get('grasp_yaw_sweep_required', False))
++                         or cartesian_info.get('grasp_yaw_sweep_required', False)
++                         or cartesian_info.get('visual_pickup_sweep_required', False))
+                     and getattr(aligner, 'command_sweep_context', None) is not None):
+                 if config['wrist_assist'].get('command_sweep_fresh_feedback', False):
+                     cartesian_info['command_sweep'] = fresh_command_sweep_audit(
+--- a/scene1/visual_pickup.py
++++ b/scene1/visual_pickup.py
+@@ -716,6 +716,12 @@
+             info['selected_target'] = self.target
+         if getattr(self, 'surface', None) is not None:
+             info['weighing_surface'] = self.surface
++        if info['stage'] in ('clear', 'hover', 'descend'):
++            # The runner checks fresh feedback through the full pending and
++            # filtered reference, not merely this update's servo increment.
++            assist.command_sweep_context = dict(stage='visual_pickup_'+info['stage'],
++                target=copy.deepcopy(self.target), plane=self.plane)
++            info['visual_pickup_sweep_required'] = True
+         info['goal_tcp'] = [g.tolist() if g is not None else None for g in motion.goal]
+         if info['stage'] != self.stage:
+             info['transition_to'] = self.stage
+--- a/tests/test_first_pickup.py
++++ b/tests/test_first_pickup.py
+@@ -61,3 +61,13 @@
+                 self.assertEqual(pickup.stage,'select');self.assertFalse(hasattr(pickup,'anchor_target'))
+             snapshot['stamp']=3.;pickup.update(self.measured,snapshot,self.assist,None)
+         self.assertEqual(pickup.stage,'clear');self.assertTrue(hasattr(pickup,'anchor_target'))
++
++    def test_visual_clear_exports_full_pending_sweep_context(self):
++        pickup,_=self.begin();pickup._stage('clear');pickup.motion.goal[1]=self.k.matrix(self.measured[8:15],1)
++        snapshot=dict(self.snapshot,stamp=1.,table_z_base_m=self.f['grasp']['plane'])
++        with patch.object(pickup.motion,'_arrived',return_value=(False,[])):
++            command,info=pickup.update(self.measured,snapshot,self.assist,None)
++        self.assertTrue(info['visual_pickup_sweep_required'])
++        self.assertEqual(self.assist.command_sweep_context['stage'],'visual_pickup_clear')
++        self.assertEqual(self.assist.command_sweep_context['plane'],pickup.plane)
++        self.assertIsNot(self.assist.command_sweep_context['target'],pickup.target)

@@ -1,0 +1,26 @@
+{
+  "at": "2026-10-24T17:55:24.079337+08:00",
+  "parent": "executor-first-pitch",
+  "candidate": "executor-first-pickup",
+  "factor": "After confirmed first pregrasp switch to existing visual clear/hover/descend/grasp, instead of ACT descent undoing15degorientation; observed midpoint height and original nearfaceXY",
+  "evidence": "Seed0pitch candidate pregrasp aligned then ACT descent led reorientation until45stepgrasp timeout,open throughout; no timeout extension",
+  "development_seed": 0,
+  "fresh_heldout_seeds": [
+    2,
+    3
+  ],
+  "already_used_seeds": [
+    0,
+    1
+  ],
+  "unchanged": [
+    "A+C",
+    "all collision geometry3mm",
+    "initial gain.35",
+    "45localgrasp budget,500existingvisualstage budget",
+    "original contact/support/success checks",
+    "laterparcels configs"
+  ],
+  "tests_passed": 508,
+  "patch_chain_count": 33
+}

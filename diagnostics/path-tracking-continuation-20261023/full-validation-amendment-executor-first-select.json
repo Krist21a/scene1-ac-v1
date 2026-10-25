@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-24T17:59:17.074362+08:00",
+  "parent": "executor-first-pickup",
+  "candidate": "executor-first-select",
+  "factor": "Bootstrap first visual pickup through existing select/stable head3frames before anchoring table, instead of anchoring before head turn",
+  "evidence": "Prior155steps failed table reference verification after headturn; no grasp or relaxation",
+  "development_seed": 0,
+  "fresh_heldout_seeds": [
+    2,
+    3
+  ],
+  "already_used_seeds": [
+    0,
+    1
+  ],
+  "unchanged": [
+    "all motion/clearance/contact bounds",
+    "existing selection and500stage budgets",
+    "A+C",
+    "all original success checks"
+  ],
+  "tests_passed": 510,
+  "patch_chain_count": 34
+}

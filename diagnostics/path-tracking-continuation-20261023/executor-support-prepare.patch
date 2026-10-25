@@ -1,0 +1,89 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -258,6 +258,7 @@
+   release_prepare_before_open: true
+   release_prepare_adapt_settled: true
+   release_prepare_whole_arm: true
++  release_prepare_support_footprint: true
+   release_cartesian_open_hold: true
+   release_open_hold_position_gain: 2.0
+   release_retreat_ready_m: 0.014
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -792,7 +792,10 @@
+             whole_arm=whole_arm, tracking_error_rad=tracking_error,
+             settled_movement_rad=wrist_movement,
+             wrist_error_rad=wrist_error, wrist_movement_rad=wrist_movement,
+-            original_support_checks_passed=bool(support_ok), stable_steps=p['release_prepare_stable'],
++            original_support_checks_passed=bool(support_ok and info.get('original_centering_passed',True)),
++            support_checks_passed=bool(support_ok),
++            support_position_rule=info.get('support_position_rule','center_and_footprint'),
++            stable_steps=p['release_prepare_stable'],
+             settled_target_adjustment_rad=adjustment.tolist(),
+             gripper_kept_closed=True, shared_weighing_step_budget=self.config['max_release_steps']))
+         if p['release_prepare_stable'] >= 3:
+@@ -1476,8 +1479,12 @@
+                                    offset_cap_rad=self.config.get(
+                                        'max_placement_joint_offset_rad', self.config['max_joint_offset_rad'])))
+             result[15] = p['hold_grip']
++            centered = np.linalg.norm(error) <= self.config['placement_tolerance_m']
++            preparation_footprint = (self.wrist_config.get('release_prepare_support_footprint', False)
++                                     and 'release_prepare_target' in p)
++            position_ready = support_fit if preparation_footprint else centered
+             stable = (p.get('level_ready', False) and vision_confirmed
+-                      and self._view_ready(snapshot, measured) and np.linalg.norm(error) <= self.config['placement_tolerance_m']
++                      and self._view_ready(snapshot, measured) and position_ready
+                       and support_fit
+                       and -.008 <= bottom_gap <= self.config['max_release_gap_m']
+                       and bottom_spread <= self.config['max_bottom_height_spread_m']
+@@ -1491,6 +1498,8 @@
+                         heading_error_degrees=float(np.rad2deg(axis_error)),
+                         heading_ready=bool(p.get('heading_ready', False)),
+                         heading_mode=heading_mode, support_footprint_fit=bool(support_fit),
++                        original_centering_passed=bool(centered),
++                        support_position_rule='prepared_footprint' if preparation_footprint else 'center_and_footprint',
+                         heading_descent_ok=bool(heading_descent_ok),
+                         stable_steps=p['stable'])
+             # Keep the pad view through release, settlement and regrasp.
+--- a/tests/test_preparation_support_position.py
++++ b/tests/test_preparation_support_position.py
+@@ -0,0 +1,39 @@
++import unittest
++import numpy as np
++import test_support_heading as support
++
++class PreparationSupportPositionTests(unittest.TestCase):
++    setUp=support.SupportHeadingTests.setUp
++    weighing_fixture=support.SupportHeadingTests.weighing_fixture
++    aim_camera=support.SupportHeadingTests.aim_camera
++    begin=support.SupportHeadingTests.begin
++
++    def run_case(self, prepared, position, verified=True):
++        self.begin(position=position,verified=verified)
++        self.a.wrist_config.update(release_prepare_before_open=True,release_prepare_support_footprint=True)
++        if prepared:self.a.pending['release_prepare_target']=self.raw.copy()
++        captured=[]
++        self.a._prepare_release_reference=lambda measured,ready,result,info: (captured.append(ready) or result)
++        for _ in range(4):
++            self.aim_camera();result,info=self.a._pending_action(self.measured,self.snapshot)
++        return result,info,captured
++
++    def test_after_entry_supported_center_offset_does_not_freeze_preparation(self):
++        result,info,captured=self.run_case(True,[.418,-.5,0.])
++        self.assertFalse(info['original_centering_passed'])
++        self.assertTrue(info['support_footprint_fit'])
++        self.assertEqual(info['support_position_rule'],'prepared_footprint')
++        self.assertTrue(captured[-1])
++        self.assertAlmostEqual(self.a.config['placement_margin_m'],.025)
++
++    def test_entry_still_requires_original_centering(self):
++        result,info,captured=self.run_case(False,[.418,-.5,0.])
++        self.assertFalse(info['original_centering_passed'])
++        self.assertEqual(captured,[])
++        self.assertNotEqual(self.a.pending['stage'],'release')
++
++    def test_actual_edge_and_unverified_orientation_still_block(self):
++        for position,verified in [([.46,-.5,0.],True),([.418,-.5,0.],False)]:
++            self.setUp();result,info,captured=self.run_case(True,position,verified)
++            self.assertFalse(captured[-1])
++            self.assertGreater(result[15],.9)

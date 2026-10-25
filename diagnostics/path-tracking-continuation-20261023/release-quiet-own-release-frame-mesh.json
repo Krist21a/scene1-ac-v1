@@ -1,0 +1,133 @@
+{
+  "robot_mesh": "inner_finger_fine_new.STL",
+  "margin_m": 0.003,
+  "parcel": {
+    "position_base_m": [
+      0.41678079057502626,
+      -0.5533528142489894,
+      -0.007150255419816391
+    ],
+    "oriented_center_base_m": [
+      0.41892364693260936,
+      -0.5566602021039805,
+      -0.007150255419816391
+    ],
+    "extent_xy_m": [
+      0.11292589221503818,
+      0.05696693167816169
+    ],
+    "points": 47,
+    "minor_extent_m": 0.041309471316468116,
+    "major_axis_xy": [
+      -0.9625163859400128,
+      0.27122353658371257
+    ],
+    "oriented_extent_m": [
+      0.1109358404006181,
+      0.041309471316468116
+    ],
+    "top_z_base_m": 0.022946375143452748,
+    "uv": [
+      424.0,
+      228.0
+    ],
+    "bbox": [
+      412,
+      212,
+      33,
+      33
+    ]
+  },
+  "plane_m": -0.08305554448891794,
+  "finger_bounds_tcp": [
+    {
+      "low": [
+        -0.07210231502568283,
+        -0.011000217366091946,
+        -0.002404080275100584
+      ],
+      "high": [
+        -0.040398757045577646,
+        0.010999825545588138,
+        0.05411052945886933
+      ]
+    },
+    {
+      "low": [
+        0.04039955683125548,
+        -0.010999851543636942,
+        -0.0024038297804947414
+      ],
+      "high": [
+        0.072102810661376,
+        0.011000173319604489,
+        0.05411088027821484
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "label": "release",
+      "box_guard_clear": true,
+      "tcp_m": [
+        0.37693103131174654,
+        -0.5490752080214006,
+        -0.015440065171520367
+      ],
+      "fingers": [
+        {
+          "convex_mesh_intersects": false,
+          "solver_status": 2,
+          "intersection_point_parcel_frame": null
+        },
+        {
+          "convex_mesh_intersects": false,
+          "solver_status": 2,
+          "intersection_point_parcel_frame": null
+        }
+      ]
+    },
+    {
+      "label": "previous",
+      "box_guard_clear": true,
+      "tcp_m": [
+        0.37146765135189685,
+        -0.5435891411398044,
+        -0.03961884509686331
+      ],
+      "fingers": [
+        {
+          "convex_mesh_intersects": false,
+          "solver_status": 2,
+          "intersection_point_parcel_frame": null
+        },
+        {
+          "convex_mesh_intersects": false,
+          "solver_status": 2,
+          "intersection_point_parcel_frame": null
+        }
+      ]
+    },
+    {
+      "label": "failed",
+      "box_guard_clear": true,
+      "tcp_m": [
+        0.372598932185334,
+        -0.5437920231932709,
+        -0.038851521071204105
+      ],
+      "fingers": [
+        {
+          "convex_mesh_intersects": false,
+          "solver_status": 2,
+          "intersection_point_parcel_frame": null
+        },
+        {
+          "convex_mesh_intersects": false,
+          "solver_status": 2,
+          "intersection_point_parcel_frame": null
+        }
+      ]
+    }
+  ]
+}

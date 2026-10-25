@@ -1,0 +1,38 @@
+{
+  "at": "2026-10-23T21:03:48.874978+08:00",
+  "source_trial": "executor-numerics-c-p2-s0",
+  "release_step": 517,
+  "last_sent_step": 521,
+  "rejected_step": 522,
+  "wrist_reference_change_rad": [
+    0.14115389940483292,
+    -0.05229387062720481,
+    -0.3362053487048584
+  ],
+  "proximal_reference_change_rad": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "last_opening_hold": {
+    "position_error_m": 0.022104530357991845,
+    "angular_error_degrees": 16.300050169645207,
+    "position_gain": 2.0,
+    "position_goal_m": [
+      0.37274590053098705,
+      -0.5548203647591821,
+      -0.019386022042874512
+    ],
+    "measured_gripper": 0.043441880494356155
+  },
+  "formal_target_clips": 0,
+  "formal_added_pd_clips": 0,
+  "original_checks_retained": true,
+  "next_hypothesis": "Prepare and settle wrist reference before opening, while grasp and original visual support checks remain active; share original450step weighing budget. Not implemented or validated.",
+  "limitations": [
+    "Contact-supported wrist error is observed; no gravity cause established.",
+    "20Hz position filter and per-command rate limits do not make concurrent gripper release/reference transfer instantaneous.",
+    "Actual final open-hand pose still blocked; numeric preflight fix did not repair this run."
+  ]
+}

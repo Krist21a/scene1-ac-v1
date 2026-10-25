@@ -1,0 +1,130 @@
+{
+  "seed": 0,
+  "seed_role": "development",
+  "repeats_per_variant": 1,
+  "same_outer_run_settings": {
+    "mode": true,
+    "task": true,
+    "config": true,
+    "stop_after_parcels": true,
+    "original_model": true,
+    "base_config": true
+  },
+  "prefix": {
+    "baseline-first-parcel": {
+      "last_state": "visual_cycle_complete",
+      "through_regrasp_steps": 878,
+      "through_regrasp_wall_s": 145.23884264800017,
+      "first_clip_source": {
+        "act_action": -1.5751986503601074,
+        "proposed_action": -1.5751986503601074,
+        "filtered_action": -1.5707963267949,
+        "measured_state": -1.5708202123641968
+      }
+    },
+    "gains-first-parcel": {
+      "last_state": "visual_cycle_lift",
+      "through_regrasp_steps": 797,
+      "through_regrasp_wall_s": 130.33006660999945,
+      "first_clip_source": {
+        "act_action": -1.5742123126983643,
+        "proposed_action": -1.5742123126983643,
+        "filtered_action": -1.5707963267949,
+        "measured_state": -1.5708162784576416
+      }
+    }
+  },
+  "prefix_clocks": {
+    "baseline-first-parcel": {
+      "wall_s": 145.23884264800017,
+      "sensor_sim_elapsed_s": 41.680999994277954,
+      "pair_error_ms": [
+        8.490609000546101,
+        1.393110000208253
+      ]
+    },
+    "gains-first-parcel": {
+      "wall_s": 130.33006660999945,
+      "sensor_sim_elapsed_s": 38.97699999809265,
+      "pair_error_ms": [
+        9.5789959996182,
+        2.284780999616487
+      ]
+    }
+  },
+  "task": {
+    "baseline": {
+      "run": "baseline-first-parcel",
+      "steps": 2871,
+      "reason": "visual_cycle_target_reached",
+      "visual_confirmed_parcels": 1,
+      "official_task_success": null,
+      "independent_four_parcel_success": false,
+      "active_duration_s": 445.7763918030005,
+      "bounds_clipped_steps": 29,
+      "clip_runs": [
+        {
+          "first": 414,
+          "last": 425,
+          "length": 12
+        },
+        {
+          "first": 449,
+          "last": 453,
+          "length": 5
+        },
+        {
+          "first": 867,
+          "last": 878,
+          "length": 12
+        }
+      ],
+      "first_clipped_step": 414,
+      "sampled_actuator_limit_near": 0,
+      "sampled_requested_torque_above_range": 0,
+      "frozen_policy_steps": 2673,
+      "explicit_hold_steps": 12,
+      "velocity_limited_steps": 1
+    },
+    "wrist_gains": {
+      "run": "gains-first-parcel",
+      "steps": 894,
+      "reason": "user_stop",
+      "visual_confirmed_parcels": 0,
+      "official_task_success": null,
+      "independent_four_parcel_success": false,
+      "active_duration_s": 146.0485980839985,
+      "bounds_clipped_steps": 28,
+      "clip_runs": [
+        {
+          "first": 469,
+          "last": 480,
+          "length": 12
+        },
+        {
+          "first": 522,
+          "last": 527,
+          "length": 6
+        },
+        {
+          "first": 788,
+          "last": 797,
+          "length": 10
+        }
+      ],
+      "first_clipped_step": 469,
+      "sampled_actuator_limit_near": 0,
+      "sampled_requested_torque_above_range": 0,
+      "frozen_policy_steps": 660,
+      "explicit_hold_steps": 10,
+      "velocity_limited_steps": 3
+    }
+  },
+  "caveats": [
+    "asymmetric stopping: baseline clipping was discovered retrospectively",
+    "different stage coverage; full task durations and success rates are not comparable",
+    "FK is derived robot kinematics, not independent TCP truth",
+    "visual offset variation is not vision computation cost",
+    "one development seed; no new seed or full four-parcel test"
+  ]
+}

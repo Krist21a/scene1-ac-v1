@@ -1,0 +1,177 @@
+{
+  "status": "completed",
+  "current_trial": "executor-pad-dense-ac-p4-s2-regression-1025",
+  "stages": [
+    {
+      "script": "audit_first_pickup.py",
+      "args": [
+        "executor-pad-dense-ac-p2-s3-1025"
+      ],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p2-s3-1025-audit_first_pickup.py.log"
+    },
+    {
+      "script": "audit_arm_preparation.py",
+      "args": [
+        "executor-pad-dense-ac-p2-s3-1025"
+      ],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p2-s3-1025-audit_arm_preparation.py.log"
+    },
+    {
+      "script": "audit_soft_open.py",
+      "args": [
+        "executor-pad-dense-ac-p2-s3-1025"
+      ],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p2-s3-1025-audit_soft_open.py.log"
+    },
+    {
+      "script": "audit_support_recovery.py",
+      "args": [
+        "executor-pad-dense-ac-p2-s3-1025"
+      ],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p2-s3-1025-audit_support_recovery.py.log"
+    },
+    {
+      "script": "archive_analysis_staging.py",
+      "args": [],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p2-s3-1025-staging-successor.log"
+    },
+    {
+      "script": "run_one.py",
+      "args": [
+        "origin_pd",
+        "executor-pad-dense-ac-p4-s0-1025",
+        "--policy",
+        "executor_pad_dense",
+        "--seed",
+        "0",
+        "--parcels",
+        "4"
+      ],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p4-s0-1025-successor.log"
+    },
+    {
+      "script": "audit_first_pickup.py",
+      "args": [
+        "executor-pad-dense-ac-p4-s0-1025"
+      ],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p4-s0-1025-audit_first_pickup.py.log"
+    },
+    {
+      "script": "audit_arm_preparation.py",
+      "args": [
+        "executor-pad-dense-ac-p4-s0-1025"
+      ],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p4-s0-1025-audit_arm_preparation.py.log"
+    },
+    {
+      "script": "audit_soft_open.py",
+      "args": [
+        "executor-pad-dense-ac-p4-s0-1025"
+      ],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p4-s0-1025-audit_soft_open.py.log"
+    },
+    {
+      "script": "audit_support_recovery.py",
+      "args": [
+        "executor-pad-dense-ac-p4-s0-1025"
+      ],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p4-s0-1025-audit_support_recovery.py.log"
+    },
+    {
+      "script": "archive_analysis_staging.py",
+      "args": [],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p4-s0-1025-staging-successor.log"
+    },
+    {
+      "script": "run_one.py",
+      "args": [
+        "origin_pd",
+        "executor-pad-dense-ac-p4-s2-regression-1025",
+        "--policy",
+        "executor_pad_dense",
+        "--seed",
+        "2",
+        "--parcels",
+        "4"
+      ],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p4-s2-regression-1025-successor.log"
+    },
+    {
+      "script": "audit_first_pickup.py",
+      "args": [
+        "executor-pad-dense-ac-p4-s2-regression-1025"
+      ],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p4-s2-regression-1025-audit_first_pickup.py.log"
+    },
+    {
+      "script": "audit_arm_preparation.py",
+      "args": [
+        "executor-pad-dense-ac-p4-s2-regression-1025"
+      ],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p4-s2-regression-1025-audit_arm_preparation.py.log"
+    },
+    {
+      "script": "audit_soft_open.py",
+      "args": [
+        "executor-pad-dense-ac-p4-s2-regression-1025"
+      ],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p4-s2-regression-1025-audit_soft_open.py.log"
+    },
+    {
+      "script": "audit_support_recovery.py",
+      "args": [
+        "executor-pad-dense-ac-p4-s2-regression-1025"
+      ],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p4-s2-regression-1025-audit_support_recovery.py.log"
+    },
+    {
+      "script": "archive_analysis_staging.py",
+      "args": [],
+      "returncode": 0,
+      "log": "executor-pad-dense-ac-p4-s2-regression-1025-staging-successor.log"
+    },
+    {
+      "script": "freeze_successor_candidate.py",
+      "args": [
+        "--policy",
+        "executor_pad_dense",
+        "--development",
+        "executor-pad-dense-ac-p4-s0-1025",
+        "--regression",
+        "executor-pad-dense-ac-p4-s2-regression-1025",
+        "--output",
+        "path-control-freeze-pad-dense-20261025.json"
+      ],
+      "returncode": 0,
+      "log": "freeze-pad-dense-20261025.log"
+    },
+    {
+      "script": "run_frozen_acceptance.py",
+      "args": [
+        "path-control-freeze-pad-dense-20261025.json",
+        "--receipt",
+        "frozen-pad-acceptance-20261025.json"
+      ],
+      "returncode": 0,
+      "log": "frozen-pad-acceptance-20261025.log"
+    }
+  ],
+  "updated_at": "2026-10-25T16:58:29.835090+08:00",
+  "phase": "frozen_acceptance"
+}

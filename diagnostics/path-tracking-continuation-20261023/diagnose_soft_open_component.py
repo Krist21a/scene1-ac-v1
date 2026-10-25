@@ -1,0 +1,6 @@
+import json,sys
+from pathlib import Path
+import numpy as np,yaml,cv2
+p=Path(__file__).resolve().parent;policy=p/'candidate-policy-executor-soft-open';scope={'__name__':'diagnostic_rgbd'}
+s=(policy/'scene1/rgbd.py').read_text().replace('"position_base_m": center.tolist(),','"debug_points": group.tolist(), "debug_pixels": image_points.tolist(), "debug_hsv": hsv[image_points[:,1],image_points[:,0]].tolist(), "position_base_m": center.tolist(),',1);exec(compile(s,'diagnostic','exec'),scope)
+raw=np.load(p/'soft-open-failed-sensors.npz');cfg=yaml.safe_load((policy/'configs/visual_cycle_four_parcels.yaml').read_text());cs,plane=scope['metric_candidates'](raw['rgb'],raw['depth_m'],raw['intrinsic'],raw['camera_to_base'],cfg['cartesian_alignment'],stride=2,spatial_components=True);c=min(cs,key=lambda c:np.linalg.norm(np.array(c['position_base_m'])[:2]-[.42,-.56]));image=raw['rgb'].copy();px=np.array(c['debug_pixels']);hsv=np.array(c['debug_hsv']);image[px[:,1],px[:,0]]=[255,0,255];cv2.imwrite(str(p/'soft-open-component-pixels.png'),cv2.cvtColor(image,cv2.COLOR_RGB2BGR));out=dict(candidate=c,plane=plane,color_counts=dict(total=len(hsv),low_sat=int((hsv[:,1]<20).sum())));(p/'soft-open-component-diagnostic.json').write_text(json.dumps(out,indent=2));print(out['color_counts'])

@@ -1,0 +1,233 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -249,6 +249,7 @@
+   release_clearance_rise_m: 0.07
+   release_measured_reference_hold: true
+   release_reference_mode: mpc_continuous
++  grasp_align_parcel_yaw: true
+   release_prepare_before_open: true
+   release_prepare_adapt_settled: true
+   release_cartesian_open_hold: true
+--- a/run_scene1.py
++++ b/run_scene1.py
+@@ -664,7 +664,8 @@
+             sent = filtered if args.mode == "optimized" else np.clip(raw_action, env.action_space.low, env.action_space.high)
+             if (config['wrist_assist'].get('command_sweep_diagnostics', False)
+                     and (cartesian_info.get('regrasp_stage') is not None
+-                         or cartesian_info.get('retreat_sweep_required', False))
++                         or cartesian_info.get('retreat_sweep_required', False)
++                         or cartesian_info.get('grasp_yaw_sweep_required', False))
+                     and getattr(aligner, 'command_sweep_context', None) is not None):
+                 if config['wrist_assist'].get('command_sweep_fresh_feedback', False):
+                     cartesian_info['command_sweep'] = fresh_command_sweep_audit(
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -175,7 +175,7 @@
+             point[2] = (plane + target.get('top_z_base_m', point[2] + .04)) / 2
+         if target.get('grasp_goal_xy') is not None:
+             point[:2] = target['grasp_goal_xy']
+-            return point
++            return self._center_grasp_transverse(target,point)
+         forward = -Rotation.from_quat(pose.quat_xyzw).as_matrix()[:2, 2]
+         if np.linalg.norm(forward) > .65:
+             forward /= np.linalg.norm(forward)
+@@ -184,6 +184,17 @@
+             extent = target.get('oriented_extent_m', target.get('extent_xy_m', [.11, .04]))
+             half = (abs(forward @ major) * extent[0] + abs(forward @ minor) * extent[1]) / 2
+             point[:2] -= forward * max(0., half - .02)
++        return self._center_grasp_transverse(target,point)
++
++    def _center_grasp_transverse(self, target, point):
++        if self.wrist_config.get('grasp_align_parcel_yaw',False) and 'support_z_base_m' not in target:
++            major=np.asarray(target['major_axis_xy'],float)
++            if major.shape!=(2,) or not np.isfinite(major).all() or np.linalg.norm(major)<1e-3:
++                raise RuntimeError('Grasp centering requires a valid parcel axis')
++            minor=np.array([-major[1],major[0]])/np.linalg.norm(major)
++            center=np.asarray(target.get('oriented_center_base_m',target['position_base_m']),float)
++            point=point.copy()
++            point[:2]+=minor*(minor@(center[:2]-point[:2]))
+         return point
+ 
+     @staticmethod
+@@ -704,6 +715,18 @@
+             raise RuntimeError('Level regrasp pose could not converge within allowed joint correction')
+         return result,info
+ 
++    @staticmethod
++    def _grasp_yaw_error(target, pose):
++        major = np.asarray(target['major_axis_xy'], float)
++        closing = Rotation.from_quat(pose.quat_xyzw).as_matrix()[:2,0]
++        if (major.shape != (2,) or not np.isfinite(major).all()
++                or np.linalg.norm(major)<1e-3 or np.linalg.norm(closing)<1e-3):
++            raise RuntimeError('Grasp yaw requires valid parcel and finger horizontal axes')
++        minor = np.array([-major[1],major[0]])/np.linalg.norm(major)
++        closing = closing/np.linalg.norm(closing)
++        if minor@closing < 0:minor = -minor
++        return float(np.arctan2(closing[0]*minor[1]-closing[1]*minor[0],closing@minor))
++
+     def _prepare_release_reference(self, measured, support_ok, result, info):
+         """Settle the wrist handoff while still gripping; share weighing budget."""
+         p = self.pending
+@@ -919,8 +942,17 @@
+             else:
+                 correction = error-2.*velocity
+             previous_offset = self.offset.copy()
++            grasp_yaw = (self._grasp_yaw_error(p['target'],pose) if side==1 and not require_wrist
++                         and self.wrist_config.get('grasp_align_parcel_yaw',False) else None)
++            yaw_ready = grasp_yaw is None or abs(grasp_yaw)<=np.deg2rad(2.)
++            transverse_error = 0.
++            if grasp_yaw is not None:
++                major=np.asarray(p['target']['major_axis_xy'],float);major/=np.linalg.norm(major)
++                transverse_error=float(np.array([-major[1],major[0]])@error)
++                yaw_ready=yaw_ready and abs(transverse_error)<=.002
+             result = self._correct(p['base'], measured, side, correction,
+-                                   None if wrist_aim is None else wrist_aim['error_base'],
++                                   (np.array([0.,0.,grasp_yaw]) if grasp_yaw is not None else
++                                    None if wrist_aim is None else wrist_aim['error_base']),
+                                    step_scale=.4,
+                                    view_target=wrist_target if require_wrist and wrist is None else None)
+             if require_wrist and wrist is None:
+@@ -958,7 +990,7 @@
+                 p['unseen_roof_steps'] = 0
+             clearance = pose.pos_xyz[2] - p['target']['top_z_base_m']
+             pose_hold = (not require_wrist and np.linalg.norm(error) <= .01
+-                         and clearance >= .03 and not self.unwinding_placement)
++                         and clearance >= .03 and not self.unwinding_placement and yaw_ready)
+             if pose_hold:
+                 # A measured pose can be aligned while still moving. Preserve
+                 # the previous target during the dwell instead of injecting
+@@ -966,13 +998,17 @@
+                 self.offset = previous_offset
+                 result = p['base'].copy()+self.offset
+                 result[grip] = 0.
+-            aligned = (np.linalg.norm(error) <= .01 and movement <= .002
++            aligned = (yaw_ready and np.linalg.norm(error) <= .01 and movement <= .002
+                        and clearance >= .03
+                        and p.get('unseen_roof_steps',0) == 0
+                        and not self.unwinding_placement
+                        and (not require_wrist or (not view_low and
+                             p['wrist_stable'] >= self.wrist_config['stable_frames'])))
+             p['stable'] = p['stable'] + 1 if aligned else 0
++            if grasp_yaw is not None:
++                info.update(grasp_yaw_error_degrees=float(np.rad2deg(grasp_yaw)),
++                            grasp_transverse_error_m=transverse_error,grasp_yaw_sweep_required=True)
++                self.command_sweep_context=dict(target=p['target'],plane=p['plane'],stage='pregrasp_yaw')
+             info.update(xy_error_m=float(np.linalg.norm(error)), clearance_m=float(clearance), pose_hold=bool(pose_hold),
+                         parcel_displacement_m=displacement,
+                         lateral_movement_m=float(movement), stable_steps=p['stable'],
+@@ -1056,6 +1092,16 @@
+                 orientation_ok = (finger_tilt <= self.wrist_config.get('regrasp_finger_tilt_degrees',5.)
+                                   and np.linalg.norm(angular_error) <= np.deg2rad(8.))
+                 info['finger_line_tilt_degrees'] = float(finger_tilt)
++            if (side==1 and self.wrist_config.get('grasp_align_parcel_yaw',False)
++                    and 'support_z_base_m' not in p['target']):
++                yaw = self._grasp_yaw_error(p['target'],pose)
++                if angular_error is None:angular_error=np.array([0.,0.,yaw])
++                orientation_ok = orientation_ok and abs(yaw)<=np.deg2rad(2.)
++                major=np.asarray(p['target']['major_axis_xy'],float);major/=np.linalg.norm(major)
++                transverse_error=float(np.array([-major[1],major[0]])@error[:2])
++                info.update(grasp_yaw_error_degrees=float(np.rad2deg(yaw)),
++                            grasp_transverse_error_m=transverse_error,grasp_yaw_sweep_required=True)
++                self.command_sweep_context=dict(target=p['target'],plane=p['plane'],stage='grasp_yaw')
+             result = self._correct(p['base'], measured, side, error if orientation_ok else np.zeros(3),
+                                    angular_error)
+             result[grip] = 0
+@@ -1063,6 +1109,8 @@
+                        and abs(error[2]) <= self.config['grasp_z_tolerance_m']
+                        and (not p.get('wrist_verified') or (wrist is not None
+                             and abs(wrist['centering_error_px']) <= self.wrist_config['aligned_error_px'])))
++            if info.get('grasp_yaw_sweep_required'):
++                arrived=arrived and abs(info['grasp_transverse_error_m'])<=.002
+             p['stable'] = p['stable'] + 1 if arrived else 0
+             info.update(xy_error_m=float(np.linalg.norm(error[:2])), z_error_m=float(error[2]),
+                         grasp_target_base_m=point.tolist(), stable_steps=p['stable'], wrist=wrist)
+@@ -1433,7 +1481,10 @@
+             distinct = (len(candidates) == 1 or
+                 np.linalg.norm(self._grasp_goal(candidates[1], pose)[:2] - pose.pos_xyz[:2]) - lateral >= .02)
+             already_aligned = self.approach[1] is not None and self.approach[1].get('aligned', False)
+-            if .03 < clearance < .10 and .012 < lateral < .10 and distinct and not already_aligned:
++            yaw_needs_alignment = (self.wrist_config.get('grasp_align_parcel_yaw',False)
++                and abs(self._grasp_yaw_error(target,pose))>np.deg2rad(2.))
++            if (.03 < clearance < .10 and lateral < .10 and (.012 < lateral or yaw_needs_alignment)
++                    and distinct and not already_aligned):
+                 if self.approach[1] is None:
+                     self.approach[1] = dict(target=copy.deepcopy(target),
+                                             plane=snapshot['table_z_base_m'], frames=0)
+--- /dev/null
++++ b/tests/test_grasp_yaw.py
+@@ -0,0 +1,75 @@
++import json
++from pathlib import Path
++from types import SimpleNamespace
++import unittest
++import numpy as np
++from scipy.spatial.transform import Rotation
++import test_residual as original
++from scene1.residual import ResidualAssist
++from scene1.retreat_projection import FingerSeparation
++
++
++class GraspYawTests(unittest.TestCase):
++    setUp=original.ResidualTests.setUp
++
++    def test_parcel_axis_sign_does_not_reverse_gripper(self):
++        pose=SimpleNamespace(quat_xyzw=Rotation.from_euler('z',80,degrees=True).as_quat())
++        for major in [[1,0],[-1,0]]:
++            self.assertAlmostEqual(np.rad2deg(self.a._grasp_yaw_error(dict(major_axis_xy=major),pose)),10.)
++
++    def test_degenerate_axis_rejected(self):
++        pose=SimpleNamespace(quat_xyzw=Rotation.identity().as_quat())
++        with self.assertRaisesRegex(RuntimeError,'valid parcel'):
++            self.a._grasp_yaw_error(dict(major_axis_xy=[0,0]),pose)
++
++    def test_measured_yaw_must_align_before_close_with_original_bounds(self):
++        self.a.wrist_config['grasp_align_parcel_yaw']=True
++        self.measured[13]=np.deg2rad(80);self.raw=self.measured.copy()
++        target=self.snapshot['candidates'][0];target['grasp_goal_xy']=self.measured[8:10].tolist()
++        self.a._begin('grasp',1,self.raw,target=target,plane=-.08,grasp_z=0.,wrist_verified=False)
++        closed=False
++        for _ in range(self.a.config['max_grasp_steps']):
++            before=self.a.offset.copy()
++            action,info=self.a._pending_action(self.measured,self.snapshot)
++            self.assertLessEqual(max(abs(self.a.offset-before)),self.a.config['max_joint_step_rad']+1e-10)
++            if abs(info['grasp_yaw_error_degrees'])>2:self.assertEqual(action[15],0.)
++            self.measured=action.copy()
++            if action[15]>.9:
++                self.assertLessEqual(abs(info['grasp_yaw_error_degrees']),2.)
++                closed=True;break
++        self.assertTrue(closed)
++
++    def test_centering_preserves_depth_and_height(self):
++        self.a.wrist_config['grasp_align_parcel_yaw']=True
++        target=dict(position_base_m=[.4,-.2,0.],oriented_center_base_m=[.405,-.208,0.],major_axis_xy=[1.,0.])
++        point=np.array([.37,-.19,.02]);centered=self.a._center_grasp_transverse(target,point)
++        np.testing.assert_allclose(centered,[.37,-.208,.02])
++
++    def test_lateral_miscentering_still_blocks_close_at_correct_yaw(self):
++        self.a.wrist_config['grasp_align_parcel_yaw']=True
++        self.measured[13]=np.pi/2;self.measured[9]=-.192;self.raw=self.measured.copy()
++        target=self.snapshot['candidates'][0]
++        self.a._begin('grasp',1,self.raw,target=target,plane=-.08,grasp_z=0.,wrist_verified=False)
++        action,info=self.a._pending_action(self.measured,self.snapshot)
++        self.assertGreater(abs(info['grasp_transverse_error_m']),.002)
++        self.assertEqual(action[15],0.)
++
++    def test_recorded_drift_retains_clearance_after_frame_alignment(self):
++        f=json.loads((Path(__file__).parent/'fixtures/grasp_yaw_clearance_20261024.json').read_text())
++        separation=FingerSeparation(f['target'],f['plane'])
++        # Counterfactual orientation screen, not contact/dynamics evidence.
++        self.a.wrist_config['grasp_align_parcel_yaw']=True
++        release=np.array(f['records'][2]['pose']);failed=np.array(f['records'][-1]['pose'])
++        yaw=self.a._grasp_yaw_error(f['target'],SimpleNamespace(quat_xyzw=Rotation.from_matrix(release[:3,:3]).as_quat()))
++        aligned=release.copy();aligned[:3,:3]=Rotation.from_rotvec([0,0,yaw]).as_matrix()@release[:3,:3]
++        aligned[:3,3]=self.a._center_grasp_transverse(f['target'],release[:3,3])
++        self.assertGreater(min(separation.gaps(aligned)),.008)
++        # Apply exactly the old measured translation and rotation drift, without
++        # recentering after release or changing the original parcel envelope.
++        aligned[:3,3]+=failed[:3,3]-release[:3,3]
++        aligned[:3,:3]=(failed[:3,:3]@release[:3,:3].T)@aligned[:3,:3]
++        self.assertLess(min(separation.gaps(failed)),0.)
++        self.assertGreater(min(separation.gaps(aligned)),0.)
++
++
++if __name__=='__main__':unittest.main()

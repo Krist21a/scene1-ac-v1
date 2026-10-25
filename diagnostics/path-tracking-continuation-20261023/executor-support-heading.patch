@@ -1,0 +1,112 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -199,6 +199,7 @@
+   level_target_bottom_spread_m: 0.023
+   level_tolerance_degrees: 15.0
+   max_bottom_height_spread_m: 0.034
++  placement_heading_mode: support_footprint
+   placement_heading_settle_degrees: 10.0
+   placement_heading_tolerance_degrees: 15.0
+   max_grasp_steps: 45
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -1348,10 +1348,20 @@
+                     p['heading_ready'] = True
+             heading_descent_ok = heading_ok and (p.get('heading_ready', False) or
+                 axis_error <= np.deg2rad(self.config.get('placement_heading_settle_degrees', 10.)))
++            support_fit = self._fit(center, rotation, extent, p['surface'])
++            heading_mode = self.config.get('placement_heading_mode', 'axis_alignment')
++            if heading_mode not in ('axis_alignment', 'support_footprint'):
++                raise ValueError('Unknown placement heading mode')
++            if heading_mode == 'support_footprint':
++                # A supported footprint need not resemble the ACT training
++                # yaw. Retain the original observed polygon and 25mm margin.
++                # If it does not fit, continue to withhold descent/release.
++                heading_ok = heading_descent_ok = support_fit
+             observation = p.get('last_box_observation', {})
+             vision_confirmed = (p.get('last_box_step', -100) >= p['steps']-5
+                                 and observation.get('orientation_confirmed', False)
+-                                and observation.get('heading_error_degrees', 0.) <= 18
++                                and (heading_mode == 'support_footprint' or
++                                     observation.get('heading_error_degrees', 0.) <= 18)
+                                 and observation.get('tilt_degrees', 0.) is not None
+                                 and observation.get('tilt_degrees', 0.) <= self.config['level_tolerance_degrees'])
+             bottom_corners = rotation.apply([[x,y,-extent[2]/2]
+@@ -1414,7 +1424,7 @@
+             result[15] = p['hold_grip']
+             stable = (p.get('level_ready', False) and vision_confirmed
+                       and self._view_ready(snapshot, measured) and np.linalg.norm(error) <= self.config['placement_tolerance_m']
+-                      and self._fit(center, rotation, extent, p['surface'])
++                      and support_fit
+                       and -.008 <= bottom_gap <= self.config['max_release_gap_m']
+                       and bottom_spread <= self.config['max_bottom_height_spread_m']
+                       and movement < .004 and heading_ok)
+@@ -1426,6 +1436,8 @@
+                         target_base_m=self.weighing_target.tolist(),
+                         heading_error_degrees=float(np.rad2deg(axis_error)),
+                         heading_ready=bool(p.get('heading_ready', False)),
++                        heading_mode=heading_mode, support_footprint_fit=bool(support_fit),
++                        heading_descent_ok=bool(heading_descent_ok),
+                         stable_steps=p['stable'])
+             # Keep the pad view through release, settlement and regrasp.
+             # The runner restores the ACT view after the local check ends.
+--- /dev/null
++++ b/tests/test_support_heading.py
+@@ -0,0 +1,57 @@
++import unittest
++import numpy as np
++import test_residual as original
++
++
++class SupportHeadingTests(unittest.TestCase):
++    setUp = original.ResidualTests.setUp
++    weighing_fixture = original.ResidualTests.weighing_fixture
++    aim_camera = original.ResidualTests.aim_camera
++
++    def begin(self, position=None, verified=True):
++        self.weighing_fixture(yaw=22, position=position)
++        self.a.config['placement_heading_mode'] = 'support_footprint'
++        self.a._observe_box = lambda *args: dict(points=80,bottom_base_m=-.08,
++            orientation_confirmed=verified,heading_error_degrees=22.,tilt_degrees=0.)
++        self.a.weighing_target = np.array([.4,-.5,-.08])
++        self.a._begin('weighing',1,self.raw,surface=self.snapshot['surfaces'][0],
++            stage='correct',hold_grip=.98,reference_base=self.raw.copy(),level_ready=True)
++
++    def test_supported_diagonal_pose_can_settle_without_act_yaw(self):
++        self.begin()
++        for _ in range(4):
++            self.aim_camera()
++            result,info=self.a._pending_action(self.measured,self.snapshot)
++        self.assertTrue(info['support_footprint_fit'])
++        self.assertTrue(info['heading_descent_ok'])
++        self.assertEqual(self.a.pending['stage'],'release')
++        self.assertGreater(result[15],.9)
++        self.assertAlmostEqual(self.a.config['placement_margin_m'],.025)
++
++    def test_near_edge_pose_still_withholds_release(self):
++        self.begin(position=[.46,-.5,0.])
++        for _ in range(4):
++            self.aim_camera()
++            result,info=self.a._pending_action(self.measured,self.snapshot)
++        self.assertFalse(info['support_footprint_fit'])
++        self.assertFalse(info['heading_descent_ok'])
++        self.assertNotEqual(self.a.pending['stage'],'release')
++        self.assertGreater(result[15],.9)
++
++    def test_missing_support_polygon_does_not_authorize_descent(self):
++        self.begin();self.a.pending['surface'].pop('footprint_xy_m')
++        self.aim_camera()
++        result,info=self.a._pending_action(self.measured,self.snapshot)
++        self.assertFalse(info['heading_descent_ok'])
++        self.assertGreater(result[15],.9)
++
++    def test_orientation_still_requires_visual_confirmation(self):
++        self.begin(verified=False)
++        for _ in range(4):
++            self.aim_camera()
++            result,info=self.a._pending_action(self.measured,self.snapshot)
++        self.assertNotEqual(self.a.pending['stage'],'release')
++        self.assertEqual(info['stable_steps'],0)
++
++
++if __name__ == '__main__':unittest.main()

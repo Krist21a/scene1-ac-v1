@@ -1,0 +1,63 @@
+..............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................E...................EEE.E...................
+======================================================================
+ERROR: test_observed_table_updates_both_goals_and_guard_without_accumulation (test_visual_pickup.VisualPickupTests.test_observed_table_updates_both_goals_and_guard_without_accumulation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-first-bin/tests/test_visual_pickup.py", line 260, in test_observed_table_updates_both_goals_and_guard_without_accumulation
+    command,info=pickup.update(measured,self.snapshot,assist)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-first-bin/scene1/visual_pickup.py", line 379, in update
+    target=copy.deepcopy(self.target), plane=self.plane)
+                                             ^^^^^^^^^^
+AttributeError: 'VisualPickup' object has no attribute 'plane'
+
+======================================================================
+ERROR: test_three_edges_keep_original_motion_limit_and_incomplete_evidence_falls_back (test_visual_pickup.VisualPickupTests.test_three_edges_keep_original_motion_limit_and_incomplete_evidence_falls_back) (component=0.012, edge_shift=0.0, missing=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-first-bin/tests/test_visual_pickup.py", line 293, in test_three_edges_keep_original_motion_limit_and_incomplete_evidence_falls_back
+    command, info = pickup.update(measured, self.snapshot, assist)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-first-bin/scene1/visual_pickup.py", line 379, in update
+    target=copy.deepcopy(self.target), plane=self.plane)
+                                             ^^^^^^^^^^
+AttributeError: 'VisualPickup' object has no attribute 'plane'
+
+======================================================================
+ERROR: test_three_edges_keep_original_motion_limit_and_incomplete_evidence_falls_back (test_visual_pickup.VisualPickupTests.test_three_edges_keep_original_motion_limit_and_incomplete_evidence_falls_back) (component=0.0, edge_shift=0.014, missing=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-first-bin/tests/test_visual_pickup.py", line 290, in test_three_edges_keep_original_motion_limit_and_incomplete_evidence_falls_back
+    pickup.update(measured, self.snapshot, assist)
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-first-bin/scene1/visual_pickup.py", line 379, in update
+    target=copy.deepcopy(self.target), plane=self.plane)
+                                             ^^^^^^^^^^
+AttributeError: 'VisualPickup' object has no attribute 'plane'
+
+======================================================================
+ERROR: test_three_edges_keep_original_motion_limit_and_incomplete_evidence_falls_back (test_visual_pickup.VisualPickupTests.test_three_edges_keep_original_motion_limit_and_incomplete_evidence_falls_back) (component=0.012, edge_shift=0.0, missing=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-first-bin/tests/test_visual_pickup.py", line 290, in test_three_edges_keep_original_motion_limit_and_incomplete_evidence_falls_back
+    pickup.update(measured, self.snapshot, assist)
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-first-bin/scene1/visual_pickup.py", line 379, in update
+    target=copy.deepcopy(self.target), plane=self.plane)
+                                             ^^^^^^^^^^
+AttributeError: 'VisualPickup' object has no attribute 'plane'
+
+======================================================================
+ERROR: test_unverified_table_holds_before_servo_and_stops_after_fresh_deadline (test_visual_pickup.VisualPickupTests.test_unverified_table_holds_before_servo_and_stops_after_fresh_deadline)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-first-bin/tests/test_visual_pickup.py", line 304, in test_unverified_table_holds_before_servo_and_stops_after_fresh_deadline
+    command,info=pickup.update(measured,self.snapshot,assist)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-first-bin/scene1/visual_pickup.py", line 379, in update
+    target=copy.deepcopy(self.target), plane=self.plane)
+                                             ^^^^^^^^^^
+AttributeError: 'VisualPickup' object has no attribute 'plane'
+
+----------------------------------------------------------------------
+Ran 520 tests in 18.685s
+
+FAILED (errors=5)

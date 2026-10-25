@@ -1,0 +1,87 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -222,6 +222,7 @@
+   regrasp_center_before_advance: true
+   regrasp_reobserve_after_level: true
+   command_sweep_diagnostics: true
++  command_sweep_enforce: true
+   regrasp_aligned_error_px: 10
+   min_edge_support: 0.64
+   min_area_px: 600
+--- a/run_scene1.py
++++ b/run_scene1.py
+@@ -639,6 +639,13 @@
+                     and getattr(aligner, 'command_sweep_context', None) is not None):
+                 cartesian_info['command_sweep'] = command_sweep_audit(
+                     kinematics, measured, residual, sent, previous_sent, aligner.command_sweep_context)
++                if (config['wrist_assist'].get('command_sweep_enforce', False)
++                        and not cartesian_info['command_sweep']['filtered']['clear']):
++                    (output/'rejected-command-sweep.json').write_text(json.dumps(dict(
++                        next_step=steps+1, action_sent=False, observation_state=measured.tolist(),
++                        proposed_action=residual.tolist(), filtered_action=sent.tolist(),
++                        sweep=cartesian_info['command_sweep']), ensure_ascii=False, indent=2))
++                    raise RuntimeError('Filtered command or pending reference intersects observed parcel; no action sent')
+             # Observe mode compares a hypothetical filter against measured state.
+             # Its internal previous target must follow the actual sent action.
+             if args.mode != "optimized":
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -12,6 +12,7 @@
+ from .settlement import SettlementMonitor, resting_observation, track_resting_roof
+ from .clearance import open_fingers_clear
+ from .release_retreat import axis_retreat_goal
++from .command_sweep import sampled_sweep
+ 
+ 
+ class ResidualAssist:
+@@ -608,6 +609,10 @@
+         self.command_sweep_context['increment_end_rad'] = (measured[8:15]+delta).tolist()
+         clear = all(open_fingers_clear(self.kinematics.matrix(measured[8:15]+a*delta,1),target,p['plane'])
+                     for a in (0.,.5,1.))
++        if self.wrist_config.get('command_sweep_enforce', False):
++            info['complete_reference_sweep'] = sampled_sweep(
++                self.kinematics, measured[8:15], result[8:15], target, p['plane'])
++            clear = clear and info['complete_reference_sweep']['clear']
+         if not clear:
+             self.offset = previous_offset
+             result = p['base'].copy()+self.offset
+--- a/tests/test_axis_retreat.py
++++ b/tests/test_axis_retreat.py
+@@ -1,6 +1,9 @@
+ import copy
+ import unittest
+ import numpy as np
++from types import SimpleNamespace
++from scipy.spatial.transform import Rotation
++from scene1.residual import ResidualAssist
+ from scene1.release_retreat import axis_retreat_goal
+ from scene1.command_sweep import command_sweep_audit
+ 
+@@ -77,6 +80,27 @@
+         self.assertTrue(report['previous']['clear'])
+         self.assertEqual(report['margin_m'], .003)
+ 
++    def test_complete_reference_blocks_even_zero_increment_and_keeps_stop_budget(self):
++        arm = LinearArm((0., 0., 1.))
++        q = np.zeros(16); q[8:11] = [.34, -.2, .2]
++        base = q.copy(); base[10] = -.02
++        assist = ResidualAssist(dict(max_translation_m=.02, max_joint_offset_rad=.5235987756,
++            max_joint_step_rad=.012, gain=.2), arm, np.full(16, -4.), np.full(16, 4.))
++        assist.wrist_config = dict(command_sweep_enforce=True)
++        target = dict(self.parcel, extent_xy_m=[.2, .2])
++        assist.pending = dict(kind='pregrasp', base=base, steps=1, stable=0,
++            target=target, plane=-.05, grasp_rotation=Rotation.identity(),
++            regrasp_stage='level', view_position=q[8:11].copy())
++        poses = SimpleNamespace(right_pose=SimpleNamespace(pos_xyz=q[8:11], quat_xyzw=[0,0,0,1]))
++        for i in range(19):
++            _, info = assist._regrasp_action(q, None, poses, {})
++            self.assertFalse(info['open_fingers_clear'])
++            self.assertEqual(assist.pending['blocked_steps'], i+1)
++            self.assertEqual(assist.pending['stable'], 0)
++            np.testing.assert_array_equal(assist.offset, np.zeros(16))
++        with self.assertRaisesRegex(RuntimeError, 'Open finger sweep'):
++            assist._regrasp_action(q, None, poses, {})
++
+ 
+ if __name__ == '__main__':
+     unittest.main()

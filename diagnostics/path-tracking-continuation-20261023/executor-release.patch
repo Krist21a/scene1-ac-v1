@@ -1,0 +1,111 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -244,6 +244,7 @@
+   release_short_retreat_m: 0.06
+   release_clearance_rise_m: 0.07
+   release_measured_reference_hold: true
++  release_reference_mode: measured_physical
+   release_retreat_ready_m: 0.014
+   max_short_retreat_steps: 140
+   max_open_joint_delta_rad: 0.025
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -1041,11 +1041,14 @@
+                             np.any(observed < joint_low - 5e-4) or
+                             np.any(observed > joint_high + 5e-4)):
+                         raise RuntimeError('Measured release pose is outside physical bounds')
+-                    cap = self.config.get('max_placement_joint_offset_rad',
+-                                          self.config['max_joint_offset_rad'])
++                    reference_mode = self.wrist_config.get('release_reference_mode', 'original_act_budget')
++                    if reference_mode not in ('original_act_budget', 'measured_physical'):
++                        raise ValueError('Unknown release reference mode')
++                    cap = (None if reference_mode == 'measured_physical' else self.config.get(
++                        'max_placement_joint_offset_rad', self.config['max_joint_offset_rad']))
+                     original_reference = p['reference_base'][8:15]
+-                    lower = np.maximum(joint_low, original_reference - cap)
+-                    upper = np.minimum(joint_high, original_reference + cap)
++                    lower = joint_low if cap is None else np.maximum(joint_low, original_reference - cap)
++                    upper = joint_high if cap is None else np.minimum(joint_high, original_reference + cap)
+                     if np.any(lower > upper):
+                         raise RuntimeError('Release reference has no feasible original correction budget')
+                     prior = result[8:15].copy()
+@@ -1054,10 +1057,13 @@
+                     info['release_reference_transfer'] = dict(
+                         previous_command_rad=prior.tolist(), measured_target_rad=observed.tolist(),
+                         bounded_target_rad=bounded.tolist(), original_reference_rad=original_reference.tolist(),
+-                        correction_cap_rad=float(cap), bound_active=(bounded != observed).tolist(),
++                        correction_cap_rad=cap, reference_mode=reference_mode,
++                        physical_lower_joint_rad=joint_low.tolist(), physical_upper_joint_rad=joint_high.tolist(),
++                        bound_active=(bounded != observed).tolist(),
+                         remaining_target_error_rad=(bounded-observed).tolist(),
+                         requested_change_rad=(bounded-prior).tolist(),
+-                        interpretation='Bounded reference construction before unchanged MotionFilter; not measured actuator tracking or a new offset budget')
++                        interpretation='Physical measured hold with a new visual phase reference' if cap is None else
++                            'Original ACT-budget reference construction; both modes use unchanged MotionFilter')
+                 extent = self.geometry[1]['extent'].copy()
+                 self.opening[1] = True
+                 self.closed[1] = False; self.geometry[1] = None
+@@ -1070,13 +1076,22 @@
+                     raise RuntimeError('Verified release command is outside configured bounds')
+                 old_inactive_reference = reference[:8].copy()
+                 reference[:8] = result[:8] - self.offset[:8]
++                visual_reference = (self.wrist_config.get('release_reference_mode') == 'measured_physical'
++                                    and self.wrist_config.get('release_measured_reference_hold', False))
++                if visual_reference:
++                    # A visual release starts its next phase at the accepted
++                    # physical hold, rather than pulling an unloaded wrist
++                    # back toward an obsolete ACT prediction. MotionFilter
++                    # still limits the transition from the last sent command.
++                    reference[8:15] = result[8:15]
+                 info['phase_reference_hold'] = dict(
+                     inactive_action_indices=list(range(8)),
+                     frozen_act_reference=old_inactive_reference.tolist(),
+                     accepted_hold_command=result[:8].tolist(),
+                     retained_inactive_offset=self.offset[:8].tolist(),
+                     discarded_reference_delta=(old_inactive_reference-reference[:8]).tolist(),
+-                    active_arm_reference_unchanged=True)
++                    active_arm_reference_unchanged=not visual_reference,
++                    active_reference_source='measured_physical_release' if visual_reference else 'original_act')
+                 self.offset[8:15] = result[8:15]-reference[8:15]
+                 self.unwinding_placement = bool(np.max(np.abs(self.offset[8:15])) > self.config['max_joint_offset_rad'])
+                 self._begin('short_retreat', 1, reference, surface=copy.deepcopy(p['surface']), extent=extent)
+--- a/tests/test_release_reference_transfer.py
++++ b/tests/test_release_reference_transfer.py
+@@ -51,3 +51,37 @@
+         self.assertEqual(info['state'],'waiting_release_view')
+         self.assertEqual(result[15],accepted[15])
+         self.assertNotIn('release_reference_transfer',info)
++
++    def test_visual_release_can_hold_measured_pose_beyond_old_act_budget(self):
++        reference,accepted=self.fixture()
++        self.a.wrist_config['release_reference_mode']='measured_physical'
++        self.measured[11]=reference[11]+.7
++        result,info=self.a._pending_action(self.measured,self.snapshot)
++        np.testing.assert_array_equal(result[8:15],self.measured[8:15])
++        np.testing.assert_array_equal(self.a.pending['base'][8:15],self.measured[8:15])
++        np.testing.assert_array_equal(self.a.offset[8:15],np.zeros(7))
++        self.assertFalse(self.a.unwinding_placement)
++        self.assertIsNone(info['release_reference_transfer']['correction_cap_rad'])
++        self.assertFalse(info['phase_reference_hold']['active_arm_reference_unchanged'])
++        self.assertEqual(info['phase_reference_hold']['active_reference_source'],'measured_physical_release')
++        for _ in range(12):
++            held,_=self.a._pending_action(self.measured,self.snapshot)
++            np.testing.assert_allclose(held,result)
++
++    def test_visual_release_retains_physical_bound_rejection(self):
++        self.fixture();self.a.wrist_config['release_reference_mode']='measured_physical'
++        self.measured[8]=self.a.high[8]+.01
++        with self.assertRaisesRegex(RuntimeError,'Measured release pose is outside'):
++            self.a._pending_action(self.measured,self.snapshot)
++
++    def test_visual_release_target_still_passes_original_motion_rate_limit(self):
++        from scene1.motion import MotionFilter
++        reference,accepted=self.fixture()
++        self.a.wrist_config['release_reference_mode']='measured_physical'
++        self.measured[11]=reference[11]+.7
++        result,_=self.a._pending_action(self.measured,self.snapshot)
++        motion=MotionFilter(self.a.low,self.a.high,1.,.6);motion.reset(accepted)
++        sent,audit=motion.apply(result,.1)
++        self.assertTrue(audit['velocity_limited'])
++        self.assertFalse(audit['bounds_clipped'])
++        self.assertLessEqual(np.max(abs(sent[8:15]-accepted[8:15])),.0600000001)

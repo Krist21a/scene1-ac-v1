@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-23T19:19:41.740798+08:00",
+  "candidate": "executor-hold",
+  "parent": "executor-context",
+  "manifest_sha256": "3184d5a18b288d091b000918efa863215408198f2c5abd983b56792cd8aa6d85",
+  "factor": "Closed-loop Cartesian pose hold during original gripper opening interval",
+  "evidence": "executor-context-c-p2-s0: measured release hold still drifts 29.219 mm, 26.866 mm downward; public fine finger mesh confirms intersection with unchanged observed parcel +3 mm margin",
+  "parameters": {
+    "position_gain": 2.0,
+    "position_delta_damping": 1.5,
+    "rotation_gain": 1.0,
+    "rotation_delta_damping": 4.0,
+    "corrector_gain": 0.2,
+    "max_joint_step_rad": 0.012
+  },
+  "unchanged": [
+    "12-step open dwell",
+    "40-step gripper timeout",
+    "140-step retreat budget",
+    "physical bounds",
+    "MotionFilter alpha1 and0.6rad/s",
+    "60mm horizontal and70mm rise",
+    "collision geometry and3mm margin",
+    "all original task success checks"
+  ],
+  "tests": {
+    "count": 415,
+    "passed": true,
+    "log": "tests-executor-hold.log"
+  },
+  "offline": "open-hold-replay-gain2.json: assumed response1/.5 clears; .25/.1 still rejected. Additive retained disturbance model is NOT plant/contact validation.",
+  "next_trial": "executor-hold-c-p2-s0",
+  "controller": "C unchanged",
+  "production_promoted": false
+}

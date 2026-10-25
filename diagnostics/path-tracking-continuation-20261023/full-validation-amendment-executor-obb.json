@@ -1,0 +1,32 @@
+{
+  "at": "2026-10-23T19:51:00.132206+08:00",
+  "candidate": "executor-obb",
+  "parent": "executor-project",
+  "manifest_sha256": "9c568987d81397cccce09833c5f5f1ac0e5178ebd1cb2d127dfe66d94a6909b2",
+  "factor": "Pair oriented dimensions with center fitted in the same PCA frame; retain original world-axis association/servo center separately",
+  "evidence": "Retained actual failed RGB-D221points has13.201mm center-frame mismatch. Same extents109.034x45.806mm, same pixels and3mm margin: original minimum SAT gap-1.727mm, corrected+9.860mm.",
+  "scope": [
+    "oriented_footprint computes unchanged5/95percentile dimensions and their midpoint",
+    "collision guard and local projection use matching oriented center",
+    "axis away check uses same center",
+    "table motion transforms both centers"
+  ],
+  "unchanged": [
+    "position_base_m used by existing servo/association",
+    "all observed dimensions/percentiles/point groups",
+    "finger box geometry",
+    "3mm margin",
+    "all motion/torque/step budgets and success checks",
+    "C controller and original task/QR"
+  ],
+  "tests": {
+    "count": 427,
+    "passed": true,
+    "log": "tests-executor-obb.log",
+    "frame_invariance": true,
+    "real_overlap_rejection": true
+  },
+  "five_case_replay": "obb-cases-replay.json: three previously blocked measured poses still blocked; second-parcel clear remains clear; latest false block becomes clear and certified.",
+  "next_trial": "executor-obb-c-p2-s0",
+  "production_promoted": false
+}

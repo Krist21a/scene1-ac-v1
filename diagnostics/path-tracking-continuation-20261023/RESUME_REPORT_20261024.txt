@@ -1,0 +1,36 @@
+路径与控制研究状态（已按用户剩余20%停止；原控制器已恢复）
+
+最新候选 executor_bin_dense，A+C；生产与v63未替换。
+523项测试、41层补丁重建通过。当前候选seed0独立两包6349步、四包12679步通过原视觉/接触/入箱检查。
+seed1同版本四包回归在7630步因usage剩余20%中断，完成2包，第三包已再抓取；seed2、3未使用。多seed验收未完成，不宣称稳定验收成功。
+官方task_success=null；原KuavoSimEnv不提供scene1成功裁决，视觉检查不能冒充官方成功。
+
+本轮主要修正：
+1. 首包固定15度抓取方向，先抬手、沿工具轴水平远离60mm恢复原目标视野，再稳定选择和全视觉下降/搬运。
+2. 视觉clear/hover/descend及早期保持阶段接入fresh反馈、完整待跟踪参考和限速后实际命令扫掠；未缩小包裹包络或降低3mm余量。
+3. 显式仅转头观察箱口，要求三帧新鲜稳定的完整四边。先按观测3D连通分组去除与箱口分离的绿色点，再仅在观察阶段使用原RGB-D密集采样。四边、尺寸、入箱余量门槛不变。
+4. K（A+C与MPC近端Q翻倍）空手结果混合，腕部外摆到位退化，固定路径两包622步失败，不选择。I/J增大补偿因初始化持续裁剪拒绝。选用原A+C，不把C称为QP内部优化。
+
+seed0四包证据：
+policywall1980.48376s；四次释放准备136/134/172/266帧，共享450预算最后阶段178/168/209/366步。
+最终跟踪误差0.011925/0.012295/0.009962/0.009312rad；最终运动量0.0000834/0.0002144/0.0002549/0.0001401rad。
+正式88274个50Hz样本未观测附加/总力矩裁剪，初始化也无裁剪；目标裁剪0，限速1帧。
+近端WBC反馈RMS0.005217rad，腕部0.067767rad。此前first-transport的0.005289/0.069526rad来自不同路径，不可作严格控制消融。
+历史first-transport四包1916.676s，本轮略慢；比较器因路径不同拒绝提速归因，未证明完整任务提速。
+seed0两包初始化有2个短暂附加裁剪样本，连续20ms；正式44447样本无裁剪，未隐瞒。
+
+文件索引：
+research-state.json：当前状态；CONTINUATION-20261024-remaining20.txt：完整续作记录。
+verify_path_delivery.py/各manifest/patch：分因素路径交付；controller_variants.py：控制身份及恢复。
+analysis-full/各回合：关节/FK误差、延迟/保持偏差、各阶段耗时、等待/纠偏、失败和限幅；comparison.json保留全部回合。
+first-select-table-diagnostic.json、partial-table-replay.json：三边恢复仍超过原30mm界限，未放宽桌面停止条件。
+pickup-sweep-replay.json：旧下降42帧回放中4帧完整参考阻断、增量检查却通过。
+bin-component-diagnostic.log、bin-dense-diagnostic.log及bin_observation_20261024夹具：箱口误拟合与稀疏支持的独立消融。
+robot-geometry-interpretation-correction.json：简化URDF手指与实际四连杆碰撞网格差异；不将简化模型交集冒充实际精确碰撞证明。
+*-pretrial-test-correction.json：首次归档后、正式试验前的测试夹具修正，旧哈希和失败日志保留，生产代码不变。
+RUNBOOK.txt：同步、构建、官方复位、日志、恢复命令。原始日志和传感器均在外盘字节验证归档。
+
+停止条件为实际usage剩余<=20%（已用>=80%），不是已用20%。达到时停止新研究，结束回合、归档、恢复原库/QR/task/VR并核验；未完成项明确保留。
+
+最终恢复：final-verification.json errors=[]；生产宿主/容器各124文件、v63备份115文件均无缺失或差异。原controller e46e9a…、VR155191…、原QR225d21…、原task3f32e8…已恢复；官方git工作区干净。交付全量归档核验通过，errors=[]，共73个回合、73个独立ROS运行；41层路径补丁、控制补丁、原始归档和运行时身份均已核对。详见delivery-verification.json。
+恢复后无运行中的实验。没有最终冻结，也未建议替换生产。下一次仅在用户重新授权继续且usage条件允许时，独立复位完成seed1四包回归；本次7630步中断不可当作四包成功。再冻结并做新seed2、3原版/组合对照，保留失败，不筛选重跑。

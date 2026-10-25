@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-24T12:46:05.975656+08:00",
+  "parent": "executor-arm-prepare",
+  "candidate": "executor-soft-open",
+  "factor": "Progressive gripper opening at0.08 normalized command per observation instead of full immediate opening; same Cartesian hold and original40step open timeout140step retreat budget",
+  "evidence": "C full4 failed actual unload drift19mm; G damping reduces empty overshoot but worsens tracking and contact preparation; returnC",
+  "unchanged": [
+    "arm trajectory generation",
+    "physical and torque bounds",
+    "all visual and sweep gates",
+    "MPC/WBC and C"
+  ],
+  "heldout_seeds_used": [],
+  "tests_passed": 474
+}

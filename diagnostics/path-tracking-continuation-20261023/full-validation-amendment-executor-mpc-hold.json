@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-23T20:36:11.313516+08:00",
+  "candidate": "executor-mpc-hold",
+  "parent": "executor-fast",
+  "manifest_sha256": "6719e3d0940ad62b759e026ce3b7b2abd561a8658737550bb198ebaeacb2e166",
+  "factor": "Preserve actually sent proximal MPC upper references across release; only wrists transfer to measured physical reference",
+  "evidence": "Release steady proximal upper/feedback differences up to0.13rad were removed in one reference handoff, followed by persistent unload motion; not a gravity hypothesis",
+  "preserved_action_indices": [
+    8,
+    9,
+    10,
+    11
+  ],
+  "unchanged": [
+    "C library and original VR/task/QR",
+    "measured wrist transfer",
+    "all motion/torque bounds",
+    "3mm envelope and fresh final sweep",
+    "60mm/70mm goal and all phase/success criteria"
+  ],
+  "tests_passed": 437,
+  "tests_log": "tests-executor-mpc-hold.log",
+  "replay": "mpc-hold-replay.json:3C cases certified;F andA+C cases still rejected",
+  "replay_limit": "Hypothetical pose-preserving transfer, later observed geometry; not measured dynamics",
+  "next_trial": "executor-mpc-hold-c-p2-s0",
+  "heldout_seeds_used": []
+}

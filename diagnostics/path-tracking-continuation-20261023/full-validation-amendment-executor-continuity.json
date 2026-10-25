@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-23T19:25:34.950049+08:00",
+  "candidate": "executor-continuity",
+  "parent": "executor-hold",
+  "manifest_sha256": "71724c6c5e046b31c716291758bd9361343cdd9fd4da271360a12ef5facff3b1",
+  "factor": "Keep last actually sent arm reference at release; measured pose is Cartesian hold goal",
+  "tests": {
+    "count": 418,
+    "passed": true
+  },
+  "offline_gate": "rejected: release jump becomes zero but actual retained command FK is blocked by original envelope; measured release FK is clear; nominal perfect-tracking certificate rejects first step",
+  "physical_trial_run": false,
+  "production_promoted": false,
+  "next": "Identical extended empty original/C/F control probes to separate MPC reference deviation and WBC tracking; path guards unchanged"
+}

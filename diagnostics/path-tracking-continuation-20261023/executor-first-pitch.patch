@@ -1,0 +1,129 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -255,6 +255,7 @@
+   grasp_align_parcel_yaw: true
+   grasp_motion_settle: true
+   first_grasp_gain_scale: 0.35
++  first_grasp_pitch_degrees: 15.0
+   release_prepare_before_open: true
+   release_prepare_adapt_settled: true
+   release_prepare_whole_arm: true
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -185,6 +185,23 @@
+             half = (abs(forward @ major) * extent[0] + abs(forward @ minor) * extent[1]) / 2
+             point[:2] -= forward * max(0., half - .02)
+         return self._center_grasp_transverse(target,point)
++
++    def _initial_grasp_rotation(self, target, pose):
++        pitch = self.wrist_config.get('first_grasp_pitch_degrees')
++        if pitch is None:
++            return None
++        if not np.isfinite(pitch) or not 12.5 <= pitch <= 17.5:
++            raise ValueError('Initial grasp pitch must stay within established visual pickup range')
++        major = np.asarray(target['major_axis_xy'], float)
++        if major.shape != (2,) or not np.isfinite(major).all() or np.linalg.norm(major) < 1e-3:
++            raise RuntimeError('Initial grasp orientation requires a valid parcel axis')
++        major = major/np.linalg.norm(major)
++        current_forward = -Rotation.from_quat(pose.quat_xyzw).as_matrix()[:2,2]
++        forward = major if major@current_forward >= 0. else -major
++        closing = np.r_[-forward[1],forward[0],0.]
++        angle = np.deg2rad(pitch)
++        z_axis = -np.r_[forward*np.cos(angle),-np.sin(angle)]
++        return Rotation.from_matrix(np.column_stack((closing,np.cross(z_axis,closing),z_axis)))
+ 
+     def _center_grasp_transverse(self, target, point):
+         if self.wrist_config.get('grasp_align_parcel_yaw',False) and 'support_z_base_m' not in target:
+@@ -1003,6 +1020,10 @@
+             else:
+                 correction = error-2.*velocity
+             previous_offset = self.offset.copy()
++            initial_rotation = (self._initial_grasp_rotation(p['target'],pose)
++                if side == 1 and not require_wrist and 'support_z_base_m' not in p['target'] else None)
++            initial_angle = (None if initial_rotation is None else
++                (initial_rotation*Rotation.from_quat(pose.quat_xyzw).inv()).as_rotvec())
+             grasp_yaw = (self._grasp_yaw_error(p['target'],pose) if side==1 and not require_wrist
+                          and self.wrist_config.get('grasp_align_parcel_yaw',False) else None)
+             yaw_ready = grasp_yaw is None or abs(grasp_yaw)<=np.deg2rad(2.)
+@@ -1011,8 +1032,12 @@
+                 major=np.asarray(p['target']['major_axis_xy'],float);major/=np.linalg.norm(major)
+                 transverse_error=float(np.array([-major[1],major[0]])@error)
+                 yaw_ready=yaw_ready and abs(transverse_error)<=.002
++            if initial_angle is not None:
++                yaw_ready = yaw_ready and np.linalg.norm(initial_angle) <= np.deg2rad(2.)
++                info.update(initial_grasp_orientation_error_degrees=float(np.rad2deg(np.linalg.norm(initial_angle))),
++                    initial_grasp_pitch_degrees=float(self.wrist_config['first_grasp_pitch_degrees']))
+             result = self._correct(p['base'], measured, side, correction,
+-                                   (np.array([0.,0.,grasp_yaw]) if grasp_yaw is not None else
++                                   (initial_angle if initial_angle is not None else np.array([0.,0.,grasp_yaw]) if grasp_yaw is not None else
+                                     None if wrist_aim is None else wrist_aim['error_base']),
+                                    step_scale=.4,
+                                    view_target=wrist_target if require_wrist and wrist is None else None)
+@@ -1146,6 +1171,14 @@
+                 error[:2] += np.asarray(wrist['correction_base_xy'])
+             angular_error = None
+             orientation_ok = True
++            initial_rotation = (self._initial_grasp_rotation(p['target'],pose)
++                if side == 1 and 'grasp_rotation' not in p and 'support_z_base_m' not in p['target'] else None)
++            if initial_rotation is not None:
++                rotation = Rotation.from_quat(pose.quat_xyzw)
++                angular_error = (initial_rotation*rotation.inv()).as_rotvec()
++                orientation_ok = np.linalg.norm(angular_error) <= np.deg2rad(2.)
++                info.update(initial_grasp_orientation_error_degrees=float(np.rad2deg(np.linalg.norm(angular_error))),
++                    initial_grasp_pitch_degrees=float(self.wrist_config['first_grasp_pitch_degrees']))
+             if p.get('grasp_rotation') is not None:
+                 rotation = Rotation.from_quat(pose.quat_xyzw)
+                 angular_error = (p['grasp_rotation']*rotation.inv()).as_rotvec()
+--- a/tests/test_first_pitch.py
++++ b/tests/test_first_pitch.py
+@@ -0,0 +1,50 @@
++import unittest
++from unittest.mock import patch
++from types import SimpleNamespace
++import numpy as np
++from scipy.spatial.transform import Rotation
++import test_residual as original
++
++class FirstPitchTests(unittest.TestCase):
++    setUp=original.ResidualTests.setUp
++    def test_known_visual_orientation_is_level_and_axis_sign_invariant(self):
++        self.a.wrist_config['first_grasp_pitch_degrees']=15.
++        pose=SimpleNamespace(quat_xyzw=Rotation.from_euler('y',-80,degrees=True).as_quat())
++        a=self.a._initial_grasp_rotation(dict(major_axis_xy=[1.,0.]),pose).as_matrix()
++        b=self.a._initial_grasp_rotation(dict(major_axis_xy=[-1.,0.]),pose).as_matrix()
++        np.testing.assert_allclose(a,b,atol=1e-12)
++        self.assertAlmostEqual(a[2,0],0.)
++        self.assertAlmostEqual(np.rad2deg(np.arcsin(a[2,2])),15.)
++        np.testing.assert_allclose(a.T@a,np.eye(3),atol=1e-12)
++    def test_default_preserves_parent(self):
++        self.assertIsNone(self.a._initial_grasp_rotation({},None))
++    def test_initial_pitch_does_not_change_existing_gain_or_allow_close_before_alignment(self):
++        self.a.wrist_config.update(first_grasp_gain_scale=.35,first_grasp_pitch_degrees=15.)
++        target=self.snapshot['candidates'][0]
++        self.a._begin('grasp',1,self.raw,target=target,plane=-.08,grasp_z=0.,wrist_verified=False)
++        with patch.object(self.a,'_correct',return_value=self.raw.copy()) as correct:
++            action,info=self.a._pending_action(self.measured,self.snapshot)
++            self.assertEqual(correct.call_args.kwargs['gain_scale'],.35)
++            self.assertEqual(action[15],0.)
++            self.assertGreater(info['initial_grasp_orientation_error_degrees'],2.)
++            np.testing.assert_array_equal(correct.call_args.args[3],np.zeros(3))
++    def test_later_visual_grasp_keeps_its_existing_orientation_and_gain(self):
++        self.a.wrist_config.update(first_grasp_gain_scale=.35,first_grasp_pitch_degrees=15.)
++        self.a._begin('grasp',1,self.raw,target=self.snapshot['candidates'][0],plane=-.08,
++            grasp_z=0.,wrist_verified=False,grasp_rotation=Rotation.identity())
++        with patch.object(self.a,'_correct',return_value=self.raw.copy()) as correct:
++            _,info=self.a._pending_action(self.measured,self.snapshot)
++            self.assertEqual(correct.call_args.kwargs['gain_scale'],1.)
++            self.assertNotIn('initial_grasp_pitch_degrees',info)
++    def test_bad_pitch_or_axis_rejected(self):
++        pose=SimpleNamespace(quat_xyzw=[0,0,0,1])
++        for pitch in [0,18,float('nan')]:
++            self.a.wrist_config['first_grasp_pitch_degrees']=pitch
++            with self.assertRaises(ValueError):self.a._initial_grasp_rotation(dict(major_axis_xy=[1,0]),pose)
++        self.a.wrist_config['first_grasp_pitch_degrees']=15.
++        with self.assertRaises(RuntimeError):self.a._initial_grasp_rotation(dict(major_axis_xy=[0,0]),pose)
++    def test_original_grasp_timeout_still_applies(self):
++        self.a.wrist_config['first_grasp_pitch_degrees']=15.
++        self.a._begin('grasp',1,self.raw,target=self.snapshot['candidates'][0],plane=-.08,grasp_z=0.,wrist_verified=False)
++        self.a.pending['steps']=self.a.config['max_grasp_steps']-1
++        with self.assertRaisesRegex(RuntimeError,'gripper kept open'):self.a._pending_action(self.measured,self.snapshot)

@@ -1,0 +1,303 @@
+--- a/configs/visual_cycle_four_parcels.yaml
++++ b/configs/visual_cycle_four_parcels.yaml
+@@ -221,6 +221,7 @@
+   centering_deadband_px: 4
+   regrasp_center_before_advance: true
+   regrasp_reobserve_after_level: true
++  command_sweep_diagnostics: true
+   regrasp_aligned_error_px: 10
+   min_edge_support: 0.64
+   min_area_px: 600
+@@ -234,7 +235,8 @@
+   max_level_regrasp_steps: 900
+   regrasp_visible_v_fraction: 0.67
+   release_open_dwell_steps: 12
+-  release_short_retreat_m: 0.05
++  release_retreat_direction: measured_tool_axis
++  release_short_retreat_m: 0.06
+   release_clearance_rise_m: 0.07
+   release_measured_reference_hold: true
+   release_retreat_ready_m: 0.014
+--- a/run_scene1.py
++++ b/run_scene1.py
+@@ -12,6 +12,7 @@
+ import yaml
+ 
+ from scene1.motion import MotionFilter, ActionPassthrough, action_vector, head_radians, reset_for_manipulation
++from scene1.command_sweep import command_sweep_audit
+ from scene1.grasp import GraspMonitor
+ from scene1.servo import VisualServo
+ from scene1.vision import ParcelDetector, rgb_image
+@@ -633,6 +634,11 @@
+             filtered, motion_info = motion.apply(residual, dt)
+             # Original env.step clips against the same action_space.
+             sent = filtered if args.mode == "optimized" else np.clip(raw_action, env.action_space.low, env.action_space.high)
++            if (config['wrist_assist'].get('command_sweep_diagnostics', False)
++                    and cartesian_info.get('regrasp_stage') is not None
++                    and getattr(aligner, 'command_sweep_context', None) is not None):
++                cartesian_info['command_sweep'] = command_sweep_audit(
++                    kinematics, measured, residual, sent, previous_sent, aligner.command_sweep_context)
+             # Observe mode compares a hypothetical filter against measured state.
+             # Its internal previous target must follow the actual sent action.
+             if args.mode != "optimized":
+--- /dev/null
++++ b/scene1/command_sweep.py
+@@ -0,0 +1,35 @@
++"""Audit pending and filtered references against the unchanged parcel envelope."""
++import numpy as np
++from .clearance import open_fingers_clear
++
++
++def sampled_sweep(kinematics, q, target_q, target, plane):
++    q, target_q = np.asarray(q, float), np.asarray(target_q, float)
++    if (q.shape != (7,) or target_q.shape != (7,)
++            or not np.isfinite(np.r_[q, target_q]).all()):
++        raise ValueError('Sweep requires finite seven-joint vectors')
++    # Include the original measured/midpoint/endpoint tests and subdivide long
++    # pending references. Sampling does not prove a continuous swept volume.
++    intervals = max(2, int(np.ceil(np.max(np.abs(target_q-q)) / .012)))
++    intervals += intervals % 2
++    for i in range(intervals + 1):
++        fraction = i / intervals
++        if not open_fingers_clear(kinematics.matrix(q+fraction*(target_q-q), 1), target, plane):
++            return dict(clear=False, first_blocked_fraction=fraction, samples=intervals+1)
++    return dict(clear=True, first_blocked_fraction=None, samples=intervals+1)
++
++
++def command_sweep_audit(kinematics, measured, proposed, sent, previous, context):
++    q = np.asarray(measured)[8:15]
++    target, plane = context['target'], context['plane']
++    output = dict(stage=context['stage'], target=target, plane_m=float(plane),
++                  margin_m=.003, interpretation='Sampled open inner fingers only; no whole robot or dynamics proof')
++    for key, action in [('proposed', proposed), ('filtered', sent), ('previous', previous)]:
++        joints = np.asarray(action)[8:15]
++        output[key] = sampled_sweep(kinematics, q, joints, target, plane)
++        output[key]['max_pending_reference_rad'] = float(np.max(np.abs(joints-q)))
++    if context.get('increment_end_rad') is not None:
++        endpoint = np.asarray(context['increment_end_rad'])
++        output['legacy_increment'] = dict(clear=all(open_fingers_clear(
++            kinematics.matrix(q+a*(endpoint-q), 1), target, plane) for a in (0., .5, 1.)))
++    return output
+--- /dev/null
++++ b/scene1/release_retreat.py
+@@ -0,0 +1,80 @@
++"""Release retreat preflight using only current RGB-D and measured robot FK."""
++import numpy as np
++from scipy.optimize import least_squares
++from scipy.spatial.transform import Rotation
++
++
++def axis_retreat_goal(kinematics, measured, reference, low, high, offset,
++                      cap, unwinding, snapshot, pad_xy, extent, distance,
++                      rise, tolerance):
++    """Reject an ambiguous direction or unreachable goal; never change limits.
++
++    The single bounded solve is a feasibility check, not a replacement command
++    or a new correction reference. The existing per-step controller executes
++    the accepted Cartesian goal with its original limits and time budget.
++    """
++    q = np.asarray(measured, float)[8:15]
++    pose = kinematics.matrix(q, 1)
++    axis = pose[:2, 2].copy()
++    projection = float(np.linalg.norm(axis))
++    if not np.isfinite(pose).all() or projection < 1e-3:
++        raise RuntimeError('Release retreat rejected: degenerate measured tool-axis projection')
++    direction = axis / projection
++    if not all(np.isfinite(x) and x > 0 for x in (distance, rise, tolerance, cap)):
++        raise ValueError('Release retreat distances, tolerance and cap must be positive and finite')
++    candidates = [] if snapshot is None else snapshot.get('candidates', [])
++    near = [c for c in candidates if np.linalg.norm(
++        np.asarray(c['position_base_m'], float)[:2] - pad_xy) < .12]
++    if len(near) != 1:
++        raise RuntimeError('Release retreat rejected: expected one currently observed parcel on pad')
++    parcel = near[0]
++    center = np.asarray(parcel['position_base_m'], float)
++    size = np.asarray(parcel.get('oriented_extent_m', parcel['extent_xy_m']), float)
++    if (center.shape != (3,) or size.shape != (2,) or not np.isfinite(center).all()
++            or not np.isfinite(size).all() or np.any(size <= 0)):
++        raise RuntimeError('Release retreat rejected: invalid observed parcel geometry')
++    separation = pose[:2, 3] - center[:2]
++    away = float(direction @ separation)
++    if not np.isfinite(away) or away <= 0:
++        raise RuntimeError('Release retreat rejected: measured tool axis does not point away from parcel')
++    goal = pose[:3, 3] + np.r_[direction * distance, rise]
++    reference = np.asarray(reference, float)[8:15]
++    offset = np.asarray(offset, float)[8:15]
++    lower_offset, upper_offset = np.full(7, -cap), np.full(7, cap)
++    if unwinding:
++        lower_offset = np.minimum(lower_offset, offset)
++        upper_offset = np.maximum(upper_offset, offset)
++    lower = np.maximum(np.asarray(low)[8:15], reference + lower_offset)
++    upper = np.minimum(np.asarray(high)[8:15], reference + upper_offset)
++    if np.any(lower > upper) or not np.isfinite(np.r_[lower, upper]).all():
++        raise RuntimeError('Release retreat rejected: no feasible original joint/correction bounds')
++    rotation = Rotation.from_matrix(pose[:3, :3])
++    free = upper - lower > 1e-10
++    solved = (lower + upper) / 2
++
++    def residual(x):
++        joints = solved.copy(); joints[free] = x
++        mat = kinematics.matrix(joints, 1)
++        angle = (rotation.inv() * Rotation.from_matrix(mat[:3, :3])).as_rotvec()
++        return np.r_[mat[:3, 3] - goal, .15 * angle]
++
++    if np.any(free):
++        solution = least_squares(residual, np.clip(q[free], lower[free], upper[free]),
++                                 bounds=(lower[free], upper[free]), max_nfev=180,
++                                 ftol=1e-8, xtol=1e-8, gtol=1e-8)
++        solved[free] = solution.x
++    error = residual(solved[free])
++    position_error = float(np.linalg.norm(error[:3]))
++    angle_error = float(np.linalg.norm(error[3:]) / .15)
++    if position_error > tolerance or angle_error > np.deg2rad(8):
++        raise RuntimeError('Release retreat rejected: goal unreachable within original bounds '
++                           f'(position={position_error:.6f}m, angle={np.rad2deg(angle_error):.3f}deg)')
++    return goal, dict(direction_source='measured_tool_positive_z_horizontal_projection',
++                     projection_norm=projection, direction_xy=direction.tolist(),
++                     origin_base_m=pose[:3, 3].tolist(), goal_base_m=goal.tolist(),
++                     observed_parcel=parcel, observation_stamp=snapshot.get('stamp'),
++                     away_dot_m=away, horizontal_distance_m=float(distance), rise_m=float(rise),
++                     feasibility_joint_rad=solved.tolist(), lower_joint_rad=lower.tolist(),
++                     upper_joint_rad=upper.tolist(), position_residual_m=position_error,
++                     orientation_residual_degrees=float(np.rad2deg(angle_error)),
++                     original_reference_rad=reference.tolist(), correction_cap_rad=float(cap))
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -11,6 +11,7 @@
+ from .motion import action_vector
+ from .settlement import SettlementMonitor, resting_observation, track_resting_roof
+ from .clearance import open_fingers_clear
++from .release_retreat import axis_retreat_goal
+ 
+ 
+ class ResidualAssist:
+@@ -468,6 +469,8 @@
+ 
+     def _regrasp_action(self, measured, snapshot, poses, info):
+         p = self.pending; pose = poses.right_pose; target = p['target']
++        self.command_sweep_context = dict(target=copy.deepcopy(target), plane=p['plane'],
++                                          stage=p.get('regrasp_stage', 'level'))
+         position = np.asarray(pose.pos_xyz)
+         rotation = Rotation.from_quat(pose.quat_xyzw)
+         if p.get('regrasp_stage') == 'reobserve':
+@@ -602,6 +605,7 @@
+         step_scale = .6 if stage == 'descend' and orientation_ok and np.linalg.norm(error[:2]) <= .008 else .4
+         result = self._correct(p['base'],measured,1,correction,angular_error-4.*angular_velocity,step_scale=step_scale)
+         delta = self.offset[8:15]-previous_offset[8:15]
++        self.command_sweep_context['increment_end_rad'] = (measured[8:15]+delta).tolist()
+         clear = all(open_fingers_clear(self.kinematics.matrix(measured[8:15]+a*delta,1),target,p['plane'])
+                     for a in (0.,.5,1.))
+         if not clear:
+@@ -682,11 +686,22 @@
+                     raise RuntimeError('Right gripper did not open before retreat')
+                 return result, info
+             if p.get('goal') is None:
+-                direction = -np.asarray(self.weighing_target[:2], float)
+-                direction /= max(np.linalg.norm(direction), 1e-9)
+-                p['goal'] = np.asarray(pose.pos_xyz, float).copy()
+-                p['goal'][:2] += direction * self.wrist_config.get('release_short_retreat_m', .035)
+-                p['goal'][2] += self.wrist_config.get('release_clearance_rise_m', .012)
++                if self.wrist_config.get('release_retreat_direction') == 'measured_tool_axis':
++                    p['goal'], p['retreat_goal_check'] = axis_retreat_goal(
++                        self.kinematics, measured, p['base'], self.low, self.high, self.offset,
++                        self.wrist_config.get('max_regrasp_joint_offset_rad', self.config['max_joint_offset_rad']),
++                        self.unwinding_placement, snapshot, self.weighing_target[:2], p['extent'],
++                        self.wrist_config['release_short_retreat_m'],
++                        self.wrist_config['release_clearance_rise_m'],
++                        self.wrist_config.get('release_retreat_ready_m', .014))
++                else:
++                    direction = -np.asarray(self.weighing_target[:2], float)
++                    direction /= max(np.linalg.norm(direction), 1e-9)
++                    p['goal'] = np.asarray(pose.pos_xyz, float).copy()
++                    p['goal'][:2] += direction * self.wrist_config.get('release_short_retreat_m', .035)
++                    p['goal'][2] += self.wrist_config.get('release_clearance_rise_m', .012)
++            if 'retreat_goal_check' in p:
++                info['retreat_goal_check'] = p['retreat_goal_check']
+             error = p['goal'] - np.asarray(pose.pos_xyz)
+             velocity = (np.zeros(3) if p.get('last_position') is None else
+                         np.asarray(pose.pos_xyz)-p['last_position'])
+--- /dev/null
++++ b/tests/test_axis_retreat.py
+@@ -0,0 +1,82 @@
++import copy
++import unittest
++import numpy as np
++from scene1.release_retreat import axis_retreat_goal
++from scene1.command_sweep import command_sweep_audit
++
++
++class LinearArm:
++    def __init__(self, axis=(-1., 0., 0.)):
++        self.axis = np.asarray(axis)
++
++    def matrix(self, q, side):
++        m = np.eye(4); m[:3, 3] = q[:3]
++        y = np.array([0., 1., 0.])
++        m[:3, :3] = np.column_stack((np.cross(y, self.axis), y, self.axis))
++        return m
++
++
++class AxisRetreatTests(unittest.TestCase):
++    def setUp(self):
++        self.q = np.zeros(16); self.q[8:11] = [.3, -.2, 0.]
++        self.parcel = dict(position_base_m=[.34, -.2, 0.], extent_xy_m=[.1, .04],
++                           top_z_base_m=.05)
++        self.kw = dict(kinematics=LinearArm(), measured=self.q, reference=self.q.copy(),
++                       low=np.full(16, -4.), high=np.full(16, 4.), offset=np.zeros(16),
++                       cap=.5235987756, unwinding=False,
++                       snapshot=dict(candidates=[self.parcel], stamp=5.),
++                       pad_xy=np.array([.34, -.2]), extent=[.1, .04, .1],
++                       distance=.06, rise=.07, tolerance=.014)
++
++    def test_goal_uses_measured_axis_and_keeps_original_reference(self):
++        before = self.kw['reference'].copy()
++        goal, audit = axis_retreat_goal(**self.kw)
++        np.testing.assert_allclose(goal, [.24, -.2, .07])
++        np.testing.assert_array_equal(before, self.kw['reference'])
++        self.assertLess(audit['position_residual_m'], 1e-6)
++        self.assertGreater(audit['away_dot_m'], 0.)
++
++    def test_degenerate_projection_is_rejected(self):
++        self.kw['kinematics'] = LinearArm((0., 0., 1.))
++        with self.assertRaisesRegex(RuntimeError, 'degenerate'):
++            axis_retreat_goal(**self.kw)
++
++    def test_axis_toward_parcel_is_rejected_without_flipping_it(self):
++        self.kw['kinematics'] = LinearArm((1., 0., 0.))
++        with self.assertRaisesRegex(RuntimeError, 'does not point away'):
++            axis_retreat_goal(**self.kw)
++
++    def test_missing_and_ambiguous_observation_rejected(self):
++        for candidates in [[], [self.parcel, copy.deepcopy(self.parcel)]]:
++            with self.subTest(candidates=len(candidates)):
++                self.kw['snapshot']['candidates'] = candidates
++                with self.assertRaisesRegex(RuntimeError, 'one currently observed'):
++                    axis_retreat_goal(**self.kw)
++
++    def test_original_correction_budget_cannot_be_rebased(self):
++        self.kw['cap'] = .005
++        with self.assertRaisesRegex(RuntimeError, 'unreachable'):
++            axis_retreat_goal(**self.kw)
++
++    def test_physical_limits_cannot_be_relaxed(self):
++        self.kw['low'][8] = .295
++        with self.assertRaisesRegex(RuntimeError, 'unreachable'):
++            axis_retreat_goal(**self.kw)
++
++    def test_pending_reference_collision_is_visible_without_new_increment(self):
++        # The tool is safely above the box but its pending target is inside it.
++        arm = LinearArm((0., 0., 1.))
++        measured = np.zeros(16); measured[8:11] = [.34, -.2, .2]
++        sent = measured.copy(); sent[10] = -.02
++        parcel = dict(self.parcel, extent_xy_m=[.2, .2])
++        report = command_sweep_audit(arm, measured, sent, sent, measured,
++                    dict(target=parcel, plane=-.05, stage='level',
++                         increment_end_rad=measured[8:15].tolist()))
++        self.assertTrue(report['legacy_increment']['clear'])
++        self.assertFalse(report['filtered']['clear'])
++        self.assertTrue(report['previous']['clear'])
++        self.assertEqual(report['margin_m'], .003)
++
++
++if __name__ == '__main__':
++    unittest.main()

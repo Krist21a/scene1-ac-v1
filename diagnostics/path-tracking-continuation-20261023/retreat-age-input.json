@@ -1,0 +1,3753 @@
+{
+  "label": "executor-obb-c-p4-s0",
+  "row": {
+    "step": 366,
+    "mode": "optimized",
+    "inference_s": 0.17648165200080257,
+    "step_s": 1.3069221299992932,
+    "sensor_age_s": {
+      "/cam_h/color/image_raw/compressed": 0.025422226997761754,
+      "/cam_l/color/image_raw/compressed": 0.02206903899786994,
+      "/cam_r/color/image_raw/compressed": 0.01147615799709456,
+      "/gripper/state": 0.00024316499911947176,
+      "/sensors_data_raw": 0.013053103997663129
+    },
+    "detections": [
+      {
+        "label": "orange",
+        "uv": [
+          352.3592365371506,
+          274.30170415814587
+        ],
+        "bbox": [
+          329,
+          251,
+          46,
+          49
+        ],
+        "area_px": 1222.5,
+        "fill": 0.5423691215616682,
+        "solidity": 0.965258586656139,
+        "candidate_count": 1,
+        "clipped": false,
+        "color_fraction": 0.7248636009353079,
+        "stable": true
+      },
+      {
+        "label": "unknown",
+        "uv": [
+          113.19650298363169,
+          358.39557289062236
+        ],
+        "bbox": [
+          44,
+          297,
+          155,
+          119
+        ],
+        "area_px": 9999.0,
+        "fill": 0.5420981295744104,
+        "solidity": 0.9544218011740562,
+        "candidate_count": 1,
+        "clipped": false,
+        "color_fraction": 0.0,
+        "stable": true
+      }
+    ],
+    "sensor_age_before_send_s": {
+      "/cam_h/color/image_raw/compressed": 0.010450800000398885,
+      "/cam_l/color/image_raw/compressed": 0.04769552300058422,
+      "/cam_r/color/image_raw/compressed": 0.037131769000552595,
+      "/gripper/state": 0.0006182100005389657,
+      "/sensors_data_raw": 0.003348936999827856
+    },
+    "observation_receipts": {
+      "/gripper/state": {
+        "receipt_monotonic_s": 17293.897676282,
+        "source_stamp_s": 1792757502.2678704,
+        "receipts": 73801
+      },
+      "/sensors_data_raw": {
+        "receipt_monotonic_s": 17293.886112337,
+        "source_stamp_s": 1792757502.2563338,
+        "receipts": 41336
+      },
+      "/cam_l/color/image_raw/compressed": {
+        "receipt_monotonic_s": 17293.877096402,
+        "source_stamp_s": 1792757502.2161913,
+        "receipts": 2331
+      },
+      "/cam_h/color/image_raw/compressed": {
+        "receipt_monotonic_s": 17293.873743214,
+        "source_stamp_s": 1792757502.2118053,
+        "receipts": 2422
+      },
+      "/cam_r/color/image_raw/compressed": {
+        "receipt_monotonic_s": 17293.887689283,
+        "source_stamp_s": 1792757502.2193809,
+        "receipts": 2277
+      }
+    },
+    "send_monotonic_s": 17295.195057529,
+    "act_action": [
+      0.576241135597229,
+      0.19381630420684814,
+      0.12709710001945496,
+      -2.2643544673919678,
+      -1.5707963267949,
+      -0.4047624170780182,
+      -0.042561888694763184,
+      0.0,
+      -0.27603328227996826,
+      -0.4651437997817993,
+      -0.15278750658035278,
+      -0.49162757396698,
+      1.1245713233947754,
+      -0.5213676691055298,
+      -0.2560652196407318,
+      0.0
+    ],
+    "proposed_action": [
+      0.576241135597229,
+      0.19381630420684814,
+      0.12709710001945496,
+      -2.2643544673919678,
+      -1.5707963267949,
+      -0.4047624170780182,
+      -0.042561888694763184,
+      0.0,
+      -0.2683498671585366,
+      -0.46854269935010395,
+      -0.14971980870672963,
+      -0.493861432778685,
+      1.131328033972774,
+      -0.5284276004466701,
+      -0.27358815630807026,
+      0.0
+    ],
+    "filtered_action": [
+      0.576241135597229,
+      0.19381630420684814,
+      0.12709710001945496,
+      -2.2643544673919678,
+      -1.5707963267949,
+      -0.4047624170780182,
+      -0.042561888694763184,
+      0.0,
+      -0.2683498671585366,
+      -0.46854269935010395,
+      -0.14971980870672963,
+      -0.493861432778685,
+      1.131328033972774,
+      -0.5284276004466701,
+      -0.27358815630807026,
+      0.0
+    ],
+    "sent_action": [
+      0.576241135597229,
+      0.19381630420684814,
+      0.12709710001945496,
+      -2.2643544673919678,
+      -1.5707963267949,
+      -0.4047624170780182,
+      -0.042561888694763184,
+      0.0,
+      -0.2683498671585366,
+      -0.46854269935010395,
+      -0.14971980870672963,
+      -0.493861432778685,
+      1.131328033972774,
+      -0.5284276004466701,
+      -0.27358815630807026,
+      0.0
+    ],
+    "motion": {
+      "velocity_limited": false,
+      "velocity_scale": 1.0,
+      "bounds_clipped": false,
+      "max_joint_change_rad": 0.006000000000000005
+    },
+    "servo": {
+      "servo": "disabled"
+    },
+    "head_camera": {
+      "state": "look_at_target",
+      "target_base_m": [
+        0.4197564719051698,
+        -0.563114179381232,
+        -0.023343356022173745
+      ],
+      "desired_degrees": [
+        -53.10283226303277,
+        17.311734803091515
+      ],
+      "command_degrees": [
+        -53.10283226303277,
+        17.311734803091515
+      ],
+      "measured_degrees": [
+        -53.161985165834196,
+        18.830732284413003
+      ],
+      "act_view_ready": false
+    },
+    "wrist_detections": {
+      "left": [
+        {
+          "label": "blue",
+          "uv": [
+            820.4917095483133,
+            188.85363064608347
+          ],
+          "bbox": [
+            788,
+            178,
+            60,
+            25
+          ],
+          "area_px": 874.5,
+          "fill": 0.583,
+          "solidity": 0.7477554510474562,
+          "candidate_count": 1,
+          "clipped": true,
+          "color_fraction": 0.6057494866529775,
+          "stable": false
+        }
+      ],
+      "right": [
+        {
+          "label": "yellow",
+          "uv": [
+            210.3272264631043,
+            387.47073791348595
+          ],
+          "bbox": [
+            198,
+            376,
+            34,
+            24
+          ],
+          "area_px": 327.5,
+          "fill": 0.4013480392156863,
+          "solidity": 0.7277777777777777,
+          "candidate_count": 2,
+          "clipped": false,
+          "color_fraction": 0.9946524064171123,
+          "stable": false
+        }
+      ]
+    },
+    "grasp": {
+      "left": {
+        "state": "open",
+        "target": null,
+        "command_gripper": 0.0,
+        "measured_gripper": 0.0032849865965545177,
+        "feedback_error": 0.0032849865965545177,
+        "visible_labels": [
+          "blue"
+        ],
+        "roi_calibrated": false,
+        "confirmed_grasp": null
+      },
+      "right": {
+        "state": "open",
+        "target": null,
+        "command_gripper": 0.0,
+        "measured_gripper": 0.004002234432846308,
+        "feedback_error": 0.004002234432846308,
+        "visible_labels": [
+          "yellow"
+        ],
+        "roi_calibrated": false,
+        "confirmed_grasp": null
+      }
+    },
+    "cartesian_alignment": {
+      "state": "small_short_retreat",
+      "arm": 1,
+      "phase_steps": 5,
+      "strategy": "act_residual",
+      "retreat_goal_check": {
+        "direction_source": "measured_tool_positive_z_horizontal_projection",
+        "projection_norm": 0.9896656272259537,
+        "direction_xy": [
+          -0.9395985315078547,
+          0.3422785409403913
+        ],
+        "origin_base_m": [
+          0.37862304135709574,
+          -0.5504253019995644,
+          -0.025217699870918965
+        ],
+        "goal_base_m": [
+          0.3222471294666245,
+          -0.5298885895431409,
+          0.04478230012908104
+        ],
+        "observed_parcel": {
+          "position_base_m": [
+            0.41898684059036356,
+            -0.5621938614491007,
+            -0.012744257130857629
+          ],
+          "oriented_center_base_m": [
+            0.42011715436472746,
+            -0.5645108919676477,
+            -0.012744257130857629
+          ],
+          "extent_xy_m": [
+            0.11299205142034063,
+            0.05909361248117184
+          ],
+          "points": 218,
+          "minor_extent_m": 0.050506539791691396,
+          "major_axis_xy": [
+            -0.9819375349047983,
+            0.18920538455627617
+          ],
+          "oriented_extent_m": [
+            0.11188987038070819,
+            0.050506539791691396
+          ],
+          "top_z_base_m": 0.02223281746776043,
+          "uv": [
+            425.0,
+            230.0
+          ],
+          "bbox": [
+            410,
+            210,
+            41,
+            41
+          ]
+        },
+        "observation_stamp": 1792757502.2625797,
+        "away_dot_m": 0.043809002830751904,
+        "horizontal_distance_m": 0.06,
+        "rise_m": 0.07,
+        "lower_joint_rad": [
+          -3.14,
+          -3.14,
+          -1.48352986419518,
+          -2.61799387799149,
+          -1.5707963267949,
+          -0.698131700797732,
+          -0.698131700797732
+        ],
+        "upper_joint_rad": [
+          1.5707963267949,
+          0.349065850398866,
+          1.48352986419518,
+          0.0,
+          1.5707963267949,
+          1.30899693899575,
+          0.698131700797732
+        ],
+        "original_reference_rad": [
+          -0.27603328227996826,
+          -0.4651437997817993,
+          -0.15278750658035278,
+          -0.49162757396698,
+          1.1245713233947754,
+          -0.5213676691055298,
+          -0.2560652196407318
+        ],
+        "correction_cap_rad": 6.283185307179586,
+        "position_tolerance_m": 0.014,
+        "certified": true,
+        "reason": "nominal bounded executor reached original position and dwell criteria",
+        "feasibility_joint_rad": [
+          -0.01629903283550843,
+          -0.41861767301315855,
+          -0.398959063517738,
+          -0.8178614327786853,
+          1.0330547985589547,
+          -0.698131700797732,
+          -0.5929471255591858
+        ],
+        "position_residual_m": 0.009172031322740297,
+        "orientation_residual_degrees": 23.013972021793293,
+        "orientation_tolerance_degrees": null,
+        "orientation_criterion": "unchanged per-step executor plus full sampled finger sweeps; no added cumulative angle gate",
+        "solver_method": "nominal_incremental_executor_sweep",
+        "remaining_steps": 136,
+        "nominal_steps": 55,
+        "max_cumulative_rotation_degrees": 22.803039990514517,
+        "nominal_filter": {
+          "alpha": 1.0,
+          "max_velocity": 0.6,
+          "period": 0.1
+        },
+        "nominal_records": [
+          {
+            "index": 0,
+            "error_m": 0.09219544457292887,
+            "cumulative_rotation_degrees": 0.0,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 5
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 5
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 1,
+            "error_m": 0.08838674495635464,
+            "cumulative_rotation_degrees": 3.3039081939678674,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 2,
+            "error_m": 0.08678648035098574,
+            "cumulative_rotation_degrees": 3.5683480838607973,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 3,
+            "error_m": 0.08519021210512547,
+            "cumulative_rotation_degrees": 3.882417488811328,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 4,
+            "error_m": 0.08358584112093402,
+            "cumulative_rotation_degrees": 4.228699653970287,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 5,
+            "error_m": 0.08197403861941518,
+            "cumulative_rotation_degrees": 4.600010350994242,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 6,
+            "error_m": 0.08035465042141231,
+            "cumulative_rotation_degrees": 4.990878162506659,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 7,
+            "error_m": 0.07872758685847181,
+            "cumulative_rotation_degrees": 5.397180369507627,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 8,
+            "error_m": 0.07709276290567918,
+            "cumulative_rotation_degrees": 5.815819215995438,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 9,
+            "error_m": 0.07545010281942097,
+            "cumulative_rotation_degrees": 6.244458470879256,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 10,
+            "error_m": 0.07379954028011751,
+            "cumulative_rotation_degrees": 6.681324099876733,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 11,
+            "error_m": 0.07214101885752514,
+            "cumulative_rotation_degrees": 7.125057502302201,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 12,
+            "error_m": 0.07047449245609629,
+            "cumulative_rotation_degrees": 7.57460869381594,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 13,
+            "error_m": 0.06879992576893733,
+            "cumulative_rotation_degrees": 8.029158722213067,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 14,
+            "error_m": 0.0671177377754208,
+            "cumulative_rotation_degrees": 8.48823741506252,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 15,
+            "error_m": 0.06542789755649486,
+            "cumulative_rotation_degrees": 8.951343891478729,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 16,
+            "error_m": 0.0637302996708044,
+            "cumulative_rotation_degrees": 9.418084442559158,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 17,
+            "error_m": 0.06202484609095031,
+            "cumulative_rotation_degrees": 9.888144092840475,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 18,
+            "error_m": 0.06031144211848693,
+            "cumulative_rotation_degrees": 10.361263260359234,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 19,
+            "error_m": 0.0585899965165934,
+            "cumulative_rotation_degrees": 10.83722731458112,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 20,
+            "error_m": 0.056860421263928464,
+            "cumulative_rotation_degrees": 11.315857846227376,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 21,
+            "error_m": 0.055122631331624206,
+            "cumulative_rotation_degrees": 11.797005962044453,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 22,
+            "error_m": 0.053376544446263656,
+            "cumulative_rotation_degrees": 12.280547035515145,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 23,
+            "error_m": 0.05162208084088602,
+            "cumulative_rotation_degrees": 12.766376574248913,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 24,
+            "error_m": 0.049859162992238394,
+            "cumulative_rotation_degrees": 13.25440694537418,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 25,
+            "error_m": 0.04808771534229457,
+            "cumulative_rotation_degrees": 13.744564767082506,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 26,
+            "error_m": 0.04630766400168525,
+            "cumulative_rotation_degrees": 14.236788822149903,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 27,
+            "error_m": 0.04451893643206382,
+            "cumulative_rotation_degrees": 14.731028384614461,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 28,
+            "error_m": 0.04272146110379889,
+            "cumulative_rotation_degrees": 15.227241876965332,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 29,
+            "error_m": 0.040915167124389015,
+            "cumulative_rotation_degrees": 15.725395794964193,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 30,
+            "error_m": 0.039563511313266506,
+            "cumulative_rotation_degrees": 16.066113170079014,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 31,
+            "error_m": 0.03839258065288046,
+            "cumulative_rotation_degrees": 16.344531561374858,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 32,
+            "error_m": 0.03722015562119788,
+            "cumulative_rotation_degrees": 16.622795747078694,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 33,
+            "error_m": 0.036044597729881146,
+            "cumulative_rotation_degrees": 16.90161468049473,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 34,
+            "error_m": 0.034865682913250866,
+            "cumulative_rotation_degrees": 17.18086172876819,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 35,
+            "error_m": 0.033682993837712095,
+            "cumulative_rotation_degrees": 17.460549622993067,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 36,
+            "error_m": 0.03249618005823678,
+            "cumulative_rotation_degrees": 17.740666722174073,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 37,
+            "error_m": 0.031304913157454754,
+            "cumulative_rotation_degrees": 18.021205608176672,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 38,
+            "error_m": 0.03010889353101917,
+            "cumulative_rotation_degrees": 18.30215797095981,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 39,
+            "error_m": 0.02890784799429472,
+            "cumulative_rotation_degrees": 18.58351564435756,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 40,
+            "error_m": 0.027701529019875982,
+            "cumulative_rotation_degrees": 18.865270481347707,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 41,
+            "error_m": 0.026489223249547098,
+            "cumulative_rotation_degrees": 19.14774252906733,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 42,
+            "error_m": 0.025270111959831754,
+            "cumulative_rotation_degrees": 19.431333863371226,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 43,
+            "error_m": 0.0240439184865014,
+            "cumulative_rotation_degrees": 19.716094300353834,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 44,
+            "error_m": 0.022810368467236164,
+            "cumulative_rotation_degrees": 20.002080720990506,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 45,
+            "error_m": 0.021569214608855598,
+            "cumulative_rotation_degrees": 20.289344875894745,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 46,
+            "error_m": 0.020321217727082168,
+            "cumulative_rotation_degrees": 20.57720919638377,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 47,
+            "error_m": 0.019069511559268223,
+            "cumulative_rotation_degrees": 20.863328217312215,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 48,
+            "error_m": 0.017813861304801108,
+            "cumulative_rotation_degrees": 21.148044272676895,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 49,
+            "error_m": 0.016554742382727167,
+            "cumulative_rotation_degrees": 21.431072574587642,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 50,
+            "error_m": 0.015290371969688849,
+            "cumulative_rotation_degrees": 21.713681473199884,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 51,
+            "error_m": 0.014020633271008939,
+            "cumulative_rotation_degrees": 21.99605815804673,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 0,
+            "projection": null
+          },
+          {
+            "index": 52,
+            "error_m": 0.012745709027716979,
+            "cumulative_rotation_degrees": 22.278244285422865,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 1,
+            "projection": null
+          },
+          {
+            "index": 53,
+            "error_m": 0.011479065859570287,
+            "cumulative_rotation_degrees": 22.55490283639332,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 2,
+            "projection": null
+          },
+          {
+            "index": 54,
+            "error_m": 0.010277456017946239,
+            "cumulative_rotation_degrees": 22.803039990514517,
+            "proposed_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "filtered_sweep": {
+              "clear": true,
+              "first_blocked_fraction": null,
+              "samples": 3
+            },
+            "motion": {
+              "velocity_limited": false,
+              "velocity_scale": 1.0,
+              "bounds_clipped": false,
+              "max_joint_change_rad": 0.006000000000000005
+            },
+            "stable_steps": 3,
+            "projection": null
+          }
+        ],
+        "limitation": "Perfect-tracking kinematic preflight only; live sweep and original timeout remain active"
+      },
+      "retreat_sweep_required": true,
+      "retreat_error_m": 0.09219544457292887,
+      "retreat_movement_m": Infinity,
+      "stable_steps": 0,
+      "sensor_error": null,
+      "candidate_count": 4,
+      "command_sweep": {
+        "stage": "short_retreat",
+        "target": {
+          "position_base_m": [
+            0.41898684059036356,
+            -0.5621938614491007,
+            -0.012744257130857629
+          ],
+          "oriented_center_base_m": [
+            0.42011715436472746,
+            -0.5645108919676477,
+            -0.012744257130857629
+          ],
+          "extent_xy_m": [
+            0.11299205142034063,
+            0.05909361248117184
+          ],
+          "points": 218,
+          "minor_extent_m": 0.050506539791691396,
+          "major_axis_xy": [
+            -0.9819375349047983,
+            0.18920538455627617
+          ],
+          "oriented_extent_m": [
+            0.11188987038070819,
+            0.050506539791691396
+          ],
+          "top_z_base_m": 0.02223281746776043,
+          "uv": [
+            425.0,
+            230.0
+          ],
+          "bbox": [
+            410,
+            210,
+            41,
+            41
+          ]
+        },
+        "plane_m": -0.08304735296003685,
+        "margin_m": 0.003,
+        "interpretation": "Sampled open inner fingers only; no whole robot or dynamics proof",
+        "proposed": {
+          "clear": true,
+          "first_blocked_fraction": null,
+          "samples": 5,
+          "max_pending_reference_rad": 0.03333968480958088
+        },
+        "filtered": {
+          "clear": true,
+          "first_blocked_fraction": null,
+          "samples": 5,
+          "max_pending_reference_rad": 0.03333968480958088
+        },
+        "previous": {
+          "clear": true,
+          "first_blocked_fraction": null,
+          "samples": 5,
+          "max_pending_reference_rad": 0.027339684809580933
+        }
+      }
+    },
+    "policy_paused_for_alignment": true,
+    "act_prediction": null,
+    "act_before_refresh": null,
+    "policy_epoch": 1,
+    "epoch_inference_index": 217,
+    "handover_contract": null,
+    "measured_state": [
+      0.5809291005134583,
+      0.19700953364372253,
+      0.11743069440126419,
+      -2.227747678756714,
+      -1.5708215236663818,
+      -0.4223509430885315,
+      -0.03906124457716942,
+      0.0032849865965545177,
+      -0.28716379404067993,
+      -0.4671427309513092,
+      -0.08650007843971252,
+      -0.43674784898757935,
+      1.1471182107925415,
+      -0.4597291648387909,
+      -0.2521428167819977,
+      0.004002234432846308
+    ],
+    "observation_state": [
+      0.580935001373291,
+      0.19700093567371368,
+      0.11744803935289383,
+      -2.2278499603271484,
+      -1.570820927619934,
+      -0.4222187399864197,
+      -0.03903359919786453,
+      0.003284921171143651,
+      -0.2794454097747803,
+      -0.4563490152359009,
+      -0.15283960103988647,
+      -0.4758633077144623,
+      1.114650011062622,
+      -0.51936936378479,
+      -0.24024847149848938,
+      0.03520118072628975
+    ],
+    "rgbd_stamp": 1792757502.2625797,
+    "rgbd_candidates": [
+      {
+        "position_base_m": [
+          0.41898684059036356,
+          -0.5621938614491007,
+          -0.012744257130857629
+        ],
+        "oriented_center_base_m": [
+          0.42011715436472746,
+          -0.5645108919676477,
+          -0.012744257130857629
+        ],
+        "extent_xy_m": [
+          0.11299205142034063,
+          0.05909361248117184
+        ],
+        "points": 218,
+        "minor_extent_m": 0.050506539791691396,
+        "major_axis_xy": [
+          -0.9819375349047983,
+          0.18920538455627617
+        ],
+        "oriented_extent_m": [
+          0.11188987038070819,
+          0.050506539791691396
+        ],
+        "top_z_base_m": 0.02223281746776043,
+        "uv": [
+          425.0,
+          230.0
+        ],
+        "bbox": [
+          410,
+          210,
+          41,
+          41
+        ]
+      },
+      {
+        "position_base_m": [
+          0.4840935098579627,
+          -0.31119843599111596,
+          -0.013975444788600265
+        ],
+        "oriented_center_base_m": [
+          0.48414948487348636,
+          -0.3103172309709486,
+          -0.013975444788600265
+        ],
+        "extent_xy_m": [
+          0.11168962771977486,
+          0.04176857841154413
+        ],
+        "points": 273,
+        "minor_extent_m": 0.042473438527419916,
+        "major_axis_xy": [
+          -0.9979977391308982,
+          -0.06324960624079658
+        ],
+        "oriented_extent_m": [
+          0.11288190465634784,
+          0.042473438527419916
+        ],
+        "top_z_base_m": 0.02099797877324707,
+        "uv": [
+          352.0,
+          272.0
+        ],
+        "bbox": [
+          330,
+          250,
+          45,
+          45
+        ]
+      },
+      {
+        "position_base_m": [
+          0.3336566858890248,
+          -0.10141160639163774,
+          -0.007810924556579793
+        ],
+        "oriented_center_base_m": [
+          0.33366099628843554,
+          -0.10150950361972057,
+          -0.007810924556579793
+        ],
+        "extent_xy_m": [
+          0.10901709430773365,
+          0.03968765992991194
+        ],
+        "points": 386,
+        "minor_extent_m": 0.03988013661522023,
+        "major_axis_xy": [
+          -0.9999928701631098,
+          0.0037761915928298776
+        ],
+        "oriented_extent_m": [
+          0.10898570155788989,
+          0.03988013661522023
+        ],
+        "top_z_base_m": 0.019530032393434205,
+        "uv": [
+          328.0,
+          372.0
+        ],
+        "bbox": [
+          298,
+          344,
+          59,
+          59
+        ]
+      },
+      {
+        "position_base_m": [
+          0.48385715692193265,
+          -0.09820571066268971,
+          -0.0026321682707829974
+        ],
+        "oriented_center_base_m": [
+          0.48385953204108434,
+          -0.0977501532517483,
+          -0.0026321682707829974
+        ],
+        "extent_xy_m": [
+          0.11094339184461338,
+          0.040630044340999885
+        ],
+        "points": 314,
+        "minor_extent_m": 0.04084021973994362,
+        "major_axis_xy": [
+          -0.9999049698077298,
+          -0.013785911424453486
+        ],
+        "oriented_extent_m": [
+          0.11096792290488006,
+          0.04084021973994362
+        ],
+        "top_z_base_m": 0.019969299187646304,
+        "uv": [
+          284.0,
+          332.0
+        ],
+        "bbox": [
+          258,
+          306,
+          53,
+          51
+        ]
+      }
+    ],
+    "rgbd_spatial_components": true,
+    "rgbd_surfaces": [
+      {
+        "position_base_m": [
+          0.44161734155789206,
+          -0.5200648472188627,
+          -0.08304735296003685
+        ],
+        "extent_xy_m": [
+          0.18112096122375465,
+          0.11796120007824146
+        ],
+        "points": 70,
+        "partial": true,
+        "footprint_xy_m": [
+          [
+            0.5348008871078491,
+            -0.5953851938247681
+          ],
+          [
+            0.5289785861968994,
+            -0.4809797406196594
+          ],
+          [
+            0.5276182889938354,
+            -0.4596315622329712
+          ],
+          [
+            0.34144771099090576,
+            -0.4598037898540497
+          ],
+          [
+            0.34034568071365356,
+            -0.47932612895965576
+          ],
+          [
+            0.4410105347633362,
+            -0.5468783378601074
+          ],
+          [
+            0.5099492073059082,
+            -0.588151216506958
+          ]
+        ]
+      },
+      {
+        "position_base_m": [
+          0.8649429753670166,
+          0.36481428683514894,
+          -0.08304735296003685
+        ],
+        "extent_xy_m": [
+          0.068219740676003,
+          0.05398962242704908
+        ],
+        "points": 69,
+        "partial": true,
+        "footprint_xy_m": [
+          [
+            0.8991991877555847,
+            0.3824385702610016
+          ],
+          [
+            0.8937649726867676,
+            0.3869756758213043
+          ],
+          [
+            0.8731715679168701,
+            0.3900119364261627
+          ],
+          [
+            0.8420594334602356,
+            0.39350414276123047
+          ],
+          [
+            0.8313615322113037,
+            0.39419928193092346
+          ],
+          [
+            0.8306336402893066,
+            0.37625378370285034
+          ],
+          [
+            0.8292279839515686,
+            0.33862975239753723
+          ],
+          [
+            0.8397721648216248,
+            0.3369863033294678
+          ],
+          [
+            0.8990570306777954,
+            0.33366936445236206
+          ],
+          [
+            0.8991908431053162,
+            0.35394588112831116
+          ]
+        ]
+      }
+    ],
+    "rgbd_table_z_base_m": -0.08304735296003685,
+    "terminated": false,
+    "truncated": false
+  },
+  "failed": {
+    "step": 367,
+    "error": "Retreat projection cannot repair an already blocked measured pose",
+    "observation_state": [
+      0.5809291005134583,
+      0.19700953364372253,
+      0.11743069440126419,
+      -2.227747678756714,
+      -1.5708215236663818,
+      -0.4223509430885315,
+      -0.03906124457716942,
+      0.0032849865965545177,
+      -0.28716379404067993,
+      -0.4671427309513092,
+      -0.08650007843971252,
+      -0.43674784898757935,
+      1.1471182107925415,
+      -0.4597291648387909,
+      -0.2521428167819977,
+      0.004002234432846308
+    ],
+    "rgbd_error": null,
+    "rgbd_candidates": [
+      {
+        "position_base_m": [
+          0.41618491336966706,
+          -0.5602038438170386,
+          -0.014961120770441965
+        ],
+        "oriented_center_base_m": [
+          0.419285022024279,
+          -0.565175856065861,
+          -0.014961120770441965
+        ],
+        "extent_xy_m": [
+          0.11121524330017529,
+          0.05422517457776044
+        ],
+        "points": 222,
+        "minor_extent_m": 0.04796984564753798,
+        "major_axis_xy": [
+          -0.9844426162668156,
+          0.17570638940501707
+        ],
+        "oriented_extent_m": [
+          0.11407348987913779,
+          0.04796984564753798
+        ],
+        "top_z_base_m": 0.021468820452312402,
+        "uv": [
+          426.0,
+          230.0
+        ],
+        "bbox": [
+          410,
+          210,
+          45,
+          41
+        ]
+      },
+      {
+        "position_base_m": [
+          0.4832684890795197,
+          -0.3133107513815732,
+          -0.014015160443881507
+        ],
+        "oriented_center_base_m": [
+          0.4834377838859324,
+          -0.31202195939760935,
+          -0.014015160443881507
+        ],
+        "extent_xy_m": [
+          0.11202043541843487,
+          0.04196951700352258
+        ],
+        "points": 279,
+        "minor_extent_m": 0.042165346558914296,
+        "major_axis_xy": [
+          -0.9980769569573537,
+          -0.06198699856218866
+        ],
+        "oriented_extent_m": [
+          0.11341184762923784,
+          0.042165346558914296
+        ],
+        "top_z_base_m": 0.020939627739526512,
+        "uv": [
+          354.0,
+          272.0
+        ],
+        "bbox": [
+          330,
+          250,
+          45,
+          45
+        ]
+      },
+      {
+        "position_base_m": [
+          0.33327079068029786,
+          -0.10262025032379014,
+          -0.007007215756532622
+        ],
+        "oriented_center_base_m": [
+          0.33323220719323193,
+          -0.10252185017965314,
+          -0.007007215756532622
+        ],
+        "extent_xy_m": [
+          0.10971978869946136,
+          0.04002449428833943
+        ],
+        "points": 388,
+        "minor_extent_m": 0.040487730048537326,
+        "major_axis_xy": [
+          -0.9999767472121585,
+          -0.006819460021960743
+        ],
+        "oriented_extent_m": [
+          0.10972021557508732,
+          0.040487730048537326
+        ],
+        "top_z_base_m": 0.019360683342934663,
+        "uv": [
+          328.0,
+          372.0
+        ],
+        "bbox": [
+          300,
+          342,
+          57,
+          59
+        ]
+      },
+      {
+        "position_base_m": [
+          0.48338042091563027,
+          -0.10058407770804315,
+          -0.004597779120289068
+        ],
+        "oriented_center_base_m": [
+          0.48338192510864186,
+          -0.10060749043442278,
+          -0.004597779120289068
+        ],
+        "extent_xy_m": [
+          0.11140219089489306,
+          0.040688568061470254
+        ],
+        "points": 313,
+        "minor_extent_m": 0.04069486461054039,
+        "major_axis_xy": [
+          -0.9999997470281803,
+          0.0007112971076477227
+        ],
+        "oriented_extent_m": [
+          0.11140891109461071,
+          0.04069486461054039
+        ],
+        "top_z_base_m": 0.02022559562259121,
+        "uv": [
+          286.0,
+          330.0
+        ],
+        "bbox": [
+          258,
+          306,
+          55,
+          53
+        ]
+      }
+    ],
+    "rgbd_spatial_components": true,
+    "rgbd_stamp": 1792757503.562353,
+    "pending_kind": "short_retreat"
+  },
+  "sensors": [
+    {
+      "t": 17293.790280573,
+      "q": [
+        0.5809586576594371,
+        0.19700026070069962,
+        0.11745114337185528,
+        -2.227853263710691,
+        -1.5708209830804352,
+        -0.4222130033129955,
+        -0.03903179931914266,
+        -0.2800059348803578,
+        -0.45712476287740267,
+        -0.1556226576001066,
+        -0.4803571749556541,
+        1.11325571752456,
+        -0.5244007579127985,
+        -0.24014092902338188
+      ]
+    },
+    {
+      "t": 17293.811258577,
+      "q": [
+        0.5809537769456303,
+        0.19700038098965322,
+        0.11745057005142351,
+        -2.2278526701696815,
+        -1.5708209777100746,
+        -0.4222140002396956,
+        -0.03903211904603249,
+        -0.2799060804067047,
+        -0.45697449248438743,
+        -0.15519024698578993,
+        -0.47961270698719777,
+        1.1134605052544395,
+        -0.5235970054825427,
+        -0.24014600614515128
+      ]
+    },
+    {
+      "t": 17293.831962628,
+      "q": [
+        0.5809500491903739,
+        0.19700047578267185,
+        0.1174501235899449,
+        -2.2278522326191537,
+        -1.5708209745606083,
+        -0.42221478980841354,
+        -0.039032371693996384,
+        -0.27982714296384165,
+        -0.456859398661323,
+        -0.1548297941289647,
+        -0.47900765307270166,
+        1.1136351487303848,
+        -0.522933833657168,
+        -0.24015390148762056
+      ]
+    },
+    {
+      "t": 17293.854170814,
+      "q": [
+        0.5809432246900773,
+        0.19700066129134267,
+        0.11744925882333643,
+        -2.227851367883792,
+        -1.5708209705359852,
+        -0.42221636432846277,
+        -0.03903286959208706,
+        -0.279671735902418,
+        -0.45664240370903775,
+        -0.15407082562815153,
+        -0.4777731550260393,
+        1.1140130135243178,
+        -0.5215561205715077,
+        -0.2401804378436775
+      ]
+    },
+    {
+      "t": 17293.87495377,
+      "q": [
+        0.5809380982829885,
+        0.19700082019853968,
+        0.11744853563535011,
+        -2.227850595391297,
+        -1.570820969248109,
+        -0.42221774320283184,
+        -0.03903329723624411,
+        -0.2795385731007852,
+        -0.45646657600462104,
+        -0.15336590711490738,
+        -0.4766672427786974,
+        1.1143745045687588,
+        -0.5202972664986742,
+        -0.24021592059919952
+      ]
+    },
+    {
+      "t": 17293.895849802,
+      "q": [
+        0.5809329262508185,
+        0.19700102205823503,
+        0.11744766102265401,
+        -2.2278495972227055,
+        -1.570820970697676,
+        -0.4222195163743417,
+        -0.03903383554661083,
+        -0.2793722088392739,
+        -0.45625971661983855,
+        -0.15240517694033776,
+        -0.4752121332689777,
+        1.114880547104912,
+        -0.5186106322699083,
+        -0.24027886367121723
+      ]
+    },
+    {
+      "t": 17293.915860779,
+      "q": [
+        0.5809298439437088,
+        0.19700119980636438,
+        0.11744693966178611,
+        -2.2278487117857395,
+        -1.5708209746950366,
+        -0.4222210912893587,
+        -0.03903430287260329,
+        -0.2792301581548661,
+        -0.45609410936011835,
+        -0.15150151966379002,
+        -0.4738897935082928,
+        1.1153680834382327,
+        -0.5170516727481328,
+        -0.24035125791307493
+      ]
+    },
+    {
+      "t": 17293.93611703,
+      "q": [
+        0.5809279517276293,
+        0.19700139781302003,
+        0.11744618478584064,
+        -2.2278477279489812,
+        -1.5708209817968963,
+        -0.42222286377567153,
+        -0.039034818090489615,
+        -0.27907898893592176,
+        -0.455928849231339,
+        -0.15043146035681687,
+        -0.47237349117733135,
+        1.1159570745172378,
+        -0.5152363113793057,
+        -0.24045084613949277
+      ]
+    },
+    {
+      "t": 17293.957555993,
+      "q": [
+        0.5809270098005034,
+        0.19700157071232696,
+        0.11744553837644596,
+        -2.2278468194893404,
+        -1.570820989346859,
+        -0.4222244580430385,
+        -0.03903527272539384,
+        -0.2789539869684157,
+        -0.4558010736490784,
+        -0.14943516705744514,
+        -0.47100410403194254,
+        1.116514751946735,
+        -0.5135732144977276,
+        -0.24055509320472954
+      ]
+    },
+    {
+      "t": 17293.978356042,
+      "q": [
+        0.5809268324468234,
+        0.19700161352442788,
+        0.11744538131355244,
+        -2.227846585529783,
+        -1.5708209914183162,
+        -0.42222485986627606,
+        -0.03903538582846031,
+        -0.27892429654627443,
+        -0.45577196178079715,
+        -0.14917972426979975,
+        -0.47065908388946054,
+        1.1166589944387177,
+        -0.5131508771358894,
+        -0.24058349556080486
+      ]
+    },
+    {
+      "t": 17293.998829966,
+      "q": [
+        0.5809265221474395,
+        0.19700169893027056,
+        0.11744507616776392,
+        -2.227846116136836,
+        -1.5708209958686692,
+        -0.422225665590177,
+        -0.03903561082474465,
+        -0.27886701256123503,
+        -0.4557172250631496,
+        -0.14866140245988557,
+        -0.46996631334151573,
+        1.1169531431733615,
+        -0.5122989813499245,
+        -0.24064320514580398
+      ]
+    },
+    {
+      "t": 17294.024901157,
+      "q": [
+        0.5809263204885029,
+        0.19700176255896,
+        0.1174448529488061,
+        -2.2278457585934666,
+        -1.5708209994090312,
+        -0.42222627284826214,
+        -0.039035778783552987,
+        -0.27882599452102663,
+        -0.4556792920746511,
+        -0.14826627660377933,
+        -0.4694446260829893,
+        1.1171786363731144,
+        -0.511654147544012,
+        -0.2406905955713517
+      ]
+    },
+    {
+      "t": 17294.049129935,
+      "q": [
+        0.5809261386719173,
+        0.19700182586139092,
+        0.11744463626424285,
+        -2.22784540772584,
+        -1.5708210031987337,
+        -0.42222688017959437,
+        -0.03903594574947505,
+        -0.27878684601103176,
+        -0.4556441764437799,
+        -0.14786578500089825,
+        -0.46892140157334944,
+        1.117408234871892,
+        -0.5110046480390001,
+        -0.24074027977809703
+      ]
+    },
+    {
+      "t": 17294.06931947,
+      "q": [
+        0.5809256842403424,
+        0.19700201178601057,
+        0.11744400924007385,
+        -2.227844353459853,
+        -1.570821015588959,
+        -0.42222871249982374,
+        -0.039036442454572225,
+        -0.27868160313842355,
+        -0.4555565263765616,
+        -0.14663311603724663,
+        -0.4673447820841928,
+        1.1181209859980887,
+        -0.5090315833239182,
+        -0.2409035988253689
+      ]
+    },
+    {
+      "t": 17294.089548357,
+      "q": [
+        0.5809252640595253,
+        0.19700222273664988,
+        0.11744322123468227,
+        -2.2278427804966747,
+        -1.5708210310418305,
+        -0.4222310334188391,
+        -0.039037047628297517,
+        -0.27857933806460433,
+        -0.4554862242018534,
+        -0.14506644676920208,
+        -0.46541031715182823,
+        1.1190384213511588,
+        -0.5065803607086706,
+        -0.24113329202486367
+      ]
+    },
+    {
+      "t": 17294.110528408,
+      "q": [
+        0.5809249863516522,
+        0.19700241698693965,
+        0.11744246681974443,
+        -2.2278408955691957,
+        -1.570821049241702,
+        -0.42223344782765365,
+        -0.03903764153287862,
+        -0.2785102001871785,
+        -0.45545667556311775,
+        -0.14344128440587164,
+        -0.46347739951554767,
+        1.1200023089107487,
+        -0.5040997466255583,
+        -0.241396049606057
+      ]
+    },
+    {
+      "t": 17294.131655562,
+      "q": [
+        0.5809248765566043,
+        0.19700258977725618,
+        0.1174419830766362,
+        -2.227839068247611,
+        -1.5708210739355788,
+        -0.4222356909249866,
+        -0.039038147751762585,
+        -0.2784807383792321,
+        -0.4554603112207035,
+        -0.1419268798881781,
+        -0.4617312818485194,
+        1.1209138619559598,
+        -0.5018305228258254,
+        -0.24166135791556
+      ]
+    },
+    {
+      "t": 17294.152749857,
+      "q": [
+        0.5809247342059942,
+        0.19700272487631543,
+        0.11744161908547325,
+        -2.2278378444086666,
+        -1.570821087851815,
+        -0.4222372455944552,
+        -0.03903851128721739,
+        -0.2784742045900105,
+        -0.45548187565360315,
+        -0.14084889336780254,
+        -0.46052597070802753,
+        1.1215696619213595,
+        -0.5002391536481988,
+        -0.2418609691527018
+      ]
+    },
+    {
+      "t": 17294.173815348,
+      "q": [
+        0.5809244505931691,
+        0.19700293114044143,
+        0.11744106729738704,
+        -2.2278362414226507,
+        -1.5708211034139294,
+        -0.42223942660790803,
+        -0.03903904079887091,
+        -0.27848279204238685,
+        -0.4555412369761288,
+        -0.1392864878187222,
+        -0.45883711722085146,
+        1.1225287164807674,
+        -0.4979677003260219,
+        -0.24216439106709362
+      ]
+    },
+    {
+      "t": 17294.194441087,
+      "q": [
+        0.5809241855401525,
+        0.19700311553884936,
+        0.1174405599351574,
+        -2.227834804496693,
+        -1.5708211156650205,
+        -0.42224138630869035,
+        -0.03903951875307775,
+        -0.27850909400991614,
+        -0.45562234329493245,
+        -0.1378609232714925,
+        -0.45735378925637993,
+        1.1234110784559526,
+        -0.4959308957056957,
+        -0.24245423610095515
+      ]
+    },
+    {
+      "t": 17294.215195916,
+      "q": [
+        0.5809239225507887,
+        0.1970033124200244,
+        0.11744000005200535,
+        -2.22783315290066,
+        -1.570821129059065,
+        -0.42224358027452835,
+        -0.03904004636454715,
+        -0.27855907773170646,
+        -0.45574149579551826,
+        -0.136259257579368,
+        -0.45575022038880875,
+        1.124408953391321,
+        -0.4936827939155939,
+        -0.2427928685637763
+      ]
+    },
+    {
+      "t": 17294.235402739,
+      "q": [
+        0.5809236612916359,
+        0.19700355266293218,
+        0.11743927450704983,
+        -2.2278308419349417,
+        -1.5708211467646995,
+        -0.4222464835528708,
+        -0.03904072661205323,
+        -0.27865662243378053,
+        -0.45593915512856137,
+        -0.13415568268413416,
+        -0.453741765624377,
+        1.1257271455156976,
+        -0.4907949047448258,
+        -0.24325567401999584
+      ]
+    },
+    {
+      "t": 17294.25545768,
+      "q": [
+        0.5809235334603581,
+        0.19700372526030788,
+        0.11743869627663407,
+        -2.2278288688233383,
+        -1.5708211602122666,
+        -0.4222487794498905,
+        -0.03904124945875861,
+        -0.27875660794499796,
+        -0.45612202426774634,
+        -0.13252605031627077,
+        -0.4522593829494017,
+        1.1267521531598184,
+        -0.4886084416933398,
+        -0.24362626449742483
+      ]
+    },
+    {
+      "t": 17294.276266396,
+      "q": [
+        0.5809234507947529,
+        0.19700389106991895,
+        0.11743814812342278,
+        -2.2278268993725274,
+        -1.5708211744256046,
+        -0.42225108393510913,
+        -0.03904176535453398,
+        -0.2788789402898289,
+        -0.4563306498146449,
+        -0.13089039487793847,
+        -0.450834838365335,
+        1.1277825136376358,
+        -0.4864592855136896,
+        -0.24400723766948165
+      ]
+    },
+    {
+      "t": 17294.297728227,
+      "q": [
+        0.5809234094769037,
+        0.19700404871191554,
+        0.11743763497184108,
+        -2.227824936838828,
+        -1.5708211892964241,
+        -0.42225339111077104,
+        -0.03904227277710803,
+        -0.27902330940931946,
+        -0.456563468649657,
+        -0.1292522315737924,
+        -0.44947088019102754,
+        1.1288144747695412,
+        -0.48435345829824256,
+        -0.2443965668129385
+      ]
+    },
+    {
+      "t": 17294.318471499,
+      "q": [
+        0.5809234111330224,
+        0.19700418216079985,
+        0.1174371957690365,
+        -2.2278231421082695,
+        -1.5708212030650397,
+        -0.42225547774013394,
+        -0.0390427228189798,
+        -0.27917109504462817,
+        -0.4567918965938887,
+        -0.12777857380497445,
+        -0.4482969657747645,
+        1.1297415784326335,
+        -0.4825000033414059,
+        -0.2447524643432074
+      ]
+    },
+    {
+      "t": 17294.339616588,
+      "q": [
+        0.5809234697965128,
+        0.1970043359527007,
+        0.11743669560110404,
+        -2.227820889975799,
+        -1.570821220694659,
+        -0.4222580477360238,
+        -0.03904326392482393,
+        -0.27937295494923053,
+        -0.45709269140444525,
+        -0.12598199391281897,
+        -0.44693307705097557,
+        1.1308685511852594,
+        -0.480294492187163,
+        -0.24519233402271273
+      ]
+    },
+    {
+      "t": 17294.360070752,
+      "q": [
+        0.5809235621942186,
+        0.19700446507035668,
+        0.11743640053316584,
+        -2.227819100845024,
+        -1.5708212384897968,
+        -0.4222601438971429,
+        -0.0390436901686318,
+        -0.27955378629589467,
+        -0.4573539086436584,
+        -0.12451852845519583,
+        -0.44587611592296084,
+        1.131782528102545,
+        -0.47854321856210336,
+        -0.245554475117579
+      ]
+    },
+    {
+      "t": 17294.380794194,
+      "q": [
+        0.5809237065862003,
+        0.19700461328315644,
+        0.11743620775276958,
+        -2.2278172004952523,
+        -1.5708212617900357,
+        -0.4222624570107213,
+        -0.039044144550986815,
+        -0.2797696719586045,
+        -0.4576577735259466,
+        -0.12290213539402146,
+        -0.44476483690577984,
+        1.1327862941738587,
+        -0.47665800758330035,
+        -0.245957379321525
+      ]
+    },
+    {
+      "t": 17294.401565169,
+      "q": [
+        0.5809238744669014,
+        0.1970047487785216,
+        0.11743613276438129,
+        -2.2278155255830097,
+        -1.5708212848899394,
+        -0.4222645346487105,
+        -0.03904453912117403,
+        -0.27997592697321383,
+        -0.45794160390582245,
+        -0.12145843706209362,
+        -0.4438220611174075,
+        1.1336764832619426,
+        -0.47501944287931025,
+        -0.24631896118511573
+      ]
+    },
+    {
+      "t": 17294.42185232,
+      "q": [
+        0.5809240938298168,
+        0.19700493609627165,
+        0.11743606592645092,
+        -2.22781325643212,
+        -1.5708213137832654,
+        -0.422267316097118,
+        -0.03904506296663818,
+        -0.28026528505955983,
+        -0.4583328339587882,
+        -0.11955369283983622,
+        -0.4426503065511289,
+        1.1348398397245565,
+        -0.4729258002454555,
+        -0.24679714554908339
+      ]
+    },
+    {
+      "t": 17294.442183151,
+      "q": [
+        0.5809241213740968,
+        0.1970050769705016,
+        0.11743591308486767,
+        -2.227811724048891,
+        -1.570821325648228,
+        -0.4222691668656884,
+        -0.03904543507348708,
+        -0.2804640603814809,
+        -0.45860125541211455,
+        -0.11829936164281891,
+        -0.44192382738797215,
+        1.1355979824336875,
+        -0.4715911452180179,
+        -0.24711198555001285
+      ]
+    },
+    {
+      "t": 17294.462636566,
+      "q": [
+        0.5809240765775934,
+        0.19700526133966895,
+        0.11743565113562737,
+        -2.227809849422754,
+        -1.570821335199679,
+        -0.42227146323063386,
+        -0.039045914450631714,
+        -0.28071778781781137,
+        -0.45894463170389727,
+        -0.11675127198560922,
+        -0.4410776474137925,
+        1.1365235109787597,
+        -0.4699947503365995,
+        -0.24749957015050353
+      ]
+    },
+    {
+      "t": 17294.482711001,
+      "q": [
+        0.5809240028582263,
+        0.19700544597175754,
+        0.11743537738873278,
+        -2.227808049292439,
+        -1.570821342708499,
+        -0.4222737359865843,
+        -0.03904639554177665,
+        -0.2809764535098286,
+        -0.45929536221162415,
+        -0.11522729965339132,
+        -0.4403004326176241,
+        1.1374220173646155,
+        -0.4684811365167355,
+        -0.2478790756333981
+      ]
+    },
+    {
+      "t": 17294.50391027,
+      "q": [
+        0.580923924826877,
+        0.1970056609834433,
+        0.1174350454081283,
+        -2.2278058984391906,
+        -1.570821350839916,
+        -0.42227645848860246,
+        -0.039046970991177696,
+        -0.2812908112425545,
+        -0.4597231464824712,
+        -0.11343345377030262,
+        -0.4394583282350837,
+        1.1384610431455793,
+        -0.46677796271955824,
+        -0.24832166938871483
+      ]
+    },
+    {
+      "t": 17294.524788841,
+      "q": [
+        0.5809238995088182,
+        0.19700584848521244,
+        0.11743469045565429,
+        -2.2278037473888017,
+        -1.570821357012114,
+        -0.42227900540457675,
+        -0.03904750423867347,
+        -0.28157922307064975,
+        -0.4601186078037319,
+        -0.11182561303914398,
+        -0.4387714557997536,
+        1.1393725310810372,
+        -0.4653284545075965,
+        -0.2487129285612126
+      ]
+    },
+    {
+      "t": 17294.545572778,
+      "q": [
+        0.5809239152061774,
+        0.19700603051735444,
+        0.11743430442618873,
+        -2.2278014746236905,
+        -1.5708213626305116,
+        -0.4222815917369038,
+        -0.039048041755231355,
+        -0.2818655356410843,
+        -0.46051503340310473,
+        -0.11025525545274158,
+        -0.43816439219261494,
+        1.1402419579353846,
+        -0.4639883248394689,
+        -0.249088435779685
+      ]
+    },
+    {
+      "t": 17294.566522928,
+      "q": [
+        0.5809239571017679,
+        0.19700622536185994,
+        0.11743388066841565,
+        -2.2277989732945014,
+        -1.5708213685102828,
+        -0.4222844232626429,
+        -0.03904862792448311,
+        -0.28217412263610453,
+        -0.4609471500743067,
+        -0.10858738636272469,
+        -0.4375916198192062,
+        1.141139558756237,
+        -0.46265342527193826,
+        -0.24947816950592697
+      ]
+    },
+    {
+      "t": 17294.587392673,
+      "q": [
+        0.5809240184582256,
+        0.19700641704013927,
+        0.11743346420179399,
+        -2.227796468304722,
+        -1.5708213742798374,
+        -0.42228725721610694,
+        -0.039049212401694414,
+        -0.2824766434984272,
+        -0.46137677284611545,
+        -0.10696926003091939,
+        -0.4371098693743169,
+        1.1419811888020883,
+        -0.461453005758255,
+        -0.24984513128032734
+      ]
+    },
+    {
+      "t": 17294.608064038,
+      "q": [
+        0.5809240723795291,
+        0.1970065592256152,
+        0.11743316443837679,
+        -2.2277946126470685,
+        -1.5708213786405492,
+        -0.4222893765524472,
+        -0.039049648392421074,
+        -0.28269820256455724,
+        -0.4616960561345322,
+        -0.10578970667758723,
+        -0.43680670428078555,
+        1.1425740939946045,
+        -0.4606417578945443,
+        -0.2501042846079117
+      ]
+    },
+    {
+      "t": 17294.629467479,
+      "q": [
+        0.5809241135297954,
+        0.19700669988769384,
+        0.11743289868026052,
+        -2.2277928794346655,
+        -1.5708213833921265,
+        -0.4222914603415665,
+        -0.03905007746504895,
+        -0.2829147950970471,
+        -0.46201231283948657,
+        -0.10464021931915957,
+        -0.43655245344807503,
+        1.1431331439736323,
+        -0.4599072240620558,
+        -0.25034893157310917
+      ]
+    },
+    {
+      "t": 17294.649585669,
+      "q": [
+        0.5809241397485401,
+        0.19700685245728625,
+        0.11743265544923479,
+        -2.227791132747855,
+        -1.5708213894098262,
+        -0.4222937201789102,
+        -0.039050542857884056,
+        -0.2831485763587139,
+        -0.4623590597578801,
+        -0.10339922996531484,
+        -0.43632625764875244,
+        1.1437135639971958,
+        -0.45918133552414336,
+        -0.25060301025953463
+      ]
+    },
+    {
+      "t": 17294.670636712,
+      "q": [
+        0.5809241599615544,
+        0.1970069838067033,
+        0.11743246518656028,
+        -2.227789638856248,
+        -1.5708213950611352,
+        -0.422295724531773,
+        -0.03905095378707294,
+        -0.28335080940843826,
+        -0.46266522597080406,
+        -0.10231584082315437,
+        -0.43617195475419673,
+        1.1441983474879667,
+        -0.4586093929409713,
+        -0.2508150411931329
+      ]
+    },
+    {
+      "t": 17294.691097716,
+      "q": [
+        0.5809241910113798,
+        0.19700710928277404,
+        0.11743227855151613,
+        -2.2277881434722695,
+        -1.570821400431787,
+        -0.422297724457025,
+        -0.03905136157900799,
+        -0.28354324400856784,
+        -0.4629641277141597,
+        -0.10126503170429922,
+        -0.4360625116706669,
+        1.144646714824945,
+        -0.45811435348549273,
+        -0.25101068129934084
+      ]
+    },
+    {
+      "t": 17294.711669112,
+      "q": [
+        0.5809242320446073,
+        0.19700723081037572,
+        0.11743209927154992,
+        -2.227786690823528,
+        -1.5708214056861574,
+        -0.42229971226204244,
+        -0.03905176658668445,
+        -0.2837246623212225,
+        -0.463254865072033,
+        -0.10024741450990793,
+        -0.43599637006145847,
+        1.1450581060311724,
+        -0.45769576795229994,
+        -0.2511894369656245
+      ]
+    },
+    {
+      "t": 17294.732681418,
+      "q": [
+        0.5809242922791431,
+        0.19700736001048713,
+        0.11743189856270632,
+        -2.2277850404275075,
+        -1.5708214112229346,
+        -0.4223019264632689,
+        -0.03905221447933425,
+        -0.2839139136693386,
+        -0.46356683777391744,
+        -0.09915616439327549,
+        -0.4359657178623286,
+        1.14547132182379,
+        -0.457320689240112,
+        -0.25136810590431286
+      ]
+    },
+    {
+      "t": 17294.75311103,
+      "q": [
+        0.5809243696946975,
+        0.19700747059326482,
+        0.11743172795439602,
+        -2.2277835351929944,
+        -1.5708214168904489,
+        -0.4223039269045801,
+        -0.03905261357201463,
+        -0.28407982525457576,
+        -0.46383698628489634,
+        -0.09820924628150235,
+        -0.435956650769216,
+        1.1458037428464172,
+        -0.4570665044380172,
+        -0.2515119333834892
+      ]
+    },
+    {
+      "t": 17294.774679173,
+      "q": [
+        0.5809244809667883,
+        0.19700760110082996,
+        0.11743154194021799,
+        -2.227781703842671,
+        -1.570821424646757,
+        -0.42230637134560745,
+        -0.03905309538710015,
+        -0.2842816173136413,
+        -0.46415300150075833,
+        -0.09709709433527552,
+        -0.43595438378059004,
+        1.1461592675032888,
+        -0.4568640869347095,
+        -0.25166650829036685
+      ]
+    },
+    {
+      "t": 17294.795158586,
+      "q": [
+        0.5809245661327286,
+        0.19700769413480748,
+        0.11743142143383867,
+        -2.2277803829663694,
+        -1.5708214305432666,
+        -0.42230814579446546,
+        -0.039053442291099354,
+        -0.28442835471467615,
+        -0.46437283547873676,
+        -0.09631960699375322,
+        -0.43595520704980995,
+        1.1463827428840974,
+        -0.45679026092911956,
+        -0.25176430873283673
+      ]
+    },
+    {
+      "t": 17294.816103923,
+      "q": [
+        0.5809246640806323,
+        0.19700778432645077,
+        0.11743132969584494,
+        -2.227779105166283,
+        -1.5708214373767733,
+        -0.4223099103042012,
+        -0.03905378316684402,
+        -0.2845752744849021,
+        -0.46458434698241685,
+        -0.09556926354901854,
+        -0.43595908898331626,
+        1.1465763649956815,
+        -0.4567592816802289,
+        -0.251849874971433
+      ]
+    },
+    {
+      "t": 17294.83659666,
+      "q": [
+        0.5809248662183446,
+        0.19700792199142284,
+        0.11743124640525067,
+        -2.227777080886932,
+        -1.5708214506660032,
+        -0.42231276582404853,
+        -0.03905432266024042,
+        -0.28481373308484303,
+        -0.46491004517875545,
+        -0.09440997564512738,
+        -0.4359763165445255,
+        1.1468264752923312,
+        -0.45674996733576767,
+        -0.2519630285761262
+      ]
+    },
+    {
+      "t": 17294.857108052,
+      "q": [
+        0.5809250095593542,
+        0.1970080026980979,
+        0.11743121015495987,
+        -2.2277758021627925,
+        -1.570821458942427,
+        -0.4223145309829447,
+        -0.03905465058851227,
+        -0.2849592082910914,
+        -0.46509892680373355,
+        -0.09373386658204698,
+        -0.43599352356656584,
+        1.1469407245486,
+        -0.4567640447713361,
+        -0.2520167262445816
+      ]
+    },
+    {
+      "t": 17294.877400392,
+      "q": [
+        0.5809252701886767,
+        0.19700812982170618,
+        0.11743113221699307,
+        -2.2277735793606483,
+        -1.5708214708487296,
+        -0.4223174380707455,
+        -0.03905518551126944,
+        -0.2851916874920845,
+        -0.4653866564900569,
+        -0.09269591230775509,
+        -0.4360308926846125,
+        1.1470624811387014,
+        -0.4568182158612851,
+        -0.25207817184529346
+      ]
+    },
+    {
+      "t": 17294.898263824,
+      "q": [
+        0.5809255323409518,
+        0.19700823436592815,
+        0.11743099381210442,
+        -2.227771414880415,
+        -1.5708214780082383,
+        -0.4223199788107596,
+        -0.03905565046363357,
+        -0.28538277122527483,
+        -0.46561128431789767,
+        -0.0918765288345809,
+        -0.43606988234562466,
+        1.147106664041617,
+        -0.45689335708898426,
+        -0.25210538277573435
+      ]
+    },
+    {
+      "t": 17294.919225443,
+      "q": [
+        0.580925790904102,
+        0.19700833101772447,
+        0.11743086225223122,
+        -2.2277694069236382,
+        -1.5708214838464525,
+        -0.42232230680106797,
+        -0.039056075786219155,
+        -0.2855520945261766,
+        -0.46580157375016334,
+        -0.0911801938308132,
+        -0.4361098175003654,
+        1.1471203066383697,
+        -0.45698428718629674,
+        -0.25211568879201585
+      ]
+    },
+    {
+      "t": 17294.940416133,
+      "q": [
+        0.5809260344968482,
+        0.19700843058472028,
+        0.11743078783068908,
+        -2.2277676064571867,
+        -1.5708214905260198,
+        -0.4223245820341685,
+        -0.03905649238828303,
+        -0.28571827824240165,
+        -0.46598007063359015,
+        -0.09053173990190823,
+        -0.4361535322729777,
+        1.1471248280163093,
+        -0.4570962216604578,
+        -0.25212061593957347
+      ]
+    },
+    {
+      "t": 17294.961400887,
+      "q": [
+        0.5809262797789209,
+        0.19700853699685053,
+        0.11743075347098934,
+        -2.2277658154382216,
+        -1.5708214981661315,
+        -0.4223270262865953,
+        -0.039056940468498606,
+        -0.28589698928877066,
+        -0.46616292704460527,
+        -0.08987446583233215,
+        -0.43620557886064665,
+        1.1471259860599659,
+        -0.4572429434053848,
+        -0.25212377546188497
+      ]
+    },
+    {
+      "t": 17294.982323171,
+      "q": [
+        0.5809264887386688,
+        0.19700862046810436,
+        0.11743073132083635,
+        -2.227764374790283,
+        -1.5708215040293956,
+        -0.4223290180084493,
+        -0.039057304657065174,
+        -0.2860384587349946,
+        -0.4663013293028008,
+        -0.08938057180451009,
+        -0.4362503680904158,
+        1.1471258327409366,
+        -0.45738075300382874,
+        -0.2521257019375894
+      ]
+    },
+    {
+      "t": 17295.002812465,
+      "q": [
+        0.5809267504481074,
+        0.19700871917806362,
+        0.11743073027849725,
+        -2.2277626709192875,
+        -1.5708215113013995,
+        -0.4223314334935847,
+        -0.039057743985099376,
+        -0.28620426609583677,
+        -0.4664562666057803,
+        -0.08883049390413486,
+        -0.43630724469249216,
+        1.1471251598623706,
+        -0.4575700713745203,
+        -0.2521277616520877
+      ]
+    },
+    {
+      "t": 17295.023656288,
+      "q": [
+        0.580926992574558,
+        0.19700879609761318,
+        0.11743069750409099,
+        -2.2277611066806937,
+        -1.570821515845599,
+        -0.42233345327285254,
+        -0.03905810791895392,
+        -0.28633250009443995,
+        -0.466570718605307,
+        -0.08842427594338675,
+        -0.43635453347263153,
+        1.147124451020341,
+        -0.45774138102952766,
+        -0.25212934553263305
+      ]
+    },
+    {
+      "t": 17295.044744868,
+      "q": [
+        0.5809273204033563,
+        0.19700889126068424,
+        0.1174306258642726,
+        -2.227759026572004,
+        -1.5708215201520574,
+        -0.42233597354914565,
+        -0.039058559711848635,
+        -0.28647946702356547,
+        -0.466695707936179,
+        -0.08798102362457326,
+        -0.43641211452715917,
+        1.1471235235233082,
+        -0.4579696123572846,
+        -0.252131234048236
+      ]
+    },
+    {
+      "t": 17295.06481219,
+      "q": [
+        0.5809275493502931,
+        0.19700896500027557,
+        0.11743060305092798,
+        -2.227757601918116,
+        -1.570821523716067,
+        -0.4223377864455947,
+        -0.039058885055342794,
+        -0.28658051559439635,
+        -0.46677720170067993,
+        -0.08769494657658003,
+        -0.4364539694512148,
+        1.1471228470953327,
+        -0.45814785815339365,
+        -0.25213260217736977
+      ]
+    },
+    {
+      "t": 17295.084872715,
+      "q": [
+        0.5809278054232125,
+        0.19700906265752247,
+        0.11743064547862736,
+        -2.227756067023667,
+        -1.5708215296282342,
+        -0.4223399874301115,
+        -0.039059281195623095,
+        -0.28670073370105936,
+        -0.46686873693298,
+        -0.08737972622524588,
+        -0.4365065557384337,
+        1.1471220160561864,
+        -0.45838429395951785,
+        -0.25213431842188155
+      ]
+    },
+    {
+      "t": 17295.105421175,
+      "q": [
+        0.5809280975592394,
+        0.1970091764881363,
+        0.1174307109425137,
+        -2.2277542366969016,
+        -1.570821536130427,
+        -0.4223426135385871,
+        -0.039059751963989774,
+        -0.28683435306876615,
+        -0.4669626322562087,
+        -0.08706315633638291,
+        -0.4365692563283814,
+        1.1471210295395324,
+        -0.45868680251003285,
+        -0.252136379762646
+      ]
+    },
+    {
+      "t": 17295.126321115,
+      "q": [
+        0.5809283918950207,
+        0.197009275352331,
+        0.11743070467078456,
+        -2.2277522818515507,
+        -1.570821539452628,
+        -0.4223450894136492,
+        -0.039060192945540105,
+        -0.286944656100231,
+        -0.4670325847623912,
+        -0.08683156107687927,
+        -0.43662502094648536,
+        1.1471201347881241,
+        -0.45898076299301416,
+        -0.25213826972530173
+      ]
+    },
+    {
+      "t": 17295.146770333,
+      "q": [
+        0.5809286501315798,
+        0.1970093578463548,
+        0.11743066477880237,
+        -2.2277505566668774,
+        -1.5708215409810147,
+        -0.4223471542283839,
+        -0.03906056104831375,
+        -0.28702625233461754,
+        -0.4670787593073458,
+        -0.08668302577923648,
+        -0.4366687297217199,
+        1.1471194233933661,
+        -0.4592319279003892,
+        -0.2521398238116782
+      ]
+    },
+    {
+      "t": 17295.167903845,
+      "q": [
+        0.580928865219747,
+        0.19700943591980002,
+        0.11743065156811416,
+        -2.2277491319241784,
+        -1.570821542702409,
+        -0.42234896497848473,
+        -0.039060886215197946,
+        -0.28709344270467707,
+        -0.46711246234077863,
+        -0.08658123168283441,
+        -0.4367064011295363,
+        1.147118818998052,
+        -0.45946242943674803,
+        -0.2521412216843592
+      ]
+    },
+    {
+      "t": 17295.188331923,
+      "q": [
+        0.5809290533631228,
+        0.1970095182006142,
+        0.1174306900923646,
+        -2.2277479094395964,
+        -1.5708215456215504,
+        -0.4223507219679237,
+        -0.0390612036798454,
+        -0.28715626308627923,
+        -0.46713976780137817,
+        -0.08650736435084866,
+        -0.4367433112080753,
+        1.1471182404079563,
+        -0.4596991677312342,
+        -0.2521426367808406
+      ]
+    },
+    {
+      "t": 17295.208589856,
+      "q": [
+        0.5809292546936882,
+        0.19700961103993747,
+        0.11743075953239356,
+        -2.2277466341999927,
+        -1.5708215493348638,
+        -0.4223526699880926,
+        -0.039061556236818055,
+        -0.2872210487268241,
+        -0.4671625579402721,
+        -0.08645719169183035,
+        -0.43678363655944263,
+        1.147117611698063,
+        -0.4599722692477114,
+        -0.25214424322611506
+      ]
+    },
+    {
+      "t": 17295.229009363,
+      "q": [
+        0.5809294954798774,
+        0.19700970696845335,
+        0.1174308293669956,
+        -2.2277451331059956,
+        -1.570821553150922,
+        -0.42235485004288675,
+        -0.03906194620776414,
+        -0.28728450043930803,
+        -0.4671787064044898,
+        -0.08643417299574789,
+        -0.4368261694573123,
+        1.1471168681805375,
+        -0.4602836504993872,
+        -0.25214597500627345
+      ]
+    },
+    {
+      "t": 17295.250014611,
+      "q": [
+        0.5809297557307601,
+        0.19700978507036648,
+        0.11743090291175827,
+        -2.2277436892841624,
+        -1.5708215574032331,
+        -0.4223568361046538,
+        -0.03906229248240369,
+        -0.28733384987545013,
+        -0.46718771300094725,
+        -0.08642679876877815,
+        -0.436861577953817,
+        1.1471160845270696,
+        -0.4605709474778206,
+        -0.25214740918778267
+      ]
+    },
+    {
+      "t": 17295.272062135,
+      "q": [
+        0.5809301229389898,
+        0.19700986220219097,
+        0.11743104446832026,
+        -2.2277420363658766,
+        -1.5708215651642377,
+        -0.4223590625013503,
+        -0.039062664439517204,
+        -0.2873813188299276,
+        -0.46719326982463216,
+        -0.0864243277990397,
+        -0.4368974691137646,
+        1.1471151225910143,
+        -0.46089813403693075,
+        -0.2521489624182204
+      ]
+    },
+    {
+      "t": 17295.295631514,
+      "q": [
+        0.5809303318399984,
+        0.19700989762638269,
+        0.11743113657585713,
+        -2.2277411851230706,
+        -1.5708215700947272,
+        -0.42236018483132665,
+        -0.03906284574025195,
+        -0.2874022993738512,
+        -0.4671945952762505,
+        -0.08642406665728901,
+        -0.4369143249934086,
+        1.1471146216935275,
+        -0.46106557253679864,
+        -0.25214979951021155
+      ]
+    },
+    {
+      "t": 17295.319503741,
+      "q": [
+        0.5809304658094815,
+        0.19700991802879783,
+        0.1174311964810081,
+        -2.227740670163506,
+        -1.5708215733001478,
+        -0.4223608610392145,
+        -0.039062953534953274,
+        -0.2874138422252773,
+        -0.4671951249554059,
+        -0.0864240661719094,
+        -0.43692427160155,
+        1.1471143171459344,
+        -0.46116754552749023,
+        -0.252150338458581
+      ]
+    },
+    {
+      "t": 17295.344758351,
+      "q": [
+        0.5809307012508347,
+        0.1970099517814264,
+        0.11743132633956706,
+        -2.2277398663419454,
+        -1.5708215797673222,
+        -0.42236197761134536,
+        -0.039063128237300154,
+        -0.2874310301249168,
+        -0.46719575100280525,
+        -0.08642427462515183,
+        -0.43694104672940576,
+        1.1471137945926935,
+        -0.46134053448696855,
+        -0.25215130232521127
+      ]
+    },
+    {
+      "t": 17295.365280856,
+      "q": [
+        0.5809310211235167,
+        0.19700998773341777,
+        0.11743152627342145,
+        -2.2277389290038614,
+        -1.5708215892764328,
+        -0.42236331414336536,
+        -0.039063329376869536,
+        -0.28744728922910573,
+        -0.46719631867170663,
+        -0.0864247639006494,
+        -0.43696207756915617,
+        1.1471131398677115,
+        -0.4615538182587157,
+        -0.25215256808557646
+      ]
+    },
+    {
+      "t": 17295.385671792,
+      "q": [
+        0.5809317708741764,
+        0.19701002802107684,
+        0.11743194953644429,
+        -2.227737573899385,
+        -1.5708216085551432,
+        -0.42236531491407725,
+        -0.03906360651600526,
+        -0.2874609542908454,
+        -0.46719729154143436,
+        -0.08642585204527635,
+        -0.4369963963676089,
+        1.1471120939958823,
+        -0.46188700940822397,
+        -0.2521546620421835
+      ]
+    },
+    {
+      "t": 17295.406177487,
+      "q": [
+        0.5809339073222439,
+        0.1970100409006582,
+        0.1174325220101767,
+        -2.2277363752385284,
+        -1.5708216339279586,
+        -0.4223670896602499,
+        -0.03906380856691988,
+        -0.28746554605746205,
+        -0.46719800010678136,
+        -0.08642702813927283,
+        -0.43702476732646245,
+        1.1471111189235366,
+        -0.46219746475773754,
+        -0.25215669878584307
+      ]
+    },
+    {
+      "t": 17295.427696239,
+      "q": [
+        0.5809405103213365,
+        0.1970100325734024,
+        0.11743358737542682,
+        -2.227734767254662,
+        -1.5708216787160278,
+        -0.42236951252724564,
+        -0.0390640236762355,
+        -0.2874637137801763,
+        -0.4671988629758326,
+        -0.08642885822651045,
+        -0.43705501505287325,
+        1.1471097266712704,
+        -0.46264701331858554,
+        -0.2521596828158335
+      ]
+    },
+    {
+      "t": 17295.448642606,
+      "q": [
+        0.5809481698947883,
+        0.19701001640180377,
+        0.11743448756906424,
+        -2.227733615475587,
+        -1.5708217139204106,
+        -0.42237126582298834,
+        -0.039064152044377694,
+        -0.28745534943168854,
+        -0.4671997982835613,
+        -0.08643029326711243,
+        -0.4370713733419546,
+        1.1471086864371984,
+        -0.46299034540370265,
+        -0.2521619244629063
+      ]
+    },
+    {
+      "t": 17295.468947557,
+      "q": [
+        0.5809625108065292,
+        0.19700998796780275,
+        0.11743582485425388,
+        -2.2277320552900974,
+        -1.570821761769842,
+        -0.4223736666157383,
+        -0.03906430685483951,
+        -0.2874338582831206,
+        -0.46720193252769754,
+        -0.0864323369722768,
+        -0.43708678851212146,
+        1.1471072395874673,
+        -0.46348380662707966,
+        -0.2521650440939974
+      ]
+    },
+    {
+      "t": 17295.48939707,
+      "q": [
+        0.5809811115554941,
+        0.19700995422528678,
+        0.11743721915389534,
+        -2.2277304140118117,
+        -1.5708218062985426,
+        -0.4223760807830079,
+        -0.03906444777243291,
+        -0.2874012062757392,
+        -0.4672047267079399,
+        -0.08643440991069044,
+        -0.43709459309370957,
+        1.1471057889119165,
+        -0.4639999963618984,
+        -0.2521681626916857
+      ]
+    }
+  ]
+}

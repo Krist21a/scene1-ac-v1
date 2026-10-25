@@ -1,0 +1,126 @@
+{
+  "label": "executor-obb-c-p4-s0",
+  "step": 366,
+  "planning_receipt_age_at_send_s": 1.308945191998646,
+  "latest_background_receipt_age_at_send_s": 0.003348936999827856,
+  "nearest_raw_before_send_age_s": 0.006725605999235995,
+  "cases": [
+    {
+      "label": "planning_observation",
+      "q_rad": [
+        -0.2794454097747803,
+        -0.4563490152359009,
+        -0.15283960103988647,
+        -0.4758633077144623,
+        1.114650011062622,
+        -0.51936936378479,
+        -0.24024847149848938
+      ],
+      "tcp_m": [
+        0.37862304135709574,
+        -0.5504253019995644,
+        -0.025217699870918965
+      ],
+      "translation_from_planning_observation_m": 0.0,
+      "original_box_clear": true,
+      "finger_separation_gaps_m": [
+        0.004114728619114279,
+        0.016965888991986505
+      ],
+      "full_sweep_to_same_sent_command": {
+        "clear": true,
+        "first_blocked_fraction": null,
+        "samples": 5
+      }
+    },
+    {
+      "label": "raw_sensor_before_send",
+      "q_rad": [
+        -0.28715626308627923,
+        -0.46713976780137817,
+        -0.08650736435084866,
+        -0.4367433112080753,
+        1.1471182404079563,
+        -0.4596991677312342,
+        -0.2521426367808406
+      ],
+      "tcp_m": [
+        0.3750409565012849,
+        -0.539577211128821,
+        -0.04804259929565995
+      ],
+      "translation_from_planning_observation_m": 0.025524271609659664,
+      "original_box_clear": false,
+      "finger_separation_gaps_m": [
+        -0.005072977970130045,
+        0.02750286548677862
+      ],
+      "full_sweep_to_same_sent_command": {
+        "clear": false,
+        "first_blocked_fraction": 0.0,
+        "samples": 7
+      }
+    },
+    {
+      "label": "env_step_feedback",
+      "q_rad": [
+        -0.28716379404067993,
+        -0.4671427309513092,
+        -0.08650007843971252,
+        -0.43674784898757935,
+        1.1471182107925415,
+        -0.4597291648387909,
+        -0.2521428167819977
+      ],
+      "tcp_m": [
+        0.3750467793100762,
+        -0.5395770524515218,
+        -0.04803355350424092
+      ],
+      "translation_from_planning_observation_m": 0.025515433476677025,
+      "original_box_clear": false,
+      "finger_separation_gaps_m": [
+        -0.005074888369012348,
+        0.02750397942894496
+      ],
+      "full_sweep_to_same_sent_command": {
+        "clear": false,
+        "first_blocked_fraction": 0.0,
+        "samples": 7
+      }
+    },
+    {
+      "label": "next_failed_observation",
+      "q_rad": [
+        -0.28716379404067993,
+        -0.4671427309513092,
+        -0.08650007843971252,
+        -0.43674784898757935,
+        1.1471182107925415,
+        -0.4597291648387909,
+        -0.2521428167819977
+      ],
+      "tcp_m": [
+        0.3750467793100762,
+        -0.5395770524515218,
+        -0.04803355350424092
+      ],
+      "translation_from_planning_observation_m": 0.025515433476677025,
+      "original_box_clear": false,
+      "finger_separation_gaps_m": [
+        -0.005074888369012348,
+        0.02750397942894496
+      ],
+      "full_sweep_to_same_sent_command": {
+        "clear": false,
+        "first_blocked_fraction": 0.0,
+        "samples": 7
+      }
+    }
+  ],
+  "limitations": [
+    "Raw feedback uses callback arrival time; exact actuator application is unavailable.",
+    "Uses the unchanged observed oriented parcel box and 3mm margin, not simulator object truth.",
+    "This diagnoses freshness; it does not prove a particular dynamics model or remedy."
+  ]
+}

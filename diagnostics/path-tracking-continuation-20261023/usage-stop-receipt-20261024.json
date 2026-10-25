@@ -1,0 +1,32 @@
+{
+  "at": "2026-10-24T11:22:12.330519+08:00",
+  "reason": "user_usage_budget_reached",
+  "latest_usage": {
+    "timestamp": "2026-10-24T03:20:35.608Z",
+    "used_percent": 20.0,
+    "windows": {
+      "primary": {
+        "used_percent": 20.0,
+        "window_minutes": 10080,
+        "resets_at": 1793407161
+      }
+    },
+    "threshold_percent": 20.0,
+    "reached": true,
+    "source": "/home/krist/.codex/sessions/2026/10/23/rollout-2026-10-23T15-41-48-01a167b5-783f-7a10-a1d8-2501750159d1.jsonl"
+  },
+  "trial": "executor-first-gain-c-p4-s0-1024",
+  "raw_status": "failed_or_interrupted",
+  "raw_error": "TypeError(\"dict() got multiple values for keyword argument 'source'\")",
+  "policy_summary": {
+    "reason": "user_stop",
+    "error": null,
+    "steps": 6291,
+    "visual_confirmed_parcels": 2,
+    "task_success": null
+  },
+  "interpretation": "Quota reached20%; stop-event construction had duplicate source keyword, raised TypeError, then existing finally cleanup stopped policy. Raw trial and orchestration snapshot retained unchanged.",
+  "bookkeeping_fix": "Nest quota payload under usage so stop source and session-log source do not collide",
+  "verification": "AST parsed; duplicate-source regression construction passed",
+  "new_trials_authorized": false
+}

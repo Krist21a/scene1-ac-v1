@@ -1,0 +1,65 @@
+...............................................................................................................................................E..............................................................................................................EEE.E.......................................................................................................................................................................................................................
+======================================================================
+ERROR: test_release_retains_valid_inactive_hold_and_original_active_budget (test_phase_reference_hold.PhaseReferenceHoldTests.test_release_retains_valid_inactive_hold_and_original_active_budget)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-soft-open/tests/test_phase_reference_hold.py", line 18, in test_release_retains_valid_inactive_hold_and_original_active_budget
+    action,info=self.a._pending_action(self.measured,self.snapshot)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-soft-open/scene1/residual.py", line 1346, in _pending_action
+    previous_command=float(self.last_sent[15]),
+                           ~~~~~~~~~~~~~~^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_transfer_cannot_reset_or_enlarge_existing_offset_budget (test_release_reference_transfer.ReleaseReferenceTests.test_transfer_cannot_reset_or_enlarge_existing_offset_budget)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-soft-open/tests/test_release_reference_transfer.py", line 36, in test_transfer_cannot_reset_or_enlarge_existing_offset_budget
+    result,info=self.a._pending_action(self.measured,self.snapshot)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-soft-open/scene1/residual.py", line 1346, in _pending_action
+    previous_command=float(self.last_sent[15]),
+                           ~~~~~~~~~~~~~~^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_transfer_to_measured_pose_retains_original_reference_and_inactive_hold (test_release_reference_transfer.ReleaseReferenceTests.test_transfer_to_measured_pose_retains_original_reference_and_inactive_hold)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-soft-open/tests/test_release_reference_transfer.py", line 22, in test_transfer_to_measured_pose_retains_original_reference_and_inactive_hold
+    result,info=self.a._pending_action(self.measured,self.snapshot)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-soft-open/scene1/residual.py", line 1346, in _pending_action
+    previous_command=float(self.last_sent[15]),
+                           ~~~~~~~~~~~~~~^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_visual_release_can_hold_measured_pose_beyond_old_act_budget (test_release_reference_transfer.ReleaseReferenceTests.test_visual_release_can_hold_measured_pose_beyond_old_act_budget)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-soft-open/tests/test_release_reference_transfer.py", line 59, in test_visual_release_can_hold_measured_pose_beyond_old_act_budget
+    result,info=self.a._pending_action(self.measured,self.snapshot)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-soft-open/scene1/residual.py", line 1346, in _pending_action
+    previous_command=float(self.last_sent[15]),
+                           ~~~~~~~~~~~~~~^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_visual_release_target_still_passes_original_motion_rate_limit (test_release_reference_transfer.ReleaseReferenceTests.test_visual_release_target_still_passes_original_motion_rate_limit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-soft-open/tests/test_release_reference_transfer.py", line 82, in test_visual_release_target_still_passes_original_motion_rate_limit
+    result,_=self.a._pending_action(self.measured,self.snapshot)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-soft-open/scene1/residual.py", line 1346, in _pending_action
+    previous_command=float(self.last_sent[15]),
+                           ~~~~~~~~~~~~~~^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+----------------------------------------------------------------------
+Ran 474 tests in 19.020s
+
+FAILED (errors=5)

@@ -1,0 +1,141 @@
+{
+  "freeze": "/home/krist/kuavo_course/scene1_act_optimization/diagnostics/path-tracking-continuation-20261023/path-control-freeze-pad-dense-20261025.json",
+  "freeze_sha256": "c60f66685ad94e2f94cc583862585285121b98d5417471b9ec656f1956221df4",
+  "trials": [
+    {
+      "seed": 0,
+      "controller": "baseline",
+      "parcels": 4,
+      "label": "frozen-executor-pad-dense-base-p4-s0-1025",
+      "returncode": 1,
+      "visual_complete": false,
+      "task_success": null,
+      "summary": {
+        "reason": "error",
+        "error": "Release reference did not settle within original weighing budget; gripper kept closed",
+        "steps": 1501,
+        "visual_confirmed_parcels": 0,
+        "task_success": null
+      },
+      "audits": {
+        "audit_first_pickup.py": 0,
+        "audit_arm_preparation.py": 0,
+        "audit_soft_open.py": 0,
+        "audit_support_recovery.py": 0
+      }
+    },
+    {
+      "seed": 2,
+      "controller": "baseline",
+      "parcels": 4,
+      "label": "frozen-executor-pad-dense-base-p4-s2-1025",
+      "returncode": 1,
+      "visual_complete": false,
+      "task_success": null,
+      "summary": {
+        "reason": "error",
+        "error": "Selected parcel moved during visual open-hand approach",
+        "steps": 515,
+        "visual_confirmed_parcels": 0,
+        "task_success": null
+      },
+      "audits": {
+        "audit_first_pickup.py": 0,
+        "audit_arm_preparation.py": 0,
+        "audit_soft_open.py": 0,
+        "audit_support_recovery.py": 0
+      }
+    },
+    {
+      "seed": 4,
+      "controller": "baseline",
+      "parcels": 4,
+      "label": "frozen-executor-pad-dense-base-p4-s4-1025",
+      "returncode": 1,
+      "visual_complete": false,
+      "task_success": null,
+      "summary": {
+        "reason": "error",
+        "error": "Release reference did not settle within original weighing budget; gripper kept closed",
+        "steps": 1558,
+        "visual_confirmed_parcels": 0,
+        "task_success": null
+      },
+      "audits": {
+        "audit_first_pickup.py": 0,
+        "audit_arm_preparation.py": 0,
+        "audit_soft_open.py": 0,
+        "audit_support_recovery.py": 0
+      }
+    },
+    {
+      "seed": 4,
+      "controller": "origin_pd",
+      "parcels": 4,
+      "label": "frozen-executor-pad-dense-ac-p4-s4-1025",
+      "returncode": 0,
+      "visual_complete": true,
+      "task_success": null,
+      "summary": {
+        "reason": "visual_cycle_target_reached",
+        "error": null,
+        "steps": 12621,
+        "visual_confirmed_parcels": 4,
+        "task_success": null
+      },
+      "audits": {
+        "audit_first_pickup.py": 0,
+        "audit_arm_preparation.py": 0,
+        "audit_soft_open.py": 0,
+        "audit_support_recovery.py": 0
+      }
+    },
+    {
+      "seed": 5,
+      "controller": "baseline",
+      "parcels": 4,
+      "label": "frozen-executor-pad-dense-base-p4-s5-1025",
+      "returncode": 1,
+      "visual_complete": false,
+      "task_success": null,
+      "summary": {
+        "reason": "error",
+        "error": "Release reference did not settle within original weighing budget; gripper kept closed",
+        "steps": 1517,
+        "visual_confirmed_parcels": 0,
+        "task_success": null
+      },
+      "audits": {
+        "audit_first_pickup.py": 0,
+        "audit_arm_preparation.py": 0,
+        "audit_soft_open.py": 0,
+        "audit_support_recovery.py": 0
+      }
+    },
+    {
+      "seed": 5,
+      "controller": "origin_pd",
+      "parcels": 4,
+      "label": "frozen-executor-pad-dense-ac-p4-s5-1025",
+      "returncode": 0,
+      "visual_complete": true,
+      "task_success": null,
+      "summary": {
+        "reason": "visual_cycle_target_reached",
+        "error": null,
+        "steps": 12644,
+        "visual_confirmed_parcels": 4,
+        "task_success": null
+      },
+      "audits": {
+        "audit_first_pickup.py": 0,
+        "audit_arm_preparation.py": 0,
+        "audit_soft_open.py": 0,
+        "audit_support_recovery.py": 0
+      }
+    }
+  ],
+  "status": "completed",
+  "updated_at": "2026-10-25T16:58:29.823790+08:00",
+  "current_trial": "frozen-executor-pad-dense-ac-p4-s5-1025"
+}

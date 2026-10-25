@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-24T18:26:17.629337+08:00",
+  "parent": "executor-first-reobserve",
+  "candidate": "executor-pickup-hold-sweep",
+  "factor": "Require unchanged final-send pending sweep on early visual holds too",
+  "evidence": "Static review of patch35 found early missing-sensor/table-reference returns bypassed tail context; first-reobserve run auditpassed but this coverage hole must close before freezing.",
+  "development_seed": 0,
+  "fresh_seeds": [
+    2,
+    3
+  ],
+  "unchanged": [
+    "physical and collision margins",
+    "table thresholds",
+    "500 stage/local budgets",
+    "A+C"
+  ]
+}

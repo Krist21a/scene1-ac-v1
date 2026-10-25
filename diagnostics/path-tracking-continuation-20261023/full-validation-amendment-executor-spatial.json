@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-23T18:45:32.328705+08:00",
+  "candidate": "executor-spatial",
+  "parent": "executor-geometry",
+  "parent_manifest": "cb9bf6868d6fbb4f289f84d5dfb90febc6d786c6ff5f71c61a7b5bff1066936c",
+  "manifest_sha256": "b3d8e3791d99f218898a8551171d094bee7de00e93f010952c6278b6c9a8b5c5",
+  "factor": "Use existing depth-connected RGB-D grouping for every release retreat, predetermined before sweep checks; no envelope/margin or threshold changes",
+  "tests": {
+    "passed": true,
+    "count": 404,
+    "log": "tests-executor-spatial.log"
+  },
+  "evidence": "executor-geometry-c-p2-s0 failed before sending retreat. Accepted XY cluster mixed15separated points with201parcel points; spatial decomposition alone still rejects actual starting finger overlap. Release ACT cap forced wrist target0.13079rad away from measured feedback.",
+  "limitations": "Counterfactual release hold has a nominal clear58-step retreat, not a prediction of unloaded dynamics. Actual failed pose stays rejected.",
+  "physical_limits_unchanged": true,
+  "stage_timeouts_unchanged": true,
+  "collision_envelope_and_margin_unchanged": true,
+  "success_checks_unchanged": true,
+  "promotion": false
+}

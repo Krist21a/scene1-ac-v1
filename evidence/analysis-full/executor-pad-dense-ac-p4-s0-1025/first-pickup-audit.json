@@ -1,0 +1,89 @@
+{
+  "label": "executor-pad-dense-ac-p4-s0-1025",
+  "status": "passed",
+  "errors": [],
+  "entry_step": 111,
+  "contact_step": 550,
+  "transitions": [
+    {
+      "step": 111,
+      "stage": "first_clear"
+    },
+    {
+      "step": 165,
+      "stage": "first_back"
+    },
+    {
+      "step": 240,
+      "stage": "observe_bin"
+    },
+    {
+      "step": 264,
+      "stage": "select"
+    },
+    {
+      "step": 297,
+      "stage": "clear"
+    },
+    {
+      "step": 301,
+      "stage": "hover"
+    },
+    {
+      "step": 364,
+      "stage": "descend"
+    },
+    {
+      "step": 528,
+      "stage": "local_grasp"
+    }
+  ],
+  "final_send_sweep_frames": 1414,
+  "sweep_failures": [],
+  "selected_target": {
+    "position_base_m": [
+      0.32558294539066934,
+      -0.29337456155784525,
+      -0.011547490468936413
+    ],
+    "oriented_center_base_m": [
+      0.3262092783477072,
+      -0.2924785503867081,
+      -0.011547490468936413
+    ],
+    "extent_xy_m": [
+      0.1093192232748002,
+      0.042321107761094934
+    ],
+    "points": 68,
+    "minor_extent_m": 0.043405012393301634,
+    "major_axis_xy": [
+      -0.9986713270176634,
+      -0.05153232570706993
+    ],
+    "oriented_extent_m": [
+      0.10964242603214186,
+      0.043405012393301634
+    ],
+    "top_z_base_m": 0.01952565630547676,
+    "uv": [
+      420.0,
+      260.0
+    ],
+    "bbox": [
+      404,
+      240,
+      41,
+      49
+    ],
+    "inherited_grasp_height_offset_m": 0.0,
+    "grasp_height_source": "observed_vertical_midpoint",
+    "extra_insertion_m": 0.0,
+    "grasp_goal_xy": [
+      0.28996053823756907,
+      -0.29363185550742865
+    ]
+  },
+  "task_success": null,
+  "full_task_acceptance_claimed": false
+}

@@ -1,0 +1,13 @@
+........................................................................F..........................................................................................................................................................................................................................................................................................................................................................................................
+======================================================================
+FAIL: test_recorded_geometry_has_more_clearance_when_axes_align (test_grasp_yaw.GraspYawTests.test_recorded_geometry_has_more_clearance_when_axes_align)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-grasp-yaw/tests/test_grasp_yaw.py", line 51, in test_recorded_geometry_has_more_clearance_when_axes_align
+    self.assertGreater(after,before+.005)
+AssertionError: 0.004648154075582243 not greater than 0.008097371337885056
+
+----------------------------------------------------------------------
+Ran 451 tests in 18.396s
+
+FAILED (failures=1)

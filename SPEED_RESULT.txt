@@ -1,0 +1,40 @@
+四包提速实施结果（2026-10-26）
+
+工作目录：/home/krist/scene1-ac-speed
+分支：speed/under-15m
+基于发布标签 ac-v1-20261025 的 A+C 方案；原仓库未改动。
+当前候选配置：configs/speed_accessible.yaml
+冻结版本：speed-accessible-p4-s3-1026
+
+同一冻结版本已完成且通过逐轮视觉、安全、计时审计：
+seed 0：853.772070 秒（14分13.8秒）
+seed 3：875.514157 秒（14分35.5秒）
+seed 4：881.845185 秒（14分41.8秒）
+冻结来源完整单元测试：643 项通过。
+同口径基线实测：2030.284608 秒（33分50.3秒）；历史均值约34分30.6秒。
+计时为首个控制循环至最后完成的实际墙钟时间，包含计算和诊断，排除重置、初始化及事后分析。
+
+主要实现：视觉/点云原生计算、FK缓存与解析雅可比、受限优化器加速、当前帧感知并行、分阶段控制频率与增益、遮挡恢复、更密集的抓取候选采样，以及更易到达和观察的四个投放位置。
+保留原碰撞、关节、速度、目标移动与视觉确认检查；第四投放位置到达误差由25毫米收紧至10毫米。未修改物理时间步或执行器限制。
+
+停止原因：用户要求额度仅剩10%时停止；本次已触发。
+seed 2 在592.763494秒、6056步时被额度保护中止，只完成两包，不计为通过。
+当前版本 seed 2、1、5、6、7、8、9 尚未完成；保留种子6–9从未参与提速试验。
+因此已有三轮低于15分钟的实测，但完整多种子验收尚未完成，不能宣称最终目标全面验收通过。
+官方 task_success 字段为 null；上述通过指现有视觉、安全与计时审计。
+
+收尾：原控制器及VR配置已恢复，两个容器均确认空闲。
+全部运行证据保存在：
+/media/krist/KINGSTON/scene1-path-tracking-continuation-20261023/
+冻结代码、清单、流水线日志和矩阵记录保存在：
+/media/krist/KINGSTON/scene1-speed-20261025/
+矩阵记录：speed-accessible-validation-1026-matrix.json
+seed2流水线记录：speed-accessible-validation-1026-s2-pipeline.json（quota_stop=true）
+
+额度恢复后继续：
+使用同一冻结来源，不混合旧版本结果；重新完整运行seed2，再跑1、5、6–9。
+命令（将UNIQUE替换为新的小写唯一标识）：
+cd /home/krist/scene1-ac-speed
+sudo -n python3 tools/speed_matrix.py --frozen-from speed-accessible-p4-s3-1026 --prefix speed-accessible-resume-UNIQUE --seeds 2 1 5 6 7 8 9
+注意：usage_guard.py目前绑定本会话额度日志；若在新会话恢复，先将其绑定新会话真实额度日志，保持90%已用即停止的规则。
+所有待测轮次通过后，再使用tools/speed_acceptance.py汇总0、2、6–9，并以当前冻结来源作为--tested-source；回归1、3、4、5也须全部通过。

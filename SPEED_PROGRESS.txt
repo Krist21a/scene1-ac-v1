@@ -162,3 +162,9 @@ Seed 2 regression speed-adaptive-reg-1025-s2 failed at second release, step 3171
 - Firstmatrixspeed-final-validation-1025 seed2 stoppedBEFOREsimstartup: rootdiskreserve3.977GB<4GB. No policyexecution/holdoutuse. Archive+restore0, frozenpolicyunchanged. Reclaimingsession-ownedROSlogs viaexacthashverifiedexternal tararchives; noexistinghistoricalevidence discarded. Offlinekernelcheck297files30.2MB alsoverified/archived toexternal kernel-check-backup-1025, localtemp removed.
 
 ROSlog archivals: ALGO17files102,753,785bytes; SIM272files50,483,340bytes. Hashchecked tar+manifeststoredinexternal evidence root, onlysessionowned originalsremoved. Rootfree4,130,570,240before retry. Matrixspeed-final-validation-r2-1025 runningseeds2,1,3,4,5,6,7,8,9 from exactspeed-final-p4-s0-1025 snapshot.615tests validatedthere;matrixskipstestswithsame-manifestverification.
+
+Frozenmatrix r2 seed2 completed4 parcels9136steps890.057391s(14m50.1s), cumulatives222.761/437.709/659.326/890.057;postprocessingpending. Source0 samefreeze882.641423s. Seed1/3/4/5 regression and6-9holdouts stillpending.
+
+- Matrixr2 seed2 strictacceptancepassed890.057391s;prunedverifiedcontainer source. Seed1 thenfailedbeforestartup onrootdiskreserve3.985GB (no policyexecution); archive+restore0.
+- ArchivedALL remainingROSlog regularfiles fromidlecontainers withtar.gz+perfileSHA256verificationbeforeunlink: ALGO567files1,019,075,163bytes;SIM5879files1,421,642,347bytes. Externalarchivesretainhistorical logs, canrestorewithtar. Rootfree6,441,992,192bytesafter.
+- Matrixspeed-final-validation-r3-1025 nowrunsremainingseeds1,3,4,5,6,7,8,9 fromsame source speed-final-p4-s0-1025. Finalacceptancewillcombinesource0 +r2seed2 +r3holdouts6-9; regression1/3/4/5mustalsopass. No algorithmchanges.

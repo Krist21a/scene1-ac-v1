@@ -1089,6 +1089,11 @@ def main():
         parser.error('--stop-after-regrasp requires --regrasp-from')
     config, base, images = load_config(args.config, args.speed_profile)
     performance = config.get('performance', {})
+    if performance.get('native_retreat_constraints', False):
+        import scene1.retreat_projection as projection_module
+        from scene1.fast_components import native_constraint_gaps
+        native_constraint_gaps()
+        projection_module.FAST_CONSTRAINTS = True
     if performance.get('native_clearance', False):
         import scene1.clearance as clearance_module
         from scene1.fast_components import native_boxes

@@ -4,6 +4,8 @@ from scipy.optimize import minimize
 from .command_sweep import sampled_sweep
 from .motion import MotionFilter
 
+FAST_CONSTRAINTS = False
+
 
 class FingerSeparation:
     """Signed SAT separating gap; positive matches the original box clearance."""
@@ -64,6 +66,12 @@ def project_retreat_reference(kinematics, measured, proposed, reference, previou
     if np.any(low > high):
         raise RuntimeError('Retreat projection has no physically bounded step')
     separation = FingerSeparation(target, plane)
+    if FAST_CONSTRAINTS and hasattr(kinematics, 'constraint_gaps'):
+        geometry = np.r_[separation.rotation.ravel(), separation.center,
+                         separation.half, separation.finger_half]
+        gap_at = lambda joints: kinematics.constraint_gaps(joints, 1, geometry)
+    else:
+        gap_at = lambda joints: separation.gaps(kinematics.matrix(joints, 1))
     intervals = max(2, int(np.ceil(np.max(np.abs(np.r_[low-q, high-q]))/.012)))
     intervals += intervals % 2
     fractions = np.linspace(0., 1., intervals+1)
@@ -80,7 +88,7 @@ def project_retreat_reference(kinematics, measured, proposed, reference, previou
         # Do not optimize its constant constraint: sub-picometre roundoff
         # near the extra 1um solver buffer can make that constraint infeasible.
         # Positive numerical separation is stricter than the original margin.
-        return np.concatenate([separation.gaps(kinematics.matrix(q+a*(endpoint-q), 1))
+        return np.concatenate([gap_at(q+a*(endpoint-q))
             for endpoint in [action[8:15], sent[8:15]] for a in fractions[1:]])/.01-1e-4
 
     desired = (proposed[8:15]-reference[8:15])/step

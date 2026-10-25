@@ -74,6 +74,44 @@ class UrdfArmKinematics:
         mat[:3, 3] += mat[:3, :3] @ self.tool_xyz
         return mat
 
+    def constraint_matrix(self, q, side):
+        """Optional fast optimizer model; never used by acceptance sweeps."""
+        from .fast_components import native_fk
+        q = np.ascontiguousarray(q, dtype=np.float64)
+        if q.shape != (7,) or not np.isfinite(q).all():
+            return self.matrix(q, side)
+        origins, axes, indices = self._constraint_chain(side)
+        tool = np.ascontiguousarray(self.tool_xyz, dtype=np.float64)
+        if tool.shape != (3,):
+            return self.matrix(q, side)
+        result = np.empty((4, 4), dtype=np.float64)
+        native_fk()(origins, axes, indices, len(indices), q, tool, result)
+        return result
+
+    def _constraint_chain(self, side):
+        if not hasattr(self, '_constraint_chains'):
+            self._constraint_chains = [(
+                np.ascontiguousarray([item[0] for item in chain], dtype=np.float64),
+                np.ascontiguousarray([item[2] for item in chain], dtype=np.float64),
+                np.ascontiguousarray([-1 if item[1] is None else item[1] for item in chain], dtype=np.int64)
+            ) for chain in self.chains]
+        return self._constraint_chains[side]
+
+    def constraint_gaps(self, q, side, geometry):
+        """Fused optimizer FK/SAT model; final sweeps use matrix(), not this."""
+        from .fast_components import native_constraint_gaps
+        q = np.ascontiguousarray(q, dtype=np.float64)
+        tool = np.ascontiguousarray(self.tool_xyz, dtype=np.float64)
+        geometry = np.ascontiguousarray(geometry, dtype=np.float64)
+        if (q.shape != (7,) or tool.shape != (3,) or geometry.shape != (18,)
+                or not np.isfinite(q).all() or not np.isfinite(geometry).all()
+                or not np.isfinite(tool).all()):
+            raise ValueError('Optimizer gaps require finite joints and parcel geometry')
+        origins, axes, indices = self._constraint_chain(side)
+        result = np.empty(2, dtype=np.float64)
+        native_constraint_gaps()(origins, axes, indices, len(indices), q, tool, geometry, result)
+        return result
+
     def matrix_and_jacobian(self, q, side):
         """TCP geometric Jacobian in base coordinates, including fixed origins."""
         mat = np.eye(4)

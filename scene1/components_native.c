@@ -1,6 +1,74 @@
 #include <stdint.h>
 #include <math.h>
 
+static void multiply4(double *left, const double *right) {
+    double result[16];
+    for (int i=0; i<4; ++i) for (int j=0; j<4; ++j) {
+        double sum=0.;
+        for (int k=0; k<4; ++k) sum+=left[4*i+k]*right[4*k+j];
+        result[4*i+j]=sum;
+    }
+    for (int i=0; i<16; ++i) left[i]=result[i];
+}
+
+/* Optimizer-only FK. Independent acceptance sweeps retain reference FK. */
+void scene1_fk_chain(const double *origins, const double *axes, const int64_t *indices,
+                     int64_t count, const double *q, const double *tool, double *result) {
+    for (int i=0; i<16; ++i) result[i]=(i%5==0) ? 1. : 0.;
+    for (int64_t n=0; n<count; ++n) {
+        multiply4(result,origins+16*n);
+        if (indices[n]<0) continue;
+        double angle=q[indices[n]],c=cos(angle),s=sin(angle),t=1.-c;
+        double x=axes[3*n],y=axes[3*n+1],z=axes[3*n+2];
+        double rot[16]={c+x*x*t, x*y*t-z*s, x*z*t+y*s, 0.,
+                        y*x*t+z*s, c+y*y*t, y*z*t-x*s, 0.,
+                        z*x*t-y*s, z*y*t+x*s, c+z*z*t, 0.,
+                        0.,0.,0.,1.};
+        multiply4(result,rot);
+    }
+    for (int i=0; i<3; ++i)
+        result[4*i+3]+=result[4*i]*tool[0]+result[4*i+1]*tool[1]+result[4*i+2]*tool[2];
+}
+
+/* Signed normalized SAT gaps used only inside the optimization constraints.
+   geometry packs parcel rotation, center, inflated half extents, finger half. */
+void scene1_fk_finger_gaps(const double *origins, const double *joint_axes,
+                          const int64_t *indices, int64_t count, const double *q,
+                          const double *tool, const double *geometry, double *gaps) {
+    double pose[16],axes[15][3],centers[2][3];
+    scene1_fk_chain(origins,joint_axes,indices,count,q,tool,pose);
+    const double *rotation=geometry,*center=geometry+9,*half=geometry+12,*finger=geometry+15;
+    for (int i=0; i<3; ++i) {
+        for (int j=0; j<3; ++j) {
+            axes[j][i]=pose[4*i+j]; axes[3+j][i]=rotation[3*i+j];
+        }
+        centers[0][i]=pose[4*i+3]-pose[4*i]*.056252+pose[4*i+2]*.025857;
+        centers[1][i]=pose[4*i+3]+pose[4*i]*.056252+pose[4*i+2]*.025857;
+    }
+    for (int i=0; i<3; ++i) for (int j=0; j<3; ++j)
+        for (int k=0; k<3; ++k)
+            axes[6+3*i+j][k]=axes[i][(k+1)%3]*axes[3+j][(k+2)%3]-axes[i][(k+2)%3]*axes[3+j][(k+1)%3];
+    gaps[0]=gaps[1]=-INFINITY;
+    for (int n=0; n<15; ++n) {
+        double length=0.,radius_a=0.,radius_b=0.;
+        for (int k=0; k<3; ++k) length+=axes[n][k]*axes[n][k];
+        length=sqrt(length);
+        if (length<1e-8) continue;
+        for (int k=0; k<3; ++k) axes[n][k]/=length;
+        for (int j=0; j<3; ++j) {
+            double a=0.,b=0.;
+            for (int k=0; k<3; ++k) {a+=axes[n][k]*pose[4*k+j];b+=axes[n][k]*rotation[3*k+j];}
+            radius_a+=fabs(a)*finger[j];radius_b+=fabs(b)*half[j];
+        }
+        for (int side=0; side<2; ++side) {
+            double distance=0.;
+            for (int k=0; k<3; ++k) distance+=(center[k]-centers[side][k])*axes[n][k];
+            double gap=fabs(distance)-(radius_a+radius_b);
+            if (gap>gaps[side]) gaps[side]=gap;
+        }
+    }
+}
+
 /* Same 15 separating axes as clearance.py. Boundary/invalid inputs request
    the original NumPy path, including its exact-contact scalar fallback. */
 int scene1_boxes_overlap(const double *a, const double *ra, const double *ha,

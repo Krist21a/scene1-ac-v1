@@ -175,3 +175,10 @@ Frozenmatrix r2 seed2 completed4 parcels9136steps890.057391s(14m50.1s), cumulati
 
 - speed-margin-p4-s1-1025:617tests, fourparcels9084steps888.721987s(14m48.7s), cumulative220.183/434.995/662.797/888.722.19.401s fasterthanprevious seed1;postprocessingpending. Auto-launcher waitingfordone+strictacceptance, thenmatrixspeed-margin-validation-1025 seeds0,2,3,4,5,6,7,8,9 fromthisexactsource.
 - AcceptanceCLI gains optional --tested-source: mustitselfpassfullacceptance+tests andmatchall6runs manifest/profile. Thisallowsfullytestedsource seed1 (regression) plus sixacceptanceseeds0/2/6-9 withoutredundanttestexecution; sourceevidenceincludedinreport.
+
+- speed-margin-validation-1025 seed0 full4/9101steps902.341879s (15m2.3s), allpipeline0;matrixacceptance_failed. Seeds2/3/4/5/6-9 notstartedwiththisprofile. Source1passed888.721987s insufficientforgoal.
+- Per-phasecomparisonseed0vsolderclearance: left_insert81.27->67.02s (790->648steps), butshort_retreat45.05->59.80s,servo15.16->29.38s;manyliveprojectioncycles>0.5s. No needrelaxguards: optimizeconstraints.
+- New optional native_retreat_constraints: C FKplusnormalizedsignedSATgaps ONLYinsideSLSQPconstraints. ActualFK, originalproposed/filtered/previoussweeps,3mmmargin,1umsolverbuffer,step/physicalboundsunchanged. Finalcheckerrejectsintentionallyfalse-clearoptimizeroutputs inregressiontest.
+- NativeFK matchesbotharms+customtooloffsets acrosslimits/randomposes atol3e-15; fusedgaps match500random+blockedposes atol2e-12.17specializedtests passedinclhistoricalretreatprojection/certificatefixtures. Representativecold-cacheprojection99.25ms->32.82ms, bothclearandmaxstep.006. InitialFK-onlyprototype99.13->91.21ms rejectedasinsufficient, fusedgeometryadded.
+- C source99f265bea0d58867b8687aeb4440a40550a22f58e6a94129a6be848ed0c6df84;binary16ffe10e893763bb40652d62133c29c385b49159f7ed818b04d9b06040461f33. Offlinevalidationdir/root/scene1_speed/fk-check-1026.
+- speed-retreat-p4-s0-1026 startedwithconfigs/speed_retreat.yaml (marginmotionunchanged+nativeconstraints),634tests expected. Holds6-9stillunused.

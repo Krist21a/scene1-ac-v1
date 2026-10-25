@@ -6,6 +6,30 @@ import numpy as np
 
 
 @lru_cache(maxsize=1)
+def native_fk():
+    # A bounded, tiny chain calculation: retain the GIL to avoid a thread
+    # handoff for each optimizer finite-difference sample.
+    library = ctypes.PyDLL(str(Path(__file__).with_name('_components.so')))
+    function = library.scene1_fk_chain
+    doubles = np.ctypeslib.ndpointer(dtype=np.float64, flags='C_CONTIGUOUS')
+    integers = np.ctypeslib.ndpointer(dtype=np.int64, flags='C_CONTIGUOUS')
+    function.argtypes = [doubles, doubles, integers, ctypes.c_int64, doubles, doubles, doubles]
+    function.restype = None
+    return function
+
+
+@lru_cache(maxsize=1)
+def native_constraint_gaps():
+    library = ctypes.PyDLL(str(Path(__file__).with_name('_components.so')))
+    function = library.scene1_fk_finger_gaps
+    doubles = np.ctypeslib.ndpointer(dtype=np.float64, flags='C_CONTIGUOUS')
+    integers = np.ctypeslib.ndpointer(dtype=np.int64, flags='C_CONTIGUOUS')
+    function.argtypes = [doubles, doubles, integers, ctypes.c_int64, doubles, doubles, doubles, doubles]
+    function.restype = None
+    return function
+
+
+@lru_cache(maxsize=1)
 def native_boxes():
     library = ctypes.CDLL(str(Path(__file__).with_name('_components.so')))
     function = library.scene1_boxes_overlap

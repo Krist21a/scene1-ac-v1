@@ -3,7 +3,10 @@ import hashlib,json
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
-for name,expected in json.loads((ROOT/'evidence/policy-manifest.json').read_text()).items():
+policy_manifest = ROOT/'evidence/speed-v1-20261026/policy-manifest.json'
+if not policy_manifest.exists():
+ policy_manifest = ROOT/'evidence/policy-manifest.json'
+for name,expected in json.loads(policy_manifest.read_text()).items():
  assert sha(ROOT/name)==expected,name
 m=json.loads((ROOT/'evidence/control-runtime-manifest.json').read_text())
 present=[(ROOT/name).exists() for name in m['files']]

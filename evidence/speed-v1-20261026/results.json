@@ -1,0 +1,96 @@
+{
+  "status": "preliminary_goal_confirmed_by_user",
+  "full_multiseed_acceptance": false,
+  "tested_source": "speed-accessible-p4-s3-1026",
+  "tests": 643,
+  "runs": [
+    {
+      "label": "speed-accessible-p4-s3-1026",
+      "seed": 3,
+      "checks": {
+        "complete": true,
+        "guarded": true,
+        "pipeline": true,
+        "timing_coverage": true,
+        "under_900": true,
+        "old_timing_under_900": true,
+        "contiguous": true,
+        "four_bins": true,
+        "no_target_clips": true,
+        "pd_available": true,
+        "no_pd_clips": true
+      },
+      "passed": true,
+      "formal_wall_s": 875.5141565459999,
+      "previous_timing_s": 875.4880426160016,
+      "sim_s": 403.28634572029114,
+      "steps": 9114,
+      "manifest": "118f5a5dbe8e894dd3db27817df9dbdf45cc0e8cb73382a558a6be592e3e8e13",
+      "profile": "configs/speed_accessible.yaml",
+      "tests_passed": true,
+      "task_success": null
+    },
+    {
+      "label": "speed-accessible-validation-1026-s4",
+      "seed": 4,
+      "checks": {
+        "complete": true,
+        "guarded": true,
+        "pipeline": true,
+        "timing_coverage": true,
+        "under_900": true,
+        "old_timing_under_900": true,
+        "contiguous": true,
+        "four_bins": true,
+        "no_target_clips": true,
+        "pd_available": true,
+        "no_pd_clips": true
+      },
+      "passed": true,
+      "formal_wall_s": 881.8451846570024,
+      "previous_timing_s": 881.823628125996,
+      "sim_s": 396.4437942504883,
+      "steps": 9135,
+      "manifest": "118f5a5dbe8e894dd3db27817df9dbdf45cc0e8cb73382a558a6be592e3e8e13",
+      "profile": "configs/speed_accessible.yaml",
+      "tests_passed": false,
+      "task_success": null
+    },
+    {
+      "label": "speed-accessible-validation-1026-s0",
+      "seed": 0,
+      "checks": {
+        "complete": true,
+        "guarded": true,
+        "pipeline": true,
+        "timing_coverage": true,
+        "under_900": true,
+        "old_timing_under_900": true,
+        "contiguous": true,
+        "four_bins": true,
+        "no_target_clips": true,
+        "pd_available": true,
+        "no_pd_clips": true
+      },
+      "passed": true,
+      "formal_wall_s": 853.7720698109988,
+      "previous_timing_s": 853.7538467659979,
+      "sim_s": 388.54217076301575,
+      "steps": 8886,
+      "manifest": "118f5a5dbe8e894dd3db27817df9dbdf45cc0e8cb73382a558a6be592e3e8e13",
+      "profile": "configs/speed_accessible.yaml",
+      "tests_passed": false,
+      "task_success": null
+    }
+  ],
+  "pending_seeds": [
+    2,
+    1,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "task_success": null
+}

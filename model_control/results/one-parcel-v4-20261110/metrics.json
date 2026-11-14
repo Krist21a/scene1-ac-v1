@@ -1,0 +1,21 @@
+{
+  "scene": "scene1",
+  "seed": 0,
+  "task_success": false,
+  "grasp_confirmed": true,
+  "weighing_release_complete": false,
+  "bin_complete": false,
+  "commands": 50,
+  "terminal_statuses": {
+    "timeout": 20,
+    "reached": 9,
+    "commanded": 12,
+    "rejected_or_failed": 9
+  },
+  "execution_s": 1394.0939462690003,
+  "observed_wall_span_s": 3026.170953989029,
+  "failure": "Release gates passed and fingers began opening; rigid attachment sweep misclassified the settling parcel after wrist unloaded. Gripper remained partially open. Whole scene reset required for the corrected release transaction.",
+  "video": "/media/krist/Data/scene1-model-control-20261110/one-parcel-v4-20261110/full.mp4",
+  "model_inference_latency_s": null,
+  "timing_note": "Observed wall span includes manual model-led planning, diagnostics, tools and idle holding; it is not model inference latency."
+}

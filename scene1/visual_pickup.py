@@ -20,6 +20,7 @@ from .receiver import NearFaceProjector
 from .approach_edges import roof_edges, roof_edge_motion
 from .clearance import open_fingers_clear
 from .placement_height import PlacementHeight
+from .retreat_projection import project_retreat_reference
 
 
 def table_hull(snapshot, stride=3):
@@ -199,8 +200,10 @@ class VisualPickup:
         self.last_stamp = None
         self.selected_frames = self.missing = self.lost = 0
         self.selection_head = None
+        self.selection_view_goal = None
         self.pad_reference_head = None
         self.table_reference = None
+        self.last_verified_table_transform = None
         self.approach_edge_reference = None
         self.unverified_table = 0
         self.pose_search_attempted = False
@@ -243,9 +246,32 @@ class VisualPickup:
         self.pose_search_done = False
         self.limit_frames = 0
 
+    def _begin_bin_observation(self, snapshot):
+        points, hsv = cloud(snapshot)
+        plane = snapshot['table_z_base_m']
+        elevated = ((hsv[:,0] >= 40) & (hsv[:,0] <= 90) & (hsv[:,1] >= 80)
+            & (points[:,2] > plane+.12) & (points[:,2] < plane+.5)
+            & (points[:,0] > .15) & (points[:,0] < 1.2) & (abs(points[:,1]) < .8))
+        visible = points[elevated]
+        if len(visible) < 150:
+            raise RuntimeError('No observed elevated bin surface for camera reobservation')
+        # A partial wall guides the camera only. The existing observe_bin
+        # stage still requires all four rim edges and three stable frames.
+        self.bin_view_goal = np.r_[np.median(visible[:,:2],axis=0),
+            np.percentile(visible[:,2],95)-.03]
+        self.bin_frames = 0
+        self.bin_previous = None
+        self._stage('observe_bin')
+
     def camera_target(self, measured, assist):
         if self.stage == 'observe_bin':
             return self.bin_view_goal
+        if (self.stage in ('select', 'clear', 'hover', 'descend', 'local_grasp')
+                and self.selection_view_goal is not None):
+            # The acquisition view can expose a parcel that is occluded by
+            # the home arm when looking directly at its center. Retain the
+            # verified view through approach; all geometry is still refreshed.
+            return self.selection_view_goal
         if self.stage == 'local_weighing':
             return assist.camera_target(measured)
         if self.stage == 'observe_pad':
@@ -394,8 +420,13 @@ class VisualPickup:
             self.surface_reference = update_pad_reference(self.surface_reference, snapshot.get('surfaces', []), self.pad)
         info['pad_reference_view_ready'] = reference_view_ready
         if self.stage in ('clear','hover','descend') and self.table_reference is not None:
-            current=table_frame(table_hull(snapshot, stride=1),snapshot['table_z_base_m'],table_boundary(snapshot))
-            relative=table_motion(self.table_reference,current)
+            current=table_frame(table_hull(snapshot, stride=1),snapshot['table_z_base_m'],
+                table_boundary(snapshot, fit_tilt=motion.config.get('table_reference_tilt_compensation', False)))
+            if snapshot.get('table_boundary_plane_fit') is not None:
+                info['table_boundary_plane_fit'] = snapshot['table_boundary_plane_fit']
+            warm_start = motion.config.get('table_reference_warm_start', False)
+            relative=table_motion(self.table_reference,current,
+                self.last_verified_table_transform if warm_start else None)
             if relative is None:
                 if fresh:self.unverified_table+=1
                 motion.servo_previous=[None,None];motion.stable=0
@@ -405,6 +436,8 @@ class VisualPickup:
                 return motion.command.copy(),info
             self.unverified_table=0
             transform=relative['transform']
+            if warm_start:
+                self.last_verified_table_transform = transform.copy()
             self.target=move_target(self.anchor_target,transform)
             self.plane=self.anchor_plane+transform[2,3]
             self.grasp_goal=transform@self.anchor_grasp_goal
@@ -445,9 +478,48 @@ class VisualPickup:
                 info.update(pose_observation_hold=True, selected_target=self.target)
                 return motion.command.copy(), info
         if self.stage == 'select':
+            if hasattr(self, 'bootstrap_template_source'):
+                info['bootstrap_template_source'] = self.bootstrap_template_source
+            if self.rim is None:
+                # Later parcels inherit an observed bin. The unified first
+                # pickup must explicitly acquire it too, before the head
+                # turns toward a parcel and the held load hides the rim.
+                self._begin_bin_observation(snapshot)
+                info.update(bin_observation_required=True, transition_to=self.stage)
+                return motion.command.copy(), info
             view_ready = self._selection_view_ready(snapshot, head_info, fresh)
             info['selection_view_ready'] = view_ready
             candidates = eligible_targets(snapshot, self.template, self.pad, self.rim)
+            if (hasattr(self, 'bootstrap_template_source') and view_ready and fresh
+                    and motion.config.get('traditional_template_settled_refresh', False)
+                    and not getattr(self, 'bootstrap_template_refreshed', False)
+                    and candidates):
+                # Bootstrap precedes the settled workspace view. Its longest
+                # visible component can be stretched by the moving camera,
+                # excluding a fully visible nearer parcel at the unchanged
+                # 95% completeness gate. Rebuild the prospective template from
+                # an already eligible observation in the now-stationary view;
+                # then restart the original three-frame nearest selection.
+                observed = max(candidates, key=lambda c: float(c['oriented_extent_m'][0]))
+                observed = copy.deepcopy(observed)
+                pose = assist.kinematics.fk(measured).right_pose
+                rotation = assist._initial_grasp_rotation(observed, pose)
+                if rotation is None:
+                    raise RuntimeError('Settled bootstrap requires configured grasp orientation')
+                prospective = SimpleNamespace(pos_xyz=np.asarray(pose.pos_xyz), quat_xyzw=rotation.as_quat())
+                plane = snapshot['table_z_base_m']
+                point = assist._grasp_goal(observed, prospective, plane)
+                prospective.pos_xyz = point
+                previous_extent = list(self.template['extent'])
+                self.template = grasp_template(assist._geometry(observed, prospective, plane),
+                    grasp_plan(observed, plane, point))
+                self.bootstrap_template_refreshed = True
+                self.selected_frames = 0
+                info['bootstrap_template_refresh'] = dict(
+                    previous_extent_m=previous_extent, extent_m=self.template['extent'],
+                    source='eligible_observation_in_settled_workspace_view',
+                    observation_stamp=snapshot['stamp'], original_eligibility_gates_retained=True)
+                candidates = eligible_targets(snapshot, self.template, self.pad, self.rim)
             if hasattr(self, 'first_selection_target'):
                 candidates = [c for c in candidates if np.linalg.norm(
                     np.asarray(c['position_base_m'])[:2]-self.first_selection_target) < .05]
@@ -459,16 +531,37 @@ class VisualPickup:
             if not candidates:
                 self.selected_frames = 0
                 return motion.command.copy(), info
+            stable_view = motion.config.get('stable_selection_view', False)
             tcp = motion.k.matrix(measured[8:15], 1)[:3, 3]
             target = min(candidates, key=lambda c: np.linalg.norm(np.asarray(c['position_base_m'])[:2]-tcp[:2]))
+            if stable_view and self.selection_view_goal is None:
+                # Observe the visible workspace rather than centering the head
+                # on a provisional parcel behind the home hand. Parcel order
+                # still follows the nearest eligible target in the settled view.
+                self.selection_view_goal = np.mean(
+                    [c['position_base_m'] for c in candidates], axis=0)
+                self.selection_head = None
+                view_ready = False
+                self.selected_frames = 0
+            if stable_view:
+                info.update(selection_view_goal=self.selection_view_goal.tolist(),
+                    selection_view_source='eligible_workspace_center',
+                    selection_view_held_through_approach=True,
+                    selection_view_ready=view_ready)
             same = self.target is not None and np.linalg.norm(np.asarray(target['position_base_m'])[:2]-np.asarray(self.target['position_base_m'])[:2]) < .012
             if fresh:
                 self.selected_frames = (self.selected_frames+1 if same else 1) if view_ready else 0
             self.target = target
             self.plane = snapshot['table_z_base_m']
             if self.selected_frames >= 3:
+                info['pickup_source'] = dict(parcel_index=self.completed_parcels,
+                    stamp=snapshot['stamp'], position_base_m=self.target['position_base_m'],
+                    outside_bin=True, outside_weighing_pad=True,
+                    stable_selection_frames=self.selected_frames)
                 self.grasp_goal = self._target_goal(measured, assist)
-                self.table_reference=table_frame(table_hull(snapshot, stride=1),self.plane,table_boundary(snapshot))
+                self.table_reference=table_frame(table_hull(snapshot, stride=1),self.plane,
+                    table_boundary(snapshot, fit_tilt=motion.config.get('table_reference_tilt_compensation', False)))
+                self.last_verified_table_transform = None
                 self.approach_edge_reference = roof_edges(snapshot, self.target)
                 self.anchor_target=copy.deepcopy(self.target)
                 self.anchor_plane=self.plane
@@ -541,7 +634,8 @@ class VisualPickup:
             # observation: a bright roof alone can bias the shaded near face.
             projector = getattr(assist, 'wrist_projector', None)
             if self.stage == 'local_weighing' and projector is not None:
-                assist.wrist_projector = NearFaceProjector(projector)
+                assist.wrist_projector = NearFaceProjector(projector,
+                    prefer_near_section=motion.config.get('regrasp_nearest_visible_section', False))
             grasp_config = None
             tolerance = motion.config.get('pickup_grasp_z_tolerance_m')
             gain_scale = motion.config.get('pickup_grasp_gain_scale')
@@ -653,6 +747,19 @@ class VisualPickup:
                 info['weighing_coupled_pose_request'] = bool(coupled_pose_request)
                 info['weighing_reserve_command_bound'] = bool(reserve_joint_bound)
             if descent_alignment:
+                margin = motion.config.get('grasp_planning_margin_m', .003)
+                if margin > .003:
+                    contract = dict(assist.retreat_motion_config,
+                                    period=getattr(motion, 'control_period_s', .1))
+                    chosen, projection = project_retreat_reference(motion.k, measured,
+                        motion.command, before_servo, assist.last_sent,
+                        motion.low, motion.high, motion.config.get('max_joint_step_rad', .012)*.5,
+                        self.target, self.plane, contract, planning_margin_m=margin)
+                    motion.command = chosen
+                    if projection['applied']:
+                        info['grasp_clearance_projection'] = projection
+                        motion.stable = 0
+                        arrived = False
                 # Apply the original regrasp sweep check to the same measured
                 # open fingers before accepting this descent command.
                 delta = motion.command[8:15]-before_servo[8:15]
@@ -681,19 +788,24 @@ class VisualPickup:
                     self.limit_frames = (self.limit_frames+1 if at_limit
                         and seen.get('orientation_confirmed') and orientation_blocked
                         and .022 <= gap <= .038 else 0)
+                joint_plan = motion.config.get('weighing_joint_plan', False)
                 if (motion.config.get('weighing_pose_search',False) and not self.pose_search_done
-                        and self.limit_frames >= 25):
+                        and (self.limit_frames >= 25 or (joint_plan and arrived
+                            and seen.get('orientation_confirmed', False) and .022 <= gap <= .038))):
                     self.pose_search_done = True
                     self.pose_search_attempted = True
+                    search_diagnostics = {}
                     alternative = alternate_weighing_pose(motion.k, measured, before_servo,
-                        motion.geometry, motion.goal[1], self.surface)
+                        motion.geometry, motion.goal[1], self.surface,
+                        cycle=motion if joint_plan else None, wrist_config=assist.wrist_config,
+                        diagnostics=search_diagnostics)
                     # Planning may outlast a camera interval. Send the already
                     # held action and wait for fresh feedback before moving.
                     motion.command = before_servo
                     motion.servo_previous = [None,None]
                     motion.stable = 0
                     arrived = False
-                    info['weighing_pose_search'] = dict(found=alternative is not None)
+                    info['weighing_pose_search'] = dict(found=alternative is not None, **search_diagnostics)
                     if alternative is not None:
                         self.box_destination[:2] = alternative['center'][:2]
                         self.box_rotation = alternative['rotation']
@@ -742,21 +854,7 @@ class VisualPickup:
                     self._stage('first_back')
                 elif self.stage == 'first_back':
                     motion.goal[1] = None
-                    points, hsv = cloud(snapshot)
-                    plane = snapshot['table_z_base_m']
-                    elevated = ((hsv[:,0] >= 40) & (hsv[:,0] <= 90) & (hsv[:,1] >= 80)
-                        & (points[:,2] > plane+.12) & (points[:,2] < plane+.5)
-                        & (points[:,0] > .15) & (points[:,0] < 1.2) & (abs(points[:,1]) < .8))
-                    visible = points[elevated]
-                    if len(visible) < 150:
-                        raise RuntimeError('No observed elevated bin surface for camera reobservation')
-                    # A partial wall only guides the camera. It never supplies
-                    # the bin boundary used for arm motion or successful release.
-                    self.bin_view_goal = np.r_[np.median(visible[:,:2],axis=0),
-                        np.percentile(visible[:,2],95)-.03]
-                    self.bin_frames = 0
-                    self.bin_previous = None
-                    self._stage('observe_bin')
+                    self._begin_bin_observation(snapshot)
                 elif self.stage == 'clear':
                     motion.goal[1] = self.approach_goal.copy()
                     motion.goal[1][2, 3] = self.target['top_z_base_m']+.10

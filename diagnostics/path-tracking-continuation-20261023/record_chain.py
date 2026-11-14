@@ -23,7 +23,7 @@ TOPICS = [
     '/humanoid_controller/resetting_mpc_state_',
     '/monitor/time_cost/controller_loop_time', '/monitor/time_cost/wbc',
     '/monitor/time_cost/mpc', '/gripper/state', '/scene1_tracking/wrist_pd',
-    '/scene1_tracking/wrist_velocity_reference',
+    '/scene1_tracking/wrist_velocity_reference', '/scene1_tracking/wbc_warmstart',
 ]
 
 

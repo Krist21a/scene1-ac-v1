@@ -67,7 +67,7 @@ def main():
                     help='For future task trials: SIGINT after N consecutive logged target clips; polling delay up to 2s. Zero retains historical manual-guard behavior.')
     args=ap.parse_args()
     d=HERE/args.label
-    archive = Path('/media/krist/KINGSTON/scene1-path-tracking-continuation-20261023') / args.label
+    archive = Path('/media/krist/USB/scene1-path-tracking-continuation-20261023') / args.label
     archive.mkdir(exist_ok=False)
     d.symlink_to(archive, target_is_directory=True)
     state=dict(kind=args.kind,label=args.label,seed=args.seed,status='precheck',

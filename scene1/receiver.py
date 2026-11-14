@@ -9,8 +9,9 @@ class NearFaceProjector:
     Used only around subsequent parcels' local weighing/regrasp calls. The
     original projector, grasp state machine and collision checks stay intact.
     """
-    def __init__(self, projector):
+    def __init__(self, projector, prefer_near_section=False):
         self.projector = projector
+        self.prefer_near_section = prefer_near_section
 
     def __getattr__(self, name):
         return getattr(self.projector, name)
@@ -43,7 +44,9 @@ class NearFaceProjector:
         reference = self.projector.project(side, roof, measured, [w, h], allow_outside=True)
         if closing is None or reference is None:
             return None
-        section = receiver_section(rgb, hull, closing['uv'])
+        section = receiver_section(rgb, hull, closing['uv'],
+            prefer_near_section=self.prefer_near_section,
+            observed_outline=original['roof_polygon_px'] if self.prefer_near_section else None)
         if section is None:
             return None
         correction = reference['rotation'] @ np.array([
@@ -56,7 +59,8 @@ class NearFaceProjector:
                     visible_width_px=section['width_px'], near_face_section=section)
 
 
-def receiver_section(rgb, projected_hull, closing_uv):
+def receiver_section(rgb, projected_hull, closing_uv, prefer_near_section=False,
+                     observed_outline=None):
     """Associate a complete bright parcel component, then measure its near edge.
 
     The projected volume only selects a component. Its actual exterior edges,
@@ -69,6 +73,16 @@ def receiver_section(rgb, projected_hull, closing_uv):
             & ((hsv[:, :, 1] <= 110) | ((hsv[:, :, 1] <= 180) & (hsv[:, :, 2] >= 190)))
             & ((hsv[:, :, 1] >= 12) | (hsv[:, :, 2] >= 180))
             & ~((hsv[:, :, 0] >= 40) & (hsv[:, :, 0] <= 85) & (hsv[:, :, 1] >= 100)))
+    bright_mask = mask.copy() if prefer_near_section else None
+    outline = None
+    if prefer_near_section:
+        if observed_outline is None:
+            raise ValueError('Near-section ranking requires an independently verified outline')
+        outline = np.zeros((height, width), np.uint8)
+        cv2.fillConvexPoly(outline, np.asarray(observed_outline, np.int32).reshape(-1, 2), 1)
+        outline_area = int(np.count_nonzero(outline))
+        if outline_area < 600:
+            return None
     projected = np.zeros((height, width), np.uint8)
     cv2.fillConvexPoly(projected, np.asarray(projected_hull, np.int32).reshape(-1, 2), 1)
     projected = cv2.dilate(projected, np.ones((31, 31), np.uint8))
@@ -85,6 +99,20 @@ def receiver_section(rgb, projected_hull, closing_uv):
                          for x, y, w, h, area in seed_stats])
     interior[0] = False
     seed = seed_mask & (projected > 0) & interior[seed_labels]
+    # A specular roof may have enough bright pixels but substantially lower
+    # saturation than the side. Prefer the fuller interior chromatic support
+    # when present, rather than learning material only from that highlight.
+    # Boundary-connected backgrounds remain excluded; all downstream dominant
+    # hue, saturation, silhouette, real-edge and unique-match gates remain.
+    shaded_seed = ((hsv[:, :, 1] >= 45) & (hsv[:, :, 2] >= 90)
+        & ~((hsv[:, :, 0] >= 40) & (hsv[:, :, 0] <= 85) & (hsv[:, :, 1] >= 100)))
+    _, shaded_labels, shaded_stats, _ = cv2.connectedComponentsWithStats(shaded_seed.astype(np.uint8))
+    shaded_interior = np.array([x >= 3 and y >= 3 and x+w < width-3 and y+h < height-3
+                                for x, y, w, h, area in shaded_stats])
+    shaded_interior[0] = False
+    shaded_seed &= (projected > 0) & shaded_interior[shaded_labels]
+    if np.count_nonzero(shaded_seed) > np.count_nonzero(seed):
+        seed = shaded_seed
     if np.count_nonzero(seed) >= 80:
         hue = hsv[:, :, 0].astype(float)
         peak = int(np.argmax(np.bincount(hsv[:, :, 0][seed], minlength=180)))
@@ -95,7 +123,6 @@ def receiver_section(rgb, projected_hull, closing_uv):
             mask |= ((hue_distance <= 5)
                      & (abs(hsv[:, :, 1].astype(float)-saturation) <= 35)
                      & (hsv[:, :, 2] >= 90))
-    count, labels, stats, _ = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
     edges = cv2.Canny(cv2.GaussianBlur(gray, (3, 3), 0), 45, 110)
     # Shaded cardboard and the gray background can have nearly equal luminance
     # while retaining a clear color boundary. Verify that boundary in the RGB
@@ -103,35 +130,67 @@ def receiver_section(rgb, projected_hull, closing_uv):
     for channel in cv2.split(rgb):
         edges |= cv2.Canny(cv2.GaussianBlur(channel, (3, 3), 0), 45, 110)
     lit = cv2.erode((gray >= 45).astype(np.uint8), np.ones((5, 5), np.uint8))
-    distance = cv2.distanceTransform(255-edges, cv2.DIST_L2, 3)
-    matches = []
-    for index in range(1, count):
-        x, y, w, h, area = stats[index]
-        if (area < 600 or min(w, h) < 20 or w > width*.6 or h > height*.8
-                or x < 3 or y < 3 or x+w >= width-3 or y+h >= height-3):
-            continue
-        if np.count_nonzero((labels == index) & (projected > 0)) < .5*area:
-            continue
-        sections = []
-        # Search nearest the closing line on both sides. A valid silhouette
-        # just below that line must not be discarded while the giver obscures
-        # the background above it. The same real-edge and finger exclusions
-        # apply, with at most 20 pixels of additional downward search.
-        rows = range(y+h//3+1, min(y+h-5, int(closing_uv[1])+20)+1)
-        for row in sorted(rows, key=lambda row: abs(row-closing_uv[1])):
-            columns = np.flatnonzero(labels[row] == index)
-            if len(columns) < max(20, .55*w):
+    # L2/3 chamfer <=2.8 is exactly the 5x5 edge neighborhood:
+    # two diagonals cost 2.7386; three axial steps already cost 2.865.
+    edge_near = cv2.dilate(edges, np.ones((5, 5), np.uint8)) > 0
+    # If pale cardboard touches a bright robot surface, the broad mask can
+    # join it to a boundary-connected component. A chromatic-only hypothesis
+    # separates those materials without clipping to the projected silhouette.
+    # It must pass the identical real-edge and full-component checks below.
+    candidates = ((bright_mask, mask, mask & (hsv[:,:,1] >= 12)) if prefer_near_section
+                  else (mask, mask & (hsv[:,:,1] >= 12)))
+    hypotheses = []
+    for mask_index, candidate_mask in enumerate(candidates):
+        count, labels, stats, _ = cv2.connectedComponentsWithStats(candidate_mask.astype(np.uint8))
+        matches = []
+        for index in range(1, count):
+            x, y, w, h, area = stats[index]
+            if (area < 600 or min(w, h) < 20 or w > width*.6 or h > height*.8
+                    or x < 3 or y < 3 or x+w >= width-3 or y+h >= height-3):
                 continue
-            left, right = int(columns[0]), int(columns[-1])
-            if (lit[row, left] and lit[row, right]
-                    and distance[row, left] <= 2.8 and distance[row, right] <= 2.8):
-                sections.append(((left+right)/2, row, right-left))
-                if len(sections) >= 5:
-                    break
-        if len(sections) < 3:
-            continue
-        center, row, span = np.median(sections, axis=0)
-        matches.append(dict(center_uv=[float(center), float(row)], width_px=float(span),
-                            centering_error_px=float(center-closing_uv[0]),
-                            edge_rows=len(sections), bbox=[int(x), int(y), int(w), int(h)]))
-    return matches[0] if len(matches) == 1 else None
+            if np.count_nonzero((labels == index) & (projected > 0)) < .5*area:
+                continue
+            if (outline is not None and
+                    np.count_nonzero((labels == index) & (outline > 0)) < .5*outline_area):
+                continue  # A support surface cannot replace the verified parcel.
+            sections = []
+            # Search nearest the closing line on both sides. A valid silhouette
+            # just below that line must not be discarded while the giver obscures
+            # the background above it. The same real-edge and finger exclusions
+            # apply, with at most 20 pixels of additional downward search.
+            rows = range(y+h//3+1, min(y+h-5, int(closing_uv[1])+20)+1)
+            for row in sorted(rows, key=lambda row: abs(row-closing_uv[1])):
+                columns = np.flatnonzero(labels[row] == index)
+                if len(columns) < max(20, .55*w):
+                    continue
+                left, right = int(columns[0]), int(columns[-1])
+                if (lit[row, left] and lit[row, right]
+                        and edge_near[row, left] and edge_near[row, right]):
+                    sections.append(((left+right)/2, row, right-left))
+                    if len(sections) >= 5:
+                        break
+            if len(sections) < 3:
+                continue
+            center, row, span = np.median(sections, axis=0)
+            matches.append(dict(center_uv=[float(center), float(row)], width_px=float(span),
+                                centering_error_px=float(center-closing_uv[0]),
+                                edge_rows=len(sections), bbox=[int(x), int(y), int(w), int(h)]))
+        if matches:
+            if len(matches) != 1:
+                return None
+            if not prefer_near_section:
+                return matches[0]
+            section = matches[0]
+            section.update(mask_source=('bright', 'material_extended',
+                'material_extended_chromatic')[mask_index],
+                closing_line_distance_px=float(abs(section['center_uv'][1]-closing_uv[1])))
+            hypotheses.append(section)
+    if hypotheses:
+        # Shaded-face extension remains available when it exposes a closer
+        # section. A bright face already visible at the closing line need not
+        # inherit a same-colored support surface from material expansion.
+        # All original real-edge, dark-finger, association and uniqueness gates
+        # apply to each hypothesis. Stable ties prefer the unexpanded mask.
+        best = min(hypotheses, key=lambda s: s['closing_line_distance_px'])
+        return dict(best, eligible_section_hypotheses=len(hypotheses))
+    return None

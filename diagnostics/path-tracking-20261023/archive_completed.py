@@ -23,7 +23,7 @@ source=e.HERE/a.label
 assert source.is_dir()
 state=json.loads((source/'experiment.json').read_text())
 assert state.get('ended_at') and state['label']==a.label
-store=Path('/media/krist/KINGSTON/scene1-path-tracking-20261023')
+store=Path('/media/krist/USB/scene1-path-tracking-20261023')
 assert store.parent.is_mount(), 'External disk must be mounted'
 store.mkdir(exist_ok=True)
 target=store/a.label;temporary=store/(a.label+'.copying')

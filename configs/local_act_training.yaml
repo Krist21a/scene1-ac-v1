@@ -1,0 +1,27 @@
+# Merge with the installed LeTools ACT total defaults; archive the resolved
+# configuration and toolchain hashes for the actual training run.
+# Dataset paths are assigned only after traditional-policy acceptance.
+# Checkpoint ranking uses deterministic held-out action-chunk L1 with latent=0,
+# valid (non-padded) steps only, and the training checkpoint's normalization.
+# The installed ACT training forward() expects VAE latents and is not used as
+# an evaluation loss in eval mode. Full validation rounds rank the best three.
+dataset:
+  repo_id: scene1/local_grasp_train
+  root: null
+  use_imagenet_stats: false
+training:
+  resume: false
+  output_dir: outputs/train/scene1_local_grasp
+  job_name: scene1_local_grasp
+  batch_size: 8
+  steps: 20000
+  save_freq: 2000
+  seed: 20261108
+wandb:
+  enable: false
+policy:
+  type: act
+  pretrained_path: null
+  vision_backbone: resnet18
+  chunk_size: 30
+  n_action_steps: 1

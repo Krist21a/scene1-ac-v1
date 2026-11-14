@@ -1,0 +1,100 @@
+{
+  "time": "2026-11-09T21:47:40.823697",
+  "label": "jitter-smooth-v37-s1476199888-1109",
+  "reviewed": [
+    "releasepose-1",
+    "releasepose-2",
+    "releasepose-3"
+  ],
+  "result": "3/4; fourth held parcel observe_pad timeout. Stop per user instruction; no rerun. V37 not accepted.",
+  "findings": "Same seed V36 parcel2 repeated XY/roll waves reduced, but V37 parcel1 still repeated measured XYZ/roll waves. Release-position screening max9.701153mm, rotation .03107861rad across only3parcels. Regrasp XYZ max2.86477mm, approach3.66645mm,bin2.85172mm. Opening raw deflections16.267-23.448mm persist. Full-process smoothness is not solved.",
+  "pad_observation_segments": [
+    {
+      "start_step": 779,
+      "end_step": 781,
+      "samples": 3,
+      "wall_s": 0.20499188799294643,
+      "observed": 3,
+      "view_ready": 0
+    },
+    {
+      "start_step": 4645,
+      "end_step": 4647,
+      "samples": 3,
+      "wall_s": 0.19473773200297728,
+      "observed": 3,
+      "view_ready": 0
+    },
+    {
+      "start_step": 8524,
+      "end_step": 8526,
+      "samples": 3,
+      "wall_s": 0.20926981800585054,
+      "observed": 3,
+      "view_ready": 0
+    },
+    {
+      "start_step": 12391,
+      "end_step": 12432,
+      "samples": 42,
+      "wall_s": 4.102219969994621,
+      "observed": 3,
+      "view_ready": 25
+    },
+    {
+      "start_step": 12537,
+      "end_step": 13036,
+      "samples": 500,
+      "wall_s": 50.00206705300661,
+      "observed": 1,
+      "view_ready": 481
+    }
+  ],
+  "current_vs_v37_manifest_differences": [],
+  "baseline_v18_same_seed_joint_comparison": {
+    "traditional-observed-template-s493986895-1108": {
+      "visual_pickup_hover": {
+        "count": 12,
+        "maximum_rad": 0.14513793038412337,
+        "sum_rad": 0.6732161705168648
+      },
+      "visual_pickup_carry": {
+        "count": 79,
+        "maximum_rad": 0.1760312695888957,
+        "sum_rad": 4.551720467802031
+      },
+      "visual_cycle_left_approach": {
+        "count": 60,
+        "maximum_rad": 0.10428312052874575,
+        "sum_rad": 2.286774590245189
+      },
+      "visual_cycle_bin_transport": {
+        "count": 29,
+        "maximum_rad": 0.16104406698448503,
+        "sum_rad": 1.4486847448400932
+      }
+    },
+    "jitter-smooth-v18-1109-s493986895": {
+      "visual_pickup_hover": {
+        "count": 1,
+        "maximum_rad": 0.04484397950164082,
+        "sum_rad": 0.04484397950164082
+      },
+      "visual_pickup_carry": {
+        "count": 0,
+        "maximum_rad": 0.0,
+        "sum_rad": 0
+      },
+      "visual_cycle_left_approach": {
+        "count": 0,
+        "maximum_rad": 0.0,
+        "sum_rad": 0
+      },
+      "visual_cycle_bin_transport": {
+        "count": 6,
+        "maximum_rad": 0.06045346373698213,
+        "sum_rad": 0.17772143791515277
+      }
+    }
+  }
+}

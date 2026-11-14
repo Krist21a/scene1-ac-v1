@@ -1,4 +1,5 @@
 """Visual evidence that an opened parcel has settled on its observed support."""
+from .rgbd import snapshot_hsv
 from collections import deque
 import numpy as np
 import cv2
@@ -16,7 +17,7 @@ def sampled_geometry(snapshot):
     camera = np.column_stack(((u-k[0,2])*z/k[0,0], (v-k[1,2])*z/k[1,1], z))
     matrix = snapshot['camera_to_base']
     points = camera @ matrix[:3,:3].T + matrix[:3,3]
-    return z, points, cv2.cvtColor(snapshot['rgb'], cv2.COLOR_RGB2HSV)[v,u]
+    return z, points, snapshot_hsv(snapshot)[v,u]
 
 
 def track_resting_roof(snapshot, target, center_hint):

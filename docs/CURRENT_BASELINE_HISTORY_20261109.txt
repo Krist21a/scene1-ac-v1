@@ -1,0 +1,22 @@
+2026-11-01 当前状态：本目录已恢复为独立 Git 仓库（.git 为本地目录），保留原分支与发布标签。
+后续提速试验存储：/media/krist/USB/scene1-speed-20261025；回合数据：/media/krist/USB/scene1-path-tracking-continuation-20261023。
+历史保留备份：/media/krist/USB/scene1-preserved-20261101/scene1-preserved.tar.gz。KINGSTON 旧数据已删除，本机旧链接已清理。
+当前工作区含清理及路径修复，尚未进行新策略验收。下述为历史基线记录，不再描述当前 Git 与存储布局。
+
+当前开发基线：baseline/current-20261029
+代码父提交：e70bcc3d099aefdd6e22dd9e9291b17f07db6a79
+工作目录：/home/krist/scene1-ac-speed
+分支：speed/under-15m
+配置：configs/speed_precise_bin15.yaml
+CPU 布局：p2-algo-p4e8-sim（仅实验子进程 taskset）
+本基线固定当前开发状态，不表示四包成功版本；最近 seed4 完成0/4，239.530415秒后首包 bin_transport 超时。645项测试通过。详见 ROUND_ANALYSIS_20261029.txt。
+已发布初步成功版本：ac-v1-speed-20261026；原始 A+C 版本：ac-v1-20261025。均须保留，不能用当前失败试验替换成功证据。
+共享 Git 主目录：/home/krist/scene1-ac-v1；scene1-ac-speed 是其 worktree，不能直接删除主目录或 .git。
+运行依赖：/home/krist/kuavo_course/scene1_act_optimization、/home/krist/kuavo_course/workspace/leju-kuavo-challenge-cup-2026；两个现有 Docker 容器及所依赖的模型、控制器、标定文件。
+外部证据：/media/krist/KINGSTON/scene1-speed-20261025、/media/krist/KINGSTON/scene1-path-tracking-continuation-20261023、/media/krist/KINGSTON/scene1-demo-20261026。
+Git 不包含所有运行依赖和原始证据；scene1/_components.so 为忽略的本地二进制，另行备份。
+自动试验目标已暂停。此次设置基线不启动实验、不更改生产运行默认配置、不更新远程 release。
+
+2026-11-01：当前工作目录已清理代码测试、夹具及专项验证文件，移除单元测试流水线与验收门槛。验证规则见 AGENTS.md。上述测试数量和旧冻结清单仅描述历史版本；当前修改尚未重新进行完整策略验收。
+
+2026-11-01 本机修复与清理：Git 完整性检查通过；当前工具与回合驱动参数入口检查通过；baseline/origin_pd 控制器及配置哈希匹配。当前与依赖项目清理约 2.2 GiB 测试夹具、调试图片、旧日志及缓存；两项目无测试目录、字节码缓存或失效链接。未启动仿真，未进行策略验收。

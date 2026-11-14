@@ -9,7 +9,7 @@ HERE = Path(__file__).resolve().parent
 SIM = 'kuavo_challenge_container_GPU_046e4301'
 SOURCE = '/tmp/scene1-integrated-analysis'
 stamp = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-destination = Path('/media/krist/KINGSTON/scene1-path-tracking-continuation-20261023') / ('analysis-staging-' + stamp)
+destination = Path('/media/krist/USB/scene1-path-tracking-continuation-20261023') / ('analysis-staging-' + stamp)
 assert not destination.exists()
 subprocess.run(['docker', 'cp', SIM + ':' + SOURCE, str(destination)], check=True)
 verified = {}

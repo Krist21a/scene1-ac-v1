@@ -8,12 +8,14 @@ import threading
 import time
 import xml.etree.ElementTree as ET
 from collections import deque
+from functools import lru_cache
 
 import cv2
 import numpy as np
 from scipy.spatial import cKDTree
 
 FAST_COMPONENTS = False
+SHARED_RGB_DECODER = None
 
 
 def decode_depth(message):
@@ -59,21 +61,42 @@ def oriented_footprint(points_xy):
     return major, upper-lower, ((upper+lower)/2)@basis.T
 
 
+@lru_cache(maxsize=16)
+def pixel_grid(height, width, stride):
+    v, u = np.mgrid[0:height:stride, 0:width:stride]
+    u, v = u.reshape(-1), v.reshape(-1)
+    u.setflags(write=False)
+    v.setflags(write=False)
+    return u, v
+
+
+def sampled_points(depth, intrinsic, matrix, stride):
+    u, v = pixel_grid(*depth.shape, stride)
+    z = depth[v, u]
+    if FAST_COMPONENTS:
+        from .fast_components import project_grid
+        points = project_grid(depth, intrinsic, matrix, stride).reshape(-1, 3)
+    else:
+        camera = np.column_stack(((u-intrinsic[0,2])*z/intrinsic[0,0],
+                                  (v-intrinsic[1,2])*z/intrinsic[1,1], z))
+        points = camera@matrix[:3,:3].T+matrix[:3,3]
+    return u, v, z, points
+
+
 def metric_candidates(rgb, depth, intrinsic, camera_to_base, config, stride=4,
-                      spatial_components=False):
+                      spatial_components=False, hsv=None, samples=None, find_objects=True,
+                      component_max_gap_m=.02):
     height, width = depth.shape
     # A 4-pixel grid bounds CPU cost; XY grouping separates overlapping boxes.
     if stride not in (1, 2, 4):
         raise ValueError('Candidate sampling stride must be 1, 2 or 4 pixels')
     if spatial_components and stride != 2:
         raise ValueError('Spatial settlement components require dense 2-pixel sampling')
-    v, u = np.mgrid[0:height:stride, 0:width:stride]
-    z = depth[v, u].reshape(-1)
-    u, v = u.reshape(-1), v.reshape(-1)
-    camera = np.column_stack(((u - intrinsic[0, 2]) * z / intrinsic[0, 0],
-                              (v - intrinsic[1, 2]) * z / intrinsic[1, 1], z))
-    points = camera @ camera_to_base[:3, :3].T + camera_to_base[:3, 3]
-    hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+    if not np.isfinite(component_max_gap_m) or not .012 <= component_max_gap_m <= .02:
+        raise ValueError('Component connectivity must be between 12 and 20 mm')
+    u, v, z, points = (sampled_points(depth, intrinsic, camera_to_base, stride)
+                       if samples is None else samples)
+    hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV) if hsv is None else hsv
     lower, upper = config["table_hsv"]
     green_image = cv2.inRange(hsv, np.array(lower, np.uint8), np.array(upper, np.uint8))
     green = green_image[v, u] > 0
@@ -89,6 +112,8 @@ def metric_candidates(rgb, depth, intrinsic, camera_to_base, config, stride=4,
     # Check the fitted surface has real support, not a handful of green pixels.
     if np.count_nonzero(np.abs(table_heights - plane_z) < 0.015) < 100:
         raise ValueError("Observed tabletop height is not stable")
+    if not find_objects:
+        return [], plane_z
     objects = valid & ~green & (hsv[v, u, 2] >= 60) & (points[:, 2] > plane_z + config["min_object_height_m"])
     objects &= points[:, 2] < plane_z + config["max_object_height_m"]
     selected = points[objects]
@@ -116,7 +141,8 @@ def metric_candidates(rgb, depth, intrinsic, camera_to_base, config, stride=4,
         # that are actually separated in depth. Never fill that 3D gap or
         # infer an unseen face; each child retains all original size checks.
         if spatial_components:
-            members.extend(indices[part] for part in spatial_groups(selected[indices]))
+            members.extend(indices[part] for part in spatial_groups(
+                selected[indices], max_gap=component_max_gap_m))
         else:
             members.append(indices)
     for member in members:
@@ -124,7 +150,8 @@ def metric_candidates(rgb, depth, intrinsic, camera_to_base, config, stride=4,
         image_points = pixels[member]
         if len(group) < config["min_component_points"]:
             continue
-        extent = np.percentile(group[:, :2], 95, axis=0) - np.percentile(group[:, :2], 5, axis=0)
+        lower, upper = np.percentile(group, [5,95], axis=0)
+        extent = upper[:2]-lower[:2]
         major, oriented_extent, oriented_center_xy = oriented_footprint(group[:, :2])
         minor_extent = float(np.min(oriented_extent))
         if (np.max(extent) > config["max_object_extent_m"] or np.min(extent) < 0.015
@@ -133,7 +160,7 @@ def metric_candidates(rgb, depth, intrinsic, camera_to_base, config, stride=4,
         if np.max(extent) < 0.035:
             continue
         # Midpoint of robust XY extents avoids a bias toward the visible face.
-        center = (np.percentile(group, 5, axis=0) + np.percentile(group, 95, axis=0)) / 2
+        center = (lower+upper)/2
         pmin, pmax = image_points.min(axis=0), image_points.max(axis=0)
         candidates.append({"position_base_m": center.tolist(),
                            # Rotated extents require their own rotated-frame
@@ -144,7 +171,7 @@ def metric_candidates(rgb, depth, intrinsic, camera_to_base, config, stride=4,
                            "minor_extent_m": minor_extent,
                            "major_axis_xy": major.tolist(),
                            "oriented_extent_m": oriented_extent.tolist(),
-                           "top_z_base_m": float(np.percentile(group[:, 2], 95)),
+                           "top_z_base_m": float(upper[2]),
                            "uv": np.median(image_points, axis=0).tolist(),
                            "bbox": [int(pmin[0]), int(pmin[1]), int(pmax[0] - pmin[0] + 1), int(pmax[1] - pmin[1] + 1)]})
     return candidates, plane_z
@@ -193,6 +220,8 @@ class RgbdScene:
         self.lock = threading.Lock()
         self.messages = {}
         self.joint_history = deque(maxlen=1500)
+        self.joint_stamps = deque(maxlen=1500)
+        self.joint_stamps_ordered = True
         self.buffer = tf2_ros.Buffer()
         self.listener = tf2_ros.TransformListener(self.buffer)
         self.subscribers = [rospy.Subscriber(config[key], msg_type,
@@ -240,15 +269,25 @@ class RgbdScene:
         from tf.transformations import euler_matrix, rotation_matrix
         if self.description is None:
             self.description = ET.fromstring(self.rospy.get_param(self.config["description_param"]))
-        by_child = {joint.find("child").attrib["link"]: joint for joint in self.description.findall("joint")}
-        chain = []
-        frame = self.config["camera_mount_frame"]
-        while frame != self.config["base_frame"]:
-            if frame not in by_child or len(chain) > 20:
-                raise ValueError("Camera mount has no URDF chain to the IK base frame")
-            joint = by_child[frame]
-            chain.append(joint)
-            frame = joint.find("parent").attrib["link"]
+        if not hasattr(self, '_mount_chain'):
+            by_child = {joint.find("child").attrib["link"]: joint for joint in self.description.findall("joint")}
+            chain = []
+            frame = self.config["camera_mount_frame"]
+            while frame != self.config["base_frame"]:
+                if frame not in by_child or len(chain) > 20:
+                    raise ValueError("Camera mount has no URDF chain to the IK base frame")
+                joint = by_child[frame]
+                chain.append(joint)
+                frame = joint.find("parent").attrib["link"]
+            self._mount_chain = []
+            for joint in reversed(chain):
+                origin = joint.find("origin")
+                attrs = {} if origin is None else origin.attrib
+                transform = euler_matrix(*[float(v) for v in attrs.get("rpy", "0 0 0").split()])
+                transform[:3, 3] = [float(v) for v in attrs.get("xyz", "0 0 0").split()]
+                moving = joint.attrib["type"] not in ("fixed", "floating")
+                axis = [float(v) for v in joint.find("axis").attrib["xyz"].split()] if moving else None
+                self._mount_chain.append((transform, joint.attrib["name"], axis))
         q = message.joint_data.joint_q
         yaw_index, pitch_index = self.config["head_joint_indices"]
         values = {"zhead_1_joint": q[yaw_index], "zhead_2_joint": q[pitch_index]}
@@ -259,25 +298,37 @@ class RgbdScene:
             raise ValueError("This aligner requires the arm-only fixed-waist IK convention")
         values["waist_yaw_joint"] = 0.0
         matrix = np.eye(4)
-        for joint in reversed(chain):
-            origin = joint.find("origin")
-            xyz = [float(v) for v in origin.attrib.get("xyz", "0 0 0").split()] if origin is not None else [0, 0, 0]
-            rpy = [float(v) for v in origin.attrib.get("rpy", "0 0 0").split()] if origin is not None else [0, 0, 0]
-            transform = euler_matrix(*rpy)
-            transform[:3, 3] = xyz
+        for transform, name, axis in self._mount_chain:
             matrix = matrix @ transform
-            if joint.attrib["type"] not in ("fixed", "floating"):
-                if joint.attrib["name"] not in values:
-                    raise ValueError(f"Unmapped moving camera joint {joint.attrib['name']}")
-                axis = [float(v) for v in joint.find("axis").attrib["xyz"].split()]
-                matrix = matrix @ rotation_matrix(values[joint.attrib["name"]], axis)
+            if axis is not None:
+                if name not in values:
+                    raise ValueError(f"Unmapped moving camera joint {name}")
+                matrix = matrix @ rotation_matrix(values[name], axis)
         return matrix
 
     def _receive(self, kind, message):
         with self.lock:
             self.messages[kind] = (message, time.monotonic())
             if kind == 'joints':
+                stamp = message.header.stamp.to_sec()
+                if self.joint_stamps and stamp < self.joint_stamps[-1]:
+                    self.joint_stamps_ordered = False
+                self.joint_stamps.append(stamp)
                 self.joint_history.append(message)
+
+    def _nearest_joint(self, stamp):
+        # Caller holds the message lock: image and history selection share the
+        # same snapshot. Preserve the original earliest-entry tie rule, even
+        # for duplicate stamps; unordered histories use the original minimum.
+        if not self.joint_stamps_ordered:
+            index = min(range(len(self.joint_stamps)), key=lambda i: abs(self.joint_stamps[i]-stamp))
+        else:
+            from bisect import bisect_left
+            right = bisect_left(self.joint_stamps, stamp)
+            candidates = (max(0, right-1), min(right, len(self.joint_stamps)-1))
+            index = min(candidates, key=lambda i: abs(self.joint_stamps[i]-stamp))
+            index = bisect_left(self.joint_stamps, self.joint_stamps[index])
+        return self.joint_history[index]
 
     def head_angles(self):
         with self.lock:
@@ -286,14 +337,16 @@ class RgbdScene:
             raise ValueError('Head joint feedback missing/stale')
         return np.asarray(message[0].joint_data.joint_q)[self.config['head_joint_indices']]
 
-    def read(self, candidate_stride=4, spatial_components=False):
+    def read(self, candidate_stride=4, spatial_components=False, find_objects=True, find_surfaces=True,
+             component_max_gap_m=.02):
         from tf.transformations import quaternion_matrix
         epoch = getattr(self, 'calibration_epoch', None)
         if epoch is not None:
             epoch.check_clock(self.rospy.Time.now().to_sec())
         with self.lock:
             messages = dict(self.messages)
-            joint_history = list(self.joint_history)
+            joint_message = (self._nearest_joint(messages['rgb'][0].header.stamp.to_sec())
+                             if 'rgb' in messages and self.joint_history else None)
         if any(kind not in messages for kind in ("rgb", "depth", "info", "joints")):
             raise ValueError("Waiting for RGB, depth and CameraInfo")
         now = time.monotonic()
@@ -302,7 +355,8 @@ class RgbdScene:
                 raise ValueError(f"RGB-D {kind} is stale")
         rgb_message, depth_message, info = (messages[kind][0] for kind in ("rgb", "depth", "info"))
         rgb_stamp = rgb_message.header.stamp.to_sec()
-        joint_message = min(joint_history, key=lambda msg: abs(msg.header.stamp.to_sec() - rgb_stamp))
+        if joint_message is None:
+            raise ValueError('Waiting for RGB-aligned joint history')
         joint_dt = abs(joint_message.header.stamp.to_sec() - rgb_stamp)
         if joint_dt > self.config['max_rgb_joint_dt_s']:
             raise ValueError('RGB and head joint timestamps do not match')
@@ -310,7 +364,11 @@ class RgbdScene:
             raise ValueError("RGB and depth timestamps do not match")
         if info.header.frame_id != self.config["camera_frame"]:
             raise ValueError(f"Unexpected camera optical frame {info.header.frame_id}")
-        bgr = cv2.imdecode(np.frombuffer(rgb_message.data, np.uint8), cv2.IMREAD_COLOR)
+        shared_hit = None
+        if SHARED_RGB_DECODER is None:
+            bgr = cv2.imdecode(np.frombuffer(rgb_message.data, np.uint8), cv2.IMREAD_COLOR)
+        else:
+            bgr, shared_hit = SHARED_RGB_DECODER(rgb_message)
         if bgr is None:
             raise ValueError("RGB-D RGB decode failed")
         depth = decode_depth(depth_message)
@@ -335,14 +393,31 @@ class RgbdScene:
         matrix[:3, 3] = [t.x, t.y, t.z]
         matrix = self.camera_mount_matrix(joint_message) @ matrix
         rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+        hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+        samples = sampled_points(depth, k, matrix, candidate_stride)
+        grids = {candidate_stride: samples}
+        if candidate_stride != 4:
+            u4, v4 = pixel_grid(*depth.shape, 4)
+            h, w = depth.shape
+            factor = 4//candidate_stride
+            dense = samples[3].reshape((h+candidate_stride-1)//candidate_stride,
+                                       (w+candidate_stride-1)//candidate_stride, 3)
+            grids[4] = (u4, v4, depth[v4,u4], dense[::factor,::factor].reshape(-1,3))
         candidates, plane_z = metric_candidates(rgb, depth, k, matrix, self.config,
-                                                stride=candidate_stride, spatial_components=spatial_components)
-        return {"candidates": candidates, "table_z_base_m": plane_z, "rgb": rgb, "depth_m": depth,
-                "candidate_spatial_components": bool(spatial_components),
-                "surfaces": surface_candidates(rgb, depth, k, matrix, plane_z, self.config),
+                                                stride=candidate_stride, spatial_components=spatial_components, hsv=hsv, samples=samples, find_objects=find_objects,
+                                                component_max_gap_m=component_max_gap_m)
+        return {"candidates": candidates, "table_z_base_m": plane_z, "rgb": rgb, "hsv": hsv, "depth_m": depth,
+                "candidate_spatial_components": bool(spatial_components), "sampled_points": grids,
+                "component_max_gap_m": float(component_max_gap_m),
+                "candidates_evaluated": bool(find_objects), "surfaces_evaluated": bool(find_surfaces),
+                "surfaces": (surface_candidates(rgb, depth, k, matrix, plane_z, self.config, hsv=hsv, samples=grids[4]) if find_surfaces else []),
                 "intrinsic": k, "camera_to_base": matrix,
                 "head_angles_rad": np.asarray(joint_message.joint_data.joint_q)[self.config['head_joint_indices']].tolist(),
-                "rgb_joint_dt_s": joint_dt,
+                # Keep the arm pose from the same sensor sample as the camera
+                # transform. A later servo observation is not the image pose.
+                "rgb_joint_positions_rad": list(joint_message.joint_data.joint_q),
+                "rgb_joint_stamp_s": joint_message.header.stamp.to_sec(),
+                "rgb_joint_dt_s": joint_dt, "shared_rgb_decode_hit": shared_hit,
                 "stamp": rgb_message.header.stamp.to_sec()}
 
     def close(self):
@@ -351,20 +426,16 @@ class RgbdScene:
         self.listener.unregister()
 
 
-def surface_candidates(rgb, depth, intrinsic, camera_to_base, plane_z, config, stride=4):
+def surface_candidates(rgb, depth, intrinsic, camera_to_base, plane_z, config, stride=4, hsv=None, samples=None):
     """Bright green/yellow planar pad observed on the tabletop."""
     if stride not in (1, 2, 4):
         raise ValueError('Surface stride must be 1, 2 or 4 pixels')
-    hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+    hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV) if hsv is None else hsv
     mask = cv2.inRange(hsv, np.array([20, 120, 175], np.uint8), np.array([85, 255, 255], np.uint8))
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8))
     _, labels = cv2.connectedComponents(mask)
-    v, u = np.mgrid[0:depth.shape[0]:stride, 0:depth.shape[1]:stride]
-    u, v = u.reshape(-1), v.reshape(-1)
-    z = depth[v, u]
-    camera = np.column_stack(((u - intrinsic[0, 2]) * z / intrinsic[0, 0],
-                              (v - intrinsic[1, 2]) * z / intrinsic[1, 1], z))
-    points = camera @ camera_to_base[:3, :3].T + camera_to_base[:3, 3]
+    u, v, z, points = (sampled_points(depth, intrinsic, camera_to_base, stride)
+                       if samples is None else samples)
     valid = (z > .1) & (z < 3) & np.isfinite(points).all(axis=1)
     valid &= np.abs(points[:, 2] - plane_z) < .015
     valid &= np.all(points >= config['workspace_min'], axis=1) & np.all(points <= config['workspace_max'], axis=1)
@@ -385,3 +456,9 @@ def surface_candidates(rgb, depth, intrinsic, camera_to_base, plane_z, config, s
                          'partial': bool(len(group) < 35 or min(extent) < .145),
                          'footprint_xy_m': cv2.convexHull(group[:, :2].astype(np.float32)).reshape(-1, 2).tolist()})
     return surfaces
+
+
+def snapshot_hsv(snapshot):
+    """Reuse the exact conversion attached to this RGB-D observation only."""
+    value = snapshot.get('hsv')
+    return cv2.cvtColor(snapshot['rgb'], cv2.COLOR_RGB2HSV) if value is None else value

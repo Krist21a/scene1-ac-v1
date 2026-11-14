@@ -10,6 +10,44 @@ class RetreatPreflightError(RuntimeError):
         self.retreat_preflight_audit = audit
 
 
+def certify_following_level(kinematics, certificate, target, plane, pitch_degrees):
+    """Check the shorter exit leaves room for the existing leveling motion.
+
+    These joints are discarded. The live controller still reobserves the
+    resting parcel, solves its own motion and checks every sent finger sweep.
+    """
+    from .weighing_pose import pose_fit_problem
+    from .command_sweep import sampled_sweep
+    q = np.asarray(certificate['feasibility_joint_rad'], float)
+    pose = kinematics.matrix(q, 1)
+    major = np.asarray(target.get('major_axis_xy', [1., 0.]), float)
+    major = major/np.linalg.norm(major)
+    forward = major if major@(np.asarray(target['position_base_m'])[:2]-pose[:2, 3]) >= 0 else -major
+    closing = np.r_[-forward[1], forward[0], 0.]
+    pitch = np.deg2rad(pitch_degrees)
+    z_axis = -np.r_[forward*np.cos(pitch), -np.sin(pitch)]
+    rotation = Rotation.from_matrix(np.column_stack((closing, np.cross(z_axis, closing), z_axis)))
+    lower = np.asarray(certificate['lower_joint_rad'])
+    upper = np.asarray(certificate['upper_joint_rad'])
+    if np.any(upper-lower <= 2e-8):
+        return dict(certified=False, reason='No bounded leveling search interval')
+    residual, jacobian = pose_fit_problem(kinematics, pose[:3, 3], rotation, 1)
+    fit = least_squares(residual, np.clip(q, lower+1e-8, upper-1e-8),
+        jac=jacobian, bounds=(lower, upper), max_nfev=70)
+    error = residual(fit.x)
+    position = float(np.linalg.norm(error[:3]))
+    angle = float(np.linalg.norm(error[3:])/.12)
+    valid = (np.isfinite(fit.x).all() and np.isfinite(error).all()
+        and np.all(fit.x >= lower) and np.all(fit.x <= upper)
+        and position <= .004 and angle <= np.deg2rad(5.))
+    sweep = (sampled_sweep(kinematics, q, fit.x, target, plane, margin=.005)
+             if valid else None)
+    return dict(certified=bool(valid and sweep['clear']), position_m=position,
+        angle_degrees=float(np.rad2deg(angle)), sweep=sweep,
+        margin_m=.005, solver_evaluations=int(fit.nfev),
+        limitation='Nominal leveling only; actual settlement, geometry refresh and live sweeps remain required')
+
+
 def axis_retreat_goal(kinematics, measured, reference, low, high, offset,
                       cap, unwinding, snapshot, pad_xy, extent, distance,
                       rise, tolerance, execution_validator=None):

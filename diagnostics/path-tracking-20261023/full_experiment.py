@@ -53,9 +53,10 @@ def main():
     if not re.fullmatch(r'[a-z0-9][a-z0-9_-]*',a.label):
         ap.error('label must contain only lowercase letters, digits, underscore and hyphen')
     d = e.HERE / a.label
-    archive_root = Path('/media/krist/KINGSTON/scene1-path-tracking-20261023')
+    archive_root = Path('/media/krist/USB/scene1-path-tracking-20261023')
     if not archive_root.parent.is_mount():
         raise RuntimeError('External evidence disk is not mounted')
+    archive_root.mkdir(exist_ok=True)
     if shutil.disk_usage(archive_root).free < 10_000_000_000:
         raise RuntimeError('Insufficient evidence disk space')
     if d.exists() or d.is_symlink():

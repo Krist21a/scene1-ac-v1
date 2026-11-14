@@ -1,0 +1,30 @@
+{
+  "scene": "scene1",
+  "seed": 0,
+  "completed_one_parcel": false,
+  "outcome": "grasp and carry to weighing area; no authorized release; reset after support reference and contact convergence failures",
+  "commands": 53,
+  "statuses": {
+    "commanded": 13,
+    "rejected_or_failed": 14,
+    "reached": 8,
+    "timeout": 18
+  },
+  "execution_s": 1259.8001341279996,
+  "observed_wall_s": 2332.6744680404663,
+  "video": "/media/krist/Data/scene1-model-control-20261110/one-parcel-v6-20261110/full.mp4",
+  "terminal_to_observation_ready_s": {
+    "n": 53,
+    "mean": 0.6662866034597721,
+    "median": 0.684053897857666,
+    "max": 1.054332971572876
+  },
+  "step_timing_s_mean": {
+    "snapshot": 0.43144622461334803,
+    "adapter": 0.14800725308353674,
+    "publish": 0.054462177634216666,
+    "rgbd": 0.20408961220070332,
+    "self_filter": 0.22682812917472372
+  },
+  "model_latency_causal_effect": "not measured: no matched successful rounds or model API inference timers; idle/diagnostic time is not inference latency"
+}

@@ -4,7 +4,7 @@ Scene1 A+C 第一代完整版本 — ac-v1-20261025
 
 冻结实现：executor_pad_dense + A+C。这是独立版本归档；原v63仓库保持不变。
 A修复正常MPC入口的手臂首参考点索引，C在WBC输出后提供有界腕部PD补偿。
-根目录187个策略、配置和测试文件与完成验收的冻结清单逐字一致。
+原发布冻结清单仅用于历史版本追溯；当前开发目录已移除测试文件，不再与旧清单逐字一致。
 没有新增视觉模型、训练任务或WBC内部QP改动。
 
 验收与耗时
@@ -22,7 +22,7 @@ seed4初始化有3个短暂附加力矩裁剪采样（约41ms），正式任务�
 详见ACCEPTANCE_REPORT.txt及diagnostics/path-tracking-continuation-20261023/MULTISEED-PAD-RESULTS-20261025.json。
 
 内容
-  根目录：最终策略、四包配置、529项回归测试及真实RGB-D夹具。
+  根目录：策略与四包配置；历史代码测试及其夹具已清理。
   controllers/：A、C精确源码、补丁、编译/链接命令、原task/QR。
   evidence/analysis-full/：保留历史成功与失败的分析摘要及逐阶段指标。
   diagnostics/：原研究报告、清单、消融、失败记录和工作站脚本快照。
@@ -53,7 +53,6 @@ Release附带精确A/C二进制和原版回退二进制，以及从v63继承的�
 测试与运行
 同步本仓库到算法容器独立目录/root/scene1_ac_v1；不要覆盖原生产或v63。
   docker cp . kuavo-ros-noetic-s12-ready:/root/scene1_ac_v1
-  docker exec -w /root/scene1_ac_v1 kuavo-ros-noetic-s12-ready /root/miniforge3/envs/kls_dev/bin/python -m unittest discover -s tests
 在仿真容器中加载原ROS工作区环境，经官方入口独立复位：
   rosrun challenge_cup_task_template challenge_task.py --scene scene1 --seed 0 --no-timer-gui
 匹配原相机/SDK就绪、初始化、robot_guard和target_guard保护监控后，在算法容器执行：

@@ -8,7 +8,7 @@ import subprocess
 import tarfile
 
 ROOT = Path(__file__).resolve().parents[1]
-STORE = Path('/media/krist/KINGSTON/scene1-speed-20261025')
+from evidence_storage import STORE, require_storage
 SCAN = r'''
 import hashlib,json
 from pathlib import Path

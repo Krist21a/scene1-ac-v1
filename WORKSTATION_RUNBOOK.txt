@@ -29,7 +29,6 @@
 
 同步独立候选（不能将整个 diagnostics 复制入容器，里面有大型证据目录符号链接）
   sudo -n docker cp -L diagnostics/path-tracking-continuation-20261023/candidate-policy-executor-pad-dense/. kuavo-ros-noetic-s12-ready:/root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-pad-dense/
-  sudo -n docker exec -w /root/scene1_path_tracking_continuation_20261023/candidate-policy-executor-pad-dense kuavo-ros-noetic-s12-ready /root/miniforge3/envs/kls_dev/bin/python -m unittest discover -s tests
   回合驱动会逐文件验证宿主及容器候选清单，拒绝不一致代码。
 
 正式回合及官方复位

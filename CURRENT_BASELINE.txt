@@ -1,0 +1,20 @@
+2026-11-09 当前开发基线：arm-jitter-baseline-20261109
+用户要求：将当前版本作为基线，新对话集中解决仿真中机器人手臂抖动。
+工作目录：/home/krist/scene1-ac-speed
+工作区冻结快照：/media/krist/Data/scene1-evidence-1105/scene1-speed-20261025/baselines/arm-jitter-baseline-20261109
+以该目录中的 manifest.json 和 receipt.json 为准；Git HEAD 不包含全部当前改动，不能单独作为本基线。
+新对话交接：ARM_JITTER_HANDOFF_20261109.txt
+
+完整回合对照配置：configs/speed_traditional_observed_template_profile.yaml
+对照来源：traditional-observed-template-s493986895-1108
+对照策略清单 SHA256：4d4e6926a69abfaea9fb7d0cbf7f67b479729f082d2de24cc04b0f8e644d6718
+该版本开发结果：493986895 四件648.32秒；449573226 三件663.82秒失败；639961920 四件632.26秒。
+这不是第一阶段验收通过或手臂抖动已解决的声明；十个新随机seed验收尚未执行。
+
+当前工作区还包含未完成完整回合验证的 bin_empty_retreat_posture 可选改动。
+其配置 speed_traditional_empty_posture_profile.yaml 不作为已验证对照配置；不得混用其成绩。
+本次仅冻结和交接，没有启动仿真、训练或修改运行默认配置。
+两个容器在2026-11-09检查时均为停止状态；容器PID及旧NVMe内部挂载记录启动后需要重新核验。
+证据根目录：/media/krist/Data/scene1-evidence-1105（内置NVMe，UUID CCDA22F7DA22DD88）。
+运行时显式设置 SCENE1_EVIDENCE_ROOT；不要沿用旧USB/KINGSTON路径。
+旧 CURRENT_BASELINE.txt 原文保存在 docs/CURRENT_BASELINE_HISTORY_20261109.txt。

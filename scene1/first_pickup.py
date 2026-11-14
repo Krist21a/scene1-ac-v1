@@ -45,3 +45,61 @@ def begin_first_pickup(cycle, assist, snapshot, measured, command):
     pickup._stage('first_clear')
     pickup.first_visual_pickup = True
     return pickup,np.asarray(surface['position_base_m']).copy()
+
+
+def begin_traditional_pickup(cycle, assist, snapshot, measured, command):
+    """Seed the shared visual selector from observed geometry, without ACT motion.
+
+    The prospective template is replaced by contact-confirmed geometry in the
+    runner. Selection stability, sweeps, close and lift remain in VisualPickup.
+    """
+    from types import SimpleNamespace
+    from .visual_pickup import eligible_targets
+    if cycle.completed or cycle.active or cycle.done or assist.first_grasp_complete:
+        raise RuntimeError('Traditional bootstrap requires an untouched first parcel')
+    if snapshot is None or not snapshot.get('candidates'):
+        raise RuntimeError('Traditional bootstrap requires fresh parcel geometry')
+    surfaces = [s for s in snapshot.get('surfaces', []) if not s.get('partial', True)
+                and s.get('points', 0) >= 60 and min(s['extent_xy_m']) >= .145]
+    if len(surfaces) != 1:
+        raise RuntimeError('Traditional bootstrap requires one unambiguous complete pad')
+    pose = assist.kinematics.fk(np.asarray(measured)).right_pose
+    surface = copy.deepcopy(surfaces[0])
+    pad = np.asarray(surface['position_base_m']).copy()
+    plane = snapshot['table_z_base_m']
+    ordered = sorted(snapshot['candidates'], key=lambda c:
+        np.linalg.norm(assist._grasp_goal(c, pose)[:2]-pose.pos_xyz[:2]))
+    if cycle.config.get('traditional_template_widest_visible', False):
+        # The nearest initial image component can be a shortened visible end.
+        # Use the most complete visible long axis for the prospective size
+        # reference; this does not select a parcel for the shared selector.
+        # Stable sorting retains the old ordering when visible lengths tie.
+        ordered.sort(key=lambda c: -float(c['oriented_extent_m'][0]))
+    for observed in ordered:
+        target = copy.deepcopy(observed)
+        rotation = assist._initial_grasp_rotation(target, pose)
+        if rotation is None:
+            raise RuntimeError('Traditional bootstrap requires configured grasp orientation')
+        prospective = SimpleNamespace(pos_xyz=np.asarray(pose.pos_xyz), quat_xyzw=rotation.as_quat())
+        point = assist._grasp_goal(target, prospective, plane)
+        prospective.pos_xyz = point
+        plan = grasp_plan(target, plane, point)
+        template = grasp_template(assist._geometry(target, prospective, plane), plan)
+        candidates = eligible_targets(snapshot, template, pad, cycle.rim)
+        if any(np.linalg.norm(np.asarray(c['position_base_m'])[:2]-
+                              np.asarray(target['position_base_m'])[:2]) < .012 for c in candidates):
+            break
+    else:
+        raise RuntimeError('No initial target passed shared visual eligibility checks')
+    pickup = VisualPickup(cycle, template, pad, measured, command)
+    pickup.surface_reference = surface
+    pickup.bootstrap_template_source = dict(
+        strategy=('widest_visible' if cycle.config.get('traditional_template_widest_visible', False)
+                  else 'nearest_initial'),
+        position_base_m=target['position_base_m'], extent_m=template['extent'],
+        actual_target_selected=False)
+    # This first image supplies only a prospective size/attachment template.
+    # Let the SAME stable-view selector used by parcels 2–4 choose the target.
+    # Pinning an initially partial observation here can select a farther parcel
+    # even after its nearer neighbor becomes fully visible, obstructing descent.
+    return pickup, pad

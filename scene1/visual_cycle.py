@@ -3,6 +3,7 @@
 The grasp transform comes from ResidualAssist's observed parcel. Both arms use
 measured FK and bounded Cartesian feedback. Bin geometry comes from RGB-D.
 """
+from .rgbd import snapshot_hsv
 import copy
 import time
 import cv2
@@ -14,7 +15,7 @@ from scipy.spatial.transform import Rotation
 from .motion import action_vector, JOINTS
 from .rgbd import spatial_groups
 from .receiver import receiver_section
-from .bin_layout import plan_bin_drop, validate_layout, slot_points
+from .bin_layout import plan_bin_drop, validate_layout, slot_points, empty_retreat_posture
 
 FAST_CLOUD = False
 
@@ -23,12 +24,12 @@ def cloud(snapshot, stride=3):
     d, k, m = snapshot['depth_m'], snapshot['intrinsic'], snapshot['camera_to_base']
     if FAST_CLOUD:
         from .fast_components import project_cloud
-        return project_cloud(d, cv2.cvtColor(snapshot['rgb'], cv2.COLOR_RGB2HSV), k, m, stride)
+        return project_cloud(d, snapshot_hsv(snapshot), k, m, stride)
     v, u = np.mgrid[0:d.shape[0]:stride, 0:d.shape[1]:stride]
     z = d[v, u].ravel(); u, v = u.ravel(), v.ravel()
     p = np.column_stack(((u-k[0, 2])*z/k[0, 0], (v-k[1, 2])*z/k[1, 1], z))
     p = p @ m[:3, :3].T + m[:3, 3]
-    hsv = cv2.cvtColor(snapshot['rgb'], cv2.COLOR_RGB2HSV)[v, u]
+    hsv = snapshot_hsv(snapshot)[v, u]
     valid = np.isfinite(p).all(axis=1) & (z > .1) & (z < 2.5)
     return p[valid], hsv[valid]
 
@@ -178,6 +179,8 @@ def track_bin_rim(snapshot, previous):
 class VisualCycle:
     def __init__(self, config, kinematics, low, high, home):
         self.config, self.k = config, kinematics
+        if config.get('bin_confirmation_mode', 'stack_height') not in ('stack_height', 'independent_entry'):
+            raise ValueError('Unknown bin confirmation mode')
         validate_layout(config)
         self.low, self.high = action_vector(low), action_vector(high)
         for side, start in enumerate((0, 8)):
@@ -189,6 +192,7 @@ class VisualCycle:
         self.rim = None
         self.last_scene_stamp = None
         self.stage = 'idle'
+        self.confirmed_stack_tops = {}
 
     def observe_scene(self, snapshot):
         if snapshot is None or snapshot['stamp'] == self.last_scene_stamp:
@@ -221,13 +225,22 @@ class VisualCycle:
         self.last_positions = None
         self.evidence_stamp = None
         self.contact_stable = 0
+        self.bin_release_previous = None
+        self.bin_release_quiet_since = None
+        self.bin_release_quiet_frames = 0
+        self.bin_open_stamp = None
         self.previous_grip = None
         self.bin_evidence = []
         self.servo_previous = [None, None]
+        self.servo_sample_time = [None, None]
         self.servo_precision = [False, False]
+        self.servo_position_precision = [False, False]
+        self.servo_axis_precision = np.zeros((2, 3), dtype=bool)
         self.home_previous = None
         self.home_settling = False
         self.receiver_center_frames = 0
+        self.receiver_center_since = None
+        self.receiver_center_last = None
 
     def world_box(self, measured):
         start = (0, 8)[self.side]
@@ -237,6 +250,16 @@ class VisualCycle:
                 r*self.geometry['rotation'], np.asarray(self.geometry['extent']))
 
     def camera_target(self, measured):
+        viewing = (self.stage == 'verify_bin' or (self.stage == 'left_retreat'
+                   and (getattr(self, 'bin_verify_resume_steps', None) is not None
+                        or self.config.get('bin_view_retreat_on_occlusion', False))))
+        if viewing and 'bin_verify_view_height_m' in self.config:
+            height = float(self.config['bin_verify_view_height_m'])
+            if not np.isfinite(height) or not 0. <= height <= .42:
+                raise ValueError('Bin verification view height must be in [0, .42] m')
+            # Aim higher to raise the camera on its existing neck pivot.
+            # Joint/speed limits and the original 3D evidence gates remain.
+            return np.r_[self.rim['center'], self.rim['rim_z']+height]
         if self.stage in ('left_clear', 'bin_transport', 'release_left', 'left_retreat', 'verify_bin'):
             return np.r_[self.rim['center'], self.rim['rim_z']-.03]
         if self.stage == 'return_home':
@@ -260,10 +283,39 @@ class VisualCycle:
 
     def _servo(self, measured, side, goal, posture_target=None, posture_gain=.04, descent_alignment=False,
                coupled_pose_request=False, reserve_joint_bound=False, servo_profile=None):
-        gain_scale = self._profile_gain(servo_profile or self.stage)
-        if ((self.stage == 'right_retreat' and side == 0) or
-                (self.stage in ('left_approach', 'left_insert') and side == 1)):
+        profile_name = servo_profile or self.stage
+        gain_scale = self._profile_gain(profile_name)
+        stationary_loaded = ((self.stage == 'right_retreat' and side == 0) or
+                (self.stage in ('left_approach', 'left_insert') and side == 1))
+        if stationary_loaded:
             gain_scale = 1.  # Keep the stationary loaded hand's hold unchanged.
+        profile = {} if stationary_loaded else self.config.get('servo_profiles', {}).get(profile_name, {})
+        precision_keys = {'precision_position_m', 'precision_gain_divisor', 'precision_error_scale', 'coarse_damping', 'precision_damping', 'angular_gain_scale', 'time_normalize', 'coarse_arm_step_rad', 'noncontact_step_rad', 'integral_reference_period_s', 'independent_position_precision', 'axis_position_precision'}
+        noncontact = {'lift', 'transport', 'left_approach', 'right_retreat', 'left_clear',
+                     'bin_transport', 'left_retreat', 'pickup_clear', 'pickup_hover',
+                     'pickup_lift', 'pickup_carry', 'pickup_prepare_weighing',
+                     'pickup_first_clear', 'pickup_first_back'}
+        if precision_keys.intersection(profile) and profile_name not in noncontact:
+            raise ValueError('Precision tuning is limited to non-contact transit profiles')
+        if 'time_normalize' in profile and not isinstance(profile['time_normalize'], bool):
+            raise ValueError('Transit time normalization must be boolean')
+        independent_position = profile.get('independent_position_precision', False)
+        if type(independent_position) is not bool:
+            raise ValueError('Independent position precision must be boolean')
+        axis_precision = profile.get('axis_position_precision', False)
+        if type(axis_precision) is not bool or (axis_precision and not independent_position):
+            raise ValueError('Axis precision requires independent position precision')
+        precision_distance = float(profile.get('precision_position_m', .08))
+        precision_divisor = float(profile.get('precision_gain_divisor', 3.))
+        coarse_damping = float(profile.get('coarse_damping', 2.))
+        precision_damping = float(profile.get('precision_damping', 4.))
+        angular_gain_scale = float(profile.get('angular_gain_scale', 1.))
+        if not np.isfinite(angular_gain_scale) or not .25 <= angular_gain_scale <= 1.:
+            raise ValueError('Transit angular gain scale must be in [.25, 1]')
+        if (not np.isfinite([precision_distance, precision_divisor, coarse_damping, precision_damping]).all()
+                or not .02 <= precision_distance <= .08 or not 1.5 <= precision_divisor <= 3.
+                or not 2. <= coarse_damping <= 8. or not 4. <= precision_damping <= 8.):
+            raise ValueError('Invalid bounded transit precision parameters')
         start = (0, 8)[side]
         q = measured[start:start+7]
         current = self.k.matrix(q, side)
@@ -278,15 +330,62 @@ class VisualCycle:
             finger_tilt = np.arcsin(np.clip(abs(current[2, 0]), 0., 1.))
             if finger_tilt > np.deg2rad(5.) or angle_error > np.deg2rad(8.):
                 xyz[:] = 0.
-        if position_error < .08 and angle_error < .35:
+        precision_ready = position_error < precision_distance
+        if descent_alignment and self.config.get('descent_xy_precision', False):
+            # Vertical clearance is intentional until XY and finger tilt pass.
+            # It must not keep the lateral/orientation controller in coarse
+            # gain while the hand is already directly above the parcel.
+            precision_ready = np.linalg.norm(goal[:2, 3]-current[:2, 3]) < .04
+        if precision_ready and angle_error < .35:
             self.servo_precision[side] = True
         precision = self.servo_precision[side]
+        if independent_position and precision_ready:
+            self.servo_position_precision[side] = True
+        if axis_precision:
+            self.servo_axis_precision[side] |= abs(xyz) < precision_distance
+        position_precision = (self.servo_axis_precision[side] if axis_precision else
+                              np.full(3, independent_position and self.servo_position_precision[side]))
+        error_scale = float(profile.get('precision_error_scale', 1.))
+        if not np.isfinite(error_scale) or not .25 <= error_scale <= 1.:
+            raise ValueError('Precision error scale must be finite and in [.25,1]')
+        if precision:
+            # Taper the pose demand near arrival without reducing the measured
+            # velocity brake or changing the original measured arrival gates.
+            xyz *= error_scale
+            angle *= error_scale
+        elif np.any(position_precision):
+            # Independent translation precision must also use its configured
+            # position-error taper while rotation is still converging. Apply
+            # it before the velocity brake, exactly as in full-pose precision.
+            xyz[position_precision] *= error_scale
         previous = self.servo_previous[side]
+        normalized = (self.stage in self.config.get('servo_time_normalization_stages', [])
+                      or profile.get('time_normalize', False))
+        sampled_at = time.monotonic()
+        sample_times = getattr(self, 'servo_sample_time', [None, None])
+        previous_time = sample_times[side]
+        if normalized and previous is not None and np.array_equal(current, previous):
+            # Do not accumulate commands against an unchanged observation.
+            return position_error, angle_error, current[:3, 3]
         self.servo_previous[side] = current.copy()
+        sample_times[side] = sampled_at
+        self.servo_sample_time = sample_times
         if previous is not None:
-            # Two control intervals of derivative damping; do not integrate
-            # every delayed WBC tracking error as a new position demand.
-            damping = 4. if precision else 2.
+            # Brake measured motion before integrating the delayed WBC
+            # tracking error into another position demand.
+            # Loaded transit can retain a delayed wrist response near arrival.
+            # Permit a stronger measured-motion brake in non-contact profiles;
+            # request, joint-step, physical and measured arrival limits below
+            # remain unchanged. Contact/holding profiles keep the old defaults.
+            damping = precision_damping if precision else coarse_damping
+            if normalized and previous_time is not None:
+                # Preserve the original 10 Hz damping in physical seconds.
+                # This is the interval between consumed feedback samples,
+                # not a claimed sensor timestamp alignment.
+                interval = sampled_at-previous_time
+                if not 0. < interval <= .5:
+                    return position_error, angle_error, current[:3, 3]
+                damping *= .1/interval
             xyz -= damping*(current[:3, 3]-previous[:3, 3])
             angle -= damping*(r*Rotation.from_matrix(previous[:3, :3]).inv()).as_rotvec()
         # The receiving hand keeps the original measured contact pose while
@@ -296,6 +395,10 @@ class VisualCycle:
         # keep its goal, derivative damping, request/step caps and all gates.
         angular_weight = (.24 if side == 0 and self.stage == 'right_retreat'
             and self.config.get('holding_pose_priority', False) else .12)
+        if self.stage == 'bin_transport':
+            angular_weight = float(self.config.get('bin_angular_weight', .12))
+            if not np.isfinite(angular_weight) or not .03 <= angular_weight <= .12:
+                raise ValueError('Bin angular weight must be finite and in [.03, .12]')
         if self.config.get('analytic_jacobian', False):
             _, jac = self.k.matrix_and_jacobian(q, side)
             jac[3:] *= angular_weight
@@ -313,13 +416,41 @@ class VisualCycle:
             # saturates. Both original component limits still apply.
             xyz_scale = angle_scale = min(xyz_scale, angle_scale)
         requested = np.r_[xyz*xyz_scale, angular_weight*angle*angle_scale]
+        # The loaded wrist has a slower tracking response than translation.
+        # Permit a lower rotational feedback bandwidth without slowing the
+        # translation demand or weakening measured orientation arrival gates.
+        requested[3:] *= angular_gain_scale
+        # Translation can already be at its goal while the receiving wrist
+        # still turns. Reduce its outer-loop gain then, instead of repeatedly
+        # correcting a settled position at coarse gain until rotation catches
+        # up. The original full-pose precision and arrival gates stay intact.
+        if not precision:
+            requested[:3][position_precision] /= precision_divisor
         step = self.config.get('max_joint_step_rad', .012)
+        configured_step = float(profile.get('noncontact_step_rad', step))
+        if not np.isfinite(configured_step) or not step <= configured_step <= .018:
+            raise ValueError('Noncontact planning step must stay between base step and 18 mrad')
+        step = configured_step
+        coarse_arm_step = float(profile.get('coarse_arm_step_rad',step))
+        if not np.isfinite(coarse_arm_step) or not step <= coarse_arm_step <= .024:
+            raise ValueError('Proximal planning increment must remain between the base step and 24 mrad')
         gain = self.config.get('servo_gain', .18)*gain_scale
+        if 'integral_reference_period_s' in profile:
+            reference_period = float(profile['integral_reference_period_s'])
+            if not normalized or not np.isfinite(reference_period) or not .05 <= reference_period <= .1:
+                raise ValueError('Integral rate normalization requires feedback damping and a 50–100 ms reference')
+            elapsed = sampled_at-previous_time if previous_time is not None else getattr(self,'control_period_s',.1)
+            if not 0. < elapsed <= .5:
+                return position_error, angle_error, current[:3,3]
+            gain *= elapsed/reference_period
         if precision:
             step *= .5
-            gain /= 3.
-        lower = np.maximum(-step, self.low[start:start+7]-self.command[start:start+7])
-        upper = np.minimum(step, self.high[start:start+7]-self.command[start:start+7])
+            gain /= precision_divisor
+        step_limits = np.full(7,step)
+        if not precision:
+            step_limits[:4] = coarse_arm_step
+        lower = np.maximum(-step_limits, self.low[start:start+7]-self.command[start:start+7])
+        upper = np.minimum(step_limits, self.high[start:start+7]-self.command[start:start+7])
         if reserve_joint_bound:
             if side != 1 or posture_target is None:
                 raise ValueError('Reserve command bound requires an accepted right-arm posture')
@@ -354,7 +485,9 @@ class VisualCycle:
         return position_error, angle_error, current[:3, 3]
 
     def _arrived(self, measured, *, position_limit=None, angle_limit=None, posture_targets=None, posture_gain=.04,
-                 descent_alignment=False, coupled_pose_request=False, reserve_joint_bound=False, servo_profile=None):
+                 descent_alignment=False, coupled_pose_request=False, reserve_joint_bound=False, servo_profile=None,
+                 receiver_alignment_ready=True, bin_footprint_ready=True):
+        before_command = self.command.copy()
         sides = [side for side, goal in enumerate(self.goal) if goal is not None]
         errors = [self._servo(measured, side, self.goal[side],
                   None if posture_targets is None else posture_targets[side], posture_gain,
@@ -368,6 +501,8 @@ class VisualCycle:
         interval = now-getattr(self, 'arrival_sample_at', now)
         movement_limit = .004*min(1., max(0., interval)/.1) if fast else .004
         moving = self.last_positions is None or np.max(abs(positions-self.last_positions)) > movement_limit
+        settle_slow = (self.last_positions is not None and
+            np.max(abs(positions-self.last_positions)) <= movement_limit*.25)
         self.arrival_sample_at = now
         self.last_positions = positions
         if angle_limit is None:
@@ -384,6 +519,42 @@ class VisualCycle:
                 if not np.isfinite(limits).all() or not np.all((limits > 0.) & (limits <= .025)):
                     raise ValueError('Bin arrival tolerance must tighten the original 25 mm gate')
                 position_limit = float(limits if not limits.ndim else limits[self.completed])
+        settle_profiles = self.config.get('settle_command_profiles', [])
+        allowed_settle = {'lift', 'transport', 'left_approach', 'right_retreat', 'left_clear',
+                         'bin_transport', 'left_retreat', 'pickup_clear', 'pickup_hover',
+                         'pickup_lift', 'pickup_carry', 'pickup_first_clear', 'pickup_first_back'}
+        if not isinstance(settle_profiles, list) or not set(settle_profiles) <= allowed_settle:
+            raise ValueError('Command settling is limited to non-contact transit profiles')
+        if ((servo_profile or self.stage) in settle_profiles and posture_targets is None
+                and (not self.config.get('settle_when_slow', False) or settle_slow)):
+            # Hold an already valid interior pose while measuring stability.
+            # Resume correction immediately on drift; arrival still requires
+            # the original measured pose, movement and elapsed-time gates.
+            for side, error in zip(sides, errors):
+                # Cartesian proximity alone cannot settle the receiving hand:
+                # its remaining lateral error can still exceed the original
+                # wrist-image centering gate. Keep correcting until that
+                # independent gate is ready; the loaded giver keeps its hold.
+                if self.stage == 'left_approach' and side == 0 and not receiver_alignment_ready:
+                    continue
+                # A TCP inside its arrival tolerance can still leave a
+                # parcel corner outside the original bin clearance. Keep
+                # converging to the planned pose until that independent
+                # release condition is satisfied, then measure quietness.
+                if self.stage == 'bin_transport' and side == 0 and not bin_footprint_ready:
+                    continue
+                if error[0] < .8*position_limit and error[1] < .8*angle_limit:
+                    start = (0, 8)[side]
+                    self.command[start:start+7] = before_command[start:start+7]
+                    stationary_loaded = ((self.stage == 'right_retreat' and side == 0) or
+                        (self.stage in ('left_approach', 'left_insert') and side == 1))
+                    if self.config.get('settle_measured_reference', False) and not stationary_loaded:
+                        # Relieve accumulated command lead only inside the
+                        # existing arrival gate. Each adjustment retains the
+                        # original precision-step and physical joint bounds.
+                        desired = np.clip(measured[start:start+7], self.low[start:start+7], self.high[start:start+7])
+                        limit = self.config.get('max_joint_step_rad', .012)*.5
+                        self.command[start:start+7] += np.clip(desired-before_command[start:start+7], -limit, limit)
         empty = lambda side: self.stage == 'left_retreat' or (self.stage == 'right_retreat' and side == 1)
         ok = all(e[0] < position_limit and (empty(side) or e[1] < angle_limit)
                  for side, e in zip(sides, errors)) and not moving
@@ -392,6 +563,13 @@ class VisualCycle:
         self.stable = self.stable+1 if ok else 0
         arrived = self.stable >= 3 and (not fast or now-self.arrival_since >= .2)
         return arrived, [dict(position_m=e[0], angle_rad=e[1]) for e in errors]
+
+    def _bin_release_footprint_clear(self, measured):
+        center, rotation, extent = self.world_box(measured)
+        corners = center+rotation.apply([[a, b, c] for a in (-extent[0]/2, extent[0]/2)
+            for b in (-extent[1]/2, extent[1]/2) for c in (-extent[2]/2, extent[2]/2)])
+        return bool(inside_bin(corners, self.rim, .025)
+                    and min(corners[:, 2]) > self.rim['rim_z']+.025)
 
     def _head_support(self, snapshot, measured):
         if snapshot is None:
@@ -448,6 +626,12 @@ class VisualCycle:
         if fresh:
             self.receiver_center_frames = (self.receiver_center_frames+1 if good
                 and abs(evidence['centering_error_px']) <= 10. else 0)
+            if self.receiver_center_frames:
+                self.receiver_center_last = time.monotonic()
+                if self.receiver_center_frames == 1:
+                    self.receiver_center_since = self.receiver_center_last
+            else:
+                self.receiver_center_since = self.receiver_center_last = None
         if not good:
             return False
         tool = self.k.matrix(measured[:7], 0)
@@ -456,7 +640,9 @@ class VisualCycle:
                         -self.receiver_nominal) @ axis)
         self.receiver_offset = .85*self.receiver_offset+.15*np.clip(offset, -.035, .035)
         self.goal[0][:3, 3] = self.receiver_nominal+axis*self.receiver_offset
-        return self.receiver_center_frames >= 3
+        dwell = (getattr(self,'control_period_s',.1) >= .1 or
+                 (self.receiver_center_since is not None and self.receiver_center_last-self.receiver_center_since >= .2))
+        return self.receiver_center_frames >= 3 and dwell
 
     def _receiver_goal(self, measured, stand_off):
         center, rotation, extent = self.world_box(measured)
@@ -504,7 +690,7 @@ class VisualCycle:
         group = p[selected]
         return np.asarray([point for point in group if inside_bin([point], self.rim, .015)]).reshape(-1, 3)
 
-    def update(self, measured, snapshot, assist):
+    def update(self, measured, snapshot, assist, head_info=None):
         measured = action_vector(measured)
         # A paused simulator republishes identical values with new timestamps.
         # Detect a frozen plant before integrating more movement into its
@@ -542,6 +728,16 @@ class VisualCycle:
                 raise RuntimeError(f'Payload gripper contact lost in {self.stage}')
         info = dict(state='visual_cycle_'+self.stage, stage=self.stage, phase_steps=self.stage_steps,
                     completed_parcels=self.completed, strategy='visual_motion', policy_controls_arms=False)
+        info['bin_layout_mode'] = self.config.get('bin_layout_mode', 'line')
+        info['bin_confirmation_mode'] = self.config.get('bin_confirmation_mode', 'stack_height')
+        if self.stage == 'left_retreat' and getattr(self, 'bin_view_retreat_shifted', False):
+            left = self.k.matrix(measured[:7], 0)
+            wrist = left[:3, 3]-left[:3, :3]@np.asarray(getattr(self.k, 'tool_xyz', [0,0,-.1488]))
+            if (max(measured[7], measured[15], self.command[7], self.command[15]) > .15
+                    or min(left[2, 3], wrist[2]) <= self.rim['rim_z']+.08):
+                raise RuntimeError('Viewing retreat requires both hands open and left hand above original rim clearance')
+            info['bin_view_retreat_lateral_m'] = self.config['bin_view_retreat_lateral_m']
+            info['bin_view_retreat_original_stage_budget'] = timeout
         center, rotation, extent = self.world_box(measured)
         if self.stage == 'left_clear' and self.stage_steps == 1:
             self.goal[0][:3, :3] = self.k.matrix(measured[:7], 0)[:3, :3]
@@ -573,10 +769,35 @@ class VisualCycle:
                 info['receiver_insert_m'] = self.receiver_insert_m
             info['receiver_lateral_offset_m'] = self.receiver_offset
         if self.stage in ('lift', 'transport', 'left_approach', 'left_insert', 'release_right', 'right_retreat', 'left_clear', 'bin_transport', 'left_retreat'):
-            arrived, errors = self._arrived(measured)
+            posture_targets = None
+            if self.stage == 'left_retreat' and self.config.get('bin_empty_retreat_posture', False):
+                if max(measured[7], measured[15], self.command[7], self.command[15]) > .15:
+                    raise RuntimeError('Empty retreat posture requires both hands open')
+                previous_goal = getattr(self, 'bin_retreat_posture_goal', None)
+                if previous_goal is None or not np.array_equal(previous_goal, self.goal[0]):
+                    self.bin_retreat_posture_goal = self.goal[0].copy()
+                    self.bin_retreat_posture, self.bin_retreat_posture_info = empty_retreat_posture(
+                        self.k, measured, self.goal[0], self.rim, self.low, self.high)
+                info['empty_retreat_posture'] = self.bin_retreat_posture_info
+                distance = np.linalg.norm(self.k.matrix(measured[:7], 0)[:3, 3]-self.goal[0][:3, 3])
+                # Inside the original precision region, use the unchanged
+                # command settling and measured arrival/stability checks.
+                if self.bin_retreat_posture is not None and distance > .03:
+                    posture_targets = [self.bin_retreat_posture, None]
+            bin_footprint_ready = True
+            if self.stage == 'bin_transport':
+                bin_footprint_ready = self._bin_release_footprint_clear(measured)
+                info['bin_prearrival_footprint_clear'] = bin_footprint_ready
+            arrived, errors = self._arrived(measured, posture_targets=posture_targets,
+                                            receiver_alignment_ready=receiver_aligned,
+                                            bin_footprint_ready=bin_footprint_ready)
             info['pose_errors'] = errors
         else:
             arrived = False
+        if self.stage == 'bin_transport' and not arrived:
+            self.bin_release_previous = None
+            self.bin_release_quiet_since = None
+            self.bin_release_quiet_frames = 0
         if self.stage == 'lift':
             evidence = self._head_support(snapshot, measured)
             info['lift_visual'] = evidence
@@ -631,27 +852,74 @@ class VisualCycle:
                 raise RuntimeError('Bin rim not visible after turning toward bin')
             # Turn while extending toward the bin. This orientation is not
             # reachable at the folded, near-chest lift waypoint.
+            stack_key = str(self.completed % 2)
+            stack_center = getattr(self, 'confirmed_stack_centers', {}).get(stack_key)
+            if self.config.get('bin_stack_rim_frame', False) and self.completed >= 2:
+                from .bin_layout import slot_axis
+                relative = getattr(self, 'confirmed_stack_local', {}).get(stack_key)
+                if relative is None:
+                    raise RuntimeError('Missing observed stack reference in bin frame')
+                lateral = slot_axis(self.rim)
+                depth = np.array([lateral[1], -lateral[0]])
+                stack_center = self.rim['center']+relative[0]*depth+relative[1]*lateral
             self.goal[0], self.bin_slot = plan_bin_drop(
-                self.rim, self.geometry, self.config, self.completed)
+                self.rim, self.geometry, self.config, self.completed, kinematics=self.k, measured=measured,
+                stack_center_xy=stack_center)
             info['bin_slot'] = self.bin_slot
             self._stage('bin_transport')
         elif self.stage == 'bin_transport' and arrived:
-            center, rotation, extent = self.world_box(measured)
-            corners = center+rotation.apply([[a, b, c] for a in (-extent[0]/2, extent[0]/2)
-                for b in (-extent[1]/2, extent[1]/2) for c in (-extent[2]/2, extent[2]/2)])
-            fit = inside_bin(corners, self.rim, .025) and min(corners[:, 2]) > self.rim['rim_z']+.025
+            fit = self._bin_release_footprint_clear(measured)
             info['bin_footprint_clear'] = bool(fit)
-            if fit and snapshot['stamp']-self.rim['stamp'] <= 1.:
+            release_ready = fit and snapshot['stamp']-self.rim['stamp'] <= 1.
+            if self.config.get('bin_release_quiet', False):
+                now = time.monotonic()
+                current = self.k.matrix(measured[:7], 0)
+                previous = self.bin_release_previous
+                self.bin_release_previous = (now, current.copy())
+                linear = angular = float('inf')
+                if previous is not None and 0. < now-previous[0] <= .5:
+                    interval = now-previous[0]
+                    linear = float(np.linalg.norm(current[:3,3]-previous[1][:3,3])/interval)
+                    angular = float(np.linalg.norm((Rotation.from_matrix(current[:3,:3])*
+                        Rotation.from_matrix(previous[1][:3,:3]).inv()).as_rotvec())/interval)
+                quiet = release_ready and fresh and linear <= .005 and angular <= .05
+                if quiet:
+                    if self.bin_release_quiet_since is None:
+                        self.bin_release_quiet_since = now
+                    self.bin_release_quiet_frames += 1
+                else:
+                    self.bin_release_quiet_since = None
+                    self.bin_release_quiet_frames = 0
+                release_ready = (self.bin_release_quiet_frames >= 3 and
+                    now-self.bin_release_quiet_since >= .2)
+                info['bin_release_settlement'] = dict(linear_m_s=linear, angular_rad_s=angular,
+                    quiet_frames=self.bin_release_quiet_frames, ready=bool(release_ready))
+            if release_ready:
                 self.bin_before = self._bin_points(snapshot)
                 self.command[7] = 0.
                 self._stage('release_left')
         elif self.stage == 'release_left':
             if fresh:
                 self.contact_stable = self.contact_stable+1 if measured[7] <= .15 else 0
-            if self.contact_stable >= 3:
+                if measured[7] > .15 or (self.bin_open_stamp is not None and snapshot['stamp'] < self.bin_open_stamp):
+                    self.bin_open_stamp = None
+                elif self.bin_open_stamp is None:
+                    self.bin_open_stamp = snapshot['stamp']
+            fall_wait = float(self.config.get('bin_open_dwell_sensor_s', 0.))
+            if not np.isfinite(fall_wait) or not 0. <= fall_wait <= .5:
+                raise ValueError('Bin open dwell must be within 0-0.5 sensor seconds')
+            open_elapsed = 0. if self.bin_open_stamp is None else snapshot['stamp']-self.bin_open_stamp
+            info['bin_open_dwell_sensor_s'] = float(open_elapsed)
+            if self.contact_stable >= 3 and open_elapsed >= fall_wait:
                 left = self.k.matrix(measured[:7], 0)
                 self.goal[0] = left.copy()
                 self.goal[0][:3, 3] += .10*left[:3, 2]+[0., 0., .08]
+                self.bin_view_retreat_shifted = False
+                self.bin_verify_resume_steps = None
+                self.bin_retreat_completed_steps = 0
+                self.bin_view_missing_frames = 0
+                self.bin_view_head_previous = None
+                self.bin_view_head_stable = 0
                 self._stage('left_retreat')
         elif self.stage == 'left_retreat' and arrived:
             left = self.k.matrix(measured[:7], 0)
@@ -659,17 +927,96 @@ class VisualCycle:
             clear = min(left[2, 3], wrist[2]) > self.rim['rim_z']+.08
             info['empty_hand_above_rim'] = bool(clear)
             if clear:
-                self._stage('verify_bin')
+                lateral = float(self.config.get('bin_view_retreat_lateral_m', 0.))
+                if not np.isfinite(lateral) or not 0. <= lateral <= .15:
+                    raise ValueError('Empty left-hand viewing retreat must be within 0–15 cm')
+                if (lateral and not self.bin_view_retreat_shifted
+                        and not self.config.get('bin_view_retreat_on_occlusion', False)):
+                    if max(measured[7], measured[15], self.command[7], self.command[15]) > .15:
+                        raise RuntimeError('Viewing retreat requires two empty hands')
+                    # First complete the original outward/upward retreat. Then
+                    # move the empty left hand toward its own side to uncover
+                    # the bin. Share the original phase clock, servo limits,
+                    # arrival/quiet gates and unchanged verification budget.
+                    self.goal[0][1, 3] += lateral
+                    self.bin_view_retreat_shifted = True
+                    self.servo_previous = [None, None]
+                    self.stable = 0
+                    info['bin_view_retreat_started'] = True
+                else:
+                    self.bin_retreat_completed_steps = self.stage_steps
+                    self._stage('verify_bin')
+                    if self.bin_verify_resume_steps is not None:
+                        self.stage_steps = self.bin_verify_resume_steps
         elif self.stage == 'verify_bin' and fresh:
             points = self._bin_points(snapshot)
             info['bin_points_before_slot_association'] = len(points)
-            points = slot_points(points, self.rim, self.config, self.completed)
+            independent_entry = self.config.get('bin_confirmation_mode') == 'independent_entry'
+            if not independent_entry:
+                points = slot_points(points, self.rim, self.config, self.completed)
             info['bin_verification_slot'] = self.completed
             if len(self.bin_before) and len(points):
                 points = points[cKDTree(self.bin_before).query(points)[0] > .015]
             info['new_bin_points_before_clustering'] = len(points)
             points = largest_surface(points)
             info['new_bin_points'] = len(points)
+            if (self.config.get('bin_view_retreat_on_occlusion', False)
+                    and not self.bin_view_retreat_shifted):
+                # A turning head can temporarily hide a valid parcel. Use the
+                # same commanded/measured/stationary view gates as pickup
+                # before treating missing points as a reason to move an arm.
+                ready = False
+                angles = snapshot.get('head_angles_rad')
+                if angles is not None and head_info and head_info.get('state') == 'look_at_target':
+                    angles = np.rad2deg(np.asarray(angles, float))
+                    desired = np.asarray(head_info['desired_degrees'], float)
+                    command = np.asarray(head_info['command_degrees'], float)
+                    previous = self.bin_view_head_previous
+                    ready = bool(previous is not None and np.isfinite(angles).all()
+                        and np.max(abs(command-desired)) <= .1
+                        and np.max(abs(angles-desired)) <= 2.6
+                        and np.max(abs(angles-previous)) <= .25)
+                    self.bin_view_head_previous = angles.copy()
+                self.bin_view_head_stable = self.bin_view_head_stable+1 if ready else 0
+                missing = self.bin_view_head_stable >= 3 and len(points) < 80
+                self.bin_view_missing_frames = self.bin_view_missing_frames+1 if missing else 0
+                info['bin_view_head_stable_frames'] = self.bin_view_head_stable
+                info['bin_view_missing_frames'] = self.bin_view_missing_frames
+                if self.bin_view_missing_frames >= 10 and self.stage_steps+15 <= 80:
+                    left = self.k.matrix(measured[:7], 0)
+                    wrist = left[:3, 3]-left[:3, :3]@np.asarray(getattr(self.k, 'tool_xyz', [0,0,-.1488]))
+                    if (max(measured[7], measured[15], self.command[7], self.command[15]) > .15
+                            or min(left[2, 3], wrist[2]) <= self.rim['rim_z']+.08):
+                        raise RuntimeError('Bin viewing recovery requires empty hands above original rim clearance')
+                    # Use the remaining ORIGINAL retreat and verification
+                    # budgets. Never restart either deadline or the pre-drop
+                    # point baseline. One viewing move is permitted per parcel.
+                    self.bin_verify_resume_steps = self.stage_steps
+                    self.goal[0][1, 3] += self.config['bin_view_retreat_lateral_m']
+                    self.bin_view_retreat_shifted = True
+                    self._stage('left_retreat')
+                    self.stage_steps = self.bin_retreat_completed_steps
+                    info['bin_view_recovery'] = dict(
+                        insufficient_fresh_frames=self.bin_view_missing_frames,
+                        largest_new_surface_points=len(points),
+                        retreat_steps_already_used=self.bin_retreat_completed_steps,
+                        verification_steps_already_used=self.bin_verify_resume_steps,
+                        original_verification_budget_steps=80,
+                        original_retreat_budget_steps=self.config.get('stage_timeout_steps', 320),
+                        pre_drop_baseline_retained=True)
+            flat = self.config.get('bin_layout_mode') == 'flat_two_stacks'
+            stack = str(self.completed % 2)
+            if flat and self.completed >= 2 and not independent_entry:
+                previous_top = self.confirmed_stack_tops.get(stack)
+                if previous_top is None:
+                    raise RuntimeError('Missing confirmed first-layer surface; cannot count another layer')
+                higher = len(points) >= 80 and float(np.median(points[:, 2])) >= previous_top+.02
+                info['stack_height_verification'] = dict(previous_top_m=previous_top,
+                    new_top_m=float(np.median(points[:, 2])) if len(points) else None,
+                    required_increase_m=.02, passed=bool(higher))
+                if not higher:
+                    self.bin_evidence = []
+                    return np.clip(self.command.copy(), self.low, self.high), info
             if len(points) >= 80 and np.count_nonzero(np.ptp(points, axis=0) >= .01) >= 2:
                 center = np.median(points, axis=0)
                 self.bin_evidence.append((snapshot['stamp'], center))
@@ -678,8 +1025,55 @@ class VisualCycle:
                 stable = len(self.bin_evidence) >= 5 and max(span) <= .015
                 if stable and self.bin_evidence[-1][0]-self.bin_evidence[0][0] >= 1.:
                     info['bin_visual_confirmed'] = True
+                    info['bin_stability'] = dict(frames=len(self.bin_evidence),
+                        sensor_span_s=self.bin_evidence[-1][0]-self.bin_evidence[0][0],
+                        max_center_span_m=float(max(span)))
+                    if flat:
+                        self.confirmed_stack_tops[stack] = float(np.median(points[:, 2]))
+                        if self.completed < 2 and self.config.get('bin_follow_confirmed_stack', False):
+                            # The near edge may be hidden by the rim. Use the
+                            # visible far boundary and measured parcel length
+                            # to plan the next drop over its actual support.
+                            # This affects planning only; new-point, dwell and
+                            # second-layer height proofs remain independent.
+                            from .bin_layout import slot_axis
+                            lateral = slot_axis(self.rim)
+                            depth = np.array([lateral[1], -lateral[0]])
+                            top = points[points[:,2] >= np.percentile(points[:,2],90)-.01]
+                            if len(top) < 40:
+                                raise RuntimeError('Insufficient observed stack support boundary')
+                            depth_center = np.percentile(top[:,:2]@depth,98)-float(self.geometry['extent'][0])/2
+                            lateral_limits = np.percentile(top[:,:2]@lateral,[2,98])
+                            center_xy = depth_center*depth+float(np.mean(lateral_limits))*lateral
+                            nominal = np.asarray(self.bin_slot['target_center_base_m'])[:2]
+                            if np.linalg.norm(center_xy-nominal) > .065:
+                                raise RuntimeError('Observed stack support moved outside planning bound')
+                            if not hasattr(self,'confirmed_stack_centers'):
+                                self.confirmed_stack_centers = {}
+                            self.confirmed_stack_centers[stack] = center_xy.tolist()
+                            info['stack_support_reference'] = dict(center_xy_m=center_xy.tolist(), points=len(top))
+                            if self.config.get('bin_stack_rim_frame', False):
+                                relative = center_xy-self.rim['center']
+                                if not hasattr(self, 'confirmed_stack_local'):
+                                    self.confirmed_stack_local = {}
+                                self.confirmed_stack_local[stack] = [float(relative@depth), float(relative@lateral)]
+                                info['stack_support_reference']['bin_frame_xy_m'] = self.confirmed_stack_local[stack]
                     self.completed += 1
-                    self._stage('return_home')
+                    finish_last = (self.config.get('finish_after_last_confirmation', False)
+                        and self.completed >= self.config.get('max_parcels', 1))
+                    if self.config.get('direct_next_pickup', False) or finish_last:
+                        left = self.k.matrix(measured[:7], 0)
+                        wrist = left[:3, 3]-left[:3, :3]@np.asarray(getattr(self.k, 'tool_xyz', [0,0,-.1488]))
+                        if (not independent_entry or max(measured[7], measured[15], self.command[7], self.command[15]) > .15
+                                or min(left[2,3],wrist[2]) <= self.rim['rim_z']+.08):
+                            raise RuntimeError('Completion without home requires independent entry and both hands empty above bin')
+                        self.done, self.active = True, False
+                        info['state'] = 'visual_cycle_complete'
+                        info['completed_parcels'] = self.completed
+                        info['direct_next_pickup'] = not finish_last
+                        info['finished_after_last_confirmation'] = bool(finish_last)
+                    else:
+                        self._stage('return_home')
             else:
                 self.bin_evidence = []
         elif self.stage == 'return_home':
@@ -687,9 +1081,15 @@ class VisualCycle:
             previous = getattr(self, 'home_previous', None)
             velocity = np.zeros(len(JOINTS)) if previous is None else measured[JOINTS]-previous
             self.home_previous = measured[JOINTS].copy()
-            gain = 1. if self.settle_home(measured) else self._profile_gain('return_home')
+            settling = self.settle_home(measured)
+            gain = 1. if settling else self._profile_gain('return_home')
             change = gain*(.06*delta-.24*velocity)
-            scale = min(1., .012/max(max(abs(change)), 1e-9))
+            step_limit = float(self.config.get('return_home_step_rad', .012))
+            if not np.isfinite(step_limit) or not .012 <= step_limit <= .024:
+                raise ValueError('Empty-arm home planning step must stay within 12–24 mrad')
+            if settling:
+                step_limit = .012
+            scale = min(1., step_limit/max(max(abs(change)), 1e-9))
             self.command[JOINTS] += scale*change
             self.command = np.clip(self.command, self.low, self.high)
             self.command[[7, 15]] = 0.
@@ -755,6 +1155,9 @@ class VisualCycle:
         self.command = action_vector(self.command)
         self.stage_steps, self.stable = 0, 0
         self.servo_previous = [None, None]
+        self.servo_sample_time = [None, None]
         self.servo_precision = [False, False]
+        self.servo_position_precision = [False, False]
+        self.servo_axis_precision = np.zeros((2, 3), dtype=bool)
         self.home_previous = None
         self.feedback_sample = None

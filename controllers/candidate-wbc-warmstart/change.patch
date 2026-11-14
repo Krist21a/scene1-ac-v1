@@ -1,0 +1,31 @@
+--- A+C/humanoidController.cpp
++++ warmstart/humanoidController.cpp
+@@ -41,7 +41,7 @@
+ #ifdef KUAVO_CONTROL_LIB_FOUND
+ #include <kuavo_estimation/base_filter/InEkfBaseFilter.h>
+ #endif
+-#include <humanoid_wbc/WeightedWbc.h>
++#include "scene1_warm_wbc.h"
+ #include <humanoid_wbc/StandUpWbc.h>
+ #include <ocs2_core/reference/TargetTrajectories.h>
+ #include <humanoid_wbc/HierarchicalWbc.h>
+@@ -1035,7 +1035,7 @@
+       // std::cout << "waitForReady estimate ready" << std::endl;
+       // Whole body control/HierarchicalWbc/WeightedWbc
+       // wbc 中 eeKinematicsPtr_ 可能需要修改
+-      wbc_ = std::make_shared<WeightedWbc>(*pinocchioInterfaceWBCPtr_, centroidalModelInfoWBC_,
++      wbc_ = std::make_shared<Scene1WarmWbc>(*pinocchioInterfaceWBCPtr_, centroidalModelInfoWBC_,
+                                            *eeKinematicsWBCPtr_);
+       wbc_->setArmNums(armNumReal_);
+       wbc_->setWaistNums(waistNum_);
+@@ -2772,6 +2772,10 @@
+         }
+         else
+         {
++          static_cast<Scene1WarmWbc*>(wbc_.get())->setEnabled(
++              !is_real_ && armNumReal_ == 14 && !isPullUp_ &&
++              mpcArmControlMode_desired_ == ArmControlMode::EXTERN_CONTROL &&
++              mpcArmControlMode_ == ArmControlMode::EXTERN_CONTROL);
+           x = wbc_->update(optimizedState2WBC_mrt_, optimizedInput2WBC_mrt_, measuredRbdStateReal_, plannedMode_, period.toSec(), is_mpc_updated);
+         }
+         // wbc_->updateVd(jointAcc_);

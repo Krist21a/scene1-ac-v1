@@ -2,6 +2,7 @@
 import argparse,hashlib,json,subprocess
 from pathlib import Path
 import environment as e
+from trace_io import open_trace, trace_path
 
 ap=argparse.ArgumentParser();ap.add_argument('label');a=ap.parse_args()
 e.wait_idle(e.ALGO);e.wait_idle(e.SIM)
@@ -21,13 +22,17 @@ with p.open('rb') as f:
 print(h.hexdigest())
 '''
 h=hashlib.sha256()
-with (d/'chain.jsonl').open('rb') as f:
+with open_trace(d, 'rb') as f:
     for b in iter(lambda:f.read(1048576),b''):h.update(b)
 expected=h.hexdigest()
 found=e.command('docker','exec',e.SIM,'python3','-c',code,trace).strip()
 if found=='missing':
     trace=where+'/chain.jsonl'
-    e.command('docker','cp',str(d/'chain.jsonl'),e.SIM+':'+trace)
+    source = trace_path(d)
+    e.command('docker','cp',str(source),e.SIM+':'+trace+('.gz' if source.suffix=='.gz' else ''))
+    if source.suffix=='.gz':
+        e.command('docker','exec',e.SIM,'python3','-c',
+            'import gzip,pathlib,shutil,sys;p=pathlib.Path(sys.argv[1]);f=gzip.open(str(p)+".gz","rb");o=p.open("wb");shutil.copyfileobj(f,o);o.close();f.close();pathlib.Path(str(p)+".gz").unlink()', trace)
     found=e.command('docker','exec',e.SIM,'python3','-c',code,trace).strip()
 assert found==expected
 steps=where+'/steps.jsonl'
@@ -45,7 +50,7 @@ out=e.command('docker','exec',e.SIM,'python3',base+'/analyze_release_events.py',
 (derived/'release-analysis.log').write_text(out+'\n')
 e.command('docker','cp',e.SIM+':'+where+'/release-transients.json',str(derived/'release-transients.json'))
 subprocess.run(['python3',str(e.HERE/'summarize_visual.py'),str(d/'output/steps.jsonl'),'--output',str(derived/'visual-full.json')],check=True)
-if json.loads((d/'experiment.json').read_text())['version'] in ['candidate','velocity_pd','mpc_q','proximal_kp','origin_pd','wrist_damping','arm_weight','pd_scale','pd_scale15','origin_mpc_q']:
+if json.loads((d/'experiment.json').read_text())['version'] in ['candidate','velocity_pd','mpc_q','proximal_kp','origin_pd','wrist_damping','arm_weight','pd_scale','pd_scale15','origin_mpc_q','wbc_warmstart','wbc_reduced']:
     out=e.command('docker','exec',e.SIM,'python3',base+'/analyze_pd.py','--trace',trace,'--output',where+'/pd-audit.json')
     (derived/'pd-analysis.log').write_text(out+'\n')
     e.command('docker','cp',e.SIM+':'+where+'/pd-audit.json',str(derived/'pd-audit.json'))

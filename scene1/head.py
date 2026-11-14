@@ -57,9 +57,25 @@ class HeadLookController:
             point = camera[:3, :3].T @ (target - camera[:3, 3])
             direction = point / max(np.linalg.norm(point), 1e-6)
             return np.r_[direction[:2], min(0., direction[2]) * 2]
+        def jacobian(angles):
+            camera = self.head_matrix(angles) @ self.camera_local
+            point = camera[:3, :3].T @ (target-camera[:3, 3])
+            radius = float(np.linalg.norm(point))
+            direction = point/max(radius, 1e-6)
+            yaw_axis = self.pivot[:3, 2]
+            pitch_axis = self.pivot[:3, :3] @ np.array([-np.sin(angles[0]), np.cos(angles[0]), 0.])
+            relative = target-self.pivot[:3, 3]
+            point_jacobian = -camera[:3, :3].T @ np.column_stack((
+                np.cross(yaw_axis, relative), np.cross(pitch_axis, relative)))
+            unit_jacobian = ((np.eye(3)-np.outer(direction,direction))/radius @ point_jacobian
+                             if radius > 1e-6 else point_jacobian/1e-6)
+            result = unit_jacobian.copy()
+            result[2] *= 2. if direction[2] < 0. else 0.
+            return result
         start = self.command if self.command is not None else self.home
         result = least_squares(error, np.clip(start, -self.limit + 1e-6, self.limit - 1e-6),
-                               bounds=(-self.limit, self.limit), max_nfev=30)
+                               bounds=(-self.limit, self.limit), max_nfev=30,
+                               jac=jacobian if self.config.get('analytic_jacobian', False) else '2-point')
         return result.x
 
     def update(self, target, measured, snapshot, dt):

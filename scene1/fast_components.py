@@ -1,4 +1,5 @@
 """Optional exact native version of the existing ordered union-find loop."""
+from .rgbd import snapshot_hsv
 import ctypes
 from functools import lru_cache
 from pathlib import Path
@@ -145,9 +146,13 @@ def project_grid(depth, intrinsic, matrix, stride=1):
 
 def sampled_geometry(snapshot, stride=2):
     import cv2
+    cached = snapshot.get('sampled_points', {}).get(stride)
+    if cached is not None:
+        u, v, z, points = cached
+        return z, points, snapshot_hsv(snapshot)[v,u]
     depth = snapshot['depth_m']
     points = project_grid(depth, snapshot['intrinsic'], snapshot['camera_to_base'], stride)
-    hsv = cv2.cvtColor(snapshot['rgb'], cv2.COLOR_RGB2HSV)
+    hsv = snapshot_hsv(snapshot)
     return (depth[::stride, ::stride].reshape(-1), points.reshape(-1, 3),
             hsv[::stride, ::stride].reshape(-1, 3))
 

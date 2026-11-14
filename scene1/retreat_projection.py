@@ -32,7 +32,8 @@ class FingerSeparation:
 
 
 def project_retreat_reference(kinematics, measured, proposed, reference, previous,
-                              lower, upper, step, target, plane, motion_config):
+                              lower, upper, step, target, plane, motion_config,
+                              planning_margin_m=.003):
     """Change only a blocked proposal; all accepted outputs are rechecked.
 
     The signed distance is only an optimization constraint. The independent
@@ -41,6 +42,9 @@ def project_retreat_reference(kinematics, measured, proposed, reference, previou
     measured, proposed, reference, previous = map(lambda x: np.asarray(x, float),
                                                 (measured, proposed, reference, previous))
     q = measured[8:15]
+    if not np.isfinite(planning_margin_m) or not .003 <= planning_margin_m <= .006:
+        raise ValueError('Planning clearance must retain the original 3 mm margin')
+    extra = planning_margin_m-.003
     motion = MotionFilter(np.asarray(lower), np.asarray(upper),
                           motion_config['alpha'], motion_config['max_velocity'])
 
@@ -57,7 +61,7 @@ def project_retreat_reference(kinematics, measured, proposed, reference, previou
                     bounds_clipped=limits['bounds_clipped'])
 
     original = checks(proposed)
-    if original['proposed']['clear'] and original['filtered']['clear'] and not original['bounds_clipped']:
+    if extra == 0. and original['proposed']['clear'] and original['filtered']['clear'] and not original['bounds_clipped']:
         return proposed.copy(), dict(applied=False, original=original)
     if not sampled_sweep(kinematics, q, q, target, plane)['clear']:
         raise RuntimeError('Retreat projection cannot repair an already blocked measured pose')
@@ -75,6 +79,7 @@ def project_retreat_reference(kinematics, measured, proposed, reference, previou
     intervals = max(2, int(np.ceil(np.max(np.abs(np.r_[low-q, high-q]))/.012)))
     intervals += intervals % 2
     fractions = np.linspace(0., 1., intervals+1)
+    initial_gap = np.minimum(gap_at(q), extra)
 
     def action_from(x):
         action = proposed.copy()
@@ -88,10 +93,15 @@ def project_retreat_reference(kinematics, measured, proposed, reference, previou
         # Do not optimize its constant constraint: sub-picometre roundoff
         # near the extra 1um solver buffer can make that constraint infeasible.
         # Positive numerical separation is stricter than the original margin.
-        return np.concatenate([gap_at(q+a*(endpoint-q))
+        return np.concatenate([gap_at(q+a*(endpoint-q))-
+            ((1.-a)*initial_gap+a*extra if extra else 0.)
             for endpoint in [action[8:15], sent[8:15]] for a in fractions[1:]])/.01-1e-4
 
     desired = (proposed[8:15]-reference[8:15])/step
+    if (original['proposed']['clear'] and original['filtered']['clear']
+            and not original['bounds_clipped'] and np.min(constraints(desired)) >= 0.):
+        return proposed.copy(), dict(applied=False, original=original,
+                                     planning_margin_m=planning_margin_m)
     bounds = list(zip((low-reference[8:15])/step, (high-reference[8:15])/step))
     solution = minimize(lambda x: float(np.sum((x-desired)**2)), np.zeros(7),
         jac=lambda x: 2*(x-desired), bounds=bounds,
@@ -102,9 +112,10 @@ def project_retreat_reference(kinematics, measured, proposed, reference, previou
     if (not np.isfinite(chosen).all() or np.any(chosen[8:15] < low-1e-10)
             or np.any(chosen[8:15] > high+1e-10)
             or not final['proposed']['clear'] or not final['filtered']['clear']
-            or final['bounds_clipped']):
+            or final['bounds_clipped'] or (extra and np.min(constraints(solution.x)) < -1e-6)):
         raise RuntimeError('No swept-clear retreat correction within original step and physical bounds')
     return chosen, dict(applied=True, original=original, final=final,
         solver_success=bool(solution.success), solver_message=str(solution.message),
         iterations=int(solution.nit), max_step_rad=float(np.max(abs(chosen[8:15]-reference[8:15]))),
-        proposal_adjustment_rad=(chosen[8:15]-proposed[8:15]).tolist(), margin_m=.003)
+        proposal_adjustment_rad=(chosen[8:15]-proposed[8:15]).tolist(), margin_m=.003,
+        planning_margin_m=planning_margin_m)

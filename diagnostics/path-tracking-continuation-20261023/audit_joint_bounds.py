@@ -2,6 +2,7 @@
 import argparse
 import json
 from pathlib import Path
+from trace_io import open_trace
 
 ap = argparse.ArgumentParser()
 ap.add_argument('label')
@@ -18,7 +19,7 @@ hi = rows[-1]['send_monotonic_s'] + rows[-1]['step_s']
 peak, counts, longest = [0.] * 14, [0] * 14, [0.] * 14
 starts, lasts = [None] * 14, [None] * 14
 samples = 0
-for line in (run / 'chain.jsonl').open():
+for line in open_trace(run):
     if '/sensors_data_raw' not in line:
         continue
     r = json.loads(line)

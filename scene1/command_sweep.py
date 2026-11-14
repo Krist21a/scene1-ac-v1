@@ -4,18 +4,21 @@ import time
 from .clearance import open_fingers_clear
 
 
-def sampled_sweep(kinematics, q, target_q, target, plane):
+def sampled_sweep(kinematics, q, target_q, target, plane, *, side=1, margin=.003):
     q, target_q = np.asarray(q, float), np.asarray(target_q, float)
     if (q.shape != (7,) or target_q.shape != (7,)
             or not np.isfinite(np.r_[q, target_q]).all()):
         raise ValueError('Sweep requires finite seven-joint vectors')
+    if side not in (0, 1) or not np.isfinite(margin) or not .003 <= margin <= .006:
+        raise ValueError('Sweep requires a known arm and at least the original 3 mm margin')
     # Include the original measured/midpoint/endpoint tests and subdivide long
     # pending references. Sampling does not prove a continuous swept volume.
     intervals = max(2, int(np.ceil(np.max(np.abs(target_q-q)) / .012)))
     intervals += intervals % 2
     for i in range(intervals + 1):
         fraction = i / intervals
-        if not open_fingers_clear(kinematics.matrix(q+fraction*(target_q-q), 1), target, plane):
+        if not open_fingers_clear(kinematics.matrix(q+fraction*(target_q-q), side), target, plane,
+                                  margin=margin):
             return dict(clear=False, first_blocked_fraction=fraction, samples=intervals+1)
     return dict(clear=True, first_blocked_fraction=None, samples=intervals+1)
 

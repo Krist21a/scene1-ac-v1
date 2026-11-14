@@ -1,0 +1,210 @@
+performance:
+  regrasp_phase_rgbd: true
+  analytic_head_jacobian: false
+  sparse_regrasp_diagnostics: true
+  phase_rgbd: true
+  sparse_color_diagnostics: true
+  dense_pickup_candidates: true
+  enabled: true
+  compute_threads: 1
+  cache_fk: true
+  native_components: true
+  compact_detector: true
+  cache_sdk_limits: true
+  native_rgb: true
+  native_cloud: true
+  native_projection: true
+  motion_hz: 20.0
+  parallel_rgbd: true
+  fast_cycle_stages:
+  - right_retreat
+  - left_retreat
+  - return_home
+  - lift
+  - left_approach
+  - bin_transport
+  - transport
+  - left_clear
+  - left_insert
+  native_roof_mask: true
+  native_aux_projection: true
+  native_clearance: true
+  native_retreat_constraints: true
+  sdk_numeric_copies: true
+  cycle_stage_hz:
+    lift: 20.0
+    bin_transport: 20.0
+  fast_pickup_stages:
+  - clear
+  - first_clear
+  - first_back
+  - hover
+  - lift
+  - carry
+  - descend
+  - prepare_weighing
+  pickup_stage_hz:
+    lift: 20.0
+  parallel_detection: true
+  residual_analytic_jacobian: true
+  checkpoint_evidence_only: true
+  release_continuous_adapt: true
+  guarded_motion_hz: 20.0
+  profile_every_steps: 100
+  latest_sdk_odometry: true
+visual_cycle:
+  grasp_execution: traditional
+  release_prepare_recover_gap: true
+  grasp_planning_margin_m: 0.005
+  direct_next_pickup: false
+  finish_after_last_confirmation: true
+  descent_xy_precision: true
+  bin_release_clearance_m: 0.065
+  bin_confirmation_mode: independent_entry
+  return_home_step_rad: 0.024
+  settle_when_slow: true
+  bin_release_quiet: true
+  bin_stack_rim_frame: false
+  bin_stack_clearance_adjust: true
+  bin_verify_view_height_m: 0.35
+  bin_angular_weight: 0.06
+  servo_time_normalization_stages:
+  - bin_transport
+  - left_insert
+  - descend
+  - prepare_weighing
+  return_home_settle: true
+  pickup_pad_clear_recovery: true
+  analytic_jacobian: true
+  servo_profiles:
+    pickup_clear:
+      noncontact_step_rad: 0.018
+      gain_scale: 3.0
+    pickup_hover:
+      noncontact_step_rad: 0.018
+      gain_scale: 3.0
+    pickup_lift:
+      noncontact_step_rad: 0.018
+      gain_scale: 3.0
+      precision_position_m: 0.03
+      precision_gain_divisor: 3.0
+      coarse_damping: 4.0
+      time_normalize: true
+      integral_reference_period_s: 0.06666666666666667
+    pickup_carry:
+      noncontact_step_rad: 0.012
+      gain_scale: 1.5
+      precision_position_m: 0.03
+      precision_gain_divisor: 3.0
+      coarse_damping: 4.0
+      time_normalize: true
+      integral_reference_period_s: 0.06666666666666667
+    lift:
+      noncontact_step_rad: 0.018
+      gain_scale: 1.5
+      precision_position_m: 0.03
+      precision_gain_divisor: 3.0
+      coarse_damping: 4.0
+      time_normalize: true
+      integral_reference_period_s: 0.06666666666666667
+    transport:
+      noncontact_step_rad: 0.018
+      gain_scale: 3.0
+      precision_position_m: 0.03
+      precision_gain_divisor: 3.0
+      coarse_damping: 4.0
+      time_normalize: true
+      integral_reference_period_s: 0.06666666666666667
+    left_approach:
+      gain_scale: 3.0
+      precision_position_m: 0.03
+      precision_gain_divisor: 3.0
+      coarse_damping: 4.0
+      time_normalize: true
+      integral_reference_period_s: 0.06666666666666667
+    right_retreat:
+      noncontact_step_rad: 0.018
+      gain_scale: 3.0
+      precision_position_m: 0.03
+      precision_gain_divisor: 3.0
+      coarse_damping: 4.0
+      time_normalize: true
+      integral_reference_period_s: 0.06666666666666667
+    left_clear:
+      noncontact_step_rad: 0.018
+      gain_scale: 3.0
+      precision_position_m: 0.03
+      precision_gain_divisor: 3.0
+      coarse_damping: 4.0
+      time_normalize: true
+      integral_reference_period_s: 0.06666666666666667
+    bin_transport:
+      precision_error_scale: 0.5
+      noncontact_step_rad: 0.018
+      gain_scale: 3.0
+      precision_position_m: 0.03
+      precision_gain_divisor: 3.0
+      coarse_damping: 4.0
+      time_normalize: true
+      integral_reference_period_s: 0.06666666666666667
+    left_retreat:
+      noncontact_step_rad: 0.018
+      gain_scale: 3.0
+      precision_position_m: 0.03
+      precision_gain_divisor: 3.0
+      coarse_damping: 4.0
+      time_normalize: true
+      integral_reference_period_s: 0.06666666666666667
+    pickup_first_clear:
+      noncontact_step_rad: 0.018
+      gain_scale: 2.0
+    pickup_first_back:
+      noncontact_step_rad: 0.018
+      gain_scale: 2.0
+    return_home:
+      gain_scale: 2.0
+    pickup_descend:
+      gain_scale: 3.0
+    left_insert:
+      gain_scale: 2.0
+    pickup_prepare_weighing:
+      gain_scale: 1.0
+  bin_arrival_position_m:
+  - 0.01
+  - 0.01
+  - 0.01
+  - 0.01
+  bin_lateral_offsets_m:
+  - -0.09
+  - 0.06
+  - -0.09
+  - 0.06
+  bin_depth_offsets_m:
+  - -0.02
+  - -0.02
+  - -0.02
+  - -0.02
+  settle_command_profiles:
+  - lift
+  - transport
+  - left_approach
+  - right_retreat
+  - left_clear
+  - bin_transport
+  - left_retreat
+  - pickup_clear
+  - pickup_hover
+  - pickup_lift
+  - pickup_carry
+  - pickup_first_clear
+  - pickup_first_back
+  bin_layout_mode: flat_two_stacks
+  bin_follow_confirmed_stack: false
+  guarded_receiver_approach: true
+  weighing_joint_plan: true
+  regrasp_nearest_visible_section: true
+  stable_selection_view: true
+  release_component_max_gap_m: 0.015
+  weighing_support_reserve_m: 0.005
+  bin_view_retreat_lateral_m: 0.12
+  bin_view_depth_search_m: 0.02

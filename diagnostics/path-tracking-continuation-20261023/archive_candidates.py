@@ -6,7 +6,7 @@ from pathlib import Path
 import shutil
 
 HERE = Path(__file__).resolve().parent
-ARCHIVE = Path('/media/krist/KINGSTON/scene1-path-tracking-continuation-20261023/policies')
+ARCHIVE = Path('/media/krist/USB/scene1-path-tracking-continuation-20261023/policies')
 
 
 def files(root):

@@ -1,0 +1,22 @@
+{
+  "scene": "scene1",
+  "seed": 0,
+  "task_success": false,
+  "grasp_and_lift_observed": true,
+  "weighing_release_complete": false,
+  "bin_complete": false,
+  "commands": 31,
+  "terminal_statuses": {
+    "rejected_or_failed": 12,
+    "commanded": 10,
+    "reached": 5,
+    "timeout": 4
+  },
+  "execution_s": 524.6715374369996,
+  "observed_wall_span_s": 2029.8114156723022,
+  "continuity": "One official scene, continuous video, empty-arm bridge session transition recorded separately. Final full reset while holding to deploy bounded observation waits.",
+  "failure": "Intermittent held-parcel component fragmentation caused immediate action rejection during descent; no release attempted.",
+  "validated": "Table edge tracking completed actual empty lift; asynchronous accepted/running/reached and held transport observed. Release transaction not reached.",
+  "model_inference_latency_s": null,
+  "video": "/media/krist/Data/scene1-model-control-20261110/one-parcel-v5-20261110/full.mp4"
+}

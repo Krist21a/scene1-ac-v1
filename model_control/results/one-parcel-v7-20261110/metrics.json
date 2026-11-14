@@ -1,0 +1,62 @@
+{
+  "scene": "scene1",
+  "seed": 0,
+  "completed_one_parcel": false,
+  "automatic_weighing_release": false,
+  "bin_placement": false,
+  "outcome": "grasp and transport achieved; user explicitly requested direct release and end; manual opening confirmed",
+  "commands": 52,
+  "terminal_statuses": {
+    "commanded": 7,
+    "rejected_or_failed": 14,
+    "timeout": 20,
+    "reached": 10,
+    "stopped": 1
+  },
+  "execution_s": 1394.461024944003,
+  "observed_bridge_wall_s": 2223.903096675873,
+  "terminal_to_observation_ready_s": {
+    "n": 52,
+    "mean": 0.6903451589437631,
+    "median": 0.7293688058853149,
+    "max": 1.1018145084381104
+  },
+  "step_timing_s_mean": {
+    "snapshot": 0.42672601329161475,
+    "adapter": 0.15239766512103137,
+    "publish": 0.05526391886840734,
+    "rgbd": 0.2005013463576292,
+    "self_filter": 0.22566049113114472
+  },
+  "table_reference_commands": 23,
+  "observation_resumptions": 8,
+  "observation_hold_s": 5.503974378001658,
+  "manual_release": {
+    "reason": "User explicitly requested direct release and end task",
+    "automatic_task_success": false,
+    "arm_commands_sent": false,
+    "before": {
+      "position": [
+        0.005347750143837334,
+        0.40598873259734164
+      ],
+      "stamp": 1794308364.9000983,
+      "received": 13581.870134682
+    },
+    "started_wall_s": 1794308364.9006717,
+    "after": {
+      "position": [
+        0.00534775005711392,
+        0.023134519636841044
+      ],
+      "stamp": 1794308367.807413,
+      "received": 13584.777468896
+    },
+    "open_confirmed": true,
+    "finished_wall_s": 1794308367.8077703
+  },
+  "model_latency_causal_effect": "not measured; no model API request timers or matched successful round comparisons; diagnostic and idle time must not be labeled model inference",
+  "video": "/media/krist/Data/scene1-model-control-20261110/one-parcel-v7-20261110/full.mp4",
+  "video_duration_s": 2304.734,
+  "last_logged_sim_elapsed": "14:25.55"
+}

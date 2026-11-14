@@ -1,0 +1,68 @@
+新对话任务：以 arm-jitter-baseline-20261109 为基线，集中诊断和解决仿真中的机器人手臂抖动。
+
+先读
+1. AGENTS.md、CURRENT_BASELINE.txt、本文件。
+2. PHASE1_ACCEPTANCE_REVIEW.txt：第一阶段真实完成情况，不能把开发版本称为验收通过。
+3. 冻结目录 receipt.json、manifest.json、difference-from-round-reference.json。
+冻结目录：/media/krist/Data/scene1-evidence-1105/scene1-speed-20261025/baselines/arm-jitter-baseline-20261109
+source/ 保存当前工作区代码、配置、控制器工件及运行工具；manifest.json 逐文件SHA256。
+当前代码与已运行对照的差异单独保存；历史冻结清单不得修改。
+
+任务边界与状态
+这次交接没有启动仿真。原传统策略多seed批次已按用户要求暂停，不应自动恢复旧批次或ACT训练。
+新对话应围绕抖动开展工作，使用完整任务回合验证，不新建单元/专项测试文件。
+优先从已有日志、视频、实际发送指令与测量状态建立抖动指标，再安排有明确对照的完整回合。
+保留称重、接触、独立入箱证据、原速度/步幅/跟踪偏差保护；不要通过放宽检查或修改仿真物理参数掩盖抖动。
+底层控制器是本基线的固定对照条件。若诊断表明需要改控制器，作为独立候选验证，不与上层策略同时更改而混淆归因。
+本任务没有把尚未验证的退离姿态引导指定为抖动修复方案。
+
+已有完整回合对照
+策略：traditional-observed-template-s493986895-1108
+清单SHA256：4d4e6926a69abfaea9fb7d0cbf7f67b479729f082d2de24cc04b0f8e644d6718
+配置：configs/speed_traditional_observed_template_profile.yaml
+控制器：wbc_reduced
+控制器库SHA256：2a8fda4f2c3f74dee8661db4c3235a74dda1464a77d38a5a7398d049c4ffae8c
+CPU布局：p2-algo-p4e8-sim-critical-pcores；完整原速录像；正式墙钟口径不变。
+同版本结果：
+- traditional-observed-template-s493986895-1108：4/4，648.316886885秒。
+- traditional-observed-template-dev-1108-s449573226：3/4，663.817210287秒，第四件left_retreat达到500步。
+- traditional-observed-template-dev-1108-s639961920：4/4，632.260997702秒。
+两次成功回合本地审计均通过；官方task_success为null，需与视觉验收分列。
+固定开发seed另有1476199888、6617477、1967667504，本轮冻结批次尚未运行它们。
+正式新随机10轮、专家60轮、ACT训练及对照测试均未开始。
+
+与抖动有关的现有线索（不是已确认根因）
+- 称重后 preparing_release_reference 多次长时间调整；日志包含实际发送目标、测量误差、稳定步数、每次修正量。
+  release_prepare_motion_limit_rad=0.0003；原450步预算；连续适配开启。
+- 上层阶段使用10/20Hz混合周期，原PD/WBC跟踪链仍在；需要区分指令自身往返、测量跟踪振荡、采样延迟与触地/接触后的扰动。
+- latest_sdk_odometry只调整SDK/里程计队列；实际回调代码和底层控制器保持对照条件。请核实传感器源时间与接收时间，不把重复或延迟状态误判为机械振荡。
+- 449573226第四件退离失败时，肘关节近伸直边界，位置误差约101mm；同一目标存在有界IK解。
+  这是局部求解停滞线索，不能直接等同于抖动原因。
+- 工作区新增bin_empty_retreat_posture默认关闭；仅有记录数据上的规划诊断，没有完整回合验证。
+  候选使用有界多初值IK、名义TCP/腕部高于箱沿80mm的路径检查和原伺服姿态偏好，不直接发送IK关节值。
+
+优先查看代码
+scene1/visual_cycle.py：笛卡尔伺服、阻尼、积分/周期归一化、到位与空手退离。
+scene1/residual.py：_prepare_release_reference、局部接近、称重和再抓控制。
+scene1/placement_gain.py、scene1/release_retreat.py、scene1/retreat_certificate.py（如文件存在）。
+scene1/latest_odometry.py、run_scene1.py：状态时序、实际发送链、限幅与最终检查。
+controllers/candidate-wbc-reduced/：本基线控制器源码、库、注册与构建清单。
+tools/select_controller.py、tools/speed_trial.py、tools/report_performance.py、tools/speed_acceptance.py。
+
+证据与环境
+证据根目录：/media/krist/Data/scene1-evidence-1105
+逐轮原始数据：<证据根>/scene1-path-tracking-continuation-20261023/<回合标签>/
+逐轮指标：仓库 diagnostics/path-tracking-continuation-20261023/analysis-full/<回合标签>/
+阶段报告：<证据根>/traditional-local-act-1107/
+重点报告：phase1-acceptance-review.json、observed-template-s493986895-phase-comparison.json、bin-retreat-449-reach-diagnosis.json、bin-retreat-449-posture-multistart-plan.json。
+steps.jsonl包含observation_state/measured_state、sent_action、head_camera、cartesian_alignment；performance.jsonl包含各阶段真实墙钟。
+完整控制链采样可能已压缩归档，先读回合归档清单；不要为了方便重新生成假数据。
+容器：kuavo-ros-noetic-s12-ready、kuavo_challenge_container_GPU_046e4301，交接时均停止。
+学习环境：算法容器 /root/miniforge3/envs/kls_dev/bin/python。
+公开机器人URDF：/home/krist/kuavo_course/scene1_act_optimization/results/robot.urdf。
+旧training-storage-mount.json依赖旧容器PID；重启后不得直接信任，需重新检查NVMe映射。
+
+后续需要复现实验时的已知入口（本次未执行）
+sudo -n env SCENE1_EVIDENCE_ROOT=/media/krist/Data/scene1-evidence-1105 python3 tools/speed_trial.py <新标签> --seed 449573226 --parcels 4 --speed-profile configs/speed_traditional_observed_template_profile.yaml --controller wbc_reduced --record-video --cpu-layout p2-algo-p4e8-sim-critical-pcores --frozen-from traditional-observed-template-s493986895-1108
+该命令复现历史同版本对照。验证工作区新改动时使用新标签重新冻结，不传旧--frozen-from。
+每轮等待分析、审计、归档、控制器和CPU恢复全部完成后再启动下一轮；保留失败，不补抽。

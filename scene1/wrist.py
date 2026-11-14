@@ -85,7 +85,11 @@ class WristProjector:
         lit = (gray >= 65).astype(np.uint8)
         lit = cv2.erode(lit, np.ones((5,5), np.uint8))
         edges[lit == 0] = 0
-        distance = cv2.distanceTransform(255-edges, cv2.DIST_L2, 3)
+        # OpenCV L2/3 chamfer weights are axial .955 and diagonal 1.3693.
+        # At threshold 2.8, all offsets in [-2,2]^2 qualify (max 2.7386),
+        # while any offset outside needs >=3 axial steps (min 2.865).
+        # Thus this dilation preserves exactly the former <=2.8 predicate.
+        edge_near = cv2.dilate(edges, np.ones((5, 5), np.uint8)) > 0
         samples = [corners[i][None,:] + np.linspace(.12,.88,25)[:,None] *
                    (corners[(i+1)%4]-corners[i])[None,:] for i in range(4)]
         best = None
@@ -96,7 +100,7 @@ class WristProjector:
                     xy = np.rint(sample + [dx,dy]).astype(int)
                     valid = (xy[:,0] >= 3) & (xy[:,0] < width-3) & (xy[:,1] >= 3) & (xy[:,1] < height-3)
                     hits = np.zeros(len(xy),bool)
-                    hits[valid] = distance[xy[valid,1],xy[valid,0]] <= 2.8
+                    hits[valid] = edge_near[xy[valid,1],xy[valid,0]]
                     support.append(float(hits.mean()))
                 adjacent = max(min(support[i],support[(i+1)%4]) for i in range(4))
                 score = adjacent + .15*np.mean(support) - .001*np.hypot(dx,dy)
@@ -141,7 +145,11 @@ class WristProjector:
         edges = cv2.Canny(cv2.GaussianBlur(gray, (3,3), 0), 45, 110)
         lit = cv2.erode((gray >= 45).astype(np.uint8), np.ones((5,5), np.uint8))
         edges[lit == 0] = 0
-        distance = cv2.distanceTransform(255-edges, cv2.DIST_L2, 3)
+        # OpenCV L2/3 chamfer weights are axial .955 and diagonal 1.3693.
+        # At threshold 2.8, all offsets in [-2,2]^2 qualify (max 2.7386),
+        # while any offset outside needs >=3 axial steps (min 2.865).
+        # Thus this dilation preserves exactly the former <=2.8 predicate.
+        edge_near = cv2.dilate(edges, np.ones((5, 5), np.uint8)) > 0
         arm = self.kinematics.matrix(np.asarray(measured)[(0,8)[side]:(0,8)[side]+7], side)
         tcp = self.project(side, arm[:3,3], measured, [width,height], allow_outside=True)
         closing_row = int(tcp['uv'][1]) if tcp is not None else int(height*.8)
@@ -180,7 +188,7 @@ class WristProjector:
             support = []
             for a,b in zip(polygon,np.roll(polygon,-1,axis=0)):
                 sample = np.rint(a + np.linspace(.12,.88,25)[:,None]*(b-a)).astype(int)
-                support.append(float(np.mean(distance[sample[:,1],sample[:,0]] <= 2.8)))
+                support.append(float(np.mean(edge_near[sample[:,1],sample[:,0]])))
             if max(min(support[i],support[(i+1)%len(support)]) for i in range(len(support))) < self.config.get('min_edge_support',.64):
                 continue
             sections = []
@@ -190,7 +198,7 @@ class WristProjector:
                     continue
                 left,right = int(columns[0]),int(columns[-1])
                 if (lit[row,left] and lit[row,right] and
-                        distance[row,left] <= 2.8 and distance[row,right] <= 2.8):
+                        edge_near[row,left] and edge_near[row,right]):
                     sections.append(((left+right)/2,row,right-left))
                     if len(sections) >= 5:
                         break

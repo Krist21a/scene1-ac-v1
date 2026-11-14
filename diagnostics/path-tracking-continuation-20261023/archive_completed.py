@@ -6,6 +6,7 @@ Only verified redundant container trace and isolated output copies are removed.
 import argparse, datetime, hashlib, json, re, shutil, subprocess
 from pathlib import Path
 import environment as e
+from trace_io import open_trace, digest
 
 def sha(p):
     h=hashlib.sha256()
@@ -23,8 +24,8 @@ source=e.HERE/a.label
 assert source.is_dir()
 state=json.loads((source/'experiment.json').read_text())
 assert state.get('ended_at') and state['label']==a.label
-store=Path('/media/krist/KINGSTON/scene1-path-tracking-continuation-20261023')
-assert store.parent.is_mount(), 'External disk must be mounted'
+store=e.ARCHIVE_ROOT
+e.require_storage()
 store.mkdir(exist_ok=True)
 target=store/a.label;temporary=store/(a.label+'.copying')
 expected=manifest(source)
@@ -43,7 +44,15 @@ if not already_external:
     shutil.rmtree(source)
     source.symlink_to(target,target_is_directory=True)
 assert manifest(source)==expected
-if 'chain.jsonl' in expected:
+trace_sha = expected.get('chain.jsonl')
+if 'chain.jsonl.gz' in expected:
+    transport = json.loads((source/'chain-receipt.json').read_text())
+    assert transport.get('verified') is True
+    assert transport['compressed_sha256'] == expected['chain.jsonl.gz']
+    with open_trace(source, 'rb') as stream:
+        assert digest(stream) == transport['original_sha256']
+    trace_sha = transport['original_sha256']
+if trace_sha is not None:
     code='''import pathlib,hashlib,sys
 p=pathlib.Path(sys.argv[1]);expected=sys.argv[2]
 assert p.parent==pathlib.Path('/tmp') and p.name.endswith('-chain.jsonl')
@@ -54,7 +63,8 @@ if p.exists():
  assert h.hexdigest()==expected
  p.unlink();print(str(p))
 '''
-    removed=e.command('docker','exec',e.SIM,'python3','-c',code,'/tmp/'+a.label+'-chain.jsonl',expected['chain.jsonl'])
+    removed=e.command('docker','exec',e.SIM,'python3','-c',code,'/tmp/'+a.label+'-chain.jsonl',trace_sha)
+    receipt['trace_original_sha256'] = trace_sha
     receipt['removed_redundant_copies'].append(dict(container=e.SIM,path=removed.strip()))
 if len(state.get('output_runs',[]))==1:
     project=state['policy_root'];run=state['output_runs'][0]

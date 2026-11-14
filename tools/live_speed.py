@@ -22,7 +22,9 @@ for line in paths[-1].open():
         completions.append(round(r['started_monotonic_s']+r['cycle_s']-first['started_monotonic_s'],3))
     for k,v in r['spans_s'].items():times[k]+=v
     counts[str(r.get('control_period_s','original'))]+=1
-print(json.dumps(dict(steps=n,formal_elapsed_s=last['started_monotonic_s']+last['cycle_s']-first['started_monotonic_s'],
+wall = last['started_monotonic_s']+last['cycle_s']-first['started_monotonic_s'] if n else 0
+sim = last.get('sensor_sim_end_s', 0)-first.get('sensor_sim_start_s', 0) if n and last.get('sensor_sim_end_s') and first.get('sensor_sim_start_s') else None
+print(json.dumps(dict(steps=n,formal_elapsed_s=wall,sim_elapsed_s=sim,sim_to_wall=sim/wall if sim is not None and wall else None,
                      last_phase=last.get('phase'),completed_cycles=complete,completion_wall_s=completions,period_counts=counts,
                      spans_s={k:round(v,3) for k,v in times.items()})) if n else '{}')
 '''
@@ -35,7 +37,7 @@ if __name__ == '__main__':
     label = args.label
     if not re.fullmatch(r'[a-z0-9][a-z0-9_-]*', label):
         parser.error('Invalid label')
-    store = Path('/media/krist/KINGSTON/scene1-speed-20261025')
+    store = Path('/media/krist/USB/scene1-speed-20261025')
     if args.matrix:
         matrix = json.loads((store/(label+'-matrix.json')).read_text())
         print(json.dumps(dict(matrix=label, status=matrix['status'],

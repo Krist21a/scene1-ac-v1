@@ -1,0 +1,1425 @@
+{
+  "events": [
+    {
+      "release_step": 818,
+      "release_reference_transfer": {
+        "previous_command_rad": [
+          -0.49759727716445923,
+          -0.5220927596092224,
+          -0.25736820697784424,
+          -0.09918192028999329,
+          1.4411509037017822,
+          -0.6566245904135369,
+          -0.47892501950263977
+        ],
+        "measured_target_rad": [
+          -0.497487336397171,
+          -0.5204964280128479,
+          -0.2572970390319824,
+          -0.0992506891489029,
+          1.441230297088623,
+          -0.6660599112510681,
+          -0.4784853160381317
+        ],
+        "bounded_target_rad": [
+          -0.49759727716445923,
+          -0.5220927596092224,
+          -0.25736820697784424,
+          -0.09918192028999329,
+          1.4411509037017822,
+          -0.6566245904135369,
+          -0.47892501950263977
+        ],
+        "original_reference_rad": [
+          -0.34475105281098095,
+          -0.5505546431995547,
+          -0.40341406590660456,
+          -0.551723615643061,
+          1.1973177626949265,
+          -0.5262626581484985,
+          -0.6600726700390841
+        ],
+        "correction_cap_rad": null,
+        "reference_mode": "mpc_continuous",
+        "physical_lower_joint_rad": [
+          -3.14,
+          -3.14,
+          -1.48352986419518,
+          -2.61799387799149,
+          -1.5707963267949,
+          -0.698131700797732,
+          -0.698131700797732
+        ],
+        "physical_upper_joint_rad": [
+          1.5707963267949,
+          0.349065850398866,
+          1.48352986419518,
+          0.0,
+          1.5707963267949,
+          1.30899693899575,
+          0.698131700797732
+        ],
+        "bound_active": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "remaining_target_error_rad": [
+          -0.00010994076728820801,
+          -0.0015963315963745117,
+          -7.11679458618164e-05,
+          6.876885890960693e-05,
+          -7.939338684082031e-05,
+          0.00943532083753118,
+          -0.00043970346450805664
+        ],
+        "requested_change_rad": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "interpretation": "Reference settled under closed grip before opening",
+        "preserved_action_indices": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "previous_sent_command_rad": [
+          -0.49759727716445923,
+          -0.5220927596092224,
+          -0.25736820697784424,
+          -0.09918192028999329,
+          1.4411509037017822,
+          -0.6566245904135369,
+          -0.47892501950263977
+        ],
+        "prepared_before_open": true
+      },
+      "pre_release_observation_minus_previous_command_rad": [
+        0.00010994076728820801,
+        0.0015963315963745117,
+        7.11679458618164e-05,
+        -6.876885890960693e-05,
+        7.939338684082031e-05,
+        -0.00943532083753118,
+        0.00043970346450805664
+      ],
+      "release_filtered_command_minus_observation_rad": [
+        -0.00010994076728820801,
+        -0.0015963315963745117,
+        -7.11679458618164e-05,
+        6.876885890960693e-05,
+        -7.939338684082031e-05,
+        0.00943532083753118,
+        -0.00043970346450805664
+      ],
+      "first_retreat_step": 845,
+      "maximum_observed_translation_before_retreat_m": 0.018802196661032947,
+      "maximum_observed_rotation_before_retreat_degrees": 4.706409752113736,
+      "records": [
+        {
+          "step": 818,
+          "elapsed_to_send_s": 0.0,
+          "translation_from_release_m": 0.0,
+          "rotation_from_release_degrees": 1.0057797016136035e-14,
+          "measured_gripper": 0.5076009631156921,
+          "first_retreat_command": false
+        },
+        {
+          "step": 819,
+          "elapsed_to_send_s": 0.10955236900190357,
+          "translation_from_release_m": 3.2996356777716346e-05,
+          "rotation_from_release_degrees": 0.0021001382691673886,
+          "measured_gripper": 0.5076011419296265,
+          "first_retreat_command": false
+        },
+        {
+          "step": 820,
+          "elapsed_to_send_s": 0.1622020340000745,
+          "translation_from_release_m": 6.327503902109162e-05,
+          "rotation_from_release_degrees": 0.003718043914691751,
+          "measured_gripper": 0.5076013803482056,
+          "first_retreat_command": false
+        },
+        {
+          "step": 821,
+          "elapsed_to_send_s": 0.21605810999608366,
+          "translation_from_release_m": 7.011699736453513e-05,
+          "rotation_from_release_degrees": 0.004074530336893486,
+          "measured_gripper": 0.5076011419296265,
+          "first_retreat_command": false
+        },
+        {
+          "step": 822,
+          "elapsed_to_send_s": 0.2620992500014836,
+          "translation_from_release_m": 8.271789806535208e-05,
+          "rotation_from_release_degrees": 0.004592609390463005,
+          "measured_gripper": 0.5076010823249817,
+          "first_retreat_command": false
+        },
+        {
+          "step": 823,
+          "elapsed_to_send_s": 0.31177590799779864,
+          "translation_from_release_m": 8.980823452367667e-05,
+          "rotation_from_release_degrees": 0.004828293979649183,
+          "measured_gripper": 0.5076011419296265,
+          "first_retreat_command": false
+        },
+        {
+          "step": 824,
+          "elapsed_to_send_s": 0.3651798009959748,
+          "translation_from_release_m": 9.823398801779312e-05,
+          "rotation_from_release_degrees": 0.005168975939885928,
+          "measured_gripper": 0.5076013207435608,
+          "first_retreat_command": false
+        },
+        {
+          "step": 825,
+          "elapsed_to_send_s": 0.41450133599573746,
+          "translation_from_release_m": 0.00010741143497039127,
+          "rotation_from_release_degrees": 0.005582300753117409,
+          "measured_gripper": 0.5076016187667847,
+          "first_retreat_command": false
+        },
+        {
+          "step": 826,
+          "elapsed_to_send_s": 0.4646797690002131,
+          "translation_from_release_m": 0.00011745595889957959,
+          "rotation_from_release_degrees": 0.006058500504989424,
+          "measured_gripper": 0.5076015591621399,
+          "first_retreat_command": false
+        },
+        {
+          "step": 827,
+          "elapsed_to_send_s": 0.5165975389973028,
+          "translation_from_release_m": 0.00012619151662324364,
+          "rotation_from_release_degrees": 0.00647233063718196,
+          "measured_gripper": 0.507601261138916,
+          "first_retreat_command": false
+        },
+        {
+          "step": 828,
+          "elapsed_to_send_s": 0.5661080930003664,
+          "translation_from_release_m": 0.0001326115486968119,
+          "rotation_from_release_degrees": 0.006742778371827364,
+          "measured_gripper": 0.5076010227203369,
+          "first_retreat_command": false
+        },
+        {
+          "step": 829,
+          "elapsed_to_send_s": 0.6141534650014364,
+          "translation_from_release_m": 0.0001380422758303127,
+          "rotation_from_release_degrees": 0.006987316171435135,
+          "measured_gripper": 0.5075147151947021,
+          "first_retreat_command": false
+        },
+        {
+          "step": 830,
+          "elapsed_to_send_s": 0.666475404999801,
+          "translation_from_release_m": 0.00013955073495624328,
+          "rotation_from_release_degrees": 0.008931364508199162,
+          "measured_gripper": 0.5045374631881714,
+          "first_retreat_command": false
+        },
+        {
+          "step": 831,
+          "elapsed_to_send_s": 0.7182098639968899,
+          "translation_from_release_m": 0.00013712744226852195,
+          "rotation_from_release_degrees": 0.026169604165469783,
+          "measured_gripper": 0.49899813532829285,
+          "first_retreat_command": false
+        },
+        {
+          "step": 832,
+          "elapsed_to_send_s": 0.7690366800015909,
+          "translation_from_release_m": 0.00012201466494179673,
+          "rotation_from_release_degrees": 0.04205770614805505,
+          "measured_gripper": 0.4908323884010315,
+          "first_retreat_command": false
+        },
+        {
+          "step": 833,
+          "elapsed_to_send_s": 0.8198142490000464,
+          "translation_from_release_m": 0.0003706916918567017,
+          "rotation_from_release_degrees": 0.09380104356260888,
+          "measured_gripper": 0.47539445757865906,
+          "first_retreat_command": false
+        },
+        {
+          "step": 834,
+          "elapsed_to_send_s": 0.8690913149985136,
+          "translation_from_release_m": 0.0013892641863668068,
+          "rotation_from_release_degrees": 0.27847387667826673,
+          "measured_gripper": 0.4556305408477783,
+          "first_retreat_command": false
+        },
+        {
+          "step": 835,
+          "elapsed_to_send_s": 0.9185952909974731,
+          "translation_from_release_m": 0.0025221741090948437,
+          "rotation_from_release_degrees": 0.5037628573358652,
+          "measured_gripper": 0.428915411233902,
+          "first_retreat_command": false
+        },
+        {
+          "step": 836,
+          "elapsed_to_send_s": 0.9671286070006317,
+          "translation_from_release_m": 0.005142223716012798,
+          "rotation_from_release_degrees": 1.0486391428697408,
+          "measured_gripper": 0.39900508522987366,
+          "first_retreat_command": false
+        },
+        {
+          "step": 837,
+          "elapsed_to_send_s": 1.0195121619981364,
+          "translation_from_release_m": 0.007075765315617397,
+          "rotation_from_release_degrees": 1.4656950918506135,
+          "measured_gripper": 0.36943238973617554,
+          "first_retreat_command": false
+        },
+        {
+          "step": 838,
+          "elapsed_to_send_s": 1.0697552249985165,
+          "translation_from_release_m": 0.009561675914962098,
+          "rotation_from_release_degrees": 2.016537161299406,
+          "measured_gripper": 0.3367142677307129,
+          "first_retreat_command": false
+        },
+        {
+          "step": 839,
+          "elapsed_to_send_s": 1.1188920729982783,
+          "translation_from_release_m": 0.011607015812062305,
+          "rotation_from_release_degrees": 2.483647092030716,
+          "measured_gripper": 0.30273470282554626,
+          "first_retreat_command": false
+        },
+        {
+          "step": 840,
+          "elapsed_to_send_s": 1.1706735369953094,
+          "translation_from_release_m": 0.01434787583396153,
+          "rotation_from_release_degrees": 3.138463225628904,
+          "measured_gripper": 0.25950005650520325,
+          "first_retreat_command": false
+        },
+        {
+          "step": 841,
+          "elapsed_to_send_s": 1.2223222800021176,
+          "translation_from_release_m": 0.016495432116243106,
+          "rotation_from_release_degrees": 3.6961826068834713,
+          "measured_gripper": 0.222257599234581,
+          "first_retreat_command": false
+        },
+        {
+          "step": 842,
+          "elapsed_to_send_s": 1.2753283900019596,
+          "translation_from_release_m": 0.01789241780225248,
+          "rotation_from_release_degrees": 4.118362656835967,
+          "measured_gripper": 0.18435826897621155,
+          "first_retreat_command": false
+        },
+        {
+          "step": 843,
+          "elapsed_to_send_s": 1.3206025389954448,
+          "translation_from_release_m": 0.01839311452863604,
+          "rotation_from_release_degrees": 4.305421920863965,
+          "measured_gripper": 0.14507029950618744,
+          "first_retreat_command": false
+        },
+        {
+          "step": 844,
+          "elapsed_to_send_s": 1.3703601109955343,
+          "translation_from_release_m": 0.018802196661032947,
+          "rotation_from_release_degrees": 4.562563206092565,
+          "measured_gripper": 0.12231376022100449,
+          "first_retreat_command": false
+        },
+        {
+          "step": 845,
+          "elapsed_to_send_s": 1.8375667899963446,
+          "translation_from_release_m": 0.018573648099032617,
+          "rotation_from_release_degrees": 4.706409752113736,
+          "measured_gripper": 0.09394614398479462,
+          "first_retreat_command": true
+        }
+      ]
+    },
+    {
+      "release_step": 3095,
+      "release_reference_transfer": {
+        "previous_command_rad": [
+          -0.5231952667236328,
+          -0.5192238092422485,
+          -0.13449077308177948,
+          -0.0939445048570633,
+          1.312087893486023,
+          -0.5957260023350247,
+          -0.4401819109916687
+        ],
+        "measured_target_rad": [
+          -0.5221269726753235,
+          -0.5175042748451233,
+          -0.1344543695449829,
+          -0.09390676021575928,
+          1.3121274709701538,
+          -0.6092701554298401,
+          -0.43895137310028076
+        ],
+        "bounded_target_rad": [
+          -0.5231952667236328,
+          -0.5192238092422485,
+          -0.13449077308177948,
+          -0.0939445048570633,
+          1.312087893486023,
+          -0.5957260023350247,
+          -0.4401819109916687
+        ],
+        "original_reference_rad": [
+          -0.31085507720601996,
+          -0.5929989956278733,
+          -0.2112181419342691,
+          -0.6190472134619904,
+          1.0710763258779659,
+          -0.41736154179487583,
+          -0.530814756245785
+        ],
+        "correction_cap_rad": null,
+        "reference_mode": "mpc_continuous",
+        "physical_lower_joint_rad": [
+          -3.14,
+          -3.14,
+          -1.48352986419518,
+          -2.61799387799149,
+          -1.5707963267949,
+          -0.698131700797732,
+          -0.698131700797732
+        ],
+        "physical_upper_joint_rad": [
+          1.5707963267949,
+          0.349065850398866,
+          1.48352986419518,
+          0.0,
+          1.5707963267949,
+          1.30899693899575,
+          0.698131700797732
+        ],
+        "bound_active": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "remaining_target_error_rad": [
+          -0.0010682940483093262,
+          -0.0017195343971252441,
+          -3.6403536796569824e-05,
+          -3.774464130401611e-05,
+          -3.9577484130859375e-05,
+          0.013544153094815381,
+          -0.0012305378913879395
+        ],
+        "requested_change_rad": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "interpretation": "Reference settled under closed grip before opening",
+        "preserved_action_indices": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "previous_sent_command_rad": [
+          -0.5231952667236328,
+          -0.5192238092422485,
+          -0.13449077308177948,
+          -0.0939445048570633,
+          1.312087893486023,
+          -0.5957260023350247,
+          -0.4401819109916687
+        ],
+        "prepared_before_open": true
+      },
+      "pre_release_observation_minus_previous_command_rad": [
+        0.0010682940483093262,
+        0.0017195343971252441,
+        3.6403536796569824e-05,
+        3.774464130401611e-05,
+        3.9577484130859375e-05,
+        -0.013544153094815381,
+        0.0012305378913879395
+      ],
+      "release_filtered_command_minus_observation_rad": [
+        -0.0010682940483093262,
+        -0.0017195343971252441,
+        -3.6403536796569824e-05,
+        -3.774464130401611e-05,
+        -3.9577484130859375e-05,
+        0.013544153094815381,
+        -0.0012305378913879395
+      ],
+      "first_retreat_step": 3122,
+      "maximum_observed_translation_before_retreat_m": 0.017853840889408928,
+      "maximum_observed_rotation_before_retreat_degrees": 4.662391781382378,
+      "records": [
+        {
+          "step": 3095,
+          "elapsed_to_send_s": 0.0,
+          "translation_from_release_m": 0.0,
+          "rotation_from_release_degrees": 0.0,
+          "measured_gripper": 0.5073333382606506,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3096,
+          "elapsed_to_send_s": 0.10929133999889018,
+          "translation_from_release_m": 4.57999480238299e-05,
+          "rotation_from_release_degrees": 0.003670126782745911,
+          "measured_gripper": 0.5073347091674805,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3097,
+          "elapsed_to_send_s": 0.15920463999646017,
+          "translation_from_release_m": 6.86097921158104e-05,
+          "rotation_from_release_degrees": 0.004827822429272804,
+          "measured_gripper": 0.5073403716087341,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3098,
+          "elapsed_to_send_s": 0.2097655899997335,
+          "translation_from_release_m": 8.450827864935284e-05,
+          "rotation_from_release_degrees": 0.005562892523783508,
+          "measured_gripper": 0.5073398947715759,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3099,
+          "elapsed_to_send_s": 0.25852121899515623,
+          "translation_from_release_m": 9.536557432881738e-05,
+          "rotation_from_release_degrees": 0.006002075798411385,
+          "measured_gripper": 0.5073431134223938,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3100,
+          "elapsed_to_send_s": 0.31699228399520507,
+          "translation_from_release_m": 0.00010536761755624224,
+          "rotation_from_release_degrees": 0.00658715397151511,
+          "measured_gripper": 0.5073426365852356,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3101,
+          "elapsed_to_send_s": 0.36402706099761417,
+          "translation_from_release_m": 0.00011320580353122035,
+          "rotation_from_release_degrees": 0.0070332232341412705,
+          "measured_gripper": 0.5073431730270386,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3102,
+          "elapsed_to_send_s": 0.4128302039971459,
+          "translation_from_release_m": 0.00011935586526566139,
+          "rotation_from_release_degrees": 0.0072431031302810645,
+          "measured_gripper": 0.5073434710502625,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3103,
+          "elapsed_to_send_s": 0.4680246569987503,
+          "translation_from_release_m": 0.00012803189049100536,
+          "rotation_from_release_degrees": 0.007757723050379805,
+          "measured_gripper": 0.507340669631958,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3104,
+          "elapsed_to_send_s": 0.5158771909991628,
+          "translation_from_release_m": 0.00013678772087002974,
+          "rotation_from_release_degrees": 0.008255364382130323,
+          "measured_gripper": 0.5073392987251282,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3105,
+          "elapsed_to_send_s": 0.5660816309973598,
+          "translation_from_release_m": 0.0001425461485698605,
+          "rotation_from_release_degrees": 0.008487496614651745,
+          "measured_gripper": 0.5073473453521729,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3106,
+          "elapsed_to_send_s": 0.6192081650006003,
+          "translation_from_release_m": 0.0001488406972604491,
+          "rotation_from_release_degrees": 0.008805436842519165,
+          "measured_gripper": 0.5073447227478027,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3107,
+          "elapsed_to_send_s": 0.6642149740000605,
+          "translation_from_release_m": 0.00014900716236305344,
+          "rotation_from_release_degrees": 0.007693913697652932,
+          "measured_gripper": 0.5048297047615051,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3108,
+          "elapsed_to_send_s": 0.7159472299972549,
+          "translation_from_release_m": 0.00013908042452456107,
+          "rotation_from_release_degrees": 0.010174041950654607,
+          "measured_gripper": 0.49895456433296204,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3109,
+          "elapsed_to_send_s": 0.7662347219957155,
+          "translation_from_release_m": 0.00011561492589833861,
+          "rotation_from_release_degrees": 0.02555814844978051,
+          "measured_gripper": 0.4908284544944763,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3110,
+          "elapsed_to_send_s": 0.8176292599964654,
+          "translation_from_release_m": 0.0002934386471522204,
+          "rotation_from_release_degrees": 0.07464928724418095,
+          "measured_gripper": 0.473113089799881,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3111,
+          "elapsed_to_send_s": 0.8761133049993077,
+          "translation_from_release_m": 0.0015436775819136757,
+          "rotation_from_release_degrees": 0.32534721446990794,
+          "measured_gripper": 0.4537787139415741,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3112,
+          "elapsed_to_send_s": 0.9167040799948154,
+          "translation_from_release_m": 0.0032938227036301425,
+          "rotation_from_release_degrees": 0.6976750003467039,
+          "measured_gripper": 0.425887793302536,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3113,
+          "elapsed_to_send_s": 0.9712924909981666,
+          "translation_from_release_m": 0.004277189990507443,
+          "rotation_from_release_degrees": 0.9111616739987066,
+          "measured_gripper": 0.4007355868816376,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3114,
+          "elapsed_to_send_s": 1.0172166429983918,
+          "translation_from_release_m": 0.0070495632537224346,
+          "rotation_from_release_degrees": 1.5253492401868138,
+          "measured_gripper": 0.3710896968841553,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3115,
+          "elapsed_to_send_s": 1.0697493689949624,
+          "translation_from_release_m": 0.00823698690646642,
+          "rotation_from_release_degrees": 1.7941394537547763,
+          "measured_gripper": 0.3426342010498047,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3116,
+          "elapsed_to_send_s": 1.1179734379984438,
+          "translation_from_release_m": 0.010722765773170394,
+          "rotation_from_release_degrees": 2.3700538725267615,
+          "measured_gripper": 0.3011150360107422,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3117,
+          "elapsed_to_send_s": 1.1730612569954246,
+          "translation_from_release_m": 0.013624372032097362,
+          "rotation_from_release_degrees": 3.0777132896191164,
+          "measured_gripper": 0.26347410678863525,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3118,
+          "elapsed_to_send_s": 1.2198235190007836,
+          "translation_from_release_m": 0.015352932891615777,
+          "rotation_from_release_degrees": 3.532885414582208,
+          "measured_gripper": 0.22089655697345734,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3119,
+          "elapsed_to_send_s": 1.2726613499980886,
+          "translation_from_release_m": 0.016894188306615966,
+          "rotation_from_release_degrees": 4.001673065157857,
+          "measured_gripper": 0.191807821393013,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3120,
+          "elapsed_to_send_s": 1.3222368839997216,
+          "translation_from_release_m": 0.01764853431646493,
+          "rotation_from_release_degrees": 4.319214967065415,
+          "measured_gripper": 0.15317422151565552,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3121,
+          "elapsed_to_send_s": 1.3754417219970492,
+          "translation_from_release_m": 0.017853840889408928,
+          "rotation_from_release_degrees": 4.531034026289165,
+          "measured_gripper": 0.11966507881879807,
+          "first_retreat_command": false
+        },
+        {
+          "step": 3122,
+          "elapsed_to_send_s": 1.7279004730007728,
+          "translation_from_release_m": 0.017409181258303045,
+          "rotation_from_release_degrees": 4.662391781382378,
+          "measured_gripper": 0.091938316822052,
+          "first_retreat_command": true
+        }
+      ]
+    },
+    {
+      "release_step": 5323,
+      "release_reference_transfer": {
+        "previous_command_rad": [
+          -0.29676851630210876,
+          -0.5172818303108215,
+          0.03516024606139163,
+          -0.5607380270957947,
+          1.0117602348327637,
+          -0.3186420500278473,
+          -0.19106066226959229
+        ],
+        "measured_target_rad": [
+          -0.2967667579650879,
+          -0.5160086154937744,
+          0.04390769451856613,
+          -0.5568344593048096,
+          1.0127274990081787,
+          -0.32661545276641846,
+          -0.19152602553367615
+        ],
+        "bounded_target_rad": [
+          -0.29676851630210876,
+          -0.5172818303108215,
+          0.03516024606139163,
+          -0.5607380270957947,
+          1.0117602348327637,
+          -0.3186420500278473,
+          -0.19106066226959229
+        ],
+        "original_reference_rad": [
+          -0.15692822749620902,
+          -0.6068444919431026,
+          -0.07331809292482452,
+          -0.8928417401284664,
+          0.8770989045072535,
+          -0.33962479035749144,
+          -0.23626888354438005
+        ],
+        "correction_cap_rad": null,
+        "reference_mode": "mpc_continuous",
+        "physical_lower_joint_rad": [
+          -3.14,
+          -3.14,
+          -1.48352986419518,
+          -2.61799387799149,
+          -1.5707963267949,
+          -0.698131700797732,
+          -0.698131700797732
+        ],
+        "physical_upper_joint_rad": [
+          1.5707963267949,
+          0.349065850398866,
+          1.48352986419518,
+          0.0,
+          1.5707963267949,
+          1.30899693899575,
+          0.698131700797732
+        ],
+        "bound_active": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "remaining_target_error_rad": [
+          -1.7583370208740234e-06,
+          -0.0012732148170471191,
+          -0.008747448457174505,
+          -0.0039035677909851074,
+          -0.0009672641754150391,
+          0.007973402738571167,
+          0.0004653632640838623
+        ],
+        "requested_change_rad": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "interpretation": "Reference settled under closed grip before opening",
+        "preserved_action_indices": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "previous_sent_command_rad": [
+          -0.29676851630210876,
+          -0.5172818303108215,
+          0.03516024606139163,
+          -0.5607380270957947,
+          1.0117602348327637,
+          -0.3186420500278473,
+          -0.19106066226959229
+        ],
+        "prepared_before_open": true
+      },
+      "pre_release_observation_minus_previous_command_rad": [
+        1.7583370208740234e-06,
+        0.0012732148170471191,
+        0.008747448457174505,
+        0.0039035677909851074,
+        0.0009672641754150391,
+        -0.007973402738571167,
+        -0.0004653632640838623
+      ],
+      "release_filtered_command_minus_observation_rad": [
+        -1.7583370208740234e-06,
+        -0.0012732148170471191,
+        -0.008747448457174505,
+        -0.0039035677909851074,
+        -0.0009672641754150391,
+        0.007973402738571167,
+        0.0004653632640838623
+      ],
+      "first_retreat_step": 5350,
+      "maximum_observed_translation_before_retreat_m": 0.015711925274045566,
+      "maximum_observed_rotation_before_retreat_degrees": 3.838240271682629,
+      "records": [
+        {
+          "step": 5323,
+          "elapsed_to_send_s": 0.0,
+          "translation_from_release_m": 0.0,
+          "rotation_from_release_degrees": 3.1805546814635168e-15,
+          "measured_gripper": 0.5073665976524353,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5324,
+          "elapsed_to_send_s": 0.11970454000402242,
+          "translation_from_release_m": 1.989548863285441e-05,
+          "rotation_from_release_degrees": 0.003442155006546781,
+          "measured_gripper": 0.507366955280304,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5325,
+          "elapsed_to_send_s": 0.17452751199743943,
+          "translation_from_release_m": 4.164882462521536e-05,
+          "rotation_from_release_degrees": 0.007112612930139153,
+          "measured_gripper": 0.5073672533035278,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5326,
+          "elapsed_to_send_s": 0.22271460999763804,
+          "translation_from_release_m": 4.9846550567614154e-05,
+          "rotation_from_release_degrees": 0.008518894223832023,
+          "measured_gripper": 0.5073674321174622,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5327,
+          "elapsed_to_send_s": 0.27301875300327083,
+          "translation_from_release_m": 5.8471518156726554e-05,
+          "rotation_from_release_degrees": 0.009990038544247194,
+          "measured_gripper": 0.5073675513267517,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5328,
+          "elapsed_to_send_s": 0.3234773470030632,
+          "translation_from_release_m": 6.726456876732299e-05,
+          "rotation_from_release_degrees": 0.011418049555376831,
+          "measured_gripper": 0.5073678493499756,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5329,
+          "elapsed_to_send_s": 0.3716591080010403,
+          "translation_from_release_m": 7.251645145423525e-05,
+          "rotation_from_release_degrees": 0.012304317348093145,
+          "measured_gripper": 0.5073679685592651,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5330,
+          "elapsed_to_send_s": 0.42492338200099766,
+          "translation_from_release_m": 8.023775365869796e-05,
+          "rotation_from_release_degrees": 0.013596825546091802,
+          "measured_gripper": 0.5073682069778442,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5331,
+          "elapsed_to_send_s": 0.475287893001223,
+          "translation_from_release_m": 8.710074909242968e-05,
+          "rotation_from_release_degrees": 0.014839972941877496,
+          "measured_gripper": 0.5073684453964233,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5332,
+          "elapsed_to_send_s": 0.5256472640030552,
+          "translation_from_release_m": 9.247096608730751e-05,
+          "rotation_from_release_degrees": 0.015908930313051302,
+          "measured_gripper": 0.507368803024292,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5333,
+          "elapsed_to_send_s": 0.5710848809976596,
+          "translation_from_release_m": 9.683354170956711e-05,
+          "rotation_from_release_degrees": 0.016622325418536147,
+          "measured_gripper": 0.507368803024292,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5334,
+          "elapsed_to_send_s": 0.6240734570019413,
+          "translation_from_release_m": 0.00010984335075150072,
+          "rotation_from_release_degrees": 0.018511147963143192,
+          "measured_gripper": 0.5071893930435181,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5335,
+          "elapsed_to_send_s": 0.6735766760029946,
+          "translation_from_release_m": 0.00011303493808615414,
+          "rotation_from_release_degrees": 0.018647776290460667,
+          "measured_gripper": 0.5044441223144531,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5336,
+          "elapsed_to_send_s": 0.7229891160022817,
+          "translation_from_release_m": 0.00011058921248274366,
+          "rotation_from_release_degrees": 0.01874718848482874,
+          "measured_gripper": 0.5001118779182434,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5337,
+          "elapsed_to_send_s": 0.7757606279992615,
+          "translation_from_release_m": 0.00010739123360117272,
+          "rotation_from_release_degrees": 0.02145122613328615,
+          "measured_gripper": 0.4909348487854004,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5338,
+          "elapsed_to_send_s": 0.8246817550025298,
+          "translation_from_release_m": 0.00028545850771499395,
+          "rotation_from_release_degrees": 0.06222622325026835,
+          "measured_gripper": 0.4738307297229767,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5339,
+          "elapsed_to_send_s": 0.8715918020025128,
+          "translation_from_release_m": 0.0014039788806102164,
+          "rotation_from_release_degrees": 0.28906508206287457,
+          "measured_gripper": 0.4535849988460541,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5340,
+          "elapsed_to_send_s": 0.9230716829988523,
+          "translation_from_release_m": 0.002176253974248854,
+          "rotation_from_release_degrees": 0.445811359746869,
+          "measured_gripper": 0.42712244391441345,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5341,
+          "elapsed_to_send_s": 0.9765703930024756,
+          "translation_from_release_m": 0.004433333967963736,
+          "rotation_from_release_degrees": 0.9113818815553403,
+          "measured_gripper": 0.3970429301261902,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5342,
+          "elapsed_to_send_s": 1.0256287239972153,
+          "translation_from_release_m": 0.005700704056203095,
+          "rotation_from_release_degrees": 1.17768797641422,
+          "measured_gripper": 0.368821382522583,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5343,
+          "elapsed_to_send_s": 1.074730123997142,
+          "translation_from_release_m": 0.0077792833579906,
+          "rotation_from_release_degrees": 1.6235006631919748,
+          "measured_gripper": 0.3351984918117523,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5344,
+          "elapsed_to_send_s": 1.1248698120034533,
+          "translation_from_release_m": 0.009866109656855,
+          "rotation_from_release_degrees": 2.0856028516533445,
+          "measured_gripper": 0.30001264810562134,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5345,
+          "elapsed_to_send_s": 1.1746431630017469,
+          "translation_from_release_m": 0.01148762199384101,
+          "rotation_from_release_degrees": 2.458570056343536,
+          "measured_gripper": 0.26117199659347534,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5346,
+          "elapsed_to_send_s": 1.2260649980016751,
+          "translation_from_release_m": 0.013561432335680624,
+          "rotation_from_release_degrees": 2.967407962782078,
+          "measured_gripper": 0.22598260641098022,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5347,
+          "elapsed_to_send_s": 1.2772246669992455,
+          "translation_from_release_m": 0.014714442693763126,
+          "rotation_from_release_degrees": 3.284464073924858,
+          "measured_gripper": 0.1907665878534317,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5348,
+          "elapsed_to_send_s": 1.3264972750039306,
+          "translation_from_release_m": 0.015602612699640294,
+          "rotation_from_release_degrees": 3.6017020325436286,
+          "measured_gripper": 0.14475685358047485,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5349,
+          "elapsed_to_send_s": 1.3758294630024466,
+          "translation_from_release_m": 0.015711925274045566,
+          "rotation_from_release_degrees": 3.7770531390618416,
+          "measured_gripper": 0.10896054655313492,
+          "first_retreat_command": false
+        },
+        {
+          "step": 5350,
+          "elapsed_to_send_s": 1.6442729929985944,
+          "translation_from_release_m": 0.01529419138340829,
+          "rotation_from_release_degrees": 3.838240271682629,
+          "measured_gripper": 0.0861915722489357,
+          "first_retreat_command": true
+        }
+      ]
+    },
+    {
+      "release_step": 7764,
+      "release_reference_transfer": {
+        "previous_command_rad": [
+          -0.5187256336212158,
+          -0.5506085753440857,
+          0.1947772204875946,
+          -0.15845581889152527,
+          1.0413498878479004,
+          -0.513179213146961,
+          -0.3997918665409088
+        ],
+        "measured_target_rad": [
+          -0.518137514591217,
+          -0.5496897101402283,
+          0.1948336362838745,
+          -0.1583934724330902,
+          1.041427731513977,
+          -0.524967610836029,
+          -0.3990834951400757
+        ],
+        "bounded_target_rad": [
+          -0.5187256336212158,
+          -0.5506085753440857,
+          0.1947772204875946,
+          -0.15845581889152527,
+          1.0413498878479004,
+          -0.513179213146961,
+          -0.3997918665409088
+        ],
+        "original_reference_rad": [
+          -0.29564238853694413,
+          -0.6623984126058247,
+          -0.026608946250625938,
+          -0.6893265360634596,
+          0.8784069876592377,
+          -0.4011995621380901,
+          -0.44374900692232233
+        ],
+        "correction_cap_rad": null,
+        "reference_mode": "mpc_continuous",
+        "physical_lower_joint_rad": [
+          -3.14,
+          -3.14,
+          -1.48352986419518,
+          -2.61799387799149,
+          -1.5707963267949,
+          -0.698131700797732,
+          -0.698131700797732
+        ],
+        "physical_upper_joint_rad": [
+          1.5707963267949,
+          0.349065850398866,
+          1.48352986419518,
+          0.0,
+          1.5707963267949,
+          1.30899693899575,
+          0.698131700797732
+        ],
+        "bound_active": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "remaining_target_error_rad": [
+          -0.0005881190299987793,
+          -0.0009188652038574219,
+          -5.6415796279907227e-05,
+          -6.23464584350586e-05,
+          -7.784366607666016e-05,
+          0.011788397689068031,
+          -0.0007083714008331299
+        ],
+        "requested_change_rad": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "interpretation": "Reference settled under closed grip before opening",
+        "preserved_action_indices": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "previous_sent_command_rad": [
+          -0.5187256336212158,
+          -0.5506085753440857,
+          0.1947772204875946,
+          -0.15845581889152527,
+          1.0413498878479004,
+          -0.513179213146961,
+          -0.3997918665409088
+        ],
+        "prepared_before_open": true
+      },
+      "pre_release_observation_minus_previous_command_rad": [
+        0.0005881190299987793,
+        0.0009188652038574219,
+        5.6415796279907227e-05,
+        6.23464584350586e-05,
+        7.784366607666016e-05,
+        -0.011788397689068031,
+        0.0007083714008331299
+      ],
+      "release_filtered_command_minus_observation_rad": [
+        -0.0005881190299987793,
+        -0.0009188652038574219,
+        -5.6415796279907227e-05,
+        -6.23464584350586e-05,
+        -7.784366607666016e-05,
+        0.011788397689068031,
+        -0.0007083714008331299
+      ],
+      "first_retreat_step": 7791,
+      "maximum_observed_translation_before_retreat_m": 0.018167816288748848,
+      "maximum_observed_rotation_before_retreat_degrees": 4.480717947849511,
+      "records": [
+        {
+          "step": 7764,
+          "elapsed_to_send_s": 0.0,
+          "translation_from_release_m": 0.0,
+          "rotation_from_release_degrees": 0.0,
+          "measured_gripper": 0.5072524547576904,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7765,
+          "elapsed_to_send_s": 0.11108601900195936,
+          "translation_from_release_m": 1.9298891352584127e-05,
+          "rotation_from_release_degrees": 0.0006880673734452128,
+          "measured_gripper": 0.5072528123855591,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7766,
+          "elapsed_to_send_s": 0.16169899600208737,
+          "translation_from_release_m": 4.189416438342144e-05,
+          "rotation_from_release_degrees": 0.0013010636375701376,
+          "measured_gripper": 0.5072532892227173,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7767,
+          "elapsed_to_send_s": 0.21010878699598834,
+          "translation_from_release_m": 4.97871389072463e-05,
+          "rotation_from_release_degrees": 0.001577902348231789,
+          "measured_gripper": 0.5072535276412964,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7768,
+          "elapsed_to_send_s": 0.26240448399767047,
+          "translation_from_release_m": 5.484316220593678e-05,
+          "rotation_from_release_degrees": 0.0016650397070769748,
+          "measured_gripper": 0.5072537064552307,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7769,
+          "elapsed_to_send_s": 0.31078466399776516,
+          "translation_from_release_m": 6.18633862604552e-05,
+          "rotation_from_release_degrees": 0.0018076834346856,
+          "measured_gripper": 0.5072539448738098,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7770,
+          "elapsed_to_send_s": 0.3689060190008604,
+          "translation_from_release_m": 7.322920198380387e-05,
+          "rotation_from_release_degrees": 0.0027233883792938153,
+          "measured_gripper": 0.507254421710968,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7771,
+          "elapsed_to_send_s": 0.4161813550017541,
+          "translation_from_release_m": 8.217996485377924e-05,
+          "rotation_from_release_degrees": 0.003712605071046969,
+          "measured_gripper": 0.507254958152771,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7772,
+          "elapsed_to_send_s": 0.46182155599672114,
+          "translation_from_release_m": 9.30928065016081e-05,
+          "rotation_from_release_degrees": 0.004756457051766515,
+          "measured_gripper": 0.5072547793388367,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7773,
+          "elapsed_to_send_s": 0.515974661000655,
+          "translation_from_release_m": 9.88424682910587e-05,
+          "rotation_from_release_degrees": 0.005054690363291268,
+          "measured_gripper": 0.507254421710968,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7774,
+          "elapsed_to_send_s": 0.566763766000804,
+          "translation_from_release_m": 0.0001060456227567227,
+          "rotation_from_release_degrees": 0.005258529947731197,
+          "measured_gripper": 0.5072543621063232,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7775,
+          "elapsed_to_send_s": 0.6158368889955455,
+          "translation_from_release_m": 0.00011192153379115754,
+          "rotation_from_release_degrees": 0.005157002074423301,
+          "measured_gripper": 0.5071823596954346,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7776,
+          "elapsed_to_send_s": 0.6664865080019808,
+          "translation_from_release_m": 0.00011097173748254528,
+          "rotation_from_release_degrees": 0.00568052406094511,
+          "measured_gripper": 0.5045706033706665,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7777,
+          "elapsed_to_send_s": 0.7176670279950486,
+          "translation_from_release_m": 0.00010958250417783371,
+          "rotation_from_release_degrees": 0.015509120209262546,
+          "measured_gripper": 0.5003659725189209,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7778,
+          "elapsed_to_send_s": 0.771174928995606,
+          "translation_from_release_m": 0.00010367317412130708,
+          "rotation_from_release_degrees": 0.04286595089270371,
+          "measured_gripper": 0.4921105206012726,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7779,
+          "elapsed_to_send_s": 0.8175214160000905,
+          "translation_from_release_m": 0.0003933279682182512,
+          "rotation_from_release_degrees": 0.10465251717206563,
+          "measured_gripper": 0.47847458720207214,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7780,
+          "elapsed_to_send_s": 0.8662421810004162,
+          "translation_from_release_m": 0.0008581149981211844,
+          "rotation_from_release_degrees": 0.184677500914829,
+          "measured_gripper": 0.45914986729621887,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7781,
+          "elapsed_to_send_s": 0.9198460999978124,
+          "translation_from_release_m": 0.0021020246734715746,
+          "rotation_from_release_degrees": 0.4158711815183086,
+          "measured_gripper": 0.43590039014816284,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7782,
+          "elapsed_to_send_s": 0.9687493329984136,
+          "translation_from_release_m": 0.004148190043924227,
+          "rotation_from_release_degrees": 0.8192839947374821,
+          "measured_gripper": 0.4062941372394562,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7783,
+          "elapsed_to_send_s": 1.0167274189952877,
+          "translation_from_release_m": 0.005215863683150591,
+          "rotation_from_release_degrees": 1.0367913155272417,
+          "measured_gripper": 0.3754352033138275,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7784,
+          "elapsed_to_send_s": 1.0669392199997674,
+          "translation_from_release_m": 0.008286571871495023,
+          "rotation_from_release_degrees": 1.685075923972852,
+          "measured_gripper": 0.3372747600078583,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7785,
+          "elapsed_to_send_s": 1.1191136699999333,
+          "translation_from_release_m": 0.010770978773225432,
+          "rotation_from_release_degrees": 2.235566855416483,
+          "measured_gripper": 0.3017188608646393,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7786,
+          "elapsed_to_send_s": 1.1673477770018508,
+          "translation_from_release_m": 0.01313912671418603,
+          "rotation_from_release_degrees": 2.786249015039836,
+          "measured_gripper": 0.26235970854759216,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7787,
+          "elapsed_to_send_s": 1.2164880010022898,
+          "translation_from_release_m": 0.014406117025613518,
+          "rotation_from_release_degrees": 3.0961378921717584,
+          "measured_gripper": 0.22643989324569702,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7788,
+          "elapsed_to_send_s": 1.2681062849951559,
+          "translation_from_release_m": 0.01661697920024546,
+          "rotation_from_release_degrees": 3.6997910816755457,
+          "measured_gripper": 0.18476027250289917,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7789,
+          "elapsed_to_send_s": 1.3160156489975634,
+          "translation_from_release_m": 0.017620369360883268,
+          "rotation_from_release_degrees": 4.036639797287736,
+          "measured_gripper": 0.14862369000911713,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7790,
+          "elapsed_to_send_s": 1.368677630001912,
+          "translation_from_release_m": 0.018167816288748848,
+          "rotation_from_release_degrees": 4.330396678269353,
+          "measured_gripper": 0.11614485085010529,
+          "first_retreat_command": false
+        },
+        {
+          "step": 7791,
+          "elapsed_to_send_s": 1.674277140002232,
+          "translation_from_release_m": 0.018052840649056174,
+          "rotation_from_release_degrees": 4.480717947849511,
+          "measured_gripper": 0.08680487424135208,
+          "first_retreat_command": true
+        }
+      ]
+    }
+  ],
+  "interpretation": "FK from logged observation_state in robot base. Includes first retreat input observation before sending its new command; exact actuator application time missing. Initial command errors/poses vary across runs, so this is not a same-state causal estimate or static tracking bias."
+}

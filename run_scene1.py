@@ -31,7 +31,7 @@ from scene1.handover_contract import HandoverContract, HandoverContractStop
 from scene1.visual_cycle import VisualCycle
 from scene1.visual_pickup import VisualPickup, grasp_template, grasp_plan, restore_next_context
 from scene1.first_transport import begin_first_transport
-from scene1.first_pickup import begin_first_pickup
+from scene1.first_pickup import begin_first_pickup, begin_traditional_pickup
 from scene1.pickup_resume import write_pickup_checkpoint, restore_weighing_context
 from scene1.placement_gain import PlacementGain
 from scene1.placement_target import PlacementTarget
@@ -64,10 +64,29 @@ def read_manipulation_rgbd(scene, aligner, visual_cycle, visual_pickup, config):
     # select no geometry based on whether a subsequent sweep passes.
     split = split or (settling and pending['kind'] == 'short_retreat' and split_enabled
                       and config.get('wrist_assist', {}).get('release_spatial_components', False))
+    # Predetermined depth connectivity separates detached gripper points before
+    # fitting parcel PCA. Never select a grouping based on a collision result.
+    component_gap = (config.get('visual_cycle', {}).get('release_component_max_gap_m', .02)
+                     if split and pending['kind'] == 'short_retreat' else .02)
     dense_pickup = (config.get('performance', {}).get('dense_pickup_candidates', False)
         and visual_pickup is not None and getattr(visual_pickup, 'active', False)
         and visual_pickup.stage in ('select', 'clear', 'hover', 'descend'))
-    snapshot = scene.read(candidate_stride=2 if settling or dense_pickup else 4, spatial_components=split)
+    cycle_only = (config.get('performance', {}).get('phase_rgbd', False)
+        and visual_cycle is not None and visual_cycle.active
+        and not (visual_pickup is not None and visual_pickup.active))
+    regrasp_motion = (config.get('performance', {}).get('regrasp_phase_rgbd', False)
+        and pending is not None and pending.get('kind') == 'pregrasp'
+        and pending.get('regrasp_stage') in ('align', 'descend', 'insert')
+        and getattr(aligner, 'weighing_target', None) is not None
+        and getattr(aligner, 'wrist_projector', None) is not None
+        and 'support_z_base_m' in pending.get('target', {}))
+    # VisualCycle uses the fresh registered cloud, table plane, bin rim and
+    # wrist edges directly. It does not consume pad/parcel candidate lists.
+    # Resume both analyses before selection of the next parcel.
+    snapshot = scene.read(candidate_stride=2 if settling or dense_pickup else 4, spatial_components=split,
+                          find_objects=not (cycle_only or regrasp_motion),
+                          find_surfaces=not (cycle_only or regrasp_motion),
+                          component_max_gap_m=component_gap)
     if (snapshot is not None and visual_pickup is not None
             and getattr(visual_pickup, 'active', False)
             and getattr(visual_pickup, 'stage', None) == 'observe_pad'):
@@ -91,7 +110,7 @@ def read_manipulation_rgbd(scene, aligner, visual_cycle, visual_pickup, config):
             snapshot['candidates'], snapshot['table_z_base_m'] = metric_candidates(
                 snapshot['rgb'], snapshot['depth_m'], snapshot['intrinsic'],
                 snapshot['camera_to_base'], config['cartesian_alignment'],
-                stride=2, spatial_components=True)
+                stride=2, spatial_components=True, component_max_gap_m=component_gap)
             snapshot['candidate_spatial_components'] = True
     if settling and pending['kind'] == 'settle' and split_enabled and not split:
         # Keep every existing first-parcel observation, including unsupported
@@ -118,6 +137,151 @@ def load_config(path, speed_profile=None):
             config.setdefault(section, {}).update(values)
     if config.get('performance', {}).get('compact_detector', False):
         config['vision']['compact_regions'] = True
+    if config.get('performance', {}).get('residual_analytic_jacobian', False):
+        config['visual_residual']['analytic_jacobian'] = True
+    continuous_adapt = config.get('performance', {}).get('release_continuous_adapt', False)
+    if not isinstance(continuous_adapt, bool):
+        raise ValueError('Release continuous adaptation must be boolean')
+    config['wrist_assist']['release_prepare_continuous_adapt'] = continuous_adapt
+    recover_gap = config.get('visual_cycle', {}).get('release_prepare_recover_gap', False)
+    if not isinstance(recover_gap, bool):
+        raise ValueError('Release gap recovery must be boolean')
+    config['wrist_assist']['release_prepare_recover_gap'] = recover_gap
+    proportional_prepare = config.get('visual_cycle', {}).get('release_prepare_proportional', False)
+    if type(proportional_prepare) is not bool:
+        raise ValueError('Release proportional preparation must be boolean')
+    config['wrist_assist']['release_prepare_proportional'] = proportional_prepare
+    shorter_exit = config.get('visual_cycle', {}).get('release_shorter_exit', False)
+    if type(shorter_exit) is not bool:
+        raise ValueError('release_shorter_exit must be boolean')
+    if shorter_exit and (config['wrist_assist'].get('release_retreat_preflight') != 'executor_sweep'
+            or config['wrist_assist'].get('release_retreat_direction') != 'measured_tool_axis'
+            or config['wrist_assist'].get('release_clearance_rise_m') != .07):
+        raise ValueError('Shorter exit requires the original 70 mm measured-axis certified retreat')
+    config['wrist_assist']['release_shorter_exit'] = shorter_exit
+    shorter_distance = config.get('visual_cycle', {}).get('release_shorter_exit_distance_m')
+    if shorter_distance is not None:
+        if (not shorter_exit or not np.isfinite(shorter_distance)
+                or not .04 <= shorter_distance <= config['wrist_assist']['release_short_retreat_m']):
+            raise ValueError('Shorter exit distance requires certified shorter exit and at least 40 mm')
+        config['wrist_assist']['release_shorter_exit_distance_m'] = shorter_distance
+    if type(config.get('visual_cycle', {}).get('stable_selection_view', False)) is not bool:
+        raise ValueError('stable_selection_view must be boolean')
+    if type(config.get('visual_cycle', {}).get('traditional_template_widest_visible', False)) is not bool:
+        raise ValueError('traditional_template_widest_visible must be boolean')
+    if type(config.get('visual_cycle', {}).get('traditional_template_settled_refresh', False)) is not bool:
+        raise ValueError('traditional_template_settled_refresh must be boolean')
+    if type(config.get('visual_cycle', {}).get('bin_empty_retreat_posture', False)) is not bool:
+        raise ValueError('bin_empty_retreat_posture must be boolean')
+    image_aligned_box_pose = config.get('visual_cycle', {}).get('image_aligned_box_pose', False)
+    if type(image_aligned_box_pose) is not bool:
+        raise ValueError('image_aligned_box_pose must be boolean')
+    config['wrist_assist']['image_aligned_box_pose'] = image_aligned_box_pose
+    attachment_time_normalization = config.get('visual_cycle', {}).get('attachment_time_normalization', False)
+    if type(attachment_time_normalization) is not bool:
+        raise ValueError('attachment_time_normalization must be boolean')
+    config['wrist_assist']['attachment_time_normalization'] = attachment_time_normalization
+    regrasp_time_normalization = config.get('visual_cycle', {}).get('regrasp_time_normalization', False)
+    if type(regrasp_time_normalization) is not bool:
+        raise ValueError('regrasp_time_normalization must be boolean')
+    config['wrist_assist']['regrasp_time_normalization'] = regrasp_time_normalization
+    regrasp_gain_scale = config.get('visual_cycle', {}).get('regrasp_gain_scale', 1.)
+    if not np.isfinite(regrasp_gain_scale) or not .25 <= regrasp_gain_scale <= 1.:
+        raise ValueError('regrasp_gain_scale must be finite in [.25,1]')
+    config['wrist_assist']['regrasp_gain_scale'] = regrasp_gain_scale
+    weighing_damping = config.get('visual_cycle', {}).get('weighing_velocity_damping', 1.5)
+    if not np.isfinite(weighing_damping) or not 1.5 <= weighing_damping <= 6.:
+        raise ValueError('weighing_velocity_damping must be finite in [1.5,6]')
+    config['wrist_assist']['weighing_velocity_damping'] = weighing_damping
+    weighing_angular_damping = config.get('visual_cycle', {}).get('weighing_angular_damping', 0.)
+    if not np.isfinite(weighing_angular_damping) or not 0. <= weighing_angular_damping <= 6.:
+        raise ValueError('weighing_angular_damping must be finite in [0,6]')
+    config['wrist_assist']['weighing_angular_damping'] = weighing_angular_damping
+    insert_position_priority = config.get('visual_cycle', {}).get('regrasp_insert_position_priority', False)
+    if type(insert_position_priority) is not bool:
+        raise ValueError('Regrasp insertion position priority must be boolean')
+    config['wrist_assist']['regrasp_insert_position_priority'] = insert_position_priority
+    release_full_open_feedback = config.get('visual_cycle', {}).get('release_full_open_feedback', False)
+    if type(release_full_open_feedback) is not bool:
+        raise ValueError('release_full_open_feedback must be boolean')
+    config['wrist_assist']['release_full_open_feedback'] = release_full_open_feedback
+    release_open_time_normalization = config.get('visual_cycle', {}).get('release_open_time_normalization', False)
+    if type(release_open_time_normalization) is not bool:
+        raise ValueError('release_open_time_normalization must be boolean')
+    config['wrist_assist']['release_open_time_normalization'] = release_open_time_normalization
+    release_live_geometry = config.get('visual_cycle', {}).get('release_live_geometry', False)
+    if type(release_live_geometry) is not bool:
+        raise ValueError('Release live geometry must be boolean')
+    if release_live_geometry and (not config['wrist_assist'].get('release_sweep_projection', False)
+            or config['wrist_assist'].get('release_retreat_preflight') != 'executor_sweep'):
+        raise ValueError('Live retreat geometry requires the original projected executor sweep')
+    config['wrist_assist']['release_live_geometry'] = release_live_geometry
+    release_open_anti_windup = config.get('visual_cycle', {}).get('release_open_anti_windup', False)
+    if type(release_open_anti_windup) is not bool:
+        raise ValueError('Release opening anti-windup must be boolean')
+    config['wrist_assist']['release_open_anti_windup'] = release_open_anti_windup
+    release_open_position_gain = config.get('visual_cycle', {}).get('release_open_hold_position_gain')
+    if release_open_position_gain is not None:
+        if not np.isfinite(release_open_position_gain) or not 1. <= release_open_position_gain <= 4.:
+            raise ValueError('Release opening position gain must be finite in [1,4]')
+        config['wrist_assist']['release_open_hold_position_gain'] = release_open_position_gain
+    release_planning_margin = config.get('visual_cycle', {}).get('release_planning_margin_m', .003)
+    if not np.isfinite(release_planning_margin) or not .003 <= release_planning_margin <= .006:
+        raise ValueError('Release planning margin must be between 3 and 6 mm')
+    config['wrist_assist']['release_planning_margin_m'] = release_planning_margin
+    if type(config.get('visual_cycle', {}).get('table_reference_warm_start', False)) is not bool:
+        raise ValueError('table_reference_warm_start must be boolean')
+    if type(config.get('visual_cycle', {}).get('table_reference_tilt_compensation', False)) is not bool:
+        raise ValueError('table_reference_tilt_compensation must be boolean')
+    if type(config.get('visual_cycle', {}).get('regrasp_nearest_visible_section', False)) is not bool:
+        raise ValueError('regrasp_nearest_visible_section must be boolean')
+    if type(config.get('visual_cycle', {}).get('weighing_feasibility_refine', False)) is not bool:
+        raise ValueError('weighing_feasibility_refine must be boolean')
+    component_gap = config.get('visual_cycle', {}).get('release_component_max_gap_m', .02)
+    if not np.isfinite(component_gap) or not .012 <= component_gap <= .02:
+        raise ValueError('release_component_max_gap_m must be between 12 and 20 mm')
+    support_reserve = config.get('visual_cycle', {}).get('weighing_support_reserve_m', 0.)
+    if not np.isfinite(support_reserve) or not 0. <= support_reserve <= .015:
+        raise ValueError('weighing_support_reserve_m must be within 0–15 mm')
+    if support_reserve and not config.get('visual_cycle', {}).get('weighing_joint_plan', False):
+        raise ValueError('Support planning reserve requires joint weighing planning')
+    view_retreat = config.get('visual_cycle', {}).get('bin_view_retreat_lateral_m', 0.)
+    if not np.isfinite(view_retreat) or not 0. <= view_retreat <= .15:
+        raise ValueError('Empty left-hand viewing retreat must be within 0–15 cm')
+    conditional_view = config.get('visual_cycle', {}).get('bin_view_retreat_on_occlusion', False)
+    if type(conditional_view) is not bool or (conditional_view and not view_retreat):
+        raise ValueError('Conditional bin viewing requires a boolean flag and nonzero viewing retreat')
+    view_depth = config.get('visual_cycle', {}).get('bin_view_depth_search_m', 0.)
+    if not np.isfinite(view_depth) or not 0. <= view_depth <= .02:
+        raise ValueError('Bin viewing depth search must stay within 0–20 mm')
+    prepare_step = config.get('visual_cycle', {}).get('release_prepare_step_rad')
+    if prepare_step is not None:
+        if (not np.isfinite(prepare_step)
+                or not 0. < prepare_step <= config['visual_residual']['max_joint_step_rad']):
+            raise ValueError('Release preparation step must retain or tighten the original joint step')
+        config['wrist_assist']['release_prepare_step_rad'] = prepare_step
+    planning_margin = config.get('visual_cycle', {}).get('grasp_planning_margin_m', .003)
+    if not np.isfinite(planning_margin) or not .003 <= planning_margin <= .006:
+        raise ValueError('Grasp planning margin must be within [3,6] mm')
+    config['wrist_assist']['grasp_planning_margin_m'] = planning_margin
+    tracking_open_step = config.get('visual_cycle', {}).get('release_tracking_open_step')
+    if tracking_open_step is not None:
+        original_step = config['wrist_assist'].get('release_gripper_open_step')
+        if (original_step is None or not np.isfinite(tracking_open_step)
+                or not 0. < tracking_open_step <= original_step):
+            raise ValueError('Tracking opening must retain or tighten the original gripper step')
+        config['wrist_assist']['release_tracking_open_step'] = tracking_open_step
+    if type(config.get('performance', {}).get('record_grasp_skills', False)) is not bool:
+        raise ValueError('record_grasp_skills must be boolean')
+    if type(config.get('performance', {}).get('shared_rgb_decode', False)) is not bool:
+        raise ValueError('shared_rgb_decode must be boolean')
+    if type(config.get('performance', {}).get('latest_sdk_odometry', False)) is not bool:
+        raise ValueError('latest_sdk_odometry must be boolean')
+    byte_images = config.get('performance', {}).get('byte_visual_observations', False)
+    if type(byte_images) is not bool:
+        raise ValueError('byte_visual_observations must be boolean')
+    if byte_images and config.get('visual_cycle', {}).get('grasp_execution', 'legacy_hybrid') not in ('traditional', 'local_act'):
+        raise ValueError('Byte visual observations require traditional or local ACT execution')
     compression = config.get('sensor_snapshot_compression_level', 6)
     if type(compression) is not int or not 0 <= compression <= 9:
         raise ValueError('sensor_snapshot_compression_level must be an integer from 0 to 9')
@@ -137,14 +301,22 @@ def load_config(path, speed_profile=None):
         raise ValueError("Use the original scene1 ACT deployment configuration")
     if base.inference.async_inference:
         raise ValueError("This runner supports synchronous ACT only")
-    model_dir = Path(base.inference.pretrained_path)
+    execution = config.get('visual_cycle', {}).get('grasp_execution', 'legacy_hybrid')
+    model_dir = Path(config['visual_cycle']['local_act_model'] if execution == 'local_act'
+                     else base.inference.pretrained_path)
     if not model_dir.is_absolute():
         model_dir = Path(config["project_root"]) / model_dir
     base.inference.pretrained_path = str(model_dir)
-    model = json.loads((model_dir / "config.json").read_text())
-    for filename in ("model.safetensors", "policy_preprocessor.json", "policy_postprocessor.json"):
-        if not (model_dir / filename).is_file():
-            raise FileNotFoundError(model_dir / filename)
+    if config.get('visual_cycle', {}).get('grasp_execution') == 'traditional':
+        model = {'type': 'act', 'output_features': {'action': {'shape': [16]}},
+                 'input_features': {'observation.state': {'shape': [16]}, **{
+                     'observation.images.'+name: {'shape': [3, env.image_size[1], env.image_size[0]]}
+                     for name in ('head_cam_h', 'wrist_cam_l', 'wrist_cam_r')}}}
+    else:
+        model = json.loads((model_dir / "config.json").read_text())
+        for filename in ("model.safetensors", "policy_preprocessor.json", "policy_postprocessor.json"):
+            if not (model_dir / filename).is_file():
+                raise FileNotFoundError(model_dir / filename)
     if model["type"] != "act" or model["output_features"]["action"]["shape"] != [16]:
         raise ValueError("Expected original 16-dimensional ACT policy")
     if model["input_features"]["observation.state"]["shape"] != [16]:
@@ -176,6 +348,21 @@ def load_config(path, speed_profile=None):
     PolicyTraceWindow(config.get('policy_trace', {}), ROOT)
     contract_config = config.get('handover_contract', {})
     cycle_config = config.get('visual_cycle', {})
+    execution = cycle_config.get('grasp_execution', 'legacy_hybrid')
+    if execution not in ('legacy_hybrid', 'traditional', 'local_act'):
+        raise ValueError('Unsupported grasp_execution')
+    if execution in ('traditional', 'local_act') and (not cycle_config.get('enabled')
+            or not cycle_config.get('visual_after_first_parcel')
+            or config.get('policy_trace', {}).get('enabled')
+            or config['wrist_assist'].get('trace_act_handover')):
+        raise ValueError('Unified pickup modes require full visual continuation without legacy ACT tracing')
+    if execution == 'local_act':
+        if not Path(cycle_config['local_act_manifest']).is_file():
+            raise FileNotFoundError(cycle_config['local_act_manifest'])
+        if model.get('chunk_size') != 30 or model.get('vision_backbone') != 'resnet18':
+            raise ValueError('Local ACT requires the frozen 30-step ResNet-18 skill')
+        if set(expected_images) != {'observation.images.'+name for name in ('head_cam_h', 'wrist_cam_l', 'wrist_cam_r')}:
+            raise ValueError('Local ACT requires the original head and both wrist RGB inputs')
     if cycle_config.get('enabled', False):
         if (not config['cartesian_alignment']['enabled']
                 or config['cartesian_alignment'].get('strategy') != 'act_residual'
@@ -281,6 +468,12 @@ class SensorWatchdog:
 
 def run(args, config, base, images):
     # Reuse original preprocessing, ACT loading, bag replay and ROS environment.
+    execution = config.get("visual_cycle", {}).get("grasp_execution", 'legacy_hybrid')
+    traditional = execution in ('traditional', 'local_act')
+    if traditional and (args.mode != 'optimized' or any((args.resume_from,
+            args.regrasp_from, args.pickup_from, args.act_handover_from,
+            args.visual_cycle_from, args.visual_next_from, args.visual_weigh_from))):
+        raise ValueError('Traditional candidate currently requires a fresh optimized full episode')
     os.chdir(config["project_root"])
     import rosgraph
     import rospy
@@ -309,6 +502,11 @@ def run(args, config, base, images):
     sdk_numeric_copies = None
     motion_cadence = None
     rgbd_worker = None
+    detection_pool = None
+    skill_recorder = None
+    skill_recording_error = None
+    local_act = None
+    local_act_report_error = None
     rgbd_scene = None
     output = ROOT / "outputs" / time.strftime("%Y%m%d-%H%M%S")
     output.mkdir(parents=True, exist_ok=False)
@@ -340,13 +538,26 @@ def run(args, config, base, images):
             if rospy.is_shutdown() or time.monotonic() > deadline:
                 raise RuntimeError(f"Sensor startup timed out: {watchdog.ages()}")
             time.sleep(0.05)
-        policy, preprocess, postprocess, _ = load_native_policy_bundle(
-            pretrained_path=base.inference.pretrained_path,
-            device=torch.device(base.inference.device), strict=True)
-        if policy.config.type != "act":
-            raise RuntimeError("Loaded policy is not ACT")
+        policy = None
+        if not traditional:
+            policy, preprocess, postprocess, _ = load_native_policy_bundle(
+                pretrained_path=base.inference.pretrained_path,
+                device=torch.device(base.inference.device), strict=True)
+            if policy.config.type != "act":
+                raise RuntimeError("Loaded policy is not ACT")
+        if execution == 'local_act':
+            from scene1.local_act_grasp import LocalACTGrasp
+            low = base.env.limits['joint_q']['min'][:7]+base.env.limits['gripper']['min'][:1]
+            low += base.env.limits['joint_q']['min'][7:]+base.env.limits['gripper']['min'][1:]
+            high = base.env.limits['joint_q']['max'][:7]+base.env.limits['gripper']['max'][:1]
+            high += base.env.limits['joint_q']['max'][7:]+base.env.limits['gripper']['max'][1:]
+            local_act = LocalACTGrasp(base.inference.pretrained_path,
+                config['visual_cycle']['local_act_manifest'], base.inference.device,
+                config, low, high, output)
         def reset_policy():
             nonlocal policy_epoch, epoch_inference_index
+            if policy is None:
+                raise RuntimeError("Traditional mode cannot resume ACT")
             policy.reset()
             policy_epoch += 1
             epoch_inference_index = 0
@@ -443,9 +654,11 @@ def run(args, config, base, images):
                     aligner.restore_weighing(records, initial, snapshot)
                 motion.reset(load_last_arm_command(args.arm_state_from) if args.arm_state_from else records[-1]['sent_action'])
             if config['head_camera']['enabled']:
-                head_tracker = HeadLookController(config['head_camera'],
+                head_tracker = HeadLookController(dict(config['head_camera'],
+                    analytic_jacobian=config.get('performance', {}).get('analytic_head_jacobian', False)),
                     rospy.get_param(config['cartesian_alignment']['description_param']))
-        reset_policy()
+        if not traditional:
+            reset_policy()
         if config.get('visual_cycle', {}).get('enabled', False):
             visual_cycle = VisualCycle(config['visual_cycle'], kinematics,
                                        env.action_space.low, env.action_space.high, initial)
@@ -465,10 +678,14 @@ def run(args, config, base, images):
                                           config['performance'].get('fast_cycle_stages'),
                                           config['performance'].get('cycle_stage_hz'),
                                           config['performance'].get('fast_pickup_stages'),
-                                          config['performance'].get('pickup_stage_hz'))
+                                          config['performance'].get('pickup_stage_hz'),
+                                          config['performance'].get('guarded_motion_hz'))
         if config.get('performance', {}).get('parallel_rgbd', False):
             from scene1.parallel_read import CycleRead
             rgbd_worker = CycleRead()
+        if config.get('performance', {}).get('parallel_detection', False):
+            from concurrent.futures import ThreadPoolExecutor
+            detection_pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix='scene1-wrist')
         last_send = time.monotonic()
         previous_sent = initial.copy()
         if visual_cycle is not None and visual_cycle.active:
@@ -492,6 +709,11 @@ def run(args, config, base, images):
             trace_window.trigger(1, 'act_handover_resume')
         paused_after_grasp = False
         paused_after_weighing = False
+        if config.get('performance', {}).get('record_grasp_skills', False):
+            if config.get('visual_cycle', {}).get('grasp_execution') != 'traditional':
+                raise ValueError('Expert skill recording requires the traditional grasp executor')
+            from scene1.skill_recording import GraspSkillRecorder
+            skill_recorder = GraspSkillRecorder(env, output/'grasp-skills', images)
         log = (output / "steps.jsonl").open("w", buffering=1)
         (output / "run.json").write_text(json.dumps({
             "mode": args.mode, "task": args.task, "config": config,
@@ -507,7 +729,7 @@ def run(args, config, base, images):
             "visual_weigh_from": args.visual_weigh_from,
             "visual_cycle_from": str(Path(args.visual_cycle_from).resolve()) if args.visual_cycle_from else None,
             "task_success": None,
-            "policy_runtime": {key: getattr(policy.config, key, None) for key in
+            "policy_runtime": {key: getattr(policy.config, key, None) if policy is not None else None for key in
                                ('chunk_size', 'n_obs_steps', 'n_action_steps', 'temporal_ensemble_coeff')},
         }, ensure_ascii=False, indent=2))
         for step in range(config["max_steps"]):
@@ -522,7 +744,7 @@ def run(args, config, base, images):
             started = time.monotonic()
             if motion_cadence is not None:
                 period = motion_cadence.select(visual_cycle, visual_pickup,
-                    observation['observation.state'].detach().cpu().numpy().reshape(-1))
+                    observation['observation.state'].detach().cpu().numpy().reshape(-1), aligner)
             cycle_timer.begin(steps+1, rospy.get_time())
             cycle_timer.mark('clock_sample', control_period_s=period, sensor_sim_start_s=
                 watchdog.snapshot().get('/sensors_data_raw', {}).get('sensor_time_s'))
@@ -555,14 +777,46 @@ def run(args, config, base, images):
             for key, shape in images.items():
                 if list(observation[key].shape) != [1] + shape:
                     raise ValueError(f"Runtime image shape mismatch: {key}: {observation[key].shape}")
+                if config.get('performance', {}).get('byte_visual_observations', False) and observation[key].dtype != torch.uint8:
+                    raise ValueError('Byte observation adapter changed camera dtype: '+key)
             raw_image = rgb_image(observation[config["vision"]["image_key"]])
-            detections = detector.detect(raw_image)
             wrist_images = {
                 "left": rgb_image(observation["observation.images.wrist_cam_l"]),
                 "right": rgb_image(observation["observation.images.wrist_cam_r"]),
             }
-            wrist_detections = {side: wrist_detectors[side].detect(image)
-                                for side, image in wrist_images.items()}
+            color_diagnostics_evaluated = True
+            if config.get('performance', {}).get('sparse_color_diagnostics', False):
+                # These controllers consume fresh RGB-D and wrist outlines,
+                # not color-class detections. Sample only passive diagnostics;
+                # never apply this while ACT/residual color alignment controls.
+                visual_control = ((visual_cycle is not None and visual_cycle.active)
+                                  or (visual_pickup is not None and visual_pickup.active))
+                pending = getattr(aligner, 'pending', None)
+                if config.get('performance', {}).get('sparse_regrasp_diagnostics', False):
+                    outline_control = (pending is not None and pending.get('kind') == 'pregrasp'
+                        and getattr(aligner, 'weighing_target', None) is not None
+                        and 'support_z_base_m' in pending.get('target', {})
+                        and config['wrist_assist'].get('require_edges', False)
+                        and config['wrist_assist'].get('use_parcel_outline', False))
+                    visual_control = visual_control or outline_control
+                passive_only = (not config['servo']['enabled'] and
+                    config['grasp']['left_roi'] is None and config['grasp']['right_roi'] is None)
+                color_diagnostics_evaluated = not (visual_control and passive_only and step % 10 != 0)
+            if not color_diagnostics_evaluated:
+                detections = []
+                wrist_detections = {'left': [], 'right': []}
+                for color_detector in (detector, *wrist_detectors.values()):
+                    color_detector.previous.clear()
+                    color_detector.counts.clear()
+            elif detection_pool is not None:
+                futures = {side: detection_pool.submit(wrist_detectors[side].detect, image)
+                           for side, image in wrist_images.items()}
+                detections = detector.detect(raw_image)
+                wrist_detections = {side: future.result() for side, future in futures.items()}
+            else:
+                detections = detector.detect(raw_image)
+                wrist_detections = {side: wrist_detectors[side].detect(image)
+                                    for side, image in wrist_images.items()}
             if isinstance(aligner, ResidualAssist):
                 aligner.observe_wrist(wrist_detections,
                     {side: [image.shape[1], image.shape[0]] for side, image in wrist_images.items()},
@@ -585,6 +839,10 @@ def run(args, config, base, images):
                 if config.get('visual_cycle', {}).get('visual_after_first_parcel') and first_grasp_plan is None:
                     raise RuntimeError('No requested first grasp target was captured for visual continuation')
                 pickup_template = grasp_template(aligner.geometry[1], first_grasp_plan)
+            if traditional and visual_pickup is None and visual_cycle.completed == 0:
+                visual_pickup, weighing_pad = begin_traditional_pickup(
+                    visual_cycle, aligner, rgbd_snapshot, measured, previous_sent)
+                print(f'TRADITIONAL_PICKUP step={steps+1}', flush=True)
             if (config.get('visual_cycle', {}).get('first_visual_pickup', False)
                     and visual_pickup is None and visual_cycle is not None
                     and visual_cycle.completed == 0 and isinstance(aligner, ResidualAssist)
@@ -644,6 +902,8 @@ def run(args, config, base, images):
             if frozen:
                 raw_action = (previous_sent.copy() if head_returning or cycle_active or pickup_active else aligner.held_action.copy())
             else:
+                if traditional:
+                    raise RuntimeError('Traditional controller unexpectedly requested ACT inference')
                 model_input = preprocess(inject_task_prompt(dict(observation), base.inference.task_prompt))
                 with torch.inference_mode():
                     if policy_trace is not None:
@@ -691,9 +951,12 @@ def run(args, config, base, images):
                               else {"state": "disabled"})
             if aligner is not None:
                 if cycle_active:
-                    residual, cartesian_info = visual_cycle.update(measured, rgbd_snapshot, aligner)
+                    residual, cartesian_info = visual_cycle.update(measured, rgbd_snapshot, aligner, head_info)
                 elif pickup_active:
                     residual, cartesian_info = visual_pickup.update(measured, rgbd_snapshot, aligner, head_info)
+                    if local_act is not None and rgbd_snapshot is not None:
+                        residual = local_act.apply(observation, visual_pickup, aligner,
+                            measured, previous_sent, residual, cartesian_info, steps+1)
                 elif head_returning:
                     residual = previous_sent.copy()
                     cartesian_info = {'state': 'returning_policy_view'}
@@ -811,6 +1074,8 @@ def run(args, config, base, images):
                 observation_received = watchdog.snapshot()
                 continue
             cycle_timer.mark('filter_and_sweep')
+            if skill_recorder is not None and pickup_active:
+                skill_recorder.phase(cartesian_info, visual_pickup.completed_parcels, steps+1, measured)
             last_send = time.monotonic()
             next_observation, reward, terminated, truncated, info = env.step(sent)
             next_observation_received = watchdog.snapshot()
@@ -822,6 +1087,8 @@ def run(args, config, base, images):
                 visual_pickup.motion.command = sent.copy()
             if aligner is not None:
                 aligner.observe_command(sent)
+                if local_act is not None and pickup_active:
+                    local_act.observe_sent(sent, aligner)
             grasp_info = grasp_monitor.update(
                 sent, next_observation["observation.state"].detach().cpu().numpy().reshape(-1),
                 wrist_detections,
@@ -847,6 +1114,9 @@ def run(args, config, base, images):
                 "step": steps, "mode": args.mode,
                 "inference_s": inferred - started, "step_s": ended - started,
                 "sensor_age_s": ages, "detections": detections,
+                "color_diagnostics_evaluated": color_diagnostics_evaluated,
+                "rgbd_candidates_evaluated": rgbd_snapshot.get('candidates_evaluated', True) if rgbd_snapshot else None,
+                "rgbd_surfaces_evaluated": rgbd_snapshot.get('surfaces_evaluated', True) if rgbd_snapshot else None,
                 "sensor_age_before_send_s": send_ages,
                 "observation_receipts": observation_received,
                 "send_monotonic_s": last_send,
@@ -866,6 +1136,8 @@ def run(args, config, base, images):
                 "rgbd_stamp": rgbd_snapshot.get('stamp') if rgbd_snapshot else None,
                 "rgbd_candidates": rgbd_snapshot["candidates"] if rgbd_snapshot else [],
                 "rgbd_spatial_components": bool(rgbd_snapshot and rgbd_snapshot.get('candidate_spatial_components')),
+                "rgbd_component_max_gap_m": None if rgbd_snapshot is None else rgbd_snapshot.get('component_max_gap_m'),
+                "shared_rgb_decode_hit": rgbd_snapshot.get('shared_rgb_decode_hit') if rgbd_snapshot else None,
                 "rgbd_surfaces": rgbd_snapshot.get("surfaces", []) if rgbd_snapshot else [],
                 "rgbd_table_z_base_m": rgbd_snapshot.get("table_z_base_m") if rgbd_snapshot else None,
                 "terminated": bool(terminated), "truncated": bool(truncated),
@@ -890,7 +1162,9 @@ def run(args, config, base, images):
                 np.savez_compressed(output / f'policy-observation-{steps:04d}.npz',
                     **{key: value.detach().cpu().numpy() for key, value in observation.items()
                        if key.startswith('observation.')})
-            if steps == 1 or steps % config["snapshot_every_steps"] == 0 or grasp_check or checkpoint:
+            periodic_snapshot = (not config.get('performance', {}).get('checkpoint_evidence_only', False)
+                                 and steps % config["snapshot_every_steps"] == 0)
+            if steps == 1 or periodic_snapshot or grasp_check or checkpoint:
                 cv2.imwrite(str(output / f"vision-{steps:04d}.jpg"), detector.annotate(raw_image, detections))
                 for side in ("left", "right"):
                     cv2.imwrite(str(output / f"wrist-{side}-{steps:04d}.jpg"),
@@ -984,6 +1258,7 @@ def run(args, config, base, images):
                           rgbd_error=rgbd_error,
                           rgbd_candidates=rgbd_snapshot['candidates'] if rgbd_snapshot else [],
                           rgbd_spatial_components=bool(rgbd_snapshot and rgbd_snapshot.get('candidate_spatial_components')),
+                          rgbd_component_max_gap_m=None if rgbd_snapshot is None else rgbd_snapshot.get('component_max_gap_m'),
                           rgbd_stamp=rgbd_snapshot.get('stamp') if rgbd_snapshot else None,
                           pending_kind=aligner.pending.get('kind') if aligner and aligner.pending else None)
             if hasattr(exc, 'retreat_preflight_audit'):
@@ -998,8 +1273,22 @@ def run(args, config, base, images):
         raise
     finally:
         cycle_timer.close()
+        if local_act is not None:
+            try:
+                local_act.finish(reason, steps)
+            except Exception as exc:
+                local_act_report_error = str(exc)
+                print(f'Local ACT evidence finalization failed: {exc}', flush=True)
+        if skill_recorder is not None:
+            try:
+                skill_recorder.close(reason, visual_cycle.completed if visual_cycle is not None else 0)
+            except Exception as exc:
+                skill_recording_error = str(exc)
+                print(f'Skill evidence finalization failed: {exc}', flush=True)
         if rgbd_worker is not None:
             rgbd_worker.close()
+        if detection_pool is not None:
+            detection_pool.shutdown(wait=True)
         if motion_cadence is not None:
             motion_cadence.close()
         if sdk_limit_cache is not None:
@@ -1027,6 +1316,8 @@ def run(args, config, base, images):
             "handover_contract_stop": contract_stop,
             "last_sensor_receipts": watchdog.snapshot(),
             "trace_manifest_error": trace_manifest_error,
+            "skill_recording_error": skill_recording_error,
+            "local_act_report_error": local_act_report_error,
             "visual_confirmed_parcels": visual_cycle.completed if visual_cycle is not None else None,
             "note": "Original KuavoSimEnv returns reward=0 and does not judge scene1 success.",
         }, ensure_ascii=False, indent=2))
@@ -1092,6 +1383,15 @@ def main():
         parser.error('--stop-after-regrasp requires --regrasp-from')
     config, base, images = load_config(args.config, args.speed_profile)
     performance = config.get('performance', {})
+    if performance.get('latest_sdk_odometry', False):
+        from scene1.latest_odometry import install
+        install()
+    if performance.get('byte_visual_observations', False):
+        from scene1.byte_observations import install
+        print('BYTE_VISUAL_OBSERVATIONS '+json.dumps(install()), flush=True)
+    if performance.get('shared_rgb_decode', False):
+        from scene1.shared_rgb import install
+        install()
     if performance.get('native_retreat_constraints', False):
         import scene1.retreat_projection as projection_module
         from scene1.fast_components import native_constraint_gaps

@@ -24,7 +24,7 @@ for label in a.labels:
     d = e.HERE / label
     state = json.loads((d/'experiment.json').read_text())
     assert state['kind'] == 'empty' and state.get('ended_at')
-    assert d.is_symlink() and str(d.resolve()).startswith('/media/krist/KINGSTON/scene1-path-tracking-continuation-20261023/')
+    assert d.is_symlink() and str(d.resolve()).startswith('/media/krist/USB/scene1-path-tracking-continuation-20261023/')
     files = {str(p.relative_to(d)): sha(p) for p in d.rglob('*') if p.is_file()}
     receipt = dict(label=label, retained_directory=str(d.resolve()), files=files, removed_duplicates=[])
     for filename, suffix in [('chain.jsonl', '-chain.jsonl'), ('probe.jsonl', '-probe.jsonl')]:

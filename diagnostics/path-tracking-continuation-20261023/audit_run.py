@@ -2,6 +2,7 @@
 import argparse,collections,json,math
 from pathlib import Path
 import environment as e
+from trace_io import open_trace
 ap=argparse.ArgumentParser();ap.add_argument('label');a=ap.parse_args();d=e.HERE/a.label
 derived=e.HERE/'analysis-full'/a.label;derived.mkdir(parents=True,exist_ok=True)
 rows=[json.loads(l) for l in (d/'output/steps.jsonl').open()];summary=json.loads((d/'output/summary.json').read_text());state=json.loads((d/'experiment.json').read_text())
@@ -13,15 +14,33 @@ for r in rows:
         val=r['sent_action'][j];new=grip[s] if .25<val<.6 else val>=.6
         if new!=grip[s]:events.append(dict(step=r['step'],side=['left','right'][s],action='close' if new else 'open',phase=info['state']));grip[s]=new
     if info.get('bin_visual_confirmed'):
-        bins.append(dict(step=r['step'],slot=info.get('bin_verification_slot'),new_points=info.get('new_bin_points'),stamp=r.get('rgbd_stamp')))
+        bins.append(dict(step=r['step'],slot=info.get('bin_verification_slot'),new_points=info.get('new_bin_points'),stamp=r.get('rgbd_stamp'),
+            layout_mode=info.get('bin_layout_mode','line'),stack_height_verification=info.get('stack_height_verification'),
+            confirmation_mode=info.get('bin_confirmation_mode','stack_height'),stability=info.get('bin_stability')))
     if info['state']=='visual_cycle_complete':
         completes.append(dict(step=r['step'],completed_parcels=info['completed_parcels']))
         if first_cycle_end is None:first_cycle_end=r['step']
     if first_cycle_end and r['step']>first_cycle_end and not r['policy_paused_for_alignment']:act_after_first+=1
 pd={k:dict(samples=0,raw_clipped_samples=0,total_clipped_samples=0,raw_peak_nm=0.,added_peak_nm=0.,wrist_command_peak_nm=0.,longest_observed_clip_s=0.,previous_clip_start=None) for k in ['initialization','formal_policy','after_policy']}
 wrist=[4,5,6,11,12,13]
-for line in (d/'chain.jsonl').open():
+warm=dict(samples=0, enabled_samples=0, hot_samples=0, cold_solves=0, hot_solves=0, fallbacks=0, invalid_outputs=0, equality_peak=0., inequality_peak=0., solve_peak_s=0., projection_samples=0, dimensions={})
+for line in open_trace(d):
     r=json.loads(line)
+    if r.get('topic') == '/scene1_tracking/wbc_warmstart':
+        t=r['callback_monotonic_ns']/1e9; x=r['message']['data']
+        assert len(x) in (10,14) and all(math.isfinite(v) for v in x)
+        warm['invalid_outputs']=max(warm['invalid_outputs'],x[5])
+        if start<=t<=end:
+            warm['samples']+=1
+            if x[0]>.5:
+                warm['enabled_samples']+=1;warm['hot_samples']+=x[1]>.5
+                if len(x)==14:
+                    warm['projection_samples']+=x[13]>.5
+                    dimensions=str([int(v) for v in x[10:13]])
+                    warm['dimensions'][dimensions]=warm['dimensions'].get(dimensions,0)+1
+                for key, index in [('cold_solves',2),('hot_solves',3),('fallbacks',4),('equality_peak',6),('inequality_peak',7),('solve_peak_s',8)]:
+                    warm[key]=max(warm[key],x[index])
+        continue
     if r.get('topic')!='/scene1_tracking/wrist_pd':continue
     t=r['callback_monotonic_ns']/1e9;x=r['message']['data']
     key='initialization' if t<start else 'formal_policy' if t<=end else 'after_policy'
@@ -42,6 +61,46 @@ for p in pd.values():
         for k in list(p):
             if k not in ['samples','available']:p[k]=None
 report=dict(label=a.label,steps=len(rows),step_sequence_contiguous=[r['step'] for r in rows]==list(range(1,len(rows)+1)),summary=summary,ros_run_id=state['ros_run_id'],controller_sha=state['runtime_controller_sha256'],policy_sha=state['policy_manifest_sha256'],requested_parcels=state['parcels'],bin_confirmations=bins,complete_events=completes,gripper_events=events,gripper_event_count=len(events),unpaused_ACT_steps_after_first_complete=act_after_first,target_clips=sum(bool(r['motion']['bounds_clipped']) for r in rows),velocity_limited_steps=sum(bool(r['motion']['velocity_limited']) for r in rows),regrasp_sweep_block_steps=sum(r['cartesian_alignment'].get('open_fingers_clear') is False for r in rows),regrasp_forward_gate_hold_steps=sum('regrasp_forward_gate' in r['cartesian_alignment'] and not r['cartesian_alignment']['regrasp_forward_gate']['centered'] for r in rows),pd_limits_50hz=pd,task_success=summary['task_success'],limitations='Gripper events are upper command threshold crossings (0.25/0.6 hysteresis), not proof of contact. Original visual checks and raw feedback evidence retained. 50Hz clipping can miss shorter events; online guard is separate. null is not an official verdict.')
+report['wbc_warmstart']=warm
+# Each entry must follow its own table pickup, weighing, handover and release.
+# Temporal windows cannot reuse evidence from a previously counted parcel.
+previous_bin_step = 0
+for parcel_index, b in enumerate(bins):
+    if b.get('confirmation_mode') != 'independent_entry':
+        previous_bin_step = b['step']
+        continue
+    window = [r for r in rows if previous_bin_step < r['step'] <= b['step']]
+    predicates = [
+        ('source_pickup', lambda r,i: (i.get('pickup_source',{}).get('parcel_index') == parcel_index
+            and i['pickup_source'].get('outside_bin') is True
+            and i['pickup_source'].get('outside_weighing_pad') is True
+            and i['pickup_source'].get('stable_selection_frames',0) >= 3)),
+        ('weighing_release', lambda r,i: i.get('state') == 'weighing_release'),
+        ('weighing_settled', lambda r,i: i.get('state') == 'placement_stable'),
+        ('regrasp_verified', lambda r,i: i.get('state') == 'regrasp_pose_verified'),
+        ('left_contact', lambda r,i: i.get('stage') == 'close_left' and i.get('receiver_contact_frames',0) >= 3),
+        ('inside_bin_release', lambda r,i: i.get('stage') == 'bin_transport'
+            and i.get('bin_footprint_clear') is True and r['sent_action'][7] <= .15),
+        ('empty_hand_retreat', lambda r,i: i.get('empty_hand_above_rim') is True
+            and max(r['measured_state'][7],r['measured_state'][15]) <= .15),
+        ('stable_bin', lambda r,i: i.get('bin_visual_confirmed') is True),
+    ]
+    cursor = 0; evidence = {}
+    for name, predicate in predicates:
+        while cursor < len(window) and not predicate(window[cursor],window[cursor]['cartesian_alignment']):
+            cursor += 1
+        if cursor == len(window):break
+        evidence[name] = window[cursor]['step']; cursor += 1
+    stability = b.get('stability') or {}
+    b['independent_entry'] = dict(parcel_index=parcel_index, evidence_steps=evidence,
+        passed=(len(evidence)==len(predicates) and b['slot']==parcel_index and b['new_points']>=80
+            and stability.get('frames',0)>=5 and stability.get('sensor_span_s',0)>=1.
+            and stability.get('max_center_span_m',float('inf'))<=.015))
+    previous_bin_step = b['step']
+if state['version'] in ('wbc_warmstart','wbc_reduced'):
+    assert warm['enabled_samples']>0 and warm['hot_samples']>0 and warm['invalid_outputs']==0
+    assert warm['equality_peak']<=1e-5 and warm['inequality_peak']<=1e-5
+if state['version']=='wbc_reduced':assert warm['projection_samples']>0
 transfers=[]
 for r in rows:
     t=r['cartesian_alignment'].get('release_reference_transfer')

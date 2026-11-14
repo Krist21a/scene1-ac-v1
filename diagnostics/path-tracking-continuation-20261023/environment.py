@@ -1,8 +1,11 @@
 """Reuse previously verified process helpers without changing historical artifacts."""
 from pathlib import Path
 import importlib.util
+import sys
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent.parent/'tools'))
+from evidence_storage import STORE, ARCHIVE_ROOT, require_storage
 ROOT = Path('/home/krist/kuavo_course/scene1_act_optimization')
 OLD = ROOT / 'diagnostics/mpc-wbc-tracking-20261022'
 ASSETS = ROOT / 'diagnostics/path-tracking-continuation-20261023'
@@ -15,36 +18,38 @@ command, wait_idle = _module.command, _module.wait_idle
 
 def stop(container, suffix):
     """Bound policy shutdown even inside SDK initialization; retain other cleanup."""
-    if suffix.rsplit('/', 1)[-1] != 'run_scene1.py':
+    name = suffix.rsplit('/', 1)[-1]
+    if name not in ('run_scene1.py', 'challenge_task.py', 'target_guard.py', 'robot_guard.py', 'record_chain.py'):
         return _module.stop(container, suffix)
     code = '''import pathlib,os,signal,time,json
-name='run_scene1.py'
+name=TARGET_NAME
 def identity(pid):
  p=pathlib.Path('/proc')/str(pid)
  try:
   fields=(p/'stat').read_text().rsplit(') ',1)[1].split()
   return None if fields[0]=='Z' else fields[19]
- except FileNotFoundError:return None
+ except (FileNotFoundError, ProcessLookupError):return None
 matches=[]
 for p in pathlib.Path('/proc').glob('[0-9]*'):
  try:args=(p/'cmdline').read_bytes().split(b'\\0')
- except FileNotFoundError:continue
+ except (FileNotFoundError, ProcessLookupError):continue
  if any(x.decode(errors='replace').rsplit('/',1)[-1]==name for x in args):
   token=identity(int(p.name))
   if token is not None:matches.append((int(p.name),token))
 assert len(matches)<=1,matches
 events=[]
 for pid,token in matches:
- for sig,wait in [(signal.SIGINT,2.),(signal.SIGTERM,2.),(signal.SIGKILL,2.)]:
+ for sig,wait in [(signal.SIGINT,2. if name=='run_scene1.py' else 10.),(signal.SIGTERM,2. if name=='run_scene1.py' else 5.),(signal.SIGKILL,2.)]:
   if identity(pid)!=token:break
   try:os.kill(pid,sig)
   except ProcessLookupError:break
   events.append(dict(pid=pid,signal=int(sig)))
   until=time.monotonic()+wait
   while identity(pid)==token and time.monotonic()<until:time.sleep(.05)
- assert identity(pid)!=token,('Policy survived SIGKILL',pid)
-print(json.dumps(dict(kind='bounded_policy_stop',events=events)))
+ assert identity(pid)!=token,('Process survived SIGKILL',name,pid)
+print(json.dumps(dict(kind='bounded_process_stop',process=name,events=events)))
 '''
+    code = code.replace('TARGET_NAME', repr(name))
     result = command('docker','exec',container,'python3','-c',code)
     print(result, flush=True)
     return result

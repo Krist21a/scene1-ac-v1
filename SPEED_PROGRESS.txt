@@ -243,3 +243,32 @@ Frozenmatrix r2 seed2 completed4 parcels9136steps890.057391s(14m50.1s), cumulati
 - Accessible matrix seed2 interruptedbyquota at6056steps592.763494s,completed2 (218.628/430.318). Pipelinequota_stop=true, driver1/restore0. Raw evidence retained externally; analysis/audit intentionallynotrunafterquota. Matrixstatus trial_failed reflectsquota interruption, not a completed performance failure.
 - Bothcontainers verifiedidle;baselinecontrollerSHA e46e9a800011f8c5bf43e269cb2ba0ab7d543c27e09ac10deaea6ae06e1179e4 andVR155191dc393e6c92552e57a2c4af6d52833283bc22660e7d8788ba65424ce293 restored. No furtherexperiments.
 - Finalmulti-seedgoal NOT complete: currentfrozen2/1/5/6/7/8/9 pending;holdouts6-9 neverused. SeeSPEED_RESULT.txt forresults/resumption.
+
+2026-10-29 resumed goal: current quota89%remaining;noholdoutsusedyet. Publishedcandidate remains241-file freeze118f5a5dbe8e894dd3db27817df9dbdf45cc0e8cb73382a558a6be592e3e8e13. Recordingtrialseed0on1026completed1087.323717s8908stepsvs853.772070s8886steps;vision+109.726s,servo+76.396s,RGBD+42.826s. Resourcecontentioninferrednotproved. Noadditionalvideo requested.
+- Added explicit CPU profile p2-algo-p4e8-sim:policy0-3(twoPcores),simulation/observers4-19;CPUgovernorsunchanged. Initial docker-update experiment speed-cpu-p4-s0-1029 passed643tests butfailedCUDApreflightbeforeanytask;DockerCPUupdateinvalidatedGPUaccess. Emptycpusetrestoreignoredbydaemon;restoredfullonline0-19explicitlythenrestartedidlecontainers,CUDA/NVMLworkingagain. Historicalerrorreceiptretained.
+- Replacedcontainerupdatewithtasksetprefixonexperimentchildprocesses,neverupdatescontainerdevices/cgroups. ParentSCENE1_CPU_LAYOUT restoredfinally;containerCPUsettingscheckedunchanged. Threeorchestrationtestspass. New fulltest+4parcelseed0 speed-affinity-p4-s0-1029 running. Freezeandphysics/safetyunchanged.
+- Finalacceptancenowrequiresregressionseeds1/3/4/5inadditionto0/2/6-9,andidenticalCPUlayoutacrossall10runs. MatrixinheritsCPUlayoutfromtestedsource. Newprofilemustvalidateallseeds;olderunrestrictedCPUresultsnotmixedascurrentfinalacceptance.
+
+- speed-affinity-p4-s0-1029 endedafter643tests,beforecontrollerswitch/formaltask;launcherhandlelostduringcontinuation,restore0andCPUenvironmentrestored. No performanceconclusion. Detachedfile-backedlauncherusedforreplacement speed-affinity-r2-p4-s0-1029 (PID8881),conditionalmatrixlauncherPID16719.
+- speed-affinity-r2-p4-s0-1029:643tests passed;fourparcels9479steps846.704449s(14m6.7s), cumulative216.282/425.932/636.806/846.704. Postprocessingpending. Tasksetruntimeconfirmedpolicy64threads0-3,MPC14threads4-19,nodeletthreadswithin4-19. No governor or recordingchanges. Conditionalmatrix speed-affinity-validation-1029 seeds2/1/3/4/5/6/7/8/9 starts onlyafterfullstrictacceptance+restore.
+
+- speed-affinity-r2-p4-s0-1029 strictaccepted846.704449s;allstages0 andprocessCPUlayoutrestored,sourcecopyprunedafterexternalhashverification.
+- Frozenmatrixspeed-affinity-validation-1029-s2 full4/9800steps868.126908s(14m28.1s), cumulative231.478/429.359/647.664/868.127;postprocessingpending. Same643-testpolicyandtasksetlayout. Next1/3/4/5thenholdouts6-9 stillunused.
+
+- Affinityseed2 strictaccepted868.126908s,allstages0. Matrixseed1 failedPRE-FLIGHT only:rootreserve<4GB;noformalsteps,restore0. No secondseed1performanceattemptdiscarded. Archived5oldSIMcorefilesexternallySHAverifiedbeforeunlink,reclaimed945893376allocatedbytes;rootfree4.6GiB.
+- Resumedsamefrozenpolicy/layout via speed-affinity-validation-r2-1029 seeds1/3/4/5/6/7/8/9,detachedlauncherPID90188. Source0andpriorseed2retained;holdouts6-9stillunused.
+
+- speed-affinity-validation-r2-1029-s1 failedthirdverify_bin at7280steps(~648.522s),2completed233.042/437.925;allanalysis/audit/archive/restore0. Thirdrelease7091 accepted23.9459mmerror under25mm;estimatedcenterx.708976 versusplannedaround.732. Verifynewpoints0-2,80pointcriterionnotmet. Preservedoriginalslot/subtraction/stability/timeout. Holdouts6-9stillunused.
+- Newprofile speed_precise_last_two changesONLYarrivalarray[.025,.025,.010,.010],thirdnow10mm;fourthalready10mm. Existingnearhomesettle+denseapproachretained. Rawreleasefixture+integrationtestkeepthirdgripclosedat23.9mmthenallow8mm. OfflineboundedURDFfit6.00018mm/.003586rad at1500eval(maxevaluations,notconverged);dynamicvalidationrequired.
+
+- speed-lasttwo-p4-s1-1029 stoppedbytestgate(testArmdoesnotimplementanalyticJacobian);noformaltask,restore0. Correctednewtesttoapplyonlyper-slottoleranceundertest,28visualcycletests pass. Re-frozen speed-lasttwo-r2-p4-s1-1029 startsfull644-testgate+4parcelsseed1;newpolicyallfinalseedsmustbererunifsuccessful.
+
+- speed-lasttwo-r2-p4-s1-1029:644tests passed;fourparcels10291steps883.381722s(14m43.4s),cumulative242.856/448.674/672.870/883.382. Third10mmreleasepassedoriginalvisualverificationandhome;postprocessingpending. DetachedconditionalmatrixlauncherPID125183 waitsstrictacceptance/restorationthen speed-lasttwo-validation-1029 seeds3/4/0/2/5/6/7/8/9. Time margin16.6s;fullgoalunproven.
+
+- speed-lasttwo-r2-p4-s1-1029 strictaccepted883.381722s,allstages0. Thirdreleaseerror9.878mm(actualestimatedcenterx.72155 vsoldfailure.70898),originalbinconfirmationpassed.
+- Frozenmatrixspeed-lasttwo-validation-1029-s3 full4/9835steps877.449691s(14m37.4s),cumulative225.580/451.274/660.200/877.450;postprocessingpending. Same644-testsourceandtasksetlayout. Next4/0/2/5thenholdouts6-9stillunused.
+
+- Lasttwo seed3 strictaccepted877.449691s;seed4failedsecondverify_bin at4984steps(~438.900s),1completed237.434s;allpostprocessing/restore0. Secondrelease4749 positionerror24.1526mm,x.709959;verify2-4newpoints. Notonlyfourth/thirdneedsaccurateplacement;noholdoutsused.
+- New speed_precise_bin15 config:allfourarrival10mm;onlybin_transportcadence15Hz(previous10),samegain3,physicalstep/velocity/collision/arrival/visualguards. Allotherstagesunchanged. Secondreleasefixture+allslotgateintegrationtest;29visualtests passed,645fulltestsexpected. New speed-bin15-p4-s4-1029 fullseed4started,PID227923.
+
+- User requested analysis only and no next round. Goal paused. Latest bin15 seed4 failed first bin_transport, 0/4 parcels, 239.530415s, final position error16.5397mm above10mm. 645 tests passed; analysis/audit/archive/restore0. No next candidate implemented/launched. See ROUND_ANALYSIS_20261029.txt.

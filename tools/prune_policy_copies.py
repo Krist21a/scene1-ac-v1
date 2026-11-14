@@ -6,8 +6,9 @@ from pathlib import Path
 import re
 import subprocess
 
-STORE = Path('/media/krist/KINGSTON/scene1-speed-20261025')
+from evidence_storage import STORE, require_storage
 ALGO = 'kuavo-ros-noetic-s12-ready'
+SIM = 'kuavo_challenge_container_GPU_046e4301'
 REMOTE = r'''
 import hashlib,json,sys
 from pathlib import Path
@@ -62,9 +63,42 @@ def prune(label):
     return receipt
 
 
+def prune_analysis(label):
+    if not re.fullmatch(r'[a-z0-9][a-z0-9_-]*', label):
+        raise ValueError('Invalid trial label')
+    receipt_path = STORE/(label+'-analysis-prune.json')
+    if receipt_path.exists():
+        return json.loads(receipt_path.read_text())
+    pipeline = json.loads((STORE/(label+'-pipeline.json')).read_text())
+    if pipeline.get('current_stage') != 'done' or any(pipeline['stages'].get(s) != 0
+            for s in ('analysis', 'audit', 'archive', 'restore')):
+        raise RuntimeError('Only fully archived/restored analysis copies can be pruned')
+    driver = Path(__file__).resolve().parents[1]/'diagnostics/path-tracking-continuation-20261023'
+    names = ('pd-audit.json', 'chain-targets.json', 'reference-analysis.json',
+             'steps.jsonl', 'release-transients.json', 'metrics-full.json')
+    manifest = {}
+    for name in names:
+        source = (driver/label/'output'/name if name == 'steps.jsonl'
+                  else driver/'analysis-full'/label/name)
+        if name == 'pd-audit.json' and not source.is_file():
+            continue  # Older analysis drivers did not emit this optional secondary report.
+        manifest[name] = hashlib.sha256(source.read_bytes()).hexdigest()
+    result = subprocess.run(['docker', 'exec', '-i', SIM, 'python3', '-c', REMOTE],
+        input=json.dumps(dict(root='/tmp/scene1-integrated-analysis/'+label, manifest=manifest)),
+        text=True, capture_output=True, check=True)
+    receipt = dict(label=label, source_hashes=manifest, removed=json.loads(result.stdout))
+    receipt_path.write_text(json.dumps(receipt, indent=2)+'\n')
+    return receipt
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('labels', nargs='+')
-    for label in parser.parse_args().labels:
+    parser.add_argument('--analysis', action='store_true')
+    args = parser.parse_args()
+    for label in args.labels:
         receipt = prune(label)
         print(json.dumps(dict(label=label, removed_bytes=receipt['removed']['bytes'])), flush=True)
+        if args.analysis:
+            receipt = prune_analysis(label)
+            print(json.dumps(dict(label=label, removed_analysis_bytes=receipt['removed']['bytes'])), flush=True)

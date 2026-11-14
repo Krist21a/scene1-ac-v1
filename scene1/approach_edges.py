@@ -1,4 +1,5 @@
 """Parcel motion from visible roof boundaries, independent of occluded centroids."""
+from .rgbd import snapshot_hsv
 import cv2
 import numpy as np
 
@@ -53,7 +54,7 @@ def roof_edges(snapshot, target):
     axes = np.column_stack((major, [-major[1], major[0]]))
     depth, intrinsic = snapshot['depth_m'], snapshot['intrinsic']
     matrix = snapshot['camera_to_base']
-    hsv = cv2.cvtColor(snapshot['rgb'], cv2.COLOR_RGB2HSV)
+    hsv = snapshot_hsv(snapshot)
     top = target['top_z_base_m']
     if FAST_ROOF_MASK:
         from .fast_components import roof_masks

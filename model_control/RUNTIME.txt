@@ -1,0 +1,33 @@
+Scene1模型控制实验运行环境（2026-11-10实际验证）
+
+仿真启动失败修复：
+旧调用只设置DISPLAY=:0，未显式提供当前桌面Xauthority。
+使用既有prepare_display.py更新cookie后，带XAUTHORITY的官方seed0启动成功。
+无需修改仿真物理参数或控制器源码。
+
+1. 启动容器（若已启动则跳过）
+  docker start kuavo_challenge_container_GPU_046e4301 kuavo-ros-noetic-s12-ready
+2. 两容器尚未启动策略/仿真时复制当前桌面cookie
+  python3 diagnostics/path-tracking-continuation-20261023/prepare_display.py
+3. 启动官方seed0（将stdout/stderr保存到新回合simulation.log）
+  docker exec -t -e DISPLAY=:0 -e XAUTHORITY=/tmp/scene1-current-display.Xauthority kuavo_challenge_container_GPU_046e4301 zsh -lc 'cd /root/kuavo_ws; source installed/setup.zsh; source devel/setup.zsh; export LD_LIBRARY_PATH=/opt/drake/lib:$LD_LIBRARY_PATH; exec rosrun challenge_cup_task_template challenge_task.py --scene scene1 --seed 0 --no-timer-gui'
+4. 等待日志“场景实例已初始化。”，确认传感器与控制器正常，再启动模型桥。
+官方launch已启动底层控制器。arm.go()是准备bag回放，不是底层控制器启动。
+本次未调用arm.go，不运行旧ACT或传统任务状态机。
+5. 宿主原速录像
+  python3 model_control/record_video.py --output /media/krist/Data/scene1-model-control-20261110/<新回合>/full.mp4
+录像进程收到SIGINT或SIGTERM会封装MP4并保存ffprobe/sha256收据。
+录像本身不判定任务成功。必须另以当前观测与任务判据核验抓取、称重、入箱。
+
+证据磁盘：
+内置NVMe /dev/nvme0n1p4，UUID CCDA22F7DA22DD88，挂载点 /media/krist/Data。
+若未挂载，可使用 udisksctl mount -b /dev/nvme0n1p4；不要改用旧USB/KINGSTON。
+当前算法容器 /root/scene1_model_evidence 映射到host
+/media/krist/Data/scene1-model-control-20261110，映射receipt在host根下mount-receipt.json。
+该映射使用本次容器PID，不随容器重启持久存在，重启必须重新核验。
+
+本次初始实际运行身份：
+ROS run_id 3fc2a662-dccf-11f1-9d91-c85ea94bd8c7
+libhumanoid_controllers.so SHA256
+ab20325136810cc785bfdb4abd80c3ecc2b2e73627ebebea42b904bd7bb3f0ba
+这是本次实际控制器，不是11/09 wbc_reduced候选。完整runtime.json位于本轮证据目录。

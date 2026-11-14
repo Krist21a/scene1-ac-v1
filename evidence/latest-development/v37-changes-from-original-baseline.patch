@@ -1,0 +1,1252 @@
+--- a/diagnostics/path-tracking-continuation-20261023/full_experiment.py
++++ b/diagnostics/path-tracking-continuation-20261023/full_experiment.py
+@@ -138,7 +138,7 @@
+     try:
+         state['usage_at_start'] = usage_guard.latest()
+         if state['usage_at_start']['reached']:
+-            raise RuntimeError('User quota stop: <=10% remaining; no new experiment')
++            raise RuntimeError('Live quota threshold reached; no new experiment')
+         e.wait_idle(e.ALGO)
+         e.wait_idle(e.SIM)
+         if shutil.disk_usage('/').free < 4_000_000_000:
+--- a/diagnostics/path-tracking-continuation-20261023/usage_guard.py
++++ b/diagnostics/path-tracking-continuation-20261023/usage_guard.py
+@@ -1,4 +1,4 @@
+-"""Current-session quota stop requested by user: stop with 10% remaining."""
++"""Live quota guard with an opt-in, once-only reset at 1% for this task."""
+ import json
+ import os
+ import datetime
+@@ -6,13 +6,29 @@
+ import subprocess
+ import threading
+ import time
++import fcntl
++import uuid
+ from pathlib import Path
+ 
+ _cached = None
+ _cached_at = 0.
+ 
+-def live_latest():
+-    """Read the current authenticated account; never infer a reset from old logs."""
++def account_rpc(method, params=None):
++    # A transient account endpoint failure must not tear down a live physics
++    # run on its first occurrence. Retry only reads; never return stale quota
++    # or automatically repeat a credit mutation here.
++    attempts = 3 if method == 'account/rateLimits/read' else 1
++    for attempt in range(attempts):
++        try:
++            return _account_rpc_once(method, params)
++        except (RuntimeError, queue.Empty, OSError):
++            if attempt + 1 == attempts:
++                raise
++            time.sleep(.5 * (attempt + 1))
++
++
++def _account_rpc_once(method, params=None):
++    """Use authenticated account RPC without opening another model turn."""
+     command = ['/home/krist/.local/bin/codex', 'app-server', '--stdio']
+     if os.geteuid() == 0:
+         command = ['sudo', '-n', '-u', 'krist', '-H', *command]
+@@ -35,24 +51,65 @@
+                 return value['result']
+             if time.monotonic() >= deadline: raise RuntimeError('Live quota RPC timed out')
+     try:
+-        send(dict(id=1, method='initialize', params=dict(clientInfo=dict(name='scene1_usage_guard',version='1.0'))))
++        send(dict(id=1, method='initialize', params=dict(clientInfo=dict(name='scene1_usage_guard',version='1.0'),
++                                                      capabilities=dict(experimentalApi=True))))
+         response(1); send(dict(method='initialized'))
+-        send(dict(id=2, method='account/rateLimits/read'))
+-        limits = response(2)['rateLimits']
+-        windows = {k: dict(used_percent=v['usedPercent'], window_minutes=v['windowDurationMins'],
+-                          resets_at=v['resetsAt']) for k in ('primary','secondary')
+-                   if (v := limits.get(k)) is not None}
+-        if not windows or any(not 0 <= float(v['used_percent']) <= 100 for v in windows.values()):
+-            raise RuntimeError('Live quota unavailable or invalid; stop before further work')
+-        used = max(float(v['used_percent']) for v in windows.values())
+-        return dict(timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat(), windows=windows,
+-                    used_percent=used, remaining_percent=100-used, threshold_percent=90, enforced=True,
+-                    reached=used>=90, source='authenticated Codex account/rateLimits/read',
+-                    thread_id=os.environ.get('CODEX_THREAD_ID') or os.environ.get('CODEX_SESSION_ID'))
++        request = dict(id=2, method=method)
++        if params is not None:
++            request['params'] = params
++        send(request)
++        return response(2)
+     finally:
+         process.terminate()
+         try: process.wait(timeout=5)
+         except subprocess.TimeoutExpired: process.kill(); process.wait(timeout=5)
++
++
++def live_latest():
++    """Read live usage, optionally consuming the user's single authorized card."""
++    raw = account_rpc('account/rateLimits/read')
++    limits = raw['rateLimits']
++    windows = {k: dict(used_percent=v['usedPercent'], window_minutes=v['windowDurationMins'],
++                      resets_at=v['resetsAt']) for k in ('primary','secondary')
++               if (v := limits.get(k)) is not None}
++    if not windows or any(not 0 <= float(v['used_percent']) <= 100 for v in windows.values()):
++        raise RuntimeError('Live quota unavailable or invalid; stop before further work')
++    used = max(float(v['used_percent']) for v in windows.values())
++    receipt_name = os.environ.get('SCENE1_RESET_CREDIT_RECEIPT')
++    threshold = 99 if receipt_name else 90
++    if used >= 99 and receipt_name:
++        attempted = False
++        receipt = Path(receipt_name)
++        with receipt.with_suffix('.lock').open('a') as lock:
++            fcntl.flock(lock, fcntl.LOCK_EX)
++            attempt = json.loads(receipt.read_text()) if receipt.exists() else None
++            if attempt is None:
++                credits = (raw.get('rateLimitResetCredits') or {}).get('credits') or []
++                available = [c for c in credits if c['status'] == 'available' and c['resetType'] == 'codexRateLimits']
++                if available:
++                    attempt = dict(account_id=raw.get('accountId'), before_used_percent=used,
++                                   params=dict(creditId=available[0]['id'], idempotencyKey=str(uuid.uuid4())))
++                    with receipt.open('x') as f:
++                        json.dump(attempt, f, indent=2); f.flush(); os.fsync(f.fileno())
++            if attempt and 'response' not in attempt:
++                if attempt['account_id'] != raw.get('accountId'):
++                    raise RuntimeError('Account changed during authorized reset')
++                # Reuse the exact credit and idempotency key after an uncertain response.
++                attempt['response'] = account_rpc('account/rateLimitResetCredit/consume', attempt['params'])
++                temporary = receipt.with_suffix('.tmp')
++                with temporary.open('w') as f:
++                    json.dump(attempt, f, indent=2); f.flush(); os.fsync(f.fileno())
++                temporary.replace(receipt)
++                attempted = True
++        # Release the inter-process lock before re-reading or checking the receipt.
++        if attempted:
++            return live_latest()
++    return dict(timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat(), windows=windows,
++                used_percent=used, remaining_percent=100-used, threshold_percent=threshold, enforced=True,
++                reached=used>=threshold or raw.get('ordinaryUsageAllowed') is False,
++                reset_credits_available=(raw.get('rateLimitResetCredits') or {}).get('availableCount'),
++                source='authenticated Codex account/rateLimits/read',
++                thread_id=os.environ.get('CODEX_THREAD_ID') or os.environ.get('CODEX_SESSION_ID'))
+ 
+ def current_session():
+     identity = os.environ.get('CODEX_THREAD_ID') or os.environ.get('CODEX_SESSION_ID')
+--- a/run_scene1.py
++++ b/run_scene1.py
+@@ -147,6 +147,10 @@
+     if not isinstance(recover_gap, bool):
+         raise ValueError('Release gap recovery must be boolean')
+     config['wrist_assist']['release_prepare_recover_gap'] = recover_gap
++    proportional_prepare = config.get('visual_cycle', {}).get('release_prepare_proportional', False)
++    if type(proportional_prepare) is not bool:
++        raise ValueError('Release proportional preparation must be boolean')
++    config['wrist_assist']['release_prepare_proportional'] = proportional_prepare
+     shorter_exit = config.get('visual_cycle', {}).get('release_shorter_exit', False)
+     if type(shorter_exit) is not bool:
+         raise ValueError('release_shorter_exit must be boolean')
+@@ -155,14 +159,80 @@
+             or config['wrist_assist'].get('release_clearance_rise_m') != .07):
+         raise ValueError('Shorter exit requires the original 70 mm measured-axis certified retreat')
+     config['wrist_assist']['release_shorter_exit'] = shorter_exit
++    shorter_distance = config.get('visual_cycle', {}).get('release_shorter_exit_distance_m')
++    if shorter_distance is not None:
++        if (not shorter_exit or not np.isfinite(shorter_distance)
++                or not .04 <= shorter_distance <= config['wrist_assist']['release_short_retreat_m']):
++            raise ValueError('Shorter exit distance requires certified shorter exit and at least 40 mm')
++        config['wrist_assist']['release_shorter_exit_distance_m'] = shorter_distance
+     if type(config.get('visual_cycle', {}).get('stable_selection_view', False)) is not bool:
+         raise ValueError('stable_selection_view must be boolean')
+     if type(config.get('visual_cycle', {}).get('traditional_template_widest_visible', False)) is not bool:
+         raise ValueError('traditional_template_widest_visible must be boolean')
++    if type(config.get('visual_cycle', {}).get('traditional_template_settled_refresh', False)) is not bool:
++        raise ValueError('traditional_template_settled_refresh must be boolean')
+     if type(config.get('visual_cycle', {}).get('bin_empty_retreat_posture', False)) is not bool:
+         raise ValueError('bin_empty_retreat_posture must be boolean')
++    image_aligned_box_pose = config.get('visual_cycle', {}).get('image_aligned_box_pose', False)
++    if type(image_aligned_box_pose) is not bool:
++        raise ValueError('image_aligned_box_pose must be boolean')
++    config['wrist_assist']['image_aligned_box_pose'] = image_aligned_box_pose
++    attachment_time_normalization = config.get('visual_cycle', {}).get('attachment_time_normalization', False)
++    if type(attachment_time_normalization) is not bool:
++        raise ValueError('attachment_time_normalization must be boolean')
++    config['wrist_assist']['attachment_time_normalization'] = attachment_time_normalization
++    regrasp_time_normalization = config.get('visual_cycle', {}).get('regrasp_time_normalization', False)
++    if type(regrasp_time_normalization) is not bool:
++        raise ValueError('regrasp_time_normalization must be boolean')
++    config['wrist_assist']['regrasp_time_normalization'] = regrasp_time_normalization
++    regrasp_gain_scale = config.get('visual_cycle', {}).get('regrasp_gain_scale', 1.)
++    if not np.isfinite(regrasp_gain_scale) or not .25 <= regrasp_gain_scale <= 1.:
++        raise ValueError('regrasp_gain_scale must be finite in [.25,1]')
++    config['wrist_assist']['regrasp_gain_scale'] = regrasp_gain_scale
++    weighing_damping = config.get('visual_cycle', {}).get('weighing_velocity_damping', 1.5)
++    if not np.isfinite(weighing_damping) or not 1.5 <= weighing_damping <= 6.:
++        raise ValueError('weighing_velocity_damping must be finite in [1.5,6]')
++    config['wrist_assist']['weighing_velocity_damping'] = weighing_damping
++    weighing_angular_damping = config.get('visual_cycle', {}).get('weighing_angular_damping', 0.)
++    if not np.isfinite(weighing_angular_damping) or not 0. <= weighing_angular_damping <= 6.:
++        raise ValueError('weighing_angular_damping must be finite in [0,6]')
++    config['wrist_assist']['weighing_angular_damping'] = weighing_angular_damping
++    insert_position_priority = config.get('visual_cycle', {}).get('regrasp_insert_position_priority', False)
++    if type(insert_position_priority) is not bool:
++        raise ValueError('Regrasp insertion position priority must be boolean')
++    config['wrist_assist']['regrasp_insert_position_priority'] = insert_position_priority
++    release_full_open_feedback = config.get('visual_cycle', {}).get('release_full_open_feedback', False)
++    if type(release_full_open_feedback) is not bool:
++        raise ValueError('release_full_open_feedback must be boolean')
++    config['wrist_assist']['release_full_open_feedback'] = release_full_open_feedback
++    release_open_time_normalization = config.get('visual_cycle', {}).get('release_open_time_normalization', False)
++    if type(release_open_time_normalization) is not bool:
++        raise ValueError('release_open_time_normalization must be boolean')
++    config['wrist_assist']['release_open_time_normalization'] = release_open_time_normalization
++    release_live_geometry = config.get('visual_cycle', {}).get('release_live_geometry', False)
++    if type(release_live_geometry) is not bool:
++        raise ValueError('Release live geometry must be boolean')
++    if release_live_geometry and (not config['wrist_assist'].get('release_sweep_projection', False)
++            or config['wrist_assist'].get('release_retreat_preflight') != 'executor_sweep'):
++        raise ValueError('Live retreat geometry requires the original projected executor sweep')
++    config['wrist_assist']['release_live_geometry'] = release_live_geometry
++    release_open_anti_windup = config.get('visual_cycle', {}).get('release_open_anti_windup', False)
++    if type(release_open_anti_windup) is not bool:
++        raise ValueError('Release opening anti-windup must be boolean')
++    config['wrist_assist']['release_open_anti_windup'] = release_open_anti_windup
++    release_open_position_gain = config.get('visual_cycle', {}).get('release_open_hold_position_gain')
++    if release_open_position_gain is not None:
++        if not np.isfinite(release_open_position_gain) or not 1. <= release_open_position_gain <= 4.:
++            raise ValueError('Release opening position gain must be finite in [1,4]')
++        config['wrist_assist']['release_open_hold_position_gain'] = release_open_position_gain
++    release_planning_margin = config.get('visual_cycle', {}).get('release_planning_margin_m', .003)
++    if not np.isfinite(release_planning_margin) or not .003 <= release_planning_margin <= .006:
++        raise ValueError('Release planning margin must be between 3 and 6 mm')
++    config['wrist_assist']['release_planning_margin_m'] = release_planning_margin
+     if type(config.get('visual_cycle', {}).get('table_reference_warm_start', False)) is not bool:
+         raise ValueError('table_reference_warm_start must be boolean')
++    if type(config.get('visual_cycle', {}).get('table_reference_tilt_compensation', False)) is not bool:
++        raise ValueError('table_reference_tilt_compensation must be boolean')
+     if type(config.get('visual_cycle', {}).get('regrasp_nearest_visible_section', False)) is not bool:
+         raise ValueError('regrasp_nearest_visible_section must be boolean')
+     if type(config.get('visual_cycle', {}).get('weighing_feasibility_refine', False)) is not bool:
+--- a/scene1/residual.py
++++ b/scene1/residual.py
+@@ -377,7 +377,8 @@
+         try:
+             chosen, audit = project_retreat_reference(self.kinematics, measured, proposed,
+                 base+before, self.last_sent, lower, upper, self.config['max_joint_step_rad']*.5,
+-                target, plane, motion_config)
++                target, plane, motion_config,
++                planning_margin_m=self.wrist_config.get('release_planning_margin_m', .003))
+         except Exception:
+             self.offset = before
+             raise
+@@ -483,6 +484,23 @@
+         """Use RGB-D around the held box, excluding the wrist behind it."""
+         if snapshot is None or 'depth_m' not in snapshot:
+             return None
++        image_pose = None
++        if self.wrist_config.get('image_aligned_box_pose', False):
++            # v52 sensors: 12 leg joints, waist, 14 arm joints, 2 head joints.
++            # FK ignores gripper slots. Only the visual attachment estimate
++            # uses this image-time pose; control and contact checks stay live.
++            q = np.asarray(snapshot.get('rgb_joint_positions_rad'), dtype=float)
++            if q.shape != (29,) or not np.isfinite(q).all():
++                raise ValueError('Image-aligned box observation requires the v52 joint sample')
++            aligned = self.kinematics.fk(np.r_[q[13:20], 0., q[20:27], 0.])
++            image_pose = dict(source='rgb_aligned_joint_history',
++                joint_stamp_s=snapshot['rgb_joint_stamp_s'], rgb_stamp_s=snapshot['stamp'],
++                rgb_joint_dt_s=snapshot['rgb_joint_dt_s'],
++                translation_from_control_pose_m=float(np.linalg.norm(
++                    np.asarray(aligned.right_pose.pos_xyz)-np.asarray(poses.right_pose.pos_xyz))),
++                rotation_from_control_pose_rad=float((Rotation.from_quat(aligned.right_pose.quat_xyzw)*
++                    Rotation.from_quat(poses.right_pose.quat_xyzw).inv()).magnitude()))
++            poses = aligned
+         import cv2
+         center, rotation, extent = self._world_geometry(1, poses)
+         if FAST_PROJECTION:
+@@ -523,7 +541,21 @@
+         if np.linalg.norm(shift) > .025:
+             return None
+         pose = poses.right_pose; tool = Rotation.from_quat(pose.quat_xyzw)
+-        self.geometry[1]['center'] += .3 * tool.inv().apply(shift)
++        attachment_gain = .3
++        attachment_interval = None
++        if self.wrist_config.get('attachment_time_normalization', False):
++            # Preserve the original 10 Hz estimator pole at faster RGB-D
++            # cadence. A repeated image supplies no new attachment evidence.
++            # Long gaps keep the original per-observation correction bound.
++            stamp = float(snapshot['stamp'])
++            if not np.isfinite(stamp):
++                raise ValueError('Attachment estimation requires a finite image timestamp')
++            previous = getattr(self, '_attachment_image_stamp', None)
++            attachment_interval = .1 if previous is None else stamp-previous
++            attachment_gain = min(.3, 1.-.7**(np.clip(attachment_interval, 0., .1)/.1))
++            if previous is None or stamp > previous:
++                self._attachment_image_stamp = stamp
++        self.geometry[1]['center'] += attachment_gain * tool.inv().apply(shift)
+         vertical_height = float(np.abs(rotation.as_matrix()[2]) @ extent)
+         bottom = float(np.percentile(group[:,2],95)-vertical_height)
+         eigenvalues, eigenvectors = np.linalg.eigh(np.cov(group[:,:2].T))
+@@ -551,7 +583,7 @@
+             # Update the grasp transform only from an adequately visible box;
+             # limit the change from one RGB-D frame to reject wrist faces.
+             if np.linalg.norm(angular_shift) <= np.deg2rad(20):
+-                rotation = rotation * Rotation.from_rotvec(.3 * angular_shift)
++                rotation = rotation * Rotation.from_rotvec(attachment_gain * angular_shift)
+                 self.geometry[1]['rotation'] = tool.inv() * rotation
+                 vertical_height = float(np.abs(rotation.as_matrix()[2]) @ extent)
+                 bottom = float(np.percentile(group[:,2],95)-vertical_height)
+@@ -559,6 +591,9 @@
+                 orientation_confirmed = False
+         return dict(points=len(group), bottom_base_m=bottom,
+                     position_source=position_source,
++                    image_pose=image_pose,
++                    attachment_update_gain=float(attachment_gain),
++                    attachment_interval_s=attachment_interval,
+                     roof_normal_base=normal.tolist() if tilt is not None else None,
+                     heading_error_degrees=float(np.rad2deg(heading_error)),
+                     tilt_degrees=tilt, orientation_confirmed=orientation_confirmed,
+@@ -732,14 +767,34 @@
+         # gate. Switching directly between low and full pitch weight at that
+         # gate drives a repeated pose/translation limit cycle during insertion.
+         if stage == 'insert' and pitch_weight < 1.:
+-            blend = float(np.clip((np.linalg.norm(angular_error)-np.deg2rad(4.))
+-                                  /np.deg2rad(3.), 0., 1.))
++            position_priority = self.wrist_config.get('regrasp_insert_position_priority', False)
++            # Once inside the original orientation gate, avoid letting a
++            # residual pitch demand overpower the small visual centering
++            # correction. Restore full pitch authority before the unchanged
++            # 8 degree gate; lateral finger tilt remains fully constrained.
++            blend_start, blend_end = (6., 7.5) if position_priority else (4., 7.)
++            blend = float(np.clip((np.linalg.norm(angular_error)-np.deg2rad(blend_start))
++                                  /np.deg2rad(blend_end-blend_start), 0., 1.))
+             blend = blend*blend*(3.-2.*blend)
+             pitch_weight += (1.-pitch_weight)*blend
+         pitch_relaxed = stage == 'insert' and orientation_ok and pitch_weight < 1.
+         pitch_axis = p['grasp_rotation'].as_matrix()[:,0] if pitch_relaxed else None
++        # The derivative already uses a 100 ms reference interval. Match the
++        # accumulated correction to that same interval at fast cadence, so
++        # switching to 20 Hz does not double the closed-loop integral gain.
++        gain_scale = (min(1., 1./rate_scale) if fast and
++            self.wrist_config.get('regrasp_time_normalization', False) else 1.)
++        # The measured hand can oscillate around a swept-clear reference.
++        # Reduce the reference integrator bandwidth for the complete regrasp
++        # servo, preserving its derivative terms and all live clearance gates.
++        regrasp_gain = self.wrist_config.get('regrasp_gain_scale', 1.)
++        if not np.isfinite(regrasp_gain) or not .25 <= regrasp_gain <= 1.:
++            raise ValueError('Regrasp gain scale must be finite in [.25,1]')
++        gain_scale *= regrasp_gain
+         result = self._correct(p['base'],measured,1,correction,angular_error-4.*damping_scale*rate_scale*angular_velocity,
+-            step_scale=step_scale,level_axis=pitch_axis,level_axis_weight=pitch_weight)
++            step_scale=step_scale,level_axis=pitch_axis,level_axis_weight=pitch_weight,
++            gain_scale=gain_scale)
++        info['regrasp_integral_gain_scale'] = float(gain_scale)
+         margin = self.wrist_config.get('grasp_planning_margin_m', .003)
+         if margin > .003:
+             cap = self.wrist_config.get('max_regrasp_joint_offset_rad', self.config['max_joint_offset_rad'])
+@@ -756,6 +811,7 @@
+                 info['grasp_clearance_projection'] = projection
+         info['insert_pitch_task'] = dict(relaxed=bool(pitch_relaxed),
+             weight=float(pitch_weight) if pitch_relaxed else 1.,
++            position_priority=bool(self.wrist_config.get('regrasp_insert_position_priority', False)),
+             original_orientation_gate_passed=bool(orientation_ok))
+         delta = self.offset[8:15]-previous_offset[8:15]
+         self.command_sweep_context['increment_end_rad'] = (measured[8:15]+delta).tolist()
+@@ -870,16 +926,40 @@
+         previous = p.get('release_prepare_previous_wrist')
+         wrist_movement = np.inf if previous is None else float(np.max(abs(measured[active]-previous)))
+         p['release_prepare_previous_wrist'] = measured[active].copy()
+-        quiet = support_ok and sent_error <= .005 and wrist_movement <= .003
++        proportional = self.wrist_config.get('release_prepare_proportional', False)
++        release_motion_limit = self.wrist_config.get('release_prepare_motion_limit_rad',.003)
++        if not np.isfinite(release_motion_limit) or not 0. < release_motion_limit <= .003:
++            raise ValueError('Release motion limit must be positive and no looser than original')
++        quiet_limit = release_motion_limit if proportional else .003
++        quiet = support_ok and sent_error <= .005 and wrist_movement <= quiet_limit
+         p['release_prepare_quiet'] = p.get('release_prepare_quiet',0)+1 if quiet else 0
+         adjustment = np.zeros(7 if whole_arm else 3)
++        now = time.monotonic()
++        interval = now-p.get('release_prepare_sample_at', now-getattr(self, 'control_period_s', .1))
++        p['release_prepare_sample_at'] = now
+         prepare_step = self.wrist_config.get('release_prepare_step_rad', self.config['max_joint_step_rad'])
+         if not np.isfinite(prepare_step) or not 0. < prepare_step <= self.config['max_joint_step_rad']:
+             raise ValueError('Release preparation cannot exceed the original joint step')
+         if (self.wrist_config.get('release_prepare_adapt_settled',False)
+                 and p['release_prepare_quiet'] >= 3 and tracking_error > .015):
+             step = prepare_step
+-            adjustment = np.clip(measured[active]-target[active],-step,step)
++            delta = measured[active]-target[active]
++            if proportional:
++                # Unload the supported arm along its measured tracking-error
++                # vector. Per-joint saturation changes this direction and can
++                # twist/lift the parcel while cancelling contact preload.
++                # Keep the 10 Hz rate at faster callbacks, with no catch-up
++                # jump after a delay. The original support/quiet gates above
++                # and release tracking/movement gates below still apply.
++                step *= float(np.clip(interval/.1, 0., 1.))
++                # Retain a small tracking preload on joints already inside
++                # tolerance instead of continually chasing their load-induced
++                # displacement. Adaptation itself now requires release-level
++                # quiet, so moving feedback cannot drag the reference along.
++                excess = np.sign(delta)*np.maximum(abs(delta)-.010,0.)
++                adjustment = excess*min(1.,step/max(float(np.max(abs(excess))),1e-12))
++            else:
++                adjustment = np.clip(delta,-step,step)
+             updated = np.clip(target[active]+adjustment,self.low[active],self.high[active])
+             adjustment = updated-target[active]
+             target[active] = updated
+@@ -892,9 +972,6 @@
+             sent_error = float(np.max(abs(self.last_sent[8:15]-target[8:15])))
+             wrist_error = float(np.max(abs(measured[12:15]-target[12:15])))
+         tracking_error = float(np.max(abs(measured[active]-target[active])))
+-        release_motion_limit = self.wrist_config.get('release_prepare_motion_limit_rad',.003)
+-        if not np.isfinite(release_motion_limit) or not 0. < release_motion_limit <= .003:
+-            raise ValueError('Release motion limit must be positive and no looser than original')
+         ready = support_ok and sent_error <= .005 and tracking_error <= .015 and wrist_movement <= release_motion_limit
+         p['release_prepare_stable'] = p['release_prepare_stable']+1 if ready else 0
+         self.offset[8:15] = target[8:15]-p['base'][8:15]
+@@ -909,6 +986,8 @@
+             support_position_rule=info.get('support_position_rule','center_and_footprint'),
+             stable_steps=p['release_prepare_stable'],
+             continuous_adaptation=bool(self.wrist_config.get('release_prepare_continuous_adapt', False)),
++            proportional_adaptation=bool(proportional),
++            adaptation_motion_limit_rad=float(quiet_limit),
+             quiet_observations=p['release_prepare_quiet'],
+             settled_target_adjustment_rad=adjustment.tolist(),
+             adaptation_step_limit_rad=float(prepare_step),
+@@ -951,8 +1030,18 @@
+         if p['kind'] == 'short_retreat':
+             result = p['base'].copy()+self.offset; result[15] = 0.
+             opening_command = self._release_open_command(measured[15])
++            # Finish actual finger motion before taking the fresh parcel
++            # geometry used by the original retreat sweep. At the old .1
++            # threshold the fingers can still join the observed parcel blob.
++            # Tighten feedback only; retain the original 40-step deadline and
++            # let the existing live geometry/sweep decide physical clearance.
++            full_open = self.wrist_config.get('release_full_open_feedback', False)
++            open_grip_limit = .03 if full_open else .1
++            if full_open:
++                info['release_open_feedback'] = dict(measured_gripper=float(measured[15]),
++                    required_at_most=open_grip_limit, original_open_timeout_steps=40)
+             if (p['steps'] <= self.wrist_config.get('release_open_dwell_steps', 12)
+-                    or measured[15] > .1 or opening_command > 0.):
++                    or measured[15] > open_grip_limit or opening_command > 0.):
+                 if p['steps'] >= 40:
+                     raise RuntimeError('Right gripper did not open before retreat')
+                 if self.wrist_config.get('release_cartesian_open_hold', False):
+@@ -965,17 +1054,48 @@
+                     position_gain=self.wrist_config.get('release_open_hold_position_gain',1.)
+                     if not np.isfinite(position_gain) or position_gain<=0:
+                         raise ValueError('Opening hold position gain must be positive and finite')
++                    normalized = self.wrist_config.get('release_open_time_normalization', False)
++                    rate_scale, integral_scale, valid_interval = 1., 1., True
++                    if normalized:
++                        _, rate_scale, fast, valid_interval = self._motion_clock(p)
++                        integral_scale = min(1.,1./rate_scale) if fast and valid_interval else 1.
+                     # Compensate measured unload drift while fingers open.
+                     # Same incremental corrector, step limit and downstream
+                     # MotionFilter; the original open dwell/budget is retained.
+-                    result=self._correct(p['base'],measured,side,position_gain*error-1.5*velocity,
+-                                         angular-4.*angular_velocity)
++                    if valid_interval:
++                        previous_reference = p['base']+self.offset
++                        result=self._correct(p['base'],measured,side,position_gain*error-1.5*rate_scale*velocity,
++                                             angular-4.*rate_scale*angular_velocity,
++                                             gain_scale=integral_scale)
++                        if self.wrist_config.get('release_open_anti_windup', False):
++                            tracking_cap = self.wrist_config['max_open_joint_delta_rad']
++                            if not np.isfinite(tracking_cap) or not 0. < tracking_cap <= .025:
++                                raise ValueError('Opening anti-windup must retain the original 25 mrad tracking gate')
++                            # Contact can temporarily prevent motion while the
++                            # fingers open. Do not integrate a growing command
++                            # lead that would launch the hand on release.
++                            # The interval contains the previous reference:
++                            # clipping only shortens this bounded increment.
++                            # Existing excess from feedback motion may shrink
++                            # but cannot grow through another correction.
++                            proposed = result[8:15].copy()
++                            lower = np.minimum(previous_reference[8:15], measured[8:15]-tracking_cap)
++                            upper = np.maximum(previous_reference[8:15], measured[8:15]+tracking_cap)
++                            result[8:15] = np.clip(proposed, lower, upper)
++                            self.offset[8:15] = result[8:15]-p['base'][8:15]
++                            info['release_open_anti_windup'] = dict(tracking_cap_rad=float(tracking_cap),
++                                limited_joints=int(np.count_nonzero(abs(result[8:15]-proposed)>1e-10)),
++                                max_pending_reference_rad=float(np.max(abs(result[8:15]-measured[8:15]))),
++                                original_step_limit_retained=True)
+                     result[15]=0.
+                     p['hold_last_position']=position.copy()
+                     p['hold_last_rotation']=rotation
+                     info['release_pose_hold']=dict(position_error_m=float(np.linalg.norm(error)),
+                         angular_error_degrees=float(np.rad2deg(np.linalg.norm(angular))),
+                         position_gain=float(position_gain),
++                        time_normalized=bool(normalized),
++                        integral_scale=float(integral_scale),
++                        valid_interval=bool(valid_interval),
+                         position_goal_m=p['release_hold_position'].tolist(),
+                         measured_gripper=float(measured[15]))
+                 result[15] = opening_command
+@@ -1025,21 +1145,45 @@
+                                 snapshot['table_z_base_m'],
+                                 self.wrist_config.get('max_short_retreat_steps', 90)-p['steps']+1,
+                                 dict(self.retreat_motion_config, period=period), cadence_aware=True)
+-                        try:
+-                            candidate, check = axis_retreat_goal(*retreat_args, .05,
+-                                self.wrist_config.get('release_retreat_ready_m', .014),
+-                                execution_validator=short_validator)
+-                            level = certify_following_level(self.kinematics, check,
+-                                check['observed_parcel'], snapshot['table_z_base_m'],
+-                                self.wrist_config.get('regrasp_pitch_degrees', 12.5))
+-                            p['shorter_exit_selection'] = dict(rise_m=.05, level=level,
+-                                certified=level['certified'], nominal_steps=check['nominal_steps'])
+-                            if level['certified']:
+-                                check['following_level'] = level
+-                                chosen = candidate, check
+-                        except RuntimeError as error:
+-                            p['shorter_exit_selection'] = dict(rise_m=.05, certified=False,
+-                                reason=str(error), preflight=getattr(error, 'retreat_preflight_audit', None))
++                        original_distance = retreat_args[-1]
++                        distance = self.wrist_config.get('release_shorter_exit_distance_m', original_distance)
++                        # Avoid unnecessary elbow travel near extension. A
++                        # shorter endpoint is usable only after the same full
++                        # executor sweep AND the existing 5 mm leveling sweep.
++                        # Keep the original endpoint as fallback; no command,
++                        # arrival, clearance or phase-budget limit changes.
++                        distances = list(dict.fromkeys((original_distance, distance)))
++                        # Perfect-tracking preflight omits the measured WBC
++                        # lag. Preserve the original exit whenever it leaves
++                        # 45 callbacks for tracking/settling; shorten only a
++                        # budget-limited exit, not every regrasp viewpoint.
++                        tracking_reserve = 45 if distance < original_distance else 0
++                        attempts = []
++                        selected_attempt = None
++                        for distance in distances:
++                            try:
++                                candidate, check = axis_retreat_goal(*retreat_args[:-1], distance, .05,
++                                    self.wrist_config.get('release_retreat_ready_m', .014),
++                                    execution_validator=short_validator)
++                                level = certify_following_level(self.kinematics, check,
++                                    check['observed_parcel'], snapshot['table_z_base_m'],
++                                    self.wrist_config.get('regrasp_pitch_degrees', 12.5))
++                                attempt = dict(rise_m=.05, horizontal_distance_m=float(distance), level=level,
++                                    certified=level['certified'], nominal_steps=check['nominal_steps'],
++                                    tracking_reserve_steps=tracking_reserve,
++                                    remaining_after_nominal_steps=check['remaining_steps']-check['nominal_steps'])
++                                attempts.append(attempt)
++                                if level['certified']:
++                                    check['following_level'] = level
++                                    chosen = candidate, check
++                                    selected_attempt = attempt
++                                    if attempt['remaining_after_nominal_steps'] >= tracking_reserve:
++                                        break
++                            except RuntimeError as error:
++                                attempts.append(dict(rise_m=.05, horizontal_distance_m=float(distance),
++                                    certified=False, reason=str(error),
++                                    preflight=getattr(error, 'retreat_preflight_audit', None)))
++                        p['shorter_exit_selection'] = dict(selected_attempt or attempts[-1], attempts=attempts)
+                     if chosen is None:
+                         chosen = axis_retreat_goal(*retreat_args,
+                             self.wrist_config['release_clearance_rise_m'],
+@@ -1055,6 +1199,43 @@
+                     p['goal'] = np.asarray(pose.pos_xyz, float).copy()
+                     p['goal'][:2] += direction * self.wrist_config.get('release_short_retreat_m', .035)
+                     p['goal'][2] += self.wrist_config.get('release_clearance_rise_m', .012)
++            if self.wrist_config.get('release_live_geometry', False):
++                near = [] if snapshot is None else [c for c in snapshot.get('candidates', [])
++                    if np.linalg.norm(np.asarray(c['position_base_m'])[:2]-self.weighing_target[:2]) < .12]
++                if len(near) != 1 or not np.isfinite(snapshot.get('table_z_base_m', np.nan)):
++                    raise RuntimeError('Live retreat requires one currently observed parcel and plane')
++                observed = near[0]
++                if 'retreat_observation_anchor' not in p:
++                    original = p['retreat_sweep_target']
++                    p['retreat_observation_anchor'] = np.asarray(original.get(
++                        'oriented_center_base_m', original['position_base_m']))[:2].copy()
++                    p['retreat_plane_anchor'] = p['retreat_sweep_plane']
++                    p['retreat_goal_anchor'] = p['goal'].copy()
++                    p['retreat_goal_shift'] = np.zeros(3)
++                center = np.asarray(observed.get('oriented_center_base_m', observed['position_base_m']))
++                shift = np.r_[center[:2]-p['retreat_observation_anchor'],
++                              snapshot['table_z_base_m']-p['retreat_plane_anchor']]
++                if not np.isfinite(shift).all() or np.linalg.norm(shift) > .03:
++                    raise RuntimeError('Live retreat scene displacement exceeds 30 mm; no motion sent')
++                stamp = snapshot['stamp']
++                if stamp != p.get('retreat_geometry_stamp'):
++                    interval = stamp-p.get('retreat_geometry_stamp', stamp-.1)
++                    if interval <= 0.:
++                        raise RuntimeError('Live retreat observation timestamp moved backwards')
++                    alpha = min(.5, .3*interval/.1)
++                    p['retreat_goal_shift'] += alpha*(shift-p['retreat_goal_shift'])
++                    p['retreat_geometry_stamp'] = stamp
++                # Collision geometry is current and unfiltered. Only the
++                # relative waypoint is smoothed to avoid chasing RGB-D noise.
++                # The initial nominal certificate is not a dynamics proof;
++                # every bounded proposed/filtered command still passes the
++                # original sweep against this current observed parcel.
++                p['retreat_sweep_target'] = copy.deepcopy(observed)
++                p['retreat_sweep_plane'] = snapshot['table_z_base_m']
++                p['goal'] = p['retreat_goal_anchor']+p['retreat_goal_shift']
++                info['retreat_live_geometry'] = dict(observation_stamp=stamp,
++                    observed_shift_m=shift.tolist(), goal_shift_m=p['retreat_goal_shift'].tolist(),
++                    collision_geometry_filtered=False, original_step_budget_retained=True)
+             if 'retreat_goal_check' in p:
+                 info['retreat_goal_check'] = p['retreat_goal_check']
+             if 'shorter_exit_selection' in p:
+@@ -1111,6 +1292,13 @@
+         if p['kind'] == 'settle':
+             result = p['base'].copy()+self.offset; result[15] = 0.
+             observed = resting_observation(snapshot, p['surface'], p['extent'], self._roof_normal)
++            if self.wrist_config.get('release_live_geometry', False):
++                target = observed.get('target') if observed is not None else None
++                if target is None:
++                    target = p['target']
++                self.command_sweep_context = dict(target=copy.deepcopy(target),
++                    plane=snapshot['table_z_base_m'], stage='release_settle')
++                info['retreat_sweep_required'] = True
+             settled = p['monitor'].update(observed)
+             info['settlement'] = settled
+             if settled['confirmed']:
+@@ -1579,6 +1767,18 @@
+             level_error = np.cross(up, [0., 0., 1.])
+             movement = np.linalg.norm(np.asarray(pose.pos_xyz) - p['last_position']) if p.get('last_position') is not None else np.inf
+             p['last_position'] = np.asarray(pose.pos_xyz)
++            # Leveling can stop its position demand inside the tilt gate
++            # while the loaded wrist is still rotating. Brake measured hand
++            # rotation independently, including after level_ready is latched.
++            hand_rotation = Rotation.from_quat(pose.quat_xyzw)
++            angular_sample_at = time.monotonic()
++            angular_interval = angular_sample_at-p.get('weighing_angular_sample_at', angular_sample_at-.1)
++            prior_rotation = p.get('weighing_last_rotation')
++            angular_feedback_valid = 0. < angular_interval <= .5
++            angular_step = ((hand_rotation*prior_rotation.inv()).as_rotvec()*.1/angular_interval
++                if prior_rotation is not None and angular_feedback_valid else np.zeros(3))
++            p['weighing_last_rotation'] = hand_rotation
++            p['weighing_angular_sample_at'] = angular_sample_at
+             heading = rotation.apply([1,0,0]); yaw = np.arctan2(heading[1], heading[0])
+             signed_axis_error = (yaw + np.pi/4) % (np.pi/2) - np.pi/4
+             axis_error = abs(signed_axis_error)
+@@ -1684,8 +1884,15 @@
+                 descent = float(np.clip(.06-bottom_gap, -.02, .02))
+             # The loaded wrist responds several frames after a correction.
+             # Brake measured movement toward the target before it overshoots.
+-            descent = float(np.clip(descent - 1.5*np.clip(gap_velocity, -.01, .01), -.04, .02))
+-            damped_xy = error - 1.5*np.clip(center_velocity, -.01, .01)
++            weighing_damping = self.wrist_config.get('weighing_velocity_damping', 1.5)
++            if not np.isfinite(weighing_damping) or not 1.5 <= weighing_damping <= 6.:
++                raise ValueError('Weighing velocity damping must be finite in [1.5,6]')
++            descent = float(np.clip(descent - weighing_damping*np.clip(gap_velocity, -.01, .01), -.04, .02))
++            damped_xy = error - weighing_damping*np.clip(center_velocity, -.01, .01)
++            angular_damping = self.wrist_config.get('weighing_angular_damping', 0.)
++            if not np.isfinite(angular_damping) or not 0. <= angular_damping <= 6.:
++                raise ValueError('Weighing angular damping must be finite in [0,6]')
++            level_error = level_error-angular_damping*angular_step
+             fast_descent = (heading_descent_ok and p.get('level_ready', False)
+                             and flat and bottom_gap > self.config['max_release_gap_m'])
+             result = (p['release_prepare_target'].copy() if 'release_prepare_target' in p else self._correct(p['base'], measured, 1,
+@@ -1708,6 +1915,10 @@
+                       and movement < .004 and heading_ok)
+             p['stable'] = p['stable'] + 1 if stable else 0
+             info.update(xy_error_m=float(np.linalg.norm(error)), bottom_gap_m=bottom_gap,
++                        weighing_velocity_damping=float(weighing_damping),
++                        weighing_angular_damping=float(angular_damping),
++                        weighing_angular_rate_rad_s=(angular_step/.1).tolist(),
++                        weighing_angular_feedback_valid=bool(angular_feedback_valid),
+                         bottom_height_spread_m=bottom_spread, visual_box=seen,
+                         placement_phase='lower' if p.get('level_ready', False) else 'level',
+                         level_stable_steps=p.get('level_stable', 0),
+--- a/scene1/rgbd.py
++++ b/scene1/rgbd.py
+@@ -413,6 +413,10 @@
+                 "surfaces": (surface_candidates(rgb, depth, k, matrix, plane_z, self.config, hsv=hsv, samples=grids[4]) if find_surfaces else []),
+                 "intrinsic": k, "camera_to_base": matrix,
+                 "head_angles_rad": np.asarray(joint_message.joint_data.joint_q)[self.config['head_joint_indices']].tolist(),
++                # Keep the arm pose from the same sensor sample as the camera
++                # transform. A later servo observation is not the image pose.
++                "rgb_joint_positions_rad": list(joint_message.joint_data.joint_q),
++                "rgb_joint_stamp_s": joint_message.header.stamp.to_sec(),
+                 "rgb_joint_dt_s": joint_dt, "shared_rgb_decode_hit": shared_hit,
+                 "stamp": rgb_message.header.stamp.to_sec()}
+ 
+--- a/scene1/table_reference.py
++++ b/scene1/table_reference.py
+@@ -6,7 +6,7 @@
+ from scipy.spatial import cKDTree
+ 
+ 
+-def table_boundary(snapshot):
++def table_boundary(snapshot, *, fit_tilt=False):
+     """Actual tabletop-to-lower-surface RGB-D edges, before hull simplification.
+ 
+     The image border and higher occluding hands provide no exterior edge
+@@ -21,9 +21,43 @@
+     plane = snapshot['table_z_base_m']
+     hsv = snapshot_hsv(snapshot)
+     valid = (depth > .1) & np.isfinite(depth) & np.isfinite(z)
+-    top = (valid & (hsv[:, :, 0] >= 40) & (hsv[:, :, 0] <= 85)
+-           & (hsv[:, :, 1] >= 100) & (abs(z-plane) < .012))
+-    lower = valid & (z < plane-.015)
++    green = ((hsv[:, :, 0] >= 40) & (hsv[:, :, 0] <= 85)
++             & (hsv[:, :, 1] >= 100))
++    surface = plane
++    if fit_tilt:
++        # A small base tilt makes a real far tabletop edge fall outside the
++        # horizontal height band. Fit only already admitted green tabletop
++        # samples, then apply the same bands relative to that observed plane.
++        # Neither the grasp plane nor the registration acceptance gates change.
++        bx = (matrix[0, 0]*x+matrix[0, 1]*y+matrix[0, 2])*depth+matrix[0, 3]
++        by = (matrix[1, 0]*x+matrix[1, 1]*y+matrix[1, 2])*depth+matrix[1, 3]
++        seed = (valid & green & (abs(z-plane) < .012))[::4, ::4]
++        xy = np.column_stack((bx[::4, ::4][seed], by[::4, ::4][seed]))
++        height = z[::4, ::4][seed]
++        if len(height) >= 100:
++            origin = np.median(xy, axis=0)
++            design = np.column_stack((xy-origin, np.ones(len(xy))))
++            singular = np.linalg.svd(design, compute_uv=False)
++            if singular[-1] >= .03*singular[0]:
++                coefficients = np.linalg.lstsq(design, height, rcond=None)[0]
++                inliers = abs(design@coefficients-height) <= .003
++                inlier_singular = np.linalg.svd(design[inliers], compute_uv=False)
++                if (np.count_nonzero(inliers) >= max(100, .7*len(height))
++                        and len(inlier_singular) == 3
++                        and inlier_singular[-1] >= .03*inlier_singular[0]):
++                    coefficients = np.linalg.lstsq(design[inliers], height[inliers], rcond=None)[0]
++                    residual = abs(design@coefficients-height)
++                    if (np.linalg.norm(coefficients[:2]) <= np.tan(np.deg2rad(2.))
++                            and abs(coefficients[2]-plane) <= .012
++                            and np.count_nonzero(residual <= .003) >= max(100, .7*len(height))):
++                        surface = (coefficients[0]*(bx-origin[0])
++                                   + coefficients[1]*(by-origin[1])+coefficients[2])
++                        snapshot['table_boundary_plane_fit'] = dict(
++                            tilt_degrees=float(np.rad2deg(np.arctan(np.linalg.norm(coefficients[:2])))),
++                            samples=len(height), inliers=int(np.count_nonzero(residual <= .003)),
++                            residual_p90_m=float(np.percentile(residual[residual <= .003], 90)))
++    top = valid & green & (abs(z-surface) < .012)
++    lower = valid & (z < surface-.015)
+     boundary = np.zeros(depth.shape, bool)
+     for axis in (0, 1):
+         for shift in (-2, 2):
+--- a/scene1/visual_cycle.py
++++ b/scene1/visual_cycle.py
+@@ -234,6 +234,8 @@
+         self.servo_previous = [None, None]
+         self.servo_sample_time = [None, None]
+         self.servo_precision = [False, False]
++        self.servo_position_precision = [False, False]
++        self.servo_axis_precision = np.zeros((2, 3), dtype=bool)
+         self.home_previous = None
+         self.home_settling = False
+         self.receiver_center_frames = 0
+@@ -253,8 +255,8 @@
+                         or self.config.get('bin_view_retreat_on_occlusion', False))))
+         if viewing and 'bin_verify_view_height_m' in self.config:
+             height = float(self.config['bin_verify_view_height_m'])
+-            if not np.isfinite(height) or not 0. <= height <= .35:
+-                raise ValueError('Bin verification view height must be in [0, .35] m')
++            if not np.isfinite(height) or not 0. <= height <= .42:
++                raise ValueError('Bin verification view height must be in [0, .42] m')
+             # Aim higher to raise the camera on its existing neck pivot.
+             # Joint/speed limits and the original 3D evidence gates remain.
+             return np.r_[self.rim['center'], self.rim['rim_z']+height]
+@@ -288,7 +290,7 @@
+         if stationary_loaded:
+             gain_scale = 1.  # Keep the stationary loaded hand's hold unchanged.
+         profile = {} if stationary_loaded else self.config.get('servo_profiles', {}).get(profile_name, {})
+-        precision_keys = {'precision_position_m', 'precision_gain_divisor', 'precision_error_scale', 'coarse_damping', 'time_normalize', 'coarse_arm_step_rad', 'noncontact_step_rad', 'integral_reference_period_s'}
++        precision_keys = {'precision_position_m', 'precision_gain_divisor', 'precision_error_scale', 'coarse_damping', 'precision_damping', 'angular_gain_scale', 'time_normalize', 'coarse_arm_step_rad', 'noncontact_step_rad', 'integral_reference_period_s', 'independent_position_precision', 'axis_position_precision'}
+         noncontact = {'lift', 'transport', 'left_approach', 'right_retreat', 'left_clear',
+                      'bin_transport', 'left_retreat', 'pickup_clear', 'pickup_hover',
+                      'pickup_lift', 'pickup_carry', 'pickup_prepare_weighing',
+@@ -297,12 +299,22 @@
+             raise ValueError('Precision tuning is limited to non-contact transit profiles')
+         if 'time_normalize' in profile and not isinstance(profile['time_normalize'], bool):
+             raise ValueError('Transit time normalization must be boolean')
++        independent_position = profile.get('independent_position_precision', False)
++        if type(independent_position) is not bool:
++            raise ValueError('Independent position precision must be boolean')
++        axis_precision = profile.get('axis_position_precision', False)
++        if type(axis_precision) is not bool or (axis_precision and not independent_position):
++            raise ValueError('Axis precision requires independent position precision')
+         precision_distance = float(profile.get('precision_position_m', .08))
+         precision_divisor = float(profile.get('precision_gain_divisor', 3.))
+         coarse_damping = float(profile.get('coarse_damping', 2.))
+-        if (not np.isfinite([precision_distance, precision_divisor, coarse_damping]).all()
++        precision_damping = float(profile.get('precision_damping', 4.))
++        angular_gain_scale = float(profile.get('angular_gain_scale', 1.))
++        if not np.isfinite(angular_gain_scale) or not .25 <= angular_gain_scale <= 1.:
++            raise ValueError('Transit angular gain scale must be in [.25, 1]')
++        if (not np.isfinite([precision_distance, precision_divisor, coarse_damping, precision_damping]).all()
+                 or not .02 <= precision_distance <= .08 or not 1.5 <= precision_divisor <= 3.
+-                or not 2. <= coarse_damping <= 4.):
++                or not 2. <= coarse_damping <= 8. or not 4. <= precision_damping <= 8.):
+             raise ValueError('Invalid bounded transit precision parameters')
+         start = (0, 8)[side]
+         q = measured[start:start+7]
+@@ -327,6 +339,12 @@
+         if precision_ready and angle_error < .35:
+             self.servo_precision[side] = True
+         precision = self.servo_precision[side]
++        if independent_position and precision_ready:
++            self.servo_position_precision[side] = True
++        if axis_precision:
++            self.servo_axis_precision[side] |= abs(xyz) < precision_distance
++        position_precision = (self.servo_axis_precision[side] if axis_precision else
++                              np.full(3, independent_position and self.servo_position_precision[side]))
+         error_scale = float(profile.get('precision_error_scale', 1.))
+         if not np.isfinite(error_scale) or not .25 <= error_scale <= 1.:
+             raise ValueError('Precision error scale must be finite and in [.25,1]')
+@@ -335,6 +353,11 @@
+             # velocity brake or changing the original measured arrival gates.
+             xyz *= error_scale
+             angle *= error_scale
++        elif np.any(position_precision):
++            # Independent translation precision must also use its configured
++            # position-error taper while rotation is still converging. Apply
++            # it before the velocity brake, exactly as in full-pose precision.
++            xyz[position_precision] *= error_scale
+         previous = self.servo_previous[side]
+         normalized = (self.stage in self.config.get('servo_time_normalization_stages', [])
+                       or profile.get('time_normalize', False))
+@@ -348,9 +371,13 @@
+         sample_times[side] = sampled_at
+         self.servo_sample_time = sample_times
+         if previous is not None:
+-            # Two control intervals of derivative damping; do not integrate
+-            # every delayed WBC tracking error as a new position demand.
+-            damping = 4. if precision else coarse_damping
++            # Brake measured motion before integrating the delayed WBC
++            # tracking error into another position demand.
++            # Loaded transit can retain a delayed wrist response near arrival.
++            # Permit a stronger measured-motion brake in non-contact profiles;
++            # request, joint-step, physical and measured arrival limits below
++            # remain unchanged. Contact/holding profiles keep the old defaults.
++            damping = precision_damping if precision else coarse_damping
+             if normalized and previous_time is not None:
+                 # Preserve the original 10 Hz damping in physical seconds.
+                 # This is the interval between consumed feedback samples,
+@@ -389,6 +416,16 @@
+             # saturates. Both original component limits still apply.
+             xyz_scale = angle_scale = min(xyz_scale, angle_scale)
+         requested = np.r_[xyz*xyz_scale, angular_weight*angle*angle_scale]
++        # The loaded wrist has a slower tracking response than translation.
++        # Permit a lower rotational feedback bandwidth without slowing the
++        # translation demand or weakening measured orientation arrival gates.
++        requested[3:] *= angular_gain_scale
++        # Translation can already be at its goal while the receiving wrist
++        # still turns. Reduce its outer-loop gain then, instead of repeatedly
++        # correcting a settled position at coarse gain until rotation catches
++        # up. The original full-pose precision and arrival gates stay intact.
++        if not precision:
++            requested[:3][position_precision] /= precision_divisor
+         step = self.config.get('max_joint_step_rad', .012)
+         configured_step = float(profile.get('noncontact_step_rad', step))
+         if not np.isfinite(configured_step) or not step <= configured_step <= .018:
+@@ -448,7 +485,8 @@
+         return position_error, angle_error, current[:3, 3]
+ 
+     def _arrived(self, measured, *, position_limit=None, angle_limit=None, posture_targets=None, posture_gain=.04,
+-                 descent_alignment=False, coupled_pose_request=False, reserve_joint_bound=False, servo_profile=None):
++                 descent_alignment=False, coupled_pose_request=False, reserve_joint_bound=False, servo_profile=None,
++                 receiver_alignment_ready=True, bin_footprint_ready=True):
+         before_command = self.command.copy()
+         sides = [side for side, goal in enumerate(self.goal) if goal is not None]
+         errors = [self._servo(measured, side, self.goal[side],
+@@ -493,6 +531,18 @@
+             # Resume correction immediately on drift; arrival still requires
+             # the original measured pose, movement and elapsed-time gates.
+             for side, error in zip(sides, errors):
++                # Cartesian proximity alone cannot settle the receiving hand:
++                # its remaining lateral error can still exceed the original
++                # wrist-image centering gate. Keep correcting until that
++                # independent gate is ready; the loaded giver keeps its hold.
++                if self.stage == 'left_approach' and side == 0 and not receiver_alignment_ready:
++                    continue
++                # A TCP inside its arrival tolerance can still leave a
++                # parcel corner outside the original bin clearance. Keep
++                # converging to the planned pose until that independent
++                # release condition is satisfied, then measure quietness.
++                if self.stage == 'bin_transport' and side == 0 and not bin_footprint_ready:
++                    continue
+                 if error[0] < .8*position_limit and error[1] < .8*angle_limit:
+                     start = (0, 8)[side]
+                     self.command[start:start+7] = before_command[start:start+7]
+@@ -513,6 +563,13 @@
+         self.stable = self.stable+1 if ok else 0
+         arrived = self.stable >= 3 and (not fast or now-self.arrival_since >= .2)
+         return arrived, [dict(position_m=e[0], angle_rad=e[1]) for e in errors]
++
++    def _bin_release_footprint_clear(self, measured):
++        center, rotation, extent = self.world_box(measured)
++        corners = center+rotation.apply([[a, b, c] for a in (-extent[0]/2, extent[0]/2)
++            for b in (-extent[1]/2, extent[1]/2) for c in (-extent[2]/2, extent[2]/2)])
++        return bool(inside_bin(corners, self.rim, .025)
++                    and min(corners[:, 2]) > self.rim['rim_z']+.025)
+ 
+     def _head_support(self, snapshot, measured):
+         if snapshot is None:
+@@ -727,7 +784,13 @@
+                 # command settling and measured arrival/stability checks.
+                 if self.bin_retreat_posture is not None and distance > .03:
+                     posture_targets = [self.bin_retreat_posture, None]
+-            arrived, errors = self._arrived(measured, posture_targets=posture_targets)
++            bin_footprint_ready = True
++            if self.stage == 'bin_transport':
++                bin_footprint_ready = self._bin_release_footprint_clear(measured)
++                info['bin_prearrival_footprint_clear'] = bin_footprint_ready
++            arrived, errors = self._arrived(measured, posture_targets=posture_targets,
++                                            receiver_alignment_ready=receiver_aligned,
++                                            bin_footprint_ready=bin_footprint_ready)
+             info['pose_errors'] = errors
+         else:
+             arrived = False
+@@ -805,10 +868,7 @@
+             info['bin_slot'] = self.bin_slot
+             self._stage('bin_transport')
+         elif self.stage == 'bin_transport' and arrived:
+-            center, rotation, extent = self.world_box(measured)
+-            corners = center+rotation.apply([[a, b, c] for a in (-extent[0]/2, extent[0]/2)
+-                for b in (-extent[1]/2, extent[1]/2) for c in (-extent[2]/2, extent[2]/2)])
+-            fit = inside_bin(corners, self.rim, .025) and min(corners[:, 2]) > self.rim['rim_z']+.025
++            fit = self._bin_release_footprint_clear(measured)
+             info['bin_footprint_clear'] = bool(fit)
+             release_ready = fit and snapshot['stamp']-self.rim['stamp'] <= 1.
+             if self.config.get('bin_release_quiet', False):
+@@ -1097,5 +1157,7 @@
+         self.servo_previous = [None, None]
+         self.servo_sample_time = [None, None]
+         self.servo_precision = [False, False]
++        self.servo_position_precision = [False, False]
++        self.servo_axis_precision = np.zeros((2, 3), dtype=bool)
+         self.home_previous = None
+         self.feedback_sample = None
+--- a/scene1/visual_pickup.py
++++ b/scene1/visual_pickup.py
+@@ -420,7 +420,10 @@
+             self.surface_reference = update_pad_reference(self.surface_reference, snapshot.get('surfaces', []), self.pad)
+         info['pad_reference_view_ready'] = reference_view_ready
+         if self.stage in ('clear','hover','descend') and self.table_reference is not None:
+-            current=table_frame(table_hull(snapshot, stride=1),snapshot['table_z_base_m'],table_boundary(snapshot))
++            current=table_frame(table_hull(snapshot, stride=1),snapshot['table_z_base_m'],
++                table_boundary(snapshot, fit_tilt=motion.config.get('table_reference_tilt_compensation', False)))
++            if snapshot.get('table_boundary_plane_fit') is not None:
++                info['table_boundary_plane_fit'] = snapshot['table_boundary_plane_fit']
+             warm_start = motion.config.get('table_reference_warm_start', False)
+             relative=table_motion(self.table_reference,current,
+                 self.last_verified_table_transform if warm_start else None)
+@@ -487,6 +490,36 @@
+             view_ready = self._selection_view_ready(snapshot, head_info, fresh)
+             info['selection_view_ready'] = view_ready
+             candidates = eligible_targets(snapshot, self.template, self.pad, self.rim)
++            if (hasattr(self, 'bootstrap_template_source') and view_ready and fresh
++                    and motion.config.get('traditional_template_settled_refresh', False)
++                    and not getattr(self, 'bootstrap_template_refreshed', False)
++                    and candidates):
++                # Bootstrap precedes the settled workspace view. Its longest
++                # visible component can be stretched by the moving camera,
++                # excluding a fully visible nearer parcel at the unchanged
++                # 95% completeness gate. Rebuild the prospective template from
++                # an already eligible observation in the now-stationary view;
++                # then restart the original three-frame nearest selection.
++                observed = max(candidates, key=lambda c: float(c['oriented_extent_m'][0]))
++                observed = copy.deepcopy(observed)
++                pose = assist.kinematics.fk(measured).right_pose
++                rotation = assist._initial_grasp_rotation(observed, pose)
++                if rotation is None:
++                    raise RuntimeError('Settled bootstrap requires configured grasp orientation')
++                prospective = SimpleNamespace(pos_xyz=np.asarray(pose.pos_xyz), quat_xyzw=rotation.as_quat())
++                plane = snapshot['table_z_base_m']
++                point = assist._grasp_goal(observed, prospective, plane)
++                prospective.pos_xyz = point
++                previous_extent = list(self.template['extent'])
++                self.template = grasp_template(assist._geometry(observed, prospective, plane),
++                    grasp_plan(observed, plane, point))
++                self.bootstrap_template_refreshed = True
++                self.selected_frames = 0
++                info['bootstrap_template_refresh'] = dict(
++                    previous_extent_m=previous_extent, extent_m=self.template['extent'],
++                    source='eligible_observation_in_settled_workspace_view',
++                    observation_stamp=snapshot['stamp'], original_eligibility_gates_retained=True)
++                candidates = eligible_targets(snapshot, self.template, self.pad, self.rim)
+             if hasattr(self, 'first_selection_target'):
+                 candidates = [c for c in candidates if np.linalg.norm(
+                     np.asarray(c['position_base_m'])[:2]-self.first_selection_target) < .05]
+@@ -526,7 +559,8 @@
+                     outside_bin=True, outside_weighing_pad=True,
+                     stable_selection_frames=self.selected_frames)
+                 self.grasp_goal = self._target_goal(measured, assist)
+-                self.table_reference=table_frame(table_hull(snapshot, stride=1),self.plane,table_boundary(snapshot))
++                self.table_reference=table_frame(table_hull(snapshot, stride=1),self.plane,
++                    table_boundary(snapshot, fit_tilt=motion.config.get('table_reference_tilt_compensation', False)))
+                 self.last_verified_table_transform = None
+                 self.approach_edge_reference = roof_edges(snapshot, self.target)
+                 self.anchor_target=copy.deepcopy(self.target)
+--- a/tools/speed_trial.py
++++ b/tools/speed_trial.py
+@@ -61,7 +61,7 @@
+     environment.wait_idle(environment.SIM)
+     quota = usage_guard.latest()
+     if quota['reached']:
+-        raise RuntimeError(('10% quota stop', quota))
++        raise RuntimeError(('Live quota threshold reached', quota))
+     from archive_idle_ros_logs import archive_if_needed
+     archive_if_needed(a.label, environment)
+     policy = STORE/'policies'/a.label
+--- /dev/null
++++ b/configs/speed_traditional_smooth_profile.yaml
+@@ -0,0 +1,265 @@
++performance:
++  regrasp_phase_rgbd: true
++  analytic_head_jacobian: false
++  sparse_regrasp_diagnostics: true
++  phase_rgbd: true
++  sparse_color_diagnostics: true
++  dense_pickup_candidates: true
++  enabled: true
++  compute_threads: 1
++  cache_fk: true
++  native_components: true
++  compact_detector: true
++  cache_sdk_limits: true
++  native_rgb: true
++  native_cloud: true
++  native_projection: true
++  motion_hz: 20.0
++  parallel_rgbd: true
++  fast_cycle_stages:
++  - right_retreat
++  - left_retreat
++  - return_home
++  - lift
++  - left_approach
++  - bin_transport
++  - transport
++  - left_clear
++  - left_insert
++  native_roof_mask: true
++  native_aux_projection: true
++  native_clearance: true
++  native_retreat_constraints: true
++  sdk_numeric_copies: true
++  cycle_stage_hz:
++    lift: 20.0
++    bin_transport: 20.0
++  fast_pickup_stages:
++  - clear
++  - first_clear
++  - first_back
++  - hover
++  - lift
++  - carry
++  - descend
++  - prepare_weighing
++  pickup_stage_hz:
++    lift: 20.0
++  parallel_detection: true
++  residual_analytic_jacobian: true
++  checkpoint_evidence_only: true
++  release_continuous_adapt: true
++  guarded_motion_hz: 20.0
++  profile_every_steps: 100
++  latest_sdk_odometry: true
++visual_cycle:
++  grasp_execution: traditional
++  release_prepare_recover_gap: true
++  release_prepare_proportional: true
++  release_prepare_step_rad: 0.006
++  weighing_velocity_damping: 4.0
++  weighing_angular_damping: 4.0
++  grasp_planning_margin_m: 0.005
++  direct_next_pickup: false
++  finish_after_last_confirmation: true
++  descent_xy_precision: true
++  bin_release_clearance_m: 0.065
++  bin_confirmation_mode: independent_entry
++  return_home_step_rad: 0.024
++  settle_when_slow: true
++  bin_release_quiet: true
++  bin_stack_rim_frame: false
++  bin_stack_clearance_adjust: true
++  bin_verify_view_height_m: 0.42
++  bin_angular_weight: 0.06
++  servo_time_normalization_stages:
++  - bin_transport
++  - left_insert
++  - descend
++  - prepare_weighing
++  return_home_settle: true
++  pickup_pad_clear_recovery: true
++  analytic_jacobian: true
++  servo_profiles:
++    pickup_clear:
++      noncontact_step_rad: 0.018
++      gain_scale: 1.5
++      time_normalize: true
++      integral_reference_period_s: 0.1
++      coarse_damping: 4.0
++    pickup_hover:
++      noncontact_step_rad: 0.018
++      gain_scale: 1.0
++      time_normalize: true
++      integral_reference_period_s: 0.1
++      coarse_damping: 8.0
++      precision_damping: 8.0
++      angular_gain_scale: 0.35
++    pickup_lift:
++      noncontact_step_rad: 0.018
++      gain_scale: 1.0
++      precision_position_m: 0.03
++      precision_gain_divisor: 3.0
++      coarse_damping: 8.0
++      time_normalize: true
++      integral_reference_period_s: 0.1
++      precision_damping: 8.0
++      angular_gain_scale: 0.35
++    pickup_carry:
++      noncontact_step_rad: 0.012
++      gain_scale: 1.2
++      precision_position_m: 0.03
++      precision_gain_divisor: 3.0
++      coarse_damping: 8.0
++      time_normalize: true
++      integral_reference_period_s: 0.1
++      precision_damping: 8.0
++      angular_gain_scale: 0.35
++    lift:
++      noncontact_step_rad: 0.018
++      gain_scale: 1.0
++      precision_position_m: 0.03
++      precision_gain_divisor: 3.0
++      coarse_damping: 8.0
++      time_normalize: true
++      integral_reference_period_s: 0.1
++      precision_damping: 8.0
++      angular_gain_scale: 0.5
++    transport:
++      noncontact_step_rad: 0.018
++      gain_scale: 1.5
++      precision_position_m: 0.03
++      precision_gain_divisor: 3.0
++      coarse_damping: 4.0
++      time_normalize: true
++      integral_reference_period_s: 0.1
++    left_approach:
++      gain_scale: 1.5
++      precision_position_m: 0.03
++      precision_gain_divisor: 3.0
++      coarse_damping: 4.0
++      independent_position_precision: true
++      time_normalize: true
++      integral_reference_period_s: 0.1
++    right_retreat:
++      noncontact_step_rad: 0.018
++      gain_scale: 1.5
++      precision_position_m: 0.03
++      precision_gain_divisor: 3.0
++      coarse_damping: 8.0
++      time_normalize: true
++      integral_reference_period_s: 0.1
++      precision_damping: 8.0
++      angular_gain_scale: 0.35
++    left_clear:
++      noncontact_step_rad: 0.018
++      gain_scale: 1.0
++      precision_position_m: 0.03
++      precision_gain_divisor: 3.0
++      coarse_damping: 8.0
++      time_normalize: true
++      integral_reference_period_s: 0.1
++      precision_damping: 8.0
++      angular_gain_scale: 0.35
++    bin_transport:
++      independent_position_precision: true
++      axis_position_precision: true
++      precision_error_scale: 0.5
++      noncontact_step_rad: 0.018
++      gain_scale: 1.5
++      precision_position_m: 0.03
++      precision_gain_divisor: 3.0
++      coarse_damping: 8.0
++      time_normalize: true
++      integral_reference_period_s: 0.1
++      precision_damping: 8.0
++    left_retreat:
++      noncontact_step_rad: 0.018
++      gain_scale: 1.5
++      precision_position_m: 0.03
++      precision_gain_divisor: 3.0
++      coarse_damping: 4.0
++      time_normalize: true
++      integral_reference_period_s: 0.1
++    pickup_first_clear:
++      noncontact_step_rad: 0.018
++      gain_scale: 1.5
++      time_normalize: true
++      integral_reference_period_s: 0.1
++      coarse_damping: 4.0
++    pickup_first_back:
++      noncontact_step_rad: 0.018
++      gain_scale: 1.5
++      time_normalize: true
++      integral_reference_period_s: 0.1
++      coarse_damping: 4.0
++    return_home:
++      gain_scale: 2.0
++    pickup_descend:
++      gain_scale: 1.5
++    left_insert:
++      gain_scale: 2.0
++    pickup_prepare_weighing:
++      gain_scale: 1.0
++      time_normalize: true
++      integral_reference_period_s: 0.1
++      coarse_damping: 4.0
++  bin_arrival_position_m:
++  - 0.01
++  - 0.01
++  - 0.01
++  - 0.01
++  bin_lateral_offsets_m:
++  - -0.09
++  - 0.04
++  - -0.09
++  - 0.04
++  bin_depth_offsets_m:
++  - -0.02
++  - -0.025
++  - -0.02
++  - -0.025
++  settle_command_profiles:
++  - lift
++  - transport
++  - left_approach
++  - right_retreat
++  - left_clear
++  - bin_transport
++  - left_retreat
++  - pickup_clear
++  - pickup_hover
++  - pickup_lift
++  - pickup_carry
++  - pickup_first_clear
++  - pickup_first_back
++  bin_layout_mode: flat_two_stacks
++  bin_follow_confirmed_stack: false
++  guarded_receiver_approach: true
++  weighing_joint_plan: true
++  regrasp_nearest_visible_section: true
++  stable_selection_view: true
++  release_component_max_gap_m: 0.015
++  weighing_support_reserve_m: 0.005
++  bin_view_retreat_lateral_m: 0.12
++  bin_view_retreat_on_occlusion: true
++  release_shorter_exit: true
++  bin_view_depth_search_m: 0.02
++  traditional_template_widest_visible: true
++  traditional_template_settled_refresh: true
++  regrasp_time_normalization: true
++  regrasp_gain_scale: 0.25
++  regrasp_insert_position_priority: true
++  bin_empty_retreat_posture: true
++  image_aligned_box_pose: true
++  table_reference_warm_start: true
++  table_reference_tilt_compensation: true
++  attachment_time_normalization: true
++  release_tracking_open_step: 0.04
++  release_full_open_feedback: true
++  release_open_time_normalization: true
++  release_live_geometry: true
++  release_open_anti_windup: true
++  release_open_hold_position_gain: 4.0
++  release_planning_margin_m: 0.004
++  release_shorter_exit_distance_m: 0.04

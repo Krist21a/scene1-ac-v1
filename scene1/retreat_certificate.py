@@ -12,7 +12,7 @@ from .motion import MotionFilter
 
 
 def certify_retreat_execution(assist, base, measured, goal, target, plane,
-                              remaining_steps, motion_config):
+                              remaining_steps, motion_config, *, cadence_aware=False):
     shadow = copy.copy(assist)
     shadow.offset = assist.offset.copy()
     measured = np.asarray(measured, float).copy()
@@ -23,6 +23,10 @@ def certify_retreat_execution(assist, base, measured, goal, target, plane,
     motion = MotionFilter(assist.low, assist.high, motion_config['alpha'], motion_config['max_velocity'])
     motion.reset(assist.last_sent)
     period = motion_config['period']
+    if not np.isfinite(period) or period <= 0:
+        raise ValueError('Retreat certificate requires a positive control period')
+    rate_scale = .1/period if cadence_aware and period < .1 else 1.
+    dwell_steps = max(3, int(np.ceil(.2/period))+1) if cadence_aware and period < .1 else 3
     tolerance = assist.wrist_config.get('release_retreat_ready_m', .014)
     start_rotation = Rotation.from_matrix(assist.kinematics.matrix(measured[8:15], 1)[:3, :3])
     previous_position = None
@@ -37,7 +41,7 @@ def certify_retreat_execution(assist, base, measured, goal, target, plane,
         error = goal - position
         velocity = np.zeros(3) if previous_position is None else position - previous_position
         movement = np.inf if previous_position is None else float(np.linalg.norm(velocity))
-        proposed, projection = shadow._retreat_correct(base, measured, error - 1.5 * velocity,
+        proposed, projection = shadow._retreat_correct(base, measured, error - 1.5 * rate_scale * velocity,
                                                        target, plane, motion_config)
         proposed[15] = 0.
         sent, motion_info = motion.apply(proposed, period)
@@ -51,7 +55,7 @@ def certify_retreat_execution(assist, base, measured, goal, target, plane,
             filtered = sampled_sweep(assist.kinematics, measured[8:15], sent[8:15], target, plane)
         rotation = float(np.rad2deg((start_rotation.inv() * Rotation.from_matrix(pose[:3, :3])).magnitude()))
         max_rotation = max(max_rotation, rotation)
-        stable = stable + 1 if np.linalg.norm(error) <= tolerance and movement <= .004 else 0
+        stable = stable + 1 if np.linalg.norm(error) <= tolerance and movement*rate_scale <= .004 else 0
         records.append(dict(index=index, error_m=float(np.linalg.norm(error)),
                             cumulative_rotation_degrees=rotation, proposed_sweep=complete,
                             filtered_sweep=filtered, motion=motion_info, stable_steps=stable,
@@ -62,7 +66,7 @@ def certify_retreat_execution(assist, base, measured, goal, target, plane,
         previous_position = position.copy()
         measured = sent.copy()
         shadow.observe_command(sent)
-        if stable >= 3:
+        if stable >= dwell_steps:
             certified = True
             reason = 'nominal bounded executor reached original position and dwell criteria'
             break
@@ -79,5 +83,6 @@ def certify_retreat_execution(assist, base, measured, goal, target, plane,
                 orientation_criterion='unchanged per-step executor plus full sampled finger sweeps; no added cumulative angle gate',
                 solver_method='nominal_incremental_executor_sweep', remaining_steps=remaining_steps,
                 nominal_steps=len(records), max_cumulative_rotation_degrees=max_rotation,
+                cadence_aware=cadence_aware, nominal_required_stable_steps=dwell_steps,
                 nominal_filter=dict(motion_config), nominal_records=records,
                 limitation='Perfect-tracking kinematic preflight only; live sweep and original timeout remain active')

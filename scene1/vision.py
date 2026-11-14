@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 
 FAST_IMAGE_CONVERSION = False
+BYTE_RGB_ROUNDTRIP = None
 
 
 def rgb_image(value):
@@ -11,6 +12,10 @@ def rgb_image(value):
     image = np.asarray(value)
     if image.ndim == 4 and image.shape[0] == 1:
         image = image[0]
+    if (BYTE_RGB_ROUNDTRIP is not None and image.dtype == np.uint8
+            and image.ndim == 3 and image.shape[0] == 3):
+        image = np.ascontiguousarray(np.moveaxis(image, 0, -1))
+        return cv2.LUT(image, BYTE_RGB_ROUNDTRIP)
     if FAST_IMAGE_CONVERSION:
         from .fast_components import convert_rgb_chw
         converted = convert_rgb_chw(image)

@@ -3,7 +3,9 @@
 Local grasp/release checks freeze policy selection. Their pose corrections
 retain the original ACT reference, physical joint limits and per-step limits.
 """
+from .rgbd import snapshot_hsv
 import copy
+import time
 import numpy as np
 from scipy.spatial.transform import Rotation
 from scipy.optimize import lsq_linear
@@ -11,7 +13,7 @@ from scipy.optimize import lsq_linear
 from .motion import action_vector
 from .settlement import SettlementMonitor, resting_observation, track_resting_roof
 from .clearance import open_fingers_clear
-from .release_retreat import axis_retreat_goal
+from .release_retreat import axis_retreat_goal, certify_following_level
 from .retreat_certificate import certify_retreat_execution
 from .command_sweep import sampled_sweep
 from .retreat_projection import project_retreat_reference
@@ -275,12 +277,18 @@ class ResidualAssist:
         q = measured[start:start + 7].copy()
         original = self.kinematics.matrix(q, side)
         rotation = Rotation.from_matrix(original[:3, :3])
-        jacobian = np.zeros((6, 7))
-        for joint in range(7):
-            shifted = q.copy(); shifted[joint] += 1e-4
-            matrix = self.kinematics.matrix(shifted, side)
-            jacobian[:3, joint] = (matrix[:3, 3] - original[:3, 3]) / 1e-4
-            jacobian[3:, joint] = .15 * (rotation.inv() * Rotation.from_matrix(matrix[:3, :3])).as_rotvec() / 1e-4
+        if self.config.get('analytic_jacobian', False):
+            _, jacobian = self.kinematics.matrix_and_jacobian(q, side)
+            # _correct uses body-frame angular error; the geometric
+            # Jacobian's angular rows are expressed in the base frame.
+            jacobian[3:] = .15 * (rotation.inv().as_matrix() @ jacobian[3:])
+        else:
+            jacobian = np.zeros((6, 7))
+            for joint in range(7):
+                shifted = q.copy(); shifted[joint] += 1e-4
+                matrix = self.kinematics.matrix(shifted, side)
+                jacobian[:3, joint] = (matrix[:3, 3] - original[:3, 3]) / 1e-4
+                jacobian[3:, joint] = .15 * (rotation.inv() * Rotation.from_matrix(matrix[:3, :3])).as_rotvec() / 1e-4
         angular = np.zeros(3) if angular_error is None else np.asarray(angular_error, float).copy()
         angular *= min(1., np.deg2rad(3) / max(np.linalg.norm(angular), 1e-9))
         if view_target is not None:
@@ -369,7 +377,8 @@ class ResidualAssist:
         try:
             chosen, audit = project_retreat_reference(self.kinematics, measured, proposed,
                 base+before, self.last_sent, lower, upper, self.config['max_joint_step_rad']*.5,
-                target, plane, motion_config)
+                target, plane, motion_config,
+                planning_margin_m=self.wrist_config.get('release_planning_margin_m', .003))
         except Exception:
             self.offset = before
             raise
@@ -437,6 +446,7 @@ class ResidualAssist:
         roof = group[group[:,2] >= np.percentile(group[:,2],60)]
         if len(roof) < 20:
             return None
+        minimum_support_height = np.percentile(group[:,2],90)-.012
         rng = np.random.default_rng(4)
         best = None
         for _ in range(80):
@@ -449,13 +459,21 @@ class ResidualAssist:
             if abs(normal[2]) < .70:
                 continue
             selected = np.abs((roof-sample[0]) @ normal) <= .003
+            support_count = int(np.count_nonzero(selected))
+            # Only a strictly larger valid support can replace the current
+            # winner. Preserve the original first-winner tie rule and avoid
+            # recomputing statistics for candidates that cannot win.
+            if support_count < 20 or (best is not None and support_count <= len(best)):
+                continue
             support = roof[selected]
             if len(support) < 20 or np.min(np.ptp(support[:,:2],axis=0)) < .015:
                 continue
-            if np.median(support[:,2]) < np.percentile(group[:,2],90)-.012:
+            if np.median(support[:,2]) < minimum_support_height:
                 continue
             if best is None or len(support) > len(best):
                 best = support
+                if len(best) == len(roof):
+                    break  # No remaining candidate can have larger support.
         if best is None:
             return None
         _,_,vectors = np.linalg.svd(best-best.mean(axis=0),full_matrices=False)
@@ -466,6 +484,23 @@ class ResidualAssist:
         """Use RGB-D around the held box, excluding the wrist behind it."""
         if snapshot is None or 'depth_m' not in snapshot:
             return None
+        image_pose = None
+        if self.wrist_config.get('image_aligned_box_pose', False):
+            # v52 sensors: 12 leg joints, waist, 14 arm joints, 2 head joints.
+            # FK ignores gripper slots. Only the visual attachment estimate
+            # uses this image-time pose; control and contact checks stay live.
+            q = np.asarray(snapshot.get('rgb_joint_positions_rad'), dtype=float)
+            if q.shape != (29,) or not np.isfinite(q).all():
+                raise ValueError('Image-aligned box observation requires the v52 joint sample')
+            aligned = self.kinematics.fk(np.r_[q[13:20], 0., q[20:27], 0.])
+            image_pose = dict(source='rgb_aligned_joint_history',
+                joint_stamp_s=snapshot['rgb_joint_stamp_s'], rgb_stamp_s=snapshot['stamp'],
+                rgb_joint_dt_s=snapshot['rgb_joint_dt_s'],
+                translation_from_control_pose_m=float(np.linalg.norm(
+                    np.asarray(aligned.right_pose.pos_xyz)-np.asarray(poses.right_pose.pos_xyz))),
+                rotation_from_control_pose_rad=float((Rotation.from_quat(aligned.right_pose.quat_xyzw)*
+                    Rotation.from_quat(poses.right_pose.quat_xyzw).inv()).magnitude()))
+            poses = aligned
         import cv2
         center, rotation, extent = self._world_geometry(1, poses)
         if FAST_PROJECTION:
@@ -479,7 +514,7 @@ class ResidualAssist:
                                       (v-intrinsic[1,2])*z/intrinsic[1,1], z))
             matrix = snapshot['camera_to_base']
             points = camera @ matrix[:3,:3].T + matrix[:3,3]
-            hsv = cv2.cvtColor(snapshot['rgb'], cv2.COLOR_RGB2HSV)[v,u]
+            hsv = snapshot_hsv(snapshot)[v,u]
         local = rotation.inv().apply(points-center)
         green = (hsv[:,0] >= 40) & (hsv[:,0] <= 85) & (hsv[:,1] >= 100)
         selected = (z > .1) & np.isfinite(points).all(axis=1) & ~green & (hsv[:,2] >= 65)
@@ -506,7 +541,21 @@ class ResidualAssist:
         if np.linalg.norm(shift) > .025:
             return None
         pose = poses.right_pose; tool = Rotation.from_quat(pose.quat_xyzw)
-        self.geometry[1]['center'] += .3 * tool.inv().apply(shift)
+        attachment_gain = .3
+        attachment_interval = None
+        if self.wrist_config.get('attachment_time_normalization', False):
+            # Preserve the original 10 Hz estimator pole at faster RGB-D
+            # cadence. A repeated image supplies no new attachment evidence.
+            # Long gaps keep the original per-observation correction bound.
+            stamp = float(snapshot['stamp'])
+            if not np.isfinite(stamp):
+                raise ValueError('Attachment estimation requires a finite image timestamp')
+            previous = getattr(self, '_attachment_image_stamp', None)
+            attachment_interval = .1 if previous is None else stamp-previous
+            attachment_gain = min(.3, 1.-.7**(np.clip(attachment_interval, 0., .1)/.1))
+            if previous is None or stamp > previous:
+                self._attachment_image_stamp = stamp
+        self.geometry[1]['center'] += attachment_gain * tool.inv().apply(shift)
         vertical_height = float(np.abs(rotation.as_matrix()[2]) @ extent)
         bottom = float(np.percentile(group[:,2],95)-vertical_height)
         eigenvalues, eigenvectors = np.linalg.eigh(np.cov(group[:,:2].T))
@@ -534,7 +583,7 @@ class ResidualAssist:
             # Update the grasp transform only from an adequately visible box;
             # limit the change from one RGB-D frame to reject wrist faces.
             if np.linalg.norm(angular_shift) <= np.deg2rad(20):
-                rotation = rotation * Rotation.from_rotvec(.3 * angular_shift)
+                rotation = rotation * Rotation.from_rotvec(attachment_gain * angular_shift)
                 self.geometry[1]['rotation'] = tool.inv() * rotation
                 vertical_height = float(np.abs(rotation.as_matrix()[2]) @ extent)
                 bottom = float(np.percentile(group[:,2],95)-vertical_height)
@@ -542,10 +591,22 @@ class ResidualAssist:
                 orientation_confirmed = False
         return dict(points=len(group), bottom_base_m=bottom,
                     position_source=position_source,
+                    image_pose=image_pose,
+                    attachment_update_gain=float(attachment_gain),
+                    attachment_interval_s=attachment_interval,
                     roof_normal_base=normal.tolist() if tilt is not None else None,
                     heading_error_degrees=float(np.rad2deg(heading_error)),
                     tilt_degrees=tilt, orientation_confirmed=orientation_confirmed,
                     orientation_difference_degrees=orientation_difference)
+
+    def _motion_clock(self, pending):
+        now = time.monotonic()
+        fast = getattr(self, 'control_period_s', .1) < .1
+        previous = pending.get('motion_sample_at')
+        pending['motion_sample_at'] = now
+        interval = now-previous if previous is not None else getattr(self, 'control_period_s', .1)
+        valid = not fast or 0. < interval <= .5
+        return now, (.1/interval if fast and valid else 1.), fast, valid
 
     def _regrasp_action(self, measured, snapshot, poses, info):
         p = self.pending; pose = poses.right_pose; target = p['target']
@@ -628,6 +689,13 @@ class ResidualAssist:
         angular_velocity = ((rotation*p['last_rotation'].inv()).as_rotvec()
                             if p.get('last_rotation') is not None else np.zeros(3))
         p['last_rotation'] = rotation
+        sampled_at, rate_scale, fast, valid_interval = self._motion_clock(p)
+        if not valid_interval:
+            p['stable'] = 0
+            held = p['base'].copy()+self.offset
+            held[15] = 0.
+            info.update(regrasp_stage=stage, cadence_feedback_hold=True)
+            return held, info
         error = goal-position
         forward = np.asarray(target.get('major_axis_xy',[1.,0.]),float)
         forward /= np.linalg.norm(forward)
@@ -669,14 +737,23 @@ class ResidualAssist:
                     requested_before_gate_m=requested_advance,
                     requested_after_gate_m=float(advance),
                     wrist_error_px=None if wrist is None else float(wrist['centering_error_px']))
-            correction[:2] = forward*advance + lateral*(correction[:2]@lateral)
-        correction -= 3.*velocity
+            lateral_gain = self.wrist_config.get('regrasp_insert_lateral_gain', 1.)
+            if not np.isfinite(lateral_gain) or not 0. < lateral_gain <= 1.:
+                raise ValueError('Insertion lateral gain must be finite in (0,1]')
+            # Reduce wrist centering oscillation without weakening velocity
+            # damping or slowing the independent forward/height requests.
+            correction[:2] = forward*advance + lateral*lateral_gain*(correction[:2]@lateral)
+        damping_scale = (self.wrist_config.get('regrasp_insert_damping_scale', 1.)
+                         if stage == 'insert' else 1.)
+        if not np.isfinite(damping_scale) or not 1. <= damping_scale <= 2.:
+            raise ValueError('Insertion damping scale must be finite in [1,2]')
+        correction -= 3.*damping_scale*rate_scale*velocity
         if stage != 'level' and not orientation_ok:
-            correction = -3.*velocity
+            correction = -3.*damping_scale*rate_scale*velocity
         missing_insert_view = stage == 'insert' and wrist is None
         p['missing_insert_view_steps'] = p.get('missing_insert_view_steps',0)+1 if missing_insert_view else 0
         if missing_insert_view:
-            correction[:2] = -3.*velocity[:2]
+            correction[:2] = -3.*damping_scale*rate_scale*velocity[:2]
             # Stop forward travel, but recover the known safe height if the
             # arm rose and hid the visible edges behind the fingers.
             if p['missing_insert_view_steps'] >= 40:
@@ -686,12 +763,55 @@ class ResidualAssist:
         pitch_weight = self.wrist_config.get('regrasp_insert_pitch_weight',1.)
         if not np.isfinite(pitch_weight) or not 0. < pitch_weight <= 1.:
             raise ValueError('Insertion pitch weight must be finite in (0,1]')
+        # Restore orientation authority smoothly before the original 8-degree
+        # gate. Switching directly between low and full pitch weight at that
+        # gate drives a repeated pose/translation limit cycle during insertion.
+        if stage == 'insert' and pitch_weight < 1.:
+            position_priority = self.wrist_config.get('regrasp_insert_position_priority', False)
+            # Once inside the original orientation gate, avoid letting a
+            # residual pitch demand overpower the small visual centering
+            # correction. Restore full pitch authority before the unchanged
+            # 8 degree gate; lateral finger tilt remains fully constrained.
+            blend_start, blend_end = (6., 7.5) if position_priority else (4., 7.)
+            blend = float(np.clip((np.linalg.norm(angular_error)-np.deg2rad(blend_start))
+                                  /np.deg2rad(blend_end-blend_start), 0., 1.))
+            blend = blend*blend*(3.-2.*blend)
+            pitch_weight += (1.-pitch_weight)*blend
         pitch_relaxed = stage == 'insert' and orientation_ok and pitch_weight < 1.
         pitch_axis = p['grasp_rotation'].as_matrix()[:,0] if pitch_relaxed else None
-        result = self._correct(p['base'],measured,1,correction,angular_error-4.*angular_velocity,
-            step_scale=step_scale,level_axis=pitch_axis,level_axis_weight=pitch_weight)
+        # The derivative already uses a 100 ms reference interval. Match the
+        # accumulated correction to that same interval at fast cadence, so
+        # switching to 20 Hz does not double the closed-loop integral gain.
+        gain_scale = (min(1., 1./rate_scale) if fast and
+            self.wrist_config.get('regrasp_time_normalization', False) else 1.)
+        # The measured hand can oscillate around a swept-clear reference.
+        # Reduce the reference integrator bandwidth for the complete regrasp
+        # servo, preserving its derivative terms and all live clearance gates.
+        regrasp_gain = self.wrist_config.get('regrasp_gain_scale', 1.)
+        if not np.isfinite(regrasp_gain) or not .25 <= regrasp_gain <= 1.:
+            raise ValueError('Regrasp gain scale must be finite in [.25,1]')
+        gain_scale *= regrasp_gain
+        result = self._correct(p['base'],measured,1,correction,angular_error-4.*damping_scale*rate_scale*angular_velocity,
+            step_scale=step_scale,level_axis=pitch_axis,level_axis_weight=pitch_weight,
+            gain_scale=gain_scale)
+        info['regrasp_integral_gain_scale'] = float(gain_scale)
+        margin = self.wrist_config.get('grasp_planning_margin_m', .003)
+        if margin > .003:
+            cap = self.wrist_config.get('max_regrasp_joint_offset_rad', self.config['max_joint_offset_rad'])
+            low, high = self.low.copy(), self.high.copy()
+            low[8:15] = np.maximum.reduce((low[8:15], self.kinematics.limits[1][:,0], p['base'][8:15]-cap))
+            high[8:15] = np.minimum.reduce((high[8:15], self.kinematics.limits[1][:,1], p['base'][8:15]+cap))
+            result, projection = project_retreat_reference(self.kinematics, measured, result,
+                p['base']+previous_offset, self.last_sent, low, high,
+                self.config['max_joint_step_rad']*step_scale, target, p['plane'],
+                dict(self.retreat_motion_config, period=getattr(self, 'control_period_s', .1)),
+                planning_margin_m=margin)
+            self.offset[8:15] = result[8:15]-p['base'][8:15]
+            if projection['applied']:
+                info['grasp_clearance_projection'] = projection
         info['insert_pitch_task'] = dict(relaxed=bool(pitch_relaxed),
             weight=float(pitch_weight) if pitch_relaxed else 1.,
+            position_priority=bool(self.wrist_config.get('regrasp_insert_position_priority', False)),
             original_orientation_gate_passed=bool(orientation_ok))
         delta = self.offset[8:15]-previous_offset[8:15]
         self.command_sweep_context['increment_end_rad'] = (measured[8:15]+delta).tolist()
@@ -724,9 +844,11 @@ class ResidualAssist:
             self.offset = previous_offset
             result = p['base'].copy()+self.offset
             result[15] = 0.
-        ready = (geometry_ready and np.linalg.norm(velocity) <= (.0015 if stage == 'insert' else .003)
-                 and np.linalg.norm(angular_velocity) <= np.deg2rad(1.))
+        ready = (geometry_ready and np.linalg.norm(velocity)*rate_scale <= (.0015 if stage == 'insert' else .003)
+                 and np.linalg.norm(angular_velocity)*rate_scale <= np.deg2rad(1.))
         p['stable'] = p['stable']+1 if ready else 0
+        if p['stable'] <= 1:
+            p['motion_stable_since'] = sampled_at
         info.update(regrasp_stage=stage, finger_line_tilt_degrees=finger_tilt,
                     approach_pitch_degrees=pitch, orientation_error_degrees=float(np.rad2deg(np.linalg.norm(angular_error))),
                     angular_movement_degrees=float(np.rad2deg(np.linalg.norm(angular_velocity))),
@@ -735,7 +857,7 @@ class ResidualAssist:
                     parcel_displacement_m=displacement, wrist=wrist, open_fingers_clear=bool(clear),
                     head_roof_visible=displacement is not None,
                     stable_steps=p['stable'], offset_rad=self.offset[8:15].tolist())
-        if p['stable'] >= 3:
+        if p['stable'] >= 3 and (not fast or sampled_at-p['motion_stable_since'] >= .2):
             if stage == 'level':
                 if (self.wrist_config.get('regrasp_reobserve_after_level', False)
                         and not p.get('post_level_geometry_verified', False)):
@@ -804,23 +926,52 @@ class ResidualAssist:
         previous = p.get('release_prepare_previous_wrist')
         wrist_movement = np.inf if previous is None else float(np.max(abs(measured[active]-previous)))
         p['release_prepare_previous_wrist'] = measured[active].copy()
-        quiet = support_ok and sent_error <= .005 and wrist_movement <= .003
-        p['release_prepare_quiet'] = p.get('release_prepare_quiet',0)+1 if quiet else 0
-        adjustment = np.zeros(7 if whole_arm else 3)
-        if (self.wrist_config.get('release_prepare_adapt_settled',False)
-                and p['release_prepare_quiet'] >= 3 and tracking_error > .015):
-            step = self.config['max_joint_step_rad']
-            adjustment = np.clip(measured[active]-target[active],-step,step)
-            updated = np.clip(target[active]+adjustment,self.low[active],self.high[active])
-            adjustment = updated-target[active]
-            target[active] = updated
-            p['release_prepare_quiet'] = 0
-            sent_error = float(np.max(abs(self.last_sent[8:15]-target[8:15])))
-            wrist_error = float(np.max(abs(measured[12:15]-target[12:15])))
-        tracking_error = float(np.max(abs(measured[active]-target[active])))
+        proportional = self.wrist_config.get('release_prepare_proportional', False)
         release_motion_limit = self.wrist_config.get('release_prepare_motion_limit_rad',.003)
         if not np.isfinite(release_motion_limit) or not 0. < release_motion_limit <= .003:
             raise ValueError('Release motion limit must be positive and no looser than original')
+        quiet_limit = release_motion_limit if proportional else .003
+        quiet = support_ok and sent_error <= .005 and wrist_movement <= quiet_limit
+        p['release_prepare_quiet'] = p.get('release_prepare_quiet',0)+1 if quiet else 0
+        adjustment = np.zeros(7 if whole_arm else 3)
+        now = time.monotonic()
+        interval = now-p.get('release_prepare_sample_at', now-getattr(self, 'control_period_s', .1))
+        p['release_prepare_sample_at'] = now
+        prepare_step = self.wrist_config.get('release_prepare_step_rad', self.config['max_joint_step_rad'])
+        if not np.isfinite(prepare_step) or not 0. < prepare_step <= self.config['max_joint_step_rad']:
+            raise ValueError('Release preparation cannot exceed the original joint step')
+        if (self.wrist_config.get('release_prepare_adapt_settled',False)
+                and p['release_prepare_quiet'] >= 3 and tracking_error > .015):
+            step = prepare_step
+            delta = measured[active]-target[active]
+            if proportional:
+                # Unload the supported arm along its measured tracking-error
+                # vector. Per-joint saturation changes this direction and can
+                # twist/lift the parcel while cancelling contact preload.
+                # Keep the 10 Hz rate at faster callbacks, with no catch-up
+                # jump after a delay. The original support/quiet gates above
+                # and release tracking/movement gates below still apply.
+                step *= float(np.clip(interval/.1, 0., 1.))
+                # Retain a small tracking preload on joints already inside
+                # tolerance instead of continually chasing their load-induced
+                # displacement. Adaptation itself now requires release-level
+                # quiet, so moving feedback cannot drag the reference along.
+                excess = np.sign(delta)*np.maximum(abs(delta)-.010,0.)
+                adjustment = excess*min(1.,step/max(float(np.max(abs(excess))),1e-12))
+            else:
+                adjustment = np.clip(delta,-step,step)
+            updated = np.clip(target[active]+adjustment,self.low[active],self.high[active])
+            adjustment = updated-target[active]
+            target[active] = updated
+            if not self.wrist_config.get('release_prepare_continuous_adapt', False):
+                p['release_prepare_quiet'] = 0
+            # With continuous adaptation, quiet remains a rolling count of
+            # actual support, sent-reference and measured-movement checks.
+            # Any failed observation resets it above. Each correction keeps
+            # the original joint-step bound and final release checks.
+            sent_error = float(np.max(abs(self.last_sent[8:15]-target[8:15])))
+            wrist_error = float(np.max(abs(measured[12:15]-target[12:15])))
+        tracking_error = float(np.max(abs(measured[active]-target[active])))
         ready = support_ok and sent_error <= .005 and tracking_error <= .015 and wrist_movement <= release_motion_limit
         p['release_prepare_stable'] = p['release_prepare_stable']+1 if ready else 0
         self.offset[8:15] = target[8:15]-p['base'][8:15]
@@ -834,7 +985,12 @@ class ResidualAssist:
             support_checks_passed=bool(support_ok),
             support_position_rule=info.get('support_position_rule','center_and_footprint'),
             stable_steps=p['release_prepare_stable'],
+            continuous_adaptation=bool(self.wrist_config.get('release_prepare_continuous_adapt', False)),
+            proportional_adaptation=bool(proportional),
+            adaptation_motion_limit_rad=float(quiet_limit),
+            quiet_observations=p['release_prepare_quiet'],
             settled_target_adjustment_rad=adjustment.tolist(),
+            adaptation_step_limit_rad=float(prepare_step),
             gripper_kept_closed=True, shared_weighing_step_budget=self.config['max_release_steps']))
         if p['release_prepare_stable'] >= 3:
             p['reference_prepared'] = True
@@ -844,7 +1000,7 @@ class ResidualAssist:
             raise RuntimeError('Release reference did not settle within original weighing budget; gripper kept closed')
         return target.copy()
 
-    def _release_open_command(self):
+    def _release_open_command(self, measured_grip=None):
         step = self.wrist_config.get('release_gripper_open_step')
         if step is None:
             return 0.
@@ -852,6 +1008,18 @@ class ResidualAssist:
             raise ValueError('Release gripper opening step must be finite in (0,1]')
         if self.last_sent is None or not np.isfinite(self.last_sent[15]):
             raise RuntimeError('Progressive release requires actual sent gripper reference')
+        tracking_step = self.wrist_config.get('release_tracking_open_step')
+        if tracking_step is not None:
+            if not np.isfinite(tracking_step) or not 0. < tracking_step <= step:
+                raise ValueError('Tracking release step must not exceed the original opening step')
+            if measured_grip is None or not np.isfinite(measured_grip):
+                raise RuntimeError('Tracking release requires measured gripper feedback')
+            # The initial command/feedback gap is contact compression. Retain
+            # the existing step there, then unload more gradually near actual
+            # finger motion. Neither the arm bounds nor the 40-step opening
+            # deadline changes; a late opening still follows the original stop.
+            if self.last_sent[15] <= measured_grip+.10:
+                step = tracking_step
         return float(max(0., self.last_sent[15]-step))
 
     def _pending_action(self, measured, snapshot):
@@ -861,9 +1029,19 @@ class ResidualAssist:
         info = dict(state='small_' + p['kind'], arm=side, phase_steps=p['steps'], strategy='act_residual')
         if p['kind'] == 'short_retreat':
             result = p['base'].copy()+self.offset; result[15] = 0.
-            opening_command = self._release_open_command()
+            opening_command = self._release_open_command(measured[15])
+            # Finish actual finger motion before taking the fresh parcel
+            # geometry used by the original retreat sweep. At the old .1
+            # threshold the fingers can still join the observed parcel blob.
+            # Tighten feedback only; retain the original 40-step deadline and
+            # let the existing live geometry/sweep decide physical clearance.
+            full_open = self.wrist_config.get('release_full_open_feedback', False)
+            open_grip_limit = .03 if full_open else .1
+            if full_open:
+                info['release_open_feedback'] = dict(measured_gripper=float(measured[15]),
+                    required_at_most=open_grip_limit, original_open_timeout_steps=40)
             if (p['steps'] <= self.wrist_config.get('release_open_dwell_steps', 12)
-                    or measured[15] > .1 or opening_command > 0.):
+                    or measured[15] > open_grip_limit or opening_command > 0.):
                 if p['steps'] >= 40:
                     raise RuntimeError('Right gripper did not open before retreat')
                 if self.wrist_config.get('release_cartesian_open_hold', False):
@@ -876,23 +1054,56 @@ class ResidualAssist:
                     position_gain=self.wrist_config.get('release_open_hold_position_gain',1.)
                     if not np.isfinite(position_gain) or position_gain<=0:
                         raise ValueError('Opening hold position gain must be positive and finite')
+                    normalized = self.wrist_config.get('release_open_time_normalization', False)
+                    rate_scale, integral_scale, valid_interval = 1., 1., True
+                    if normalized:
+                        _, rate_scale, fast, valid_interval = self._motion_clock(p)
+                        integral_scale = min(1.,1./rate_scale) if fast and valid_interval else 1.
                     # Compensate measured unload drift while fingers open.
                     # Same incremental corrector, step limit and downstream
                     # MotionFilter; the original open dwell/budget is retained.
-                    result=self._correct(p['base'],measured,side,position_gain*error-1.5*velocity,
-                                         angular-4.*angular_velocity)
+                    if valid_interval:
+                        previous_reference = p['base']+self.offset
+                        result=self._correct(p['base'],measured,side,position_gain*error-1.5*rate_scale*velocity,
+                                             angular-4.*rate_scale*angular_velocity,
+                                             gain_scale=integral_scale)
+                        if self.wrist_config.get('release_open_anti_windup', False):
+                            tracking_cap = self.wrist_config['max_open_joint_delta_rad']
+                            if not np.isfinite(tracking_cap) or not 0. < tracking_cap <= .025:
+                                raise ValueError('Opening anti-windup must retain the original 25 mrad tracking gate')
+                            # Contact can temporarily prevent motion while the
+                            # fingers open. Do not integrate a growing command
+                            # lead that would launch the hand on release.
+                            # The interval contains the previous reference:
+                            # clipping only shortens this bounded increment.
+                            # Existing excess from feedback motion may shrink
+                            # but cannot grow through another correction.
+                            proposed = result[8:15].copy()
+                            lower = np.minimum(previous_reference[8:15], measured[8:15]-tracking_cap)
+                            upper = np.maximum(previous_reference[8:15], measured[8:15]+tracking_cap)
+                            result[8:15] = np.clip(proposed, lower, upper)
+                            self.offset[8:15] = result[8:15]-p['base'][8:15]
+                            info['release_open_anti_windup'] = dict(tracking_cap_rad=float(tracking_cap),
+                                limited_joints=int(np.count_nonzero(abs(result[8:15]-proposed)>1e-10)),
+                                max_pending_reference_rad=float(np.max(abs(result[8:15]-measured[8:15]))),
+                                original_step_limit_retained=True)
                     result[15]=0.
                     p['hold_last_position']=position.copy()
                     p['hold_last_rotation']=rotation
                     info['release_pose_hold']=dict(position_error_m=float(np.linalg.norm(error)),
                         angular_error_degrees=float(np.rad2deg(np.linalg.norm(angular))),
                         position_gain=float(position_gain),
+                        time_normalized=bool(normalized),
+                        integral_scale=float(integral_scale),
+                        valid_interval=bool(valid_interval),
                         position_goal_m=p['release_hold_position'].tolist(),
                         measured_gripper=float(measured[15]))
                 result[15] = opening_command
                 info['release_gripper_ramp'] = dict(command=opening_command,
                     previous_command=None if self.last_sent is None else float(self.last_sent[15]),
                     step=self.wrist_config.get('release_gripper_open_step'),
+                    effective_step=None if self.last_sent is None else float(self.last_sent[15]-opening_command),
+                    tracking_open_step=self.wrist_config.get('release_tracking_open_step'),
                     original_open_timeout_steps=40)
                 return result, info
             if p.get('goal') is None:
@@ -918,14 +1129,67 @@ class ResidualAssist:
                             self, p['base'], measured, goal, parcel, snapshot['table_z_base_m'],
                             self.wrist_config.get('max_short_retreat_steps', 90)-p['steps']+1,
                             getattr(self, 'retreat_motion_config', None))
-                    p['goal'], p['retreat_goal_check'] = axis_retreat_goal(
+                    retreat_args = (
                         self.kinematics, measured, p['base'], self.low, self.high, self.offset,
                         self.wrist_config.get('max_regrasp_joint_offset_rad', self.config['max_joint_offset_rad']),
                         self.unwinding_placement, snapshot, self.weighing_target[:2], p['extent'],
-                        self.wrist_config['release_short_retreat_m'],
-                        self.wrist_config['release_clearance_rise_m'],
-                        self.wrist_config.get('release_retreat_ready_m', .014),
-                        execution_validator=validator)
+                        self.wrist_config['release_short_retreat_m'])
+                    shorter = self.wrist_config.get('release_shorter_exit', False)
+                    chosen = None
+                    if shorter:
+                        if validator is None:
+                            raise ValueError('Shorter exit requires the original executor sweep')
+                        period = getattr(self, 'control_period_s', .1)
+                        def short_validator(goal, parcel):
+                            return certify_retreat_execution(self, p['base'], measured, goal, parcel,
+                                snapshot['table_z_base_m'],
+                                self.wrist_config.get('max_short_retreat_steps', 90)-p['steps']+1,
+                                dict(self.retreat_motion_config, period=period), cadence_aware=True)
+                        original_distance = retreat_args[-1]
+                        distance = self.wrist_config.get('release_shorter_exit_distance_m', original_distance)
+                        # Avoid unnecessary elbow travel near extension. A
+                        # shorter endpoint is usable only after the same full
+                        # executor sweep AND the existing 5 mm leveling sweep.
+                        # Keep the original endpoint as fallback; no command,
+                        # arrival, clearance or phase-budget limit changes.
+                        distances = list(dict.fromkeys((original_distance, distance)))
+                        # Perfect-tracking preflight omits the measured WBC
+                        # lag. Preserve the original exit whenever it leaves
+                        # 45 callbacks for tracking/settling; shorten only a
+                        # budget-limited exit, not every regrasp viewpoint.
+                        tracking_reserve = 45 if distance < original_distance else 0
+                        attempts = []
+                        selected_attempt = None
+                        for distance in distances:
+                            try:
+                                candidate, check = axis_retreat_goal(*retreat_args[:-1], distance, .05,
+                                    self.wrist_config.get('release_retreat_ready_m', .014),
+                                    execution_validator=short_validator)
+                                level = certify_following_level(self.kinematics, check,
+                                    check['observed_parcel'], snapshot['table_z_base_m'],
+                                    self.wrist_config.get('regrasp_pitch_degrees', 12.5))
+                                attempt = dict(rise_m=.05, horizontal_distance_m=float(distance), level=level,
+                                    certified=level['certified'], nominal_steps=check['nominal_steps'],
+                                    tracking_reserve_steps=tracking_reserve,
+                                    remaining_after_nominal_steps=check['remaining_steps']-check['nominal_steps'])
+                                attempts.append(attempt)
+                                if level['certified']:
+                                    check['following_level'] = level
+                                    chosen = candidate, check
+                                    selected_attempt = attempt
+                                    if attempt['remaining_after_nominal_steps'] >= tracking_reserve:
+                                        break
+                            except RuntimeError as error:
+                                attempts.append(dict(rise_m=.05, horizontal_distance_m=float(distance),
+                                    certified=False, reason=str(error),
+                                    preflight=getattr(error, 'retreat_preflight_audit', None)))
+                        p['shorter_exit_selection'] = dict(selected_attempt or attempts[-1], attempts=attempts)
+                    if chosen is None:
+                        chosen = axis_retreat_goal(*retreat_args,
+                            self.wrist_config['release_clearance_rise_m'],
+                            self.wrist_config.get('release_retreat_ready_m', .014),
+                            execution_validator=validator)
+                    p['goal'], p['retreat_goal_check'] = chosen
                     if validator is not None:
                         p['retreat_sweep_target'] = copy.deepcopy(p['retreat_goal_check']['observed_parcel'])
                         p['retreat_sweep_plane'] = snapshot['table_z_base_m']
@@ -935,18 +1199,65 @@ class ResidualAssist:
                     p['goal'] = np.asarray(pose.pos_xyz, float).copy()
                     p['goal'][:2] += direction * self.wrist_config.get('release_short_retreat_m', .035)
                     p['goal'][2] += self.wrist_config.get('release_clearance_rise_m', .012)
+            if self.wrist_config.get('release_live_geometry', False):
+                near = [] if snapshot is None else [c for c in snapshot.get('candidates', [])
+                    if np.linalg.norm(np.asarray(c['position_base_m'])[:2]-self.weighing_target[:2]) < .12]
+                if len(near) != 1 or not np.isfinite(snapshot.get('table_z_base_m', np.nan)):
+                    raise RuntimeError('Live retreat requires one currently observed parcel and plane')
+                observed = near[0]
+                if 'retreat_observation_anchor' not in p:
+                    original = p['retreat_sweep_target']
+                    p['retreat_observation_anchor'] = np.asarray(original.get(
+                        'oriented_center_base_m', original['position_base_m']))[:2].copy()
+                    p['retreat_plane_anchor'] = p['retreat_sweep_plane']
+                    p['retreat_goal_anchor'] = p['goal'].copy()
+                    p['retreat_goal_shift'] = np.zeros(3)
+                center = np.asarray(observed.get('oriented_center_base_m', observed['position_base_m']))
+                shift = np.r_[center[:2]-p['retreat_observation_anchor'],
+                              snapshot['table_z_base_m']-p['retreat_plane_anchor']]
+                if not np.isfinite(shift).all() or np.linalg.norm(shift) > .03:
+                    raise RuntimeError('Live retreat scene displacement exceeds 30 mm; no motion sent')
+                stamp = snapshot['stamp']
+                if stamp != p.get('retreat_geometry_stamp'):
+                    interval = stamp-p.get('retreat_geometry_stamp', stamp-.1)
+                    if interval <= 0.:
+                        raise RuntimeError('Live retreat observation timestamp moved backwards')
+                    alpha = min(.5, .3*interval/.1)
+                    p['retreat_goal_shift'] += alpha*(shift-p['retreat_goal_shift'])
+                    p['retreat_geometry_stamp'] = stamp
+                # Collision geometry is current and unfiltered. Only the
+                # relative waypoint is smoothed to avoid chasing RGB-D noise.
+                # The initial nominal certificate is not a dynamics proof;
+                # every bounded proposed/filtered command still passes the
+                # original sweep against this current observed parcel.
+                p['retreat_sweep_target'] = copy.deepcopy(observed)
+                p['retreat_sweep_plane'] = snapshot['table_z_base_m']
+                p['goal'] = p['retreat_goal_anchor']+p['retreat_goal_shift']
+                info['retreat_live_geometry'] = dict(observation_stamp=stamp,
+                    observed_shift_m=shift.tolist(), goal_shift_m=p['retreat_goal_shift'].tolist(),
+                    collision_geometry_filtered=False, original_step_budget_retained=True)
             if 'retreat_goal_check' in p:
                 info['retreat_goal_check'] = p['retreat_goal_check']
+            if 'shorter_exit_selection' in p:
+                info['shorter_exit_selection'] = p['shorter_exit_selection']
             error = p['goal'] - np.asarray(pose.pos_xyz)
             velocity = (np.zeros(3) if p.get('last_position') is None else
                         np.asarray(pose.pos_xyz)-p['last_position'])
+            sampled_at, rate_scale, fast, valid_interval = self._motion_clock(p)
+            if not valid_interval:
+                p['last_position'] = np.asarray(pose.pos_xyz).copy()
+                p['stable'] = 0
+                held = p['base'].copy()+self.offset
+                held[15] = 0.
+                info['cadence_feedback_hold'] = True
+                return held, info
             if self.wrist_config.get('release_sweep_projection', False):
-                result, projection = self._retreat_correct(p['base'], measured, error-1.5*velocity,
+                result, projection = self._retreat_correct(p['base'], measured, error-1.5*rate_scale*velocity,
                     p['retreat_sweep_target'], p['retreat_sweep_plane'], self.retreat_motion_config)
                 if projection and projection['applied']:
                     info['retreat_projection'] = projection
             else:
-                result = self._correct(p['base'], measured, side, error-1.5*velocity, step_scale=.5)
+                result = self._correct(p['base'], measured, side, error-1.5*rate_scale*velocity, step_scale=.5)
             result[15] = 0.
             if self.wrist_config.get('release_retreat_preflight') == 'executor_sweep':
                 self.command_sweep_context = dict(target=p['retreat_sweep_target'],
@@ -957,10 +1268,12 @@ class ResidualAssist:
             p['last_position'] = np.asarray(pose.pos_xyz).copy()
             p['stable'] = (p['stable']+1 if np.linalg.norm(error) <=
                            self.wrist_config.get('release_retreat_ready_m', .014)
-                           and movement <= .004 else 0)
+                           and movement*rate_scale <= .004 else 0)
+            if p['stable'] <= 1:
+                p['motion_stable_since'] = sampled_at
             info.update(retreat_error_m=float(np.linalg.norm(error)),
                         retreat_movement_m=float(movement), stable_steps=p['stable'])
-            if p['stable'] >= 3:
+            if p['stable'] >= 3 and (not fast or sampled_at-p['motion_stable_since'] >= .2):
                 candidates = [] if snapshot is None else [c for c in snapshot['candidates']
                     if np.linalg.norm(np.asarray(c['position_base_m'])[:2]
                                       -self.weighing_target[:2]) < .12]
@@ -979,6 +1292,13 @@ class ResidualAssist:
         if p['kind'] == 'settle':
             result = p['base'].copy()+self.offset; result[15] = 0.
             observed = resting_observation(snapshot, p['surface'], p['extent'], self._roof_normal)
+            if self.wrist_config.get('release_live_geometry', False):
+                target = observed.get('target') if observed is not None else None
+                if target is None:
+                    target = p['target']
+                self.command_sweep_context = dict(target=copy.deepcopy(target),
+                    plane=snapshot['table_z_base_m'], stage='release_settle')
+                info['retreat_sweep_required'] = True
             settled = p['monitor'].update(observed)
             info['settlement'] = settled
             if settled['confirmed']:
@@ -1295,7 +1615,7 @@ class ResidualAssist:
                     if p['steps'] >= self.config['max_release_steps']:
                         raise RuntimeError('Weighing camera lost before release; gripper kept closed')
                     return p['base'].copy(), dict(info,state='waiting_release_view')
-                result = p['base'].copy(); result[15] = (self._release_open_command()
+                result = p['base'].copy(); result[15] = (self._release_open_command(measured[15])
                     if self.wrist_config.get('release_gripper_open_step') is not None else p['requested_open'])
                 if self.wrist_config.get('release_measured_reference_hold', False):
                     # Unloading can expose a large pending tracking error even
@@ -1447,6 +1767,18 @@ class ResidualAssist:
             level_error = np.cross(up, [0., 0., 1.])
             movement = np.linalg.norm(np.asarray(pose.pos_xyz) - p['last_position']) if p.get('last_position') is not None else np.inf
             p['last_position'] = np.asarray(pose.pos_xyz)
+            # Leveling can stop its position demand inside the tilt gate
+            # while the loaded wrist is still rotating. Brake measured hand
+            # rotation independently, including after level_ready is latched.
+            hand_rotation = Rotation.from_quat(pose.quat_xyzw)
+            angular_sample_at = time.monotonic()
+            angular_interval = angular_sample_at-p.get('weighing_angular_sample_at', angular_sample_at-.1)
+            prior_rotation = p.get('weighing_last_rotation')
+            angular_feedback_valid = 0. < angular_interval <= .5
+            angular_step = ((hand_rotation*prior_rotation.inv()).as_rotvec()*.1/angular_interval
+                if prior_rotation is not None and angular_feedback_valid else np.zeros(3))
+            p['weighing_last_rotation'] = hand_rotation
+            p['weighing_angular_sample_at'] = angular_sample_at
             heading = rotation.apply([1,0,0]); yaw = np.arctan2(heading[1], heading[0])
             signed_axis_error = (yaw + np.pi/4) % (np.pi/2) - np.pi/4
             axis_error = abs(signed_axis_error)
@@ -1477,7 +1809,9 @@ class ResidualAssist:
                                 and observation.get('tilt_degrees', 0.) <= self.config['level_tolerance_degrees'])
             if (self.wrist_config.get('release_prepare_recover_support',False)
                     and 'release_prepare_target' in p):
-                lost = (not support_fit and seen is not None
+                gap_lost = (self.wrist_config.get('release_prepare_recover_gap', False)
+                            and bottom_gap > self.config['max_release_gap_m'])
+                lost = ((not support_fit or gap_lost) and seen is not None
                         and seen.get('orientation_confirmed',False)
                         and self._view_ready(snapshot,measured))
                 p['release_support_lost_frames'] = p.get('release_support_lost_frames',0)+1 if lost else 0
@@ -1495,7 +1829,10 @@ class ResidualAssist:
                     p['release_support_lost_frames'] = 0
                     p['release_support_recoveries'] = p.get('release_support_recoveries',0)+1
                     info.update(state='recovering_release_support',support_recovery=dict(
-                        reason='observed_footprint_outside_original_margin',
+                        reason=('observed_bottom_above_original_release_gap' if gap_lost
+                                else 'observed_footprint_outside_original_margin'),
+                        observed_bottom_gap_m=bottom_gap,
+                        original_max_release_gap_m=self.config['max_release_gap_m'],
                         original_margin_m=self.config['placement_margin_m'],
                         count=p['release_support_recoveries'],phase_steps=p['steps'],
                         original_budget_steps=self.config['max_release_steps'],
@@ -1547,8 +1884,15 @@ class ResidualAssist:
                 descent = float(np.clip(.06-bottom_gap, -.02, .02))
             # The loaded wrist responds several frames after a correction.
             # Brake measured movement toward the target before it overshoots.
-            descent = float(np.clip(descent - 1.5*np.clip(gap_velocity, -.01, .01), -.04, .02))
-            damped_xy = error - 1.5*np.clip(center_velocity, -.01, .01)
+            weighing_damping = self.wrist_config.get('weighing_velocity_damping', 1.5)
+            if not np.isfinite(weighing_damping) or not 1.5 <= weighing_damping <= 6.:
+                raise ValueError('Weighing velocity damping must be finite in [1.5,6]')
+            descent = float(np.clip(descent - weighing_damping*np.clip(gap_velocity, -.01, .01), -.04, .02))
+            damped_xy = error - weighing_damping*np.clip(center_velocity, -.01, .01)
+            angular_damping = self.wrist_config.get('weighing_angular_damping', 0.)
+            if not np.isfinite(angular_damping) or not 0. <= angular_damping <= 6.:
+                raise ValueError('Weighing angular damping must be finite in [0,6]')
+            level_error = level_error-angular_damping*angular_step
             fast_descent = (heading_descent_ok and p.get('level_ready', False)
                             and flat and bottom_gap > self.config['max_release_gap_m'])
             result = (p['release_prepare_target'].copy() if 'release_prepare_target' in p else self._correct(p['base'], measured, 1,
@@ -1571,6 +1915,10 @@ class ResidualAssist:
                       and movement < .004 and heading_ok)
             p['stable'] = p['stable'] + 1 if stable else 0
             info.update(xy_error_m=float(np.linalg.norm(error)), bottom_gap_m=bottom_gap,
+                        weighing_velocity_damping=float(weighing_damping),
+                        weighing_angular_damping=float(angular_damping),
+                        weighing_angular_rate_rad_s=(angular_step/.1).tolist(),
+                        weighing_angular_feedback_valid=bool(angular_feedback_valid),
                         bottom_height_spread_m=bottom_spread, visual_box=seen,
                         placement_phase='lower' if p.get('level_ready', False) else 'level',
                         level_stable_steps=p.get('level_stable', 0),

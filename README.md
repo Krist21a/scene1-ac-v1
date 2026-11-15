@@ -45,8 +45,15 @@ Instead of relaxing simulator physics or blindly retraining end-to-end models fr
 
 | 第三视角：全身双臂协同与目标箱投放<br/>*Third-Person View: Whole-Body Coordination & Bin Placement* | 第一视角：头部 RGB-D 相机实时检测与槽位感知<br/>*First-Person View: Head RGB-D Parcel Detection & Slot Tracking* |
 | :---: | :---: |
-| &lt;img src=&quot;./docs/assets/third_person_manipulation.jpg&quot; width=&quot;100%&quot; alt=&quot;Third-Person Simulation View&quot; /&gt; | &lt;img src=&quot;./docs/assets/first_person_vision.jpg&quot; width=&quot;100%&quot; alt=&quot;First-Person Head Camera View&quot; /&gt; |
+| ![Third-Person Simulation View](./docs/assets/third_person_manipulation.jpg) | ![First-Person Head Camera View](./docs/assets/first_person_vision.jpg) |
 | **全身协同与精准入箱**：双臂人形机器人立于操作台前，桌面左侧为亮绿色称重垫（Weighing Pad），中部排列待处理包裹。左臂经双手交接后正将首个包裹精准抬升至右侧深绿色目标箱（Collection Bin）上方准备入槽，右臂保持安全待命姿态（由 [scene1/kinematics.py](https://www.google.com/search?q=https://github.com/Krist21a/scene1-ac-v1/blob/main/scene1/kinematics.py)、[scene1/bin\_layout.py](https://www.google.com/search?q=https://github.com/Krist21a/scene1-ac-v1/blob/main/scene1/bin_layout.py) 与底层 [controllers/](https://www.google.com/search?q=https://github.com/Krist21a/scene1-ac-v1/tree/main/controllers) A+C 控制器协同驱动）。<br/><br/>*The bimanual humanoid stands before the workspace with the green weighing pad on the left and remaining parcels lined up at the center. The left arm elevates the parcel into the collection bin on the right while the right arm maintains a collision-free standby posture.* | **实时连通域分割与多目标追踪**：头部相机俯视视角下，[scene1/vision.py](https://www.google.com/search?q=https://github.com/Krist21a/scene1-ac-v1/blob/main/scene1/vision.py) 与 C 原生扩展 [scene1/components\_native.c](https://www.google.com/search?q=https://github.com/Krist21a/scene1-ac-v1/blob/main/scene1/components_native.c) 实时框出目标与质心（绿点）——画面中左臂夹爪正在箱内释放 `orange (1)`，同时视觉系统清晰追踪箱内已落稳的 `yellow (1)`、`brown (1)` 以及桌面待抓的 `blue (1)` 包裹。<br/><br/>*From the head RGB-D camera perspective, the vision pipeline segments and tracks parcel bounding boxes and centroids in real time—verifying `orange (1)` placement alongside settled `yellow (1)` and `brown (1)` parcels inside the bin and `blue (1)` waiting on the table.* |
+
+### 双臂交接 / Bimanual Handover
+
+![Bimanual Parcel Handover](docs/assets/bimanual_handover.jpg)
+
+双臂在胸前协同持握包裹，展示交接阶段的操作姿态。
+*Both arms coordinate around the parcel in front of the torso during the handover phase.*
 
 ## 3. 系统架构与工作流 / Architecture & Workflow
 
